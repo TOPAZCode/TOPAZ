@@ -1,0 +1,3 @@
+      complex(8) u(8,16), ux(8,16), uy(8,16), uz(8,16),uyc(8,16)
+      COMMON /ucom/ u, uz, ux, uy, uyc
+

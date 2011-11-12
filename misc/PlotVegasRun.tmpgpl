@@ -1,0 +1,23 @@
+reset
+set term postscript color
+set output "dummyFILE.eps"
+set style line 1 lt 1 lc rgb "black" lw 2
+set style line 2 lt 1 lc rgb "yellow"
+
+set style fill solid 0.25 border
+
+file1="dummyFILE.status"
+set xrange[0.5:dummyMAXIT+0.5]
+
+set xtics 1
+set xlabel "iterations"
+set ylabel "integral"
+set key invert
+
+plot file1 using ($1):($4-$5):($4+$5) title "accumulated integral" w filledcurves fs pattern 0 lt 2, \
+     file1 using ($1):($4-$5) notitle w lines lt 2, \
+     file1 using ($1):($4+$5) notitle w lines lt 2, \
+     file1 using ($1):($2):($3) title "integral"  w errorbars ls 1
+
+
+

@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+\setlength\parindent{0in}
+\setlength\oddsidemargin{0.7cm}
+
+\begin{document}
+\underline{Benchmark comparison: $t\bar t$ production, MCFM~vs.~$D$-dim. generalized unitarity }
+\\
+
+{\bf setup:} Intel Core2 Quad CPU Q6600 @ 2.40GHz\\
+my program (ME): Rocket-like implementation, compiled with {\it ifort -O2}\\
+MCFM: fully analytic implementation, compiled with {\it g77 -O3}\\
+
+{\bf process:} $a b \rightarrow t \bar t \quad$ (on-shell tops, nproc=157)\\
+Time(xx) = averaged evaluation time for unpolarized cross section, incl. calls to phase space generator and pdfs\\
+
+\begin{tabular}{c|c|c|c}
+{\bf tree level} & Time(ME)/event & Time(MCFM)/event & Time(ME)/Time(MCFM) \\ \hline
+$gg\rightarrow t \bar t$        &  27.6 $\mu$sec & 18 $\mu$sec &  1.5 \\
+$q \bar q \rightarrow t \bar t$ &  15 $\mu$sec   & 18 $\mu$sec &  0.8 \\
+\end{tabular}
+\\[10mm]
+
+\begin{tabular}{c|c|c|c}
+{\bf 1-loop} & Time(ME)/event & Time(MCFM)/event & Time(ME)/Time(MCFM) \\ \hline
+$gg\rightarrow t \bar t$        & 230 msec   & 94 $\mu$sec  & 2447  \\
+$q \bar q \rightarrow t \bar t$ &  44 msec   & 110 $\mu$sec  & 400   \\
+\end{tabular}
+\\[10mm]
+
+\begin{tabular}{c|c|c|c}
+{\bf real+dipoles} & Time(ME)/event & Time(MCFM)/event & Time(ME)/Time(MCFM) \\ \hline
+$gg\rightarrow t \bar t g$      & 720 $\mu$sec   & 555 $\mu$sec  & 7.2  \\
+\end{tabular}
+
+
+
+
+
+
+\end{document}

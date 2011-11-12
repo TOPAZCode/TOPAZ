@@ -1,0 +1,18 @@
+total cs:
+  LO:  229.8 fb
+  NLO: 256.3 fb
+
+gg+qg= 88% of total cs
+
+Intel Xeon at 2.8GHz
+
+gg-channel:
+  LO: 114.4 fb
+      61min/8.3M events = 0.4ms/event
+  1L: 41.9 fb, 4 runs with 5200min/0.64M events = 487 ms/event
+      DUW: 30ms/event (3GHz P4)
+
+qg-channel:
+  LO: 87 fb
+  1L: 37.4 fb, 4 runs with 4200min/0.68M events = 370 ms/event
+

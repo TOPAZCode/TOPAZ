@@ -1,0 +1,41 @@
+UPDATED NUMBERS
+ 1.) tree level:  8.719726413028719E-002
+ 2.) Summe aller 1-loop Beiträge:  0.232526037680776
+ 2.) Summe aller 1-loop Beiträge:  1.02473679142826  ------- updated
+ 2.) Summe aller 1-loop Beiträge:  3.07375761479532  ------- updated
+ 3.) 2.) ohne geschlossene fermion loops:  0.232526037680776
+ 3.) 2.) ohne geschlossene fermion loops:  1.36924262700953  ------- updated
+ 3.) 2.) ohne geschlossene fermion loops:  1.92464618464680  ------- updated
+ 4.) alle fermion loops:  0.000000000000000E+000
+ 4.) alle fermion loops:  0.348789056512492
+ 4.) alle fermion loops:   1.14911879122698
+ 5.) leading color (LC), Q_top term:  0.190024348481315
+ 5.) leading color (LC), Q_top term:  0.944863611323056
+ 5.) leading color (LC), Q_top term:   1.55094088532582
+ 6.) LC, Q_q term:  8.477654583699590E-002
+ 6.) LC, Q_q term:  0.421536891930039
+ 6.) LC, Q_q term:   1.46355639926496
+ 7.) subLC, Q_top term:  2.111381649792085E-002
+ 7.) subLC, Q_top term:  0.140413499140955 ------- updated
+ 7.) subLC, Q_top term:  0.656119889017583 ------- updated
+ 8.) subLC, Q_q term:  9.419616204105915E-003
+ 8.) subLC, Q_q term:  6.264340309561027E-002 ------- updated
+ 8.) subLC, Q_q term:  0.495505215483581 ------- updated
+ 9a.) top loop, Q_top term:  0.000000000000000E+000
+ 9a.) top loop, Q_top term:  4.222763299583904E-002
+ 9a.) top loop, Q_top term:  0.148710273470382
+ 9b.) top loop, Q_q term:  0.000000000000000E+000
+ 9b.) top loop, Q_q term:  1.883923240822340E-002
+ 9b.) top loop, Q_q term:  5.573631056885688E-002
+ 9c.) top loop, Q_f term:  0.000000000000000E+000
+ 9c.) top loop, Q_f term:  1.488261237342192E-011
+ 9c.) top loop, Q_f term:  2.121337037795095E-011
+ 10a.) light loops, Q_top term:  0.000000000000000E+000
+ 10a.) light loops, Q_top term:  0.211138164979211
+ 10a.) light loops, Q_top term:  0.767718482364162
+ 10b.) light loops, Q_q term:  0.000000000000000E+000
+ 10b.) light loops, Q_q term:  9.419616204105015E-002
+ 10b.) light loops, Q_q term:  0.303658919372500
+ 10c.) light loops, summme über Q_f terms:  0.000000000000000E+000
+ 10c.) light loops, summme über Q_f terms:  4.039111546399252E-014
+ 10c.) light loops, summme über Q_f terms:  1.226691158143223E-013

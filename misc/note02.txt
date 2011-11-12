@@ -1,0 +1,61 @@
+* add vegas random vars to main dipole routine
+   EvalDipoles_QQBTTBGG(p,sum_dip)  --> EvalDipoles_QQBTTBGG(p,yRndDK,sum_dip)
+   with real(8) :: yRndDK(1:8) and store it globally but private in the module
+
+* add weight var to main dipole routine
+  EvalDipoles_QQBTTBGG(p,yRndDK,sum_dip)  --> EvalDipoles_QQBTTBGG(p,yRndDK,Wgt,sum_dip)
+  Wgt will include pdfs and all other prefactors
+  (here I assume that we don't want to evaluate the pdfs with a dynamic scale!)
+
+* introduce top decay routine: (should replace call to top spinors somewhere in GenerateEventxxx)
+   routines to generate decay PS:  (only if the switch "TopDecays.ge.1", "TopDecays.eq.0" means NO top decay)
+      call EvalPhasespace_TopDecay(MomExt(0:3,1),yRndDK(1:4),.false.,MomDK(0:3,1:3),PSWgt2)
+      call EvalPhasespace_TopDecay(MomExt(0:3,2),yRndDK(5:8),.false.,MomDK(0:3,4:6),PSWgt3)
+   where MomExt(0:3,i) is the momentum array for top and antitop,
+   MomDK is the momentum array for the decay particles with MomDK(0:3,1:6): 1=BotBar, 2=lep-, 3=NeuBar, 4=Bot, 5=lep+, 6=Neu
+   PSWgt2/PSWgt3 are additional PS weights
+
+  routines to generate top decay spinor:  (only if the switch "TopDecays.ge.1")
+      call TopDecay(TopQuark(1),.false.,0,MomDK(0:3,1:3))
+      call TopDecay(TopQuark(2),.false.,0,MomDK(0:3,4:6))
+  where TopQuark(1)/TopQuark(2) are particle structures (type(Particle)) fot top and antitop, i.e. it should be something like ExtParticles(1)/ExtParticles(2)
+
+  helicity loops need to be truncted  (only if the switch "TopDecays.ge.1")
+
+
+* introduce PS cuts and binning routines
+    replace "call jetktalg(q,5,pjetout,Njet,weight)"
+    by      "call Kinematics(3,MomExt(0:3,1:5),MomDK(0:3,1:6),applyPSCut,NBin(1:NumHistograms))"
+    the jet algorithm is sitting inside this routine, it will return if the event passes the PS cuts (via applyPSCut) AND
+    it returns an array of integer numbers into which bin the event falls for each histogram
+    my conventions for the momentum arrays in "Kinematics" are usually:
+         MomExt(0:3,1:4): 1=In_left, 2=In_right, 3=TopBar, 4=Top
+         MomDK(0:3,1:6) : 1=BotBar, 2=lep-, 3=NeuBar, 4=Bot, 5=lep+, 6=Neu
+    with 2-->3/6 kinematics.
+    If this is convention is inconvenient we can change it! I have not yet implemented anything inside of "Kinematics".
+
+
+    if the event passes the cuts the dipole result needs to be thrown into the histogram at the very end of the routine:
+      do NHisto=1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+      enddo
+
+    remember that "Wgt", all PSWgts and a minus sign need to be multiplied first,
+    I will take care of what needs to be added in the routines "Kinematics" and "intoHisto".
+
+
+
+* in some modules a "first_time" if-condition needs to be introduced around the "InitTrees","InitProcess_xxx" and "LinkTreeParticles" routines
+  also the variables "ExtParticles" and "TreeAmpsDip" have to be declared with a "save" statement
+  see mod_Dipoles_QQBTTBGG.f90 for example
+
+
+
+
+
+
+
+
+
+
+

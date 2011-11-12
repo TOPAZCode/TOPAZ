@@ -1,0 +1,25 @@
+      vel=dsqrt(1d0-m_top**2/EHat**2)
+      theta=pi/3D0
+!     bar t momentum
+
+     Mom(1,1) = -EHat
+     Mom(2,1)=  EHat*dsin(theta)
+     Mom(3,1) = (0d0)
+     Mom(4,1) = EHat*dcos(theta)
+
+     Mom(1,2) = -EHat
+     Mom(2,2) = -EHat*dsin(theta)
+     Mom(3,2) = (0d0)
+     Mom(4,2) = -EHat*dcos(theta)
+
+     Mom(1,3) = (EHat)
+     Mom(2,3) = (0d0)
+     Mom(3,3) = (0d0)
+     Mom(4,3) = (vel*EHat)
+
+     Mom(1,4) = (EHat)
+     Mom(2,4) = (0d0)
+     Mom(3,4) = (0d0)
+     Mom(4,4) = (-vel*EHat)
+
+

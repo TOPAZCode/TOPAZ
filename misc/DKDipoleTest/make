@@ -1,0 +1,6 @@
+echo compiling DKDipoleTestBBBar.f90
+
+
+
+
+ifort -check bounds -check pointer -warn interfaces -ftrapuv -vec-report0 -module /home/schulze/projects/ttbjets/modules t_bwpuub.o c_swpuub.o c_swpssb.o t_bwpbbb.o t_bwp.o t_bwpg.o t_bwpgg.o switchmom.o /home/schulze//lib/HELAS-3.0/coupsm.o /home/schulze/lib/HELAS-3.0/ixxxxx.o  /home/schulze/lib/HELAS-3.0/vxxxxx.o  /home/schulze/lib/HELAS-3.0/fvoxxx.o  /home/schulze/lib/HELAS-3.0/iovxxx.o  /home/schulze/lib/HELAS-3.0/fvixxx.o   /home/schulze/lib/HELAS-3.0/oxxxxx.o    /home/schulze/lib/HELAS-3.0/jioxxx.o   /home/schulze/lib/HELAS-3.0/vvvxxx.o  /home/schulze/lib/Rocky/genps.o  /home/schulze/projects/ttbjets/objects/boost.o  /home/schulze/projects/ttbjets/objects/mod_Process.o /home/schulze/projects/ttbjets/objects/mod_Parameters.o  /home/schulze/projects/ttbjets/objects/mod_MyRecurrence.o  /home/schulze/projects/ttbjets/objects/mod_MyWeylRecurrence.o  /home/schulze/projects/ttbjets/objects/mod_Misc.o  /home/schulze/projects/ttbjets/objects/mod_IntegerPartition.o  /home/schulze/projects/ttbjets/objects/mod_Permutations.o  /home/schulze/projects/ttbjets/objects/mod_Amplitudes.o    DKDipoleTestBBBar.f90
