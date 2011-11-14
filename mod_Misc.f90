@@ -2237,6 +2237,61 @@ END SUBROUTINE
 
 
 
+      function vbss(Dv,pb,p)
+      implicit none
+      complex(8), intent(in) :: pb(:),p(:)
+      integer :: Dv
+      complex(8) :: vbss(1:Dv)
+
+          vbss(:) = -(0d0,1d0)/2d0 * ( pb(:)-p(:) )
+
+      end function vbss
+
+
+      function vsbs(Dv,pb,p)
+      implicit none
+      complex(8), intent(in) :: pb(:),p(:)
+      integer :: Dv
+      complex(8) :: vsbs(1:Dv)
+
+          vsbs(:) = +(0d0,1d0)/2d0 * ( pb(:)-p(:) )
+
+      end function vsbs
+
+
+
+      function vggss(Dv,e1)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      integer :: Dv
+      complex(8) :: vggss(1:Dv)
+
+          vggss(:) = 1d0 * e1(:)
+
+      end function vggss
+
+
+      function vssgg(Dv,e1)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      integer :: Dv
+      complex(8) :: vssgg(1:Dv)
+
+          vssgg(:) = 1d0 * e1(:)
+
+      end function vssgg
+
+
+      function vsgsg(Dv,e1)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      integer :: Dv
+      complex(8) :: vsgsg(1:Dv)
+
+          vsgsg(:) = -1d0 * e1(:)
+
+      end function vsgsg
+
 
 
       function vbqq(Dv,sp1,sp2)

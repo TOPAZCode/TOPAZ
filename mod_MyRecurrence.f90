@@ -62,8 +62,6 @@ private    :: Cache_cur_g_2f_Dv4,Cache_cur_g_2f_Dv6,Cache_cur_g_2f_Dv8,Cache_cur
 !DEC$ ENDIF
 
 
-! integer :: Cache_cur_f_2f_hits,Cache_cur_f_2f_miss
-
 public  :: cur_g,cur_f_2f,cur_g_2f,cur_f_4f,cur_g_4f,cur_f_6f,cur_f_2f_massCT,cur_f_4f_massCT
 public  :: SetDim,InitCurrCache
 private :: PropCut,Dv,Ds,FourVecDot,Insertion,GluInsList_f_2f,AddGluCur,Cache_PartKey
@@ -91,43 +89,6 @@ return
 END SUBROUTINE
 
 
-
-! SUBROUTINE LinkTreeParticles(TheTreeAmp,TheParticles)
-! implicit none
-! type(TreeProcess) :: TheTreeAmp
-! type(Particle),target :: TheParticles(:)
-! integer :: iPart,PartRef,PartType,ig,iq
-!
-!    ig=0; iq=0;
-!    do iPart=1,TheTreeAmp%NumPart
-!       PartRef = TheTreeAmp%PartRef(iPart)
-!       PartType= TheTreeAmp%PartType(iPart)
-!       if( PartType.eq.10 ) then  ! PartType==Gluon
-!           ig=ig+1;
-!             TheTreeAmp%Gluons(ig)%PartType => TheParticles(PartRef)%PartType
-!             TheTreeAmp%Gluons(ig)%ExtRef   => TheParticles(PartRef)%ExtRef
-!             TheTreeAmp%Gluons(ig)%Mass     => TheParticles(PartRef)%Mass
-!             TheTreeAmp%Gluons(ig)%Mass2    => TheParticles(PartRef)%Mass2
-!             TheTreeAmp%Gluons(ig)%Helicity => TheParticles(PartRef)%Helicity
-!             TheTreeAmp%Gluons(ig)%Mom      => TheParticles(PartRef)%Mom
-!             TheTreeAmp%Gluons(ig)%Pol      => TheParticles(PartRef)%Pol
-!             if( PartType.ne.TheParticles(PartRef)%PartType ) print *,"Error1 in LinkTreeParticles"
-!       else ! PartType==Quark
-!           iq=iq+1;
-!             TheTreeAmp%Quarks(ig)%PartType => TheParticles(PartRef)%PartType
-!             TheTreeAmp%Quarks(ig)%ExtRef   => TheParticles(PartRef)%ExtRef
-!             TheTreeAmp%Quarks(ig)%Mass     => TheParticles(PartRef)%Mass
-!             TheTreeAmp%Quarks(ig)%Mass2    => TheParticles(PartRef)%Mass2
-!             TheTreeAmp%Quarks(ig)%Helicity => TheParticles(PartRef)%Helicity
-!             TheTreeAmp%Quarks(ig)%Mom      => TheParticles(PartRef)%Mom
-!             TheTreeAmp%Quarks(ig)%Pol      => TheParticles(PartRef)%Pol
-!             if( PartType.ne.TheParticles(PartRef)%PartType ) print *,"Error2 in LinkTreeParticles"
-!       endif
-!    enddo
-!    if( ig.ne.TheTreeAmp%NumGlu(0) .OR. iq.ne.TheTreeAmp%NumQua ) print *,"Error3 in LinkTreeParticles"
-!
-! return
-! END SUBROUTINE
 
 
 
@@ -3418,6 +3379,216 @@ END FUNCTION
 
 
 
+FUNCTION cur_f_ffss(Gluons,Quarks,Scalars,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
+implicit none
+integer :: NumGlu(0:4)
+type(PtrToParticle) :: Gluons(1:),Quarks(2:2),Scalars(3:4)
+integer :: tag_f
+integer,target :: TmpExtRef
+complex(8) :: res(1:Ds),tmp(1:Ds)
+complex(8) :: ubar1(1:Ds)
+complex(8),target :: ubar0(1:Ds)
+complex(8) :: eps1(1:Dv)
+complex(8) :: eps2(1:Dv)
+type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(4)),TmpQuark(1:1)
+complex(8) :: PropFac1,PropFac2
+complex(8),target :: pmom1(1:Dv)
+complex(8) :: pmom2(1:Dv)
+integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b
+integer :: rIn,rOut,i,counter
+
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_4f"
+!DEC$ ENDIF
+
+
+   Res(:)=(0d0,0d0)
+      do n2a=0,NumGlu(2)
+      do n4a=0,NumGlu(4)
+         n2b = NumGlu(2)-n2a
+         n4b = NumGlu(4)-n4a
+
+         rIn =NumGlu(1)+n2a+1
+         rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+         Eps2 = cur_g_2s(Gluons(rIn:rOut),Scalars(3:4),(/1+n2b+NumGlu(3)+n4a,n2b,NumGlu(3),n4a/))
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Scalars(3)%Mom + Scalars(4)%Mom
+         PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+         if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
+         Eps2 = Eps2*PropFac1
+         do n1a=0,NumGlu(1)
+            n1b = NumGlu(1)-n1a
+            rIn =n1a+1
+            rOut=NumGlu(1)+n2a
+            ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,(/n2a+n1b,n1b,n2a/) )
+            if(n1b.ge.1 .or. n2a.ge.1) then
+               PMom2(:) = Quarks(2)%Mom + SumMom(Gluons,rIn,rOut)  ! can be moved outside the n1a-loop
+               PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
+               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) cycle
+               if( Quarks(2)%PartType.lt.0 ) then
+                  ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(2)%Mass*ubar1(:))*PropFac2
+               else
+                  ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(2)%Mass*ubar1(:))*PropFac2
+               endif
+            endif
+            if( Quarks(2)%PartType.lt.0 ) then
+               ubar0(:) = vbqg(ubar1,eps2)       ! re-checked
+            else
+               ubar0(:) = vqg(ubar1,eps2)        ! re-checked
+            endif
+
+            PMom1 = Quarks(2)%Mom+Scalars(3)%Mom+Scalars(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+            if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
+               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) cycle
+               if( Quarks(2)%PartType.lt.0 ) then
+                  ubar0(:) = (-spi2_(PMom1,ubar0)+Quarks(2)%Mass*ubar0(:))*PropFac1
+               else
+                  ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(2)%Mass*ubar0(:))*PropFac1
+               endif
+            endif
+
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => ubar0(:)
+            TmpQuark(1)%Mass => Quarks(2)%Mass
+            TmpQuark(1)%Mass2=> Quarks(2)%Mass2
+            TmpExtRef = -1
+            TmpQuark(1)%ExtRef => TmpExtRef
+            TmpQuark(1)%PartType => Quarks(2)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+         enddo
+      enddo
+      enddo
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+FUNCTION cur_f_ssff(Gluons,Quarks,Scalars,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
+implicit none
+integer :: NumGlu(0:4)
+type(PtrToParticle) :: Gluons(1:),Quarks(4:4),Scalars(2:3)
+integer :: tag_f
+integer,target :: TmpExtRef
+complex(8) :: res(1:Ds),tmp(1:Ds)
+complex(8) :: ubar1(1:Ds)
+complex(8),target :: ubar0(1:Ds)
+complex(8) :: eps1(1:Dv)
+complex(8) :: eps2(1:Dv)
+type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(4)),TmpQuark(1:1)
+complex(8) :: PropFac1,PropFac2
+complex(8),target :: pmom1(1:Dv)
+complex(8) :: pmom2(1:Dv)
+integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b
+integer :: rIn,rOut,i,counter
+
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_4f"
+!DEC$ ENDIF
+
+
+      do n1a=0,NumGlu(1)
+      do n3b=0,NumGlu(3)
+         n1b = NumGlu(1)-n1a
+         n3a = NumGlu(3)-n3b
+         rIn =n1a+1
+         rOut=NumGlu(1)+NumGlu(2)+n3a
+         Eps2 = cur_g_2s(Gluons(rIn:rOut),Scalars(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Scalars(2)%Mom + Scalars(3)%Mom
+         PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+         if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
+         Eps2 = Eps2*PropFac1
+
+         do n4a=0,NumGlu(4)
+            n4b = NumGlu(4)-n4a
+            rIn =NumGlu(1)+NumGlu(2)+n3a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+            ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/NumGlu(3)+n4a-n3a,n3b,n4a/) )
+            if(n3b.ge.1 .or. n4a.ge.1) then
+               PMom2(:) = Quarks(4)%Mom + SumMom(Gluons,rIn,rOut)
+               PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
+               if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) cycle
+               if( Quarks(4)%PartType.lt.0 ) then
+                  ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
+               else
+                  ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(4)%Mass*ubar1(:))*PropFac2
+               endif
+            endif
+            if( Quarks(4)%PartType.lt.0 ) then
+               ubar0(:) = vgbq(eps2,ubar1)   !! changed from vqg(ubar1,eps2)       ! re-checked
+            else
+               ubar0(:) = vgq(eps2,ubar1)   !! changed from vbqg(ubar1,eps2)       ! re-checked
+            endif
+
+            PMom1 = Scalars(2)%Mom+Scalars(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+            if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
+               if( abs(sc_(PMom1,PMom1)-Quarks(4)%Mass2).lt.PropCut ) cycle
+               if( Quarks(4)%PartType.lt.0 ) then
+                  ubar0(:) = (-spi2_(PMom1,ubar0)+Quarks(4)%Mass*ubar0(:))*PropFac1
+               else
+                  ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(4)%Mass*ubar0(:))*PropFac1
+               endif
+            endif
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => ubar0(:)
+            TmpQuark(1)%Mass => Quarks(4)%Mass
+            TmpQuark(1)%Mass2=> Quarks(4)%Mass2
+            TmpExtRef = -1
+            TmpQuark(1)%ExtRef => TmpExtRef
+            TmpQuark(1)%PartType => Quarks(4)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+         enddo
+      enddo
+      enddo
+
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
 FUNCTION cur_s_sffs(Gluons,Quarks,Scalar,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:4)
@@ -3436,9 +3607,187 @@ integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b
 integer :: rIn,rOut,i,counter
 
 res = 0d0
+call Error("this current is not yet implemented: cur_s_sffs")
 
 return
 END FUNCTION
+
+
+
+
+
+FUNCTION cur_g_2s(Gluons,Scalars,NumGlu) result(Res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu(0) is the number of all gluons
+implicit none
+integer :: NumGlu(0:3),i,counter
+type(PtrToParticle) :: Gluons(1:),Scalars(1:2)
+integer :: rIn,rOut,n1a,n1b,n1c,n2a,n2b,n2c,n3a,n3b,n3c
+integer,target :: TmpExtRef
+complex(8) :: Res(1:Dv)
+complex(8) :: sc1,sc2
+complex(8),target :: Eps1(1:Dv)
+complex(8) :: Eps2(1:Dv)
+complex(8) :: EpsX(1:Dv)
+type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(3)+1)
+complex(8) :: PMom1(1:Dv),PMom2(1:Dv),PMom4(1:Dv)
+complex(8),target :: PMom3(1:Dv)
+complex(8) :: PropFac1,PropFac2,PropFac3,PropFac4
+integer :: PartKey,HelKey,CurrKey,Hel_Tmp
+
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-1-NumGlu(1)-NumGlu(2)-NumGlu(3).ne.0 ) print *, "wrong number of gluons in cur_g_2s"
+!DEC$ ENDIF
+
+   res = (0d0,0d0)
+   do n1a=0,NumGlu(1)
+   do n3a=0,NumGlu(3)
+   do n2a=0,NumGlu(2)
+   do n1c=0,NumGlu(1)-n1a
+   do n2c=0,NumGlu(2)-n2a
+   do n3c=0,NumGlu(3)-n3a
+
+      if( n1c.gt.0 .and. (n2c+n3c).gt.0  ) cycle
+      if( n2c.gt.0 .and. (n1c+n3c).gt.0  ) cycle
+      if( n3c.gt.0 .and. (n1c+n2c).gt.0  ) cycle
+
+      n1b=NumGlu(1)-n1a-n1c
+      n2b=NumGlu(2)-n2a-n2c
+      n3b=NumGlu(3)-n3a-n3c
+
+      ! Fer1
+      rIn=n1a+n1c+1
+      rOut=NumGlu(1)+n2a
+      PMom1(:) = Scalars(1)%Mom(:)+ SumMom(Gluons,rIn,rOut)
+      sc1 = cur_s_2s(Gluons(rIn:rOut),Scalars(1:1),(/n1b+n2a,n1b,n2a/))
+      if(n1b.ge.1 .or. n2a.ge.1) then
+         PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Scalars(1)%Mass2)
+         if( abs(sc_(PMom1,PMom1)-Scalars(1)%Mass2).lt.PropCut ) cycle
+         sc1 = sc1*PropFac1
+      endif
+
+      ! Fer2
+      rIn=NumGlu(1)+n2a+n2c+1
+      rOut=NumGlu(1)+NumGlu(2)+n3a
+      PMom2(:) = Scalars(2)%Mom(:)+ SumMom(Gluons,rIn,rOut)
+      sc2 = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n2b+n3a,n2b,n3a/))
+      if(n2b.ge.1 .or. n3a.ge.1) then
+         PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(2)%Mass2)
+         if( abs(sc_(PMom2,PMom2)-Scalars(2)%Mass2).lt.PropCut ) cycle
+         sc2 = sc2*PropFac1
+      endif
+
+      if( n1c.gt.0 ) then
+          rIn =n1a+1
+          rOut=n1a+n1c
+          EpsX(:) = cur_g(Gluons(rIn:rOut),1+n1c)
+          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2
+      elseif( n2c.gt.0) then
+          rIn =NumGlu(1)+n2a+1
+          rOut=NumGlu(1)+n2a+n2c
+          EpsX(:) = cur_g(Gluons(rIn:rOut),1+n2c)
+          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2
+      elseif( n3c.gt.0 ) then
+          rIn =NumGlu(1)+NumGlu(2)+n3a+1
+          rOut=NumGlu(1)+NumGlu(2)+n3a+n3c
+          EpsX(:) = cur_g(Gluons(rIn:rOut),1+n3c)
+          Eps1(:) = vsgsg(Dv,EpsX) * sc1*sc2
+      else
+          Eps1(:) = vbss(Dv,PMom1(:),PMom2(:))*sc1*sc2    !   convention unclear here!  vbss or vsbs ??
+      endif
+
+      PMom3(:) = Scalars(1)%Mom(:)+Scalars(2)%Mom(:) + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+n3c)
+
+
+      counter=1
+      rIn =1
+      rOut=n1a
+      do i=rIn,rOut
+         call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+         counter=counter+1
+      enddo
+      TmpGluons(counter)%Mom => PMom3(:)
+      TmpGluons(counter)%Pol => Eps1(:)
+      TmpExtRef = -1
+      TmpGluons(counter)%ExtRef => TmpExtRef
+      counter=counter+1
+      rIn =NumGlu(1)+NumGlu(2)+n3a+n3c+1
+      rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)
+      do i=rIn,rOut
+         call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+         counter=counter+1
+      enddo
+      Eps2(:) = cur_g(TmpGluons(1:counter-1),1+n1a+n3b+1)
+
+
+      if(n1a.ge.1 .or. n3b.ge.1) then
+         PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)
+         if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
+         Eps2(:) = Eps2(:)*PropFac3
+      endif
+
+      Res(:) = Res(:) + Eps2(:)
+   enddo
+   enddo
+   enddo
+   enddo
+   enddo
+   enddo
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FUNCTION cur_g_2s2f(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
+implicit none
+integer,intent(in) :: NumGlu(0:5)
+type(PtrToParticle) :: Gluons(1:),Scalars(1:),Quarks(1:)
+! integer :: na,nb,nc,nd,ne,nf,ng,nh,ni,nj,nk
+! integer :: rIn,rOut
+! integer :: tag_f,counter,i
+complex(8) :: res(Dv)
+! type(PtrToParticle) :: TmpGluons(1:2+NumGlu(1)+NumGlu(3)+NumGlu(5))
+! complex(8),target :: TmpMom1(1:Dv),TmpMom2(1:Dv)
+! integer,target :: TmpExtRef1,TmpExtRef2
+complex(8),target :: Eps1(1:Dv)
+complex(8),target :: Eps2(1:Dv)
+! complex(8) :: Eps3(1:Dv)
+! complex(8) :: u1(1:Ds)
+! complex(8) :: ubar2(1:Ds)
+complex(8) :: PropFac1,PropFac2
+complex(8) :: PMom1(1:Dv)
+complex(8) :: PMom2(1:Dv)
+! complex(8) :: PMom3(1:Dv)
+! complex(8) :: PMom4(1:Dv)
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-1-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5).ne.0 ) print *, "wrong number of gluons in cur_g_4f"
+!DEC$ ENDIF
+
+   if( Numglu(1).gt.0 .or. Numglu(3).gt.0 .or. NumGlu(5).gt.0 ) then
+        call Error("this current is not yet implemented: cur_g_2s2f")
+   endif
+
+!    copy from cur_g_4f
+
+   res(:) = vggg(Eps1,PMom1,Eps2,PMom2)
+
+
+return
+END FUNCTION
+
 
 
 
