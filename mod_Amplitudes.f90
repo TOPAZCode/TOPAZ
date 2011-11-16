@@ -198,8 +198,9 @@ logical :: Boson
               Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:4))
               Res(2:Ds) = 0d0
           elseif( IsAScalar(TreeProc%PartType(1)) .and. IsAQuark(TreeProc%PartType(1+TreeProc%NumGlu(1)+1))  ) then
-              Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:4))
-              Res(2:Ds) = 0d0
+!               Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:4))
+!               Res(2:Ds) = 0d0
+             call Error("current doesn't exist yet")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.4 ) then!  4 quarks

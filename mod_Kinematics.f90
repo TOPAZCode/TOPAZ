@@ -75,16 +75,16 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
     pT_miss_cut = 50d0*GeV
     eta_lep_cut = 2.5d0
 
-ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with hadr.top, lept. Atop decay OR lept.top, hadr.Atop decay at TEV
+ELSEIF( ObsSet.EQ.4 ) THEN! ! set of observables for ttb production with hadr. Atop, lept. top decay
     Rsep_jet    = 0.4d0
-    pT_bjet_cut = 15d0*GeV
+    pT_bjet_cut = 20d0*GeV
     eta_bjet_cut= 2.0d0
-    pT_jet_cut  = 15d0*GeV
+    pT_jet_cut  = 20d0*GeV
     eta_jet_cut = 2.0d0
     pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 1.1d0
+    eta_lep_cut = 2.0d0
     pT_miss_cut = 20d0*GeV
-    HT_cut      = 200d0*GeV
+    HT_cut      = 220d0*GeV
 
 ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top, lept. Atop decay at LHC
     Rsep_jet    = 0.4d0
@@ -98,14 +98,15 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay at LHC
-    Rsep_jet    = 0.4d0
+    Rsep_jet    = 0.5d0
     pT_bjet_cut = 20d0*GeV
     eta_bjet_cut= 2.0d0
     pT_jet_cut  = 20d0*GeV
-    eta_jet_cut = 2.5d0
+    eta_jet_cut = 2.0d0
     pT_lep_cut  = 20d0*GeV
     eta_lep_cut = 2.5d0
     pT_miss_cut = 20d0*GeV
+
 
 ELSEIF( ObsSet.EQ.7 ) THEN! set of observables for ttb production with lept. top and J/Psi fragmentation, hadr. Atop decay at LHC
     Rsep_jet    = 0.5d0
@@ -762,8 +763,8 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
 
 ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with semi hadronic decay
           if(Collider.ne.2)  call Error("Collider needs to be TEV!")
-          if(TopDecays.ne.3 .and. TopDecays.ne.4) call Error("TopDecays needs to be 3 or 4!")
-          NumHistograms = 11
+          if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
+          NumHistograms = 12
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -834,6 +835,12 @@ ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with semi hadr
           Histo(11)%BinSize= 20d0*GeV
           Histo(11)%LowVal = 20d0*GeV
           Histo(11)%SetScale= 100d0
+
+          Histo(12)%Info   = "pT_ttbar"
+          Histo(12)%NBins  = 40
+          Histo(12)%BinSize= 15d0*GeV
+          Histo(12)%LowVal = 0d0
+          Histo(12)%SetScale= 100d0
 
 
 
@@ -919,7 +926,7 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
-          NumHistograms = 11
+          NumHistograms = 12
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -992,6 +999,11 @@ ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top
           Histo(11)%LowVal = 20d0*GeV
           Histo(11)%SetScale= 100d0
 
+          Histo(12)%Info   = "pT_ttbar"
+          Histo(12)%NBins  = 40
+          Histo(12)%BinSize= 15d0*GeV
+          Histo(12)%LowVal = 0d0
+          Histo(12)%SetScale= 100d0
 
 
 
@@ -5839,16 +5851,16 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
         RETURN
     endif
 
+    if( abs(eta_lepM).gt.eta_lep_cut .OR. abs(eta_lepP).gt.eta_lep_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
     if( pT_miss.lt.pT_miss_cut ) then
        applyPSCut = .true.
         RETURN
     endif
 
-
-    if( abs(eta_lepM).gt.eta_lep_cut .OR. abs(eta_lepP).gt.eta_lep_cut) then
-       applyPSCut = .true.
-        RETURN
-    endif
 
 
 
@@ -6007,7 +6019,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
 
 
 !-------------------------------------------------------
-elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. top, lept. Atop decay
+elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. Atop, lept. top decay
 
 !   request at least two b-jets
     if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
@@ -6044,10 +6056,12 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. top
     enddo
 
     NObsJet_Tree = 4! request two b-jets and at least two light jets
-    if( NObsJet.lt.NObsJet_Tree ) then
+!     if( NObsJet.lt.NObsJet_Tree ) then
+    if( NObsJet.ne.NObsJet_Tree ) then!!!    CAREFUL: this cuts out the additional hard jet: only for combination with ttbjet
         applyPSCut = .true.
         RETURN
     endif
+
 
     pT_lepP = get_PT(MomLept(1:4,3))
     eta_lepP = get_ETA(MomLept(1:4,3))
@@ -6090,6 +6104,16 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. top
     endif
 
 
+!   construct hadr. W momentum
+    MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
+
+    if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+        pT_Top = get_pT(MomTops(1:4,1))
+    else
+        pT_Top   = -1d0
+    endif
+
+
 
 ! binning
     NBin(1) = WhichBin(1,pT_ATop)
@@ -6103,6 +6127,7 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. top
     NBin(9) = WhichBin(9,ET_miss)
     NBin(10)= WhichBin(10,HT)
     NBin(11)= WhichBin(11,m_lb)
+    NBin(12)= WhichBin(12,pT_Top)
 
 
 
@@ -6147,9 +6172,12 @@ elseif( ObsSet.eq.6 ) then! set of observables for ttb production with hadr. Ato
 
     NObsJet_Tree = 4! request two b-jets and at least two light jets
     if( NObsJet.lt.NObsJet_Tree ) then
+!     if( NObsJet.ne.NObsJet_Tree ) then!!!    CAREFUL: this cuts out the additional hard jet: only for combination with ttbjet
         applyPSCut = .true.
         RETURN
     endif
+
+
 
     pT_lepP = get_PT(MomLept(1:4,3))
     eta_lepP = get_ETA(MomLept(1:4,3))
@@ -6186,6 +6214,21 @@ elseif( ObsSet.eq.6 ) then! set of observables for ttb production with hadr. Ato
         RETURN
     endif
 
+    if( HT.lt.HT_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+
+!   construct hadr. W momentum
+    MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
+    if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+        pT_Top = get_pT(MomTops(1:4,1))
+    else
+        pT_Top   = -1d0
+    endif
+
 
 
 ! binning
@@ -6200,10 +6243,7 @@ elseif( ObsSet.eq.6 ) then! set of observables for ttb production with hadr. Ato
     NBin(9) = WhichBin(9,ET_miss)
     NBin(10)= WhichBin(10,HT)
     NBin(11)= WhichBin(11,m_lb)
-
-
-
-
+    NBin(12)= WhichBin(12,pT_Top)
 
 
 

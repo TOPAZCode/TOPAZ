@@ -1049,9 +1049,9 @@ implicit none
 IF( PDFSET.EQ.1 ) THEN! MRST/MSTW
 ! no initialization necessary
   IF( NLOPARAM.EQ.2) THEN
-      PDFSetString = "MSTW2008 NLO (mstw2008nlo.00.dat)"
+      PDFSetString = " MSTW2008 NLO (mstw2008nlo.00.dat)"
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
-      PDFSetString = "MSTW2008 LO (mstw2008lo.00.dat)"
+      PDFSetString = " MSTW2008 LO (mstw2008lo.00.dat)"
   ENDIF
 
 
@@ -1060,14 +1060,15 @@ ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
   IF( NLOPARAM.EQ.2) THEN
 !       call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
 !       call SetCtq6(200) !  updated CTEQ6.1M Standard MSbar scheme   0.118     326   226    cteq6m.tbl
-!        call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
-     call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
-     PDFSetString = "CTEQ10 NLO (ct10.00.pds)"
-     print *, "check that in cteq2mrst.f ct10 is really called!"; stop
+     call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
+     PDFSetString = " CTEQ6.6M NLO (ctq66.00.pds)"
+!      call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
+!      PDFSetString = "CTEQ10 NLO (ct10.00.pds)"
+!      print *, "check that in cteq2mrst.f ct10 is really called!"; stop
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
      call SetCtq6(4)  ! CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
   !     call SetCtq6(3)  ! CTEQ6L  Leading Order            0.118**   326   226    cteq6l.tbl
-     PDFSetString = "CTEQ6L1 LO (cteq6l.tbl)"
+     PDFSetString = " CTEQ6L1 LO (cteq6l.tbl)"
   ENDIF
 ENDIF
 

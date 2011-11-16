@@ -44,16 +44,16 @@ real(8), public, parameter :: m_Z     = 91.188d0*GeV
 real(8), public, parameter :: m_W     = 80.419d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
-real(8), public, parameter :: m_HTop  = 1000d0*GeV
-real(8), public, parameter :: m_A0    = 200d0*GeV
-real(8), public, parameter :: m_BH    = 200d0*GeV! remember: changes here require full re-compilation!
+real(8), public, parameter :: m_HTop  = 600d0*GeV
+real(8), public, parameter :: m_A0    = 50d0*GeV
+real(8), public, parameter :: m_BH    = 50d0*GeV! remember: changes here require full re-compilation!
 real(8), public            :: Ga_HTop
 real(8), public            :: Ga_Htop_A0Top
 real(8), public            :: Ga_Htop_BHTop
-real(8), public, parameter :: m_STop  = 1000d0*GeV
+real(8), public, parameter :: m_STop  = 600d0*GeV
 real(8), public            :: Ga_STop
 real(8), public            :: Ga_Stop_ChiTop
-real(8), public, parameter :: m_Chi   = 200d0*GeV
+real(8), public, parameter :: m_Chi   = 50d0*GeV
 
 real(8), public, parameter :: Q_up    = 2d0/3d0
 real(8), public, parameter :: Q_dn    =-1d0/3d0
@@ -283,6 +283,9 @@ m_Bot   = m_Top ! this is NOT the bottom mass! it is the mass for massive partic
 
 IF( COLLIDER.EQ.1 ) THEN
    Collider_Energy  = 14000d0*GeV
+   if( ObsSet.eq.1 ) then
+        Collider_Energy  = 7000d0*GeV
+   endif
    if( ObsSet.eq.3 ) then
         Collider_Energy  = 7000d0*GeV
    endif
@@ -348,8 +351,8 @@ ENDIF
 
 
 !  chiral couplings for stop-Chi^0-top
-   IChiStt(+1) = 1d0/50d0
-   IChiStt(-1) = 1d0/50d0
+   IChiStt(+1) = 1d0/50d0  *1d0
+   IChiStt(-1) = 1d0/50d0  *1d0
 
 !  stop-->Chi^0 + top partial width!
    Ga_Stop_ChiTop = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 
@@ -360,8 +363,8 @@ ENDIF
 
 IF( XTOPDECAYS.EQ.2 ) THEN
 !  chiral couplings for HTop-A0-top
-!   IA0Tt(+1) = 1d0/50d0
-!   IA0Tt(-1) = 1d0/50d0
+!  IA0Tt(+1) = 1d0/50d0  *1d0
+!  IA0Tt(-1) = 1d0/50d0  *1d0
    IA0Tt(+1) = M_HTop/M_A0 * 1d0/50d0  *1d0
    IA0Tt(-1) = M_Top/M_A0  * 1d0/50d0  *1d0
 
@@ -372,8 +375,8 @@ IF( XTOPDECAYS.EQ.2 ) THEN
 
 ELSEIF( XTOPDECAYS.EQ.1 ) THEN
 !  chiral couplings for HTop-BH-top
-   IBHTt(+1) = 0d0
-   IBHTt(-1) = 1d-1
+   IBHTt(+1) = 1d0/50d0  *1d0
+   IBHTt(-1) = 1d0/50d0  *1d0
 
 !  HTop-->BH + top partial width!
    Ga_Htop_BHTop =SqrtLambda(m_Htop**2,m_top**2,m_BH**2)/(16d0*DblPi*m_Htop**3) * & 
