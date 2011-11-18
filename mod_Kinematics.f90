@@ -76,7 +76,7 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
     eta_lep_cut = 2.5d0
 
 ELSEIF( ObsSet.EQ.4 ) THEN! ! set of observables for ttb production with hadr. Atop, lept. top decay
-    Rsep_jet    = 0.4d0
+    Rsep_jet    = 0.5d0
     pT_bjet_cut = 20d0*GeV
     eta_bjet_cut= 2.0d0
     pT_jet_cut  = 20d0*GeV
@@ -6056,8 +6056,8 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. Ato
     enddo
 
     NObsJet_Tree = 4! request two b-jets and at least two light jets
-!     if( NObsJet.lt.NObsJet_Tree ) then
-    if( NObsJet.ne.NObsJet_Tree ) then!!!    CAREFUL: this cuts out the additional hard jet: only for combination with ttbjet
+    if( NObsJet.lt.NObsJet_Tree ) then
+!     if( NObsJet.ne.NObsJet_Tree ) then!!!    CAREFUL: this cuts out the additional hard jet: only for combination with ttbjet
         applyPSCut = .true.
         RETURN
     endif
@@ -6104,9 +6104,8 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. Ato
     endif
 
 
-!   construct hadr. W momentum
+!   construct ttb momentum
     MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
-
     if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
         pT_Top = get_pT(MomTops(1:4,1))
     else
