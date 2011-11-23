@@ -1,16 +1,19 @@
 *  generate color correlation matrix
 
-#define WorkPath "/home/schulze/projects/ttbjets/colors/"
+#define WorkPath "/home/schulze/projects/TOPAZ/colors/"
 #define LibPath "/home/schulze/lib/FeynArtsToForm/"
 *_____________________________________________________________________________________________*
-#define InputColorFile "/home/schulze/projects/ttbjets/colors/test_input.frm"
-#define OutputFile "/home/schulze/projects/ttbjets/colors/test_output"
+#define InputColorFile "/home/schulze/projects/TOPAZ/colors/test_input.frm"
+#define OutputFile "/home/schulze/projects/TOPAZ/colors/test_output"
 *_____________________________________________________________________________________________*
 #define setDSTm4 "0"
 #define setDST   "4"
 
 #define InterfereDiags1 "{1,2}";
 #define InterfereDiags2 "{1,2}";
+
+#define ColorCorrelator "SUNT(GluInt1,ColP1,Col1)*(-SUNT(GluInt1,Col2,ColP2))*SUND(Col3,ColP3)*SUND(Col4,ColP4)";
+
 *_____________________________________________________________________________________________*
 #include `LibPath'header2.frm;
 #include `InputColorFile';
