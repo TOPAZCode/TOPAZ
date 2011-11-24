@@ -984,7 +984,6 @@ IF( ObsSet.EQ.7 ) THEN
    call intoHisto(5,1,MInv_LB**2*EvalCS_1L_ttbqqb)
    call intoHisto(6,1,xFrag*EvalCS_1L_ttbqqb)
 ELSE
-
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbqqb)
    enddo
