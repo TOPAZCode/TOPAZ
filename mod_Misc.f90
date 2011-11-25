@@ -2177,63 +2177,87 @@ END SUBROUTINE
 
 
 
-      function cssg(e1,k1,p)!! are all momenta really outgoing??
+      function csg(e1,k1,p)!! are all momenta really outgoing??
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: k1(:)
       complex(8), intent(in) ::  p(:)
-      complex(8) :: cssg
+      complex(8) :: csg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cssg = -(0d0,1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )!  minus sign corrected
+          csg = -(0d0,+1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )!  minus sign corrected
 
-      end function cssg
+      end function csg
 
-
-      function csgs(e1,k1,p)
+      function cbsg(e1,k1,p)!! are all momenta really outgoing??
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: k1(:)
       complex(8), intent(in) ::  p(:)
-      complex(8) :: csgs
+      complex(8) :: cbsg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          csgs = (0d0,-1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )
+          cbsg = -(0d0,-1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )!  minus sign corrected
 
-      end function csgs
+      end function cbsg
 
 
 
-      function csggs(e1,e2)
+      function cgs(e1,k1,p)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      complex(8), intent(in) :: k1(:)
+      complex(8), intent(in) ::  p(:)
+      complex(8) :: cgs
+      real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
+
+          cgs = -(0d0,-1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )
+
+      end function cgs
+
+
+
+      function cgbs(e1,k1,p)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      complex(8), intent(in) :: k1(:)
+      complex(8), intent(in) ::  p(:)
+      complex(8) :: cgbs
+      real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
+
+          cgbs = -(0d0,+1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )
+
+      end function cgbs
+
+
+      function cggs(e1,e2)
       implicit none
       complex(8), intent(in) :: e1(:),e2(:)
-      complex(8) :: csggs
+      complex(8) :: cggs
 
-          csggs = 1d0 * (e1.dot.e2)
+          cggs = (0d0,1d0)/2d0 * (e1.dot.e2)!  i/2 corrected
 
-      end function csggs
+      end function cggs
 
 
-      function cssgg(e1,e2)
+      function csgg(e1,e2)
       implicit none
       complex(8), intent(in) :: e1(:),e2(:)
-      complex(8) :: cssgg
+      complex(8) :: csgg
 
-          cssgg =  (0d0,1d0)/2d0 * (e1.dot.e2)!  i/2 corrected
+          csgg =  (0d0,1d0)/2d0 * (e1.dot.e2)!  i/2 corrected
 
-      end function cssgg
-
-
+      end function csgg
 
 
-      function csgsg(e1,e2)
+      function cgsg(e1,e2)
       implicit none
       complex(8), intent(in) :: e1(:),e2(:)
-      complex(8) :: csgsg
+      complex(8) :: cgsg
 
-          csgsg = 1d0 * (e1.dot.e2)
+          cgsg = 1d0 * (e1.dot.e2)
 
-      end function csgsg
+      end function cgsg
 
 
 
@@ -2271,26 +2295,26 @@ END SUBROUTINE
       end function vggss
 
 
-      function vssgg(Dv,e1)
-      implicit none
-      complex(8), intent(in) :: e1(:)
-      integer :: Dv
-      complex(8) :: vssgg(1:Dv)
-
-          vssgg(:) = 1d0 * e1(:)
-
-      end function vssgg
-
-
-      function vsgsg(Dv,e1)
-      implicit none
-      complex(8), intent(in) :: e1(:)
-      integer :: Dv
-      complex(8) :: vsgsg(1:Dv)
-
-          vsgsg(:) = -1d0 * e1(:)
-
-      end function vsgsg
+!       function vssgg(Dv,e1)
+!       implicit none
+!       complex(8), intent(in) :: e1(:)
+!       integer :: Dv
+!       complex(8) :: vssgg(1:Dv)
+! 
+!           vssgg(:) = 1d0 * e1(:)
+! 
+!       end function vssgg
+! 
+! 
+!       function vsgsg(Dv,e1)
+!       implicit none
+!       complex(8), intent(in) :: e1(:)
+!       integer :: Dv
+!       complex(8) :: vsgsg(1:Dv)
+! 
+!           vsgsg(:) = -1d0 * e1(:)
+! 
+!       end function vsgsg
 
 
 
