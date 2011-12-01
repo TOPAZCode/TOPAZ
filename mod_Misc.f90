@@ -866,7 +866,7 @@ FUNCTION ChargeConj(Part)
 implicit none
 integer :: ChargeConj,Part
 
-   if( IsAQuark(Part) ) then
+   if( IsAQuark(Part) .or. IsAScalar(Part) ) then
      ChargeConj =-Part
    else
      ChargeConj = Part
@@ -1070,6 +1070,12 @@ character(100) :: WritePartType
          Temp(i) = " Z "
       elseif( PartType .eq. 13) then
          Temp(i) = " Wp "
+      elseif( PartType .eq. 14) then
+         Temp(i) = " HTop "
+      elseif( PartType .eq. 15) then
+         Temp(i) = " Stop "
+      elseif( PartType .eq. 16) then
+         Temp(i) = " Sbot "
       elseif( PartType .eq. 0 ) then
          Temp(i) = " discd "
       elseif ( PartType .eq. -1 ) then
@@ -1086,6 +1092,12 @@ character(100) :: WritePartType
          Temp(i) = " Abot "
       elseif( PartType .eq. -13) then
          Temp(i) = " Wm "
+      elseif( PartType .eq. -14) then
+         Temp(i) = " AHTop "
+      elseif( PartType .eq. -15) then
+         Temp(i) = " AStop "
+      elseif( PartType .eq. -16) then
+         Temp(i) = " ASbot "
       else
          Temp(i) = "error"
       endif
@@ -2255,7 +2267,7 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:),e2(:)
       complex(8) :: cgsg
 
-          cgsg = 1d0 * (e1.dot.e2)
+          cgsg = -(0d0,1d0) * (e1.dot.e2)!  what??? why no factor two?
 
       end function cgsg
 
@@ -2479,9 +2491,6 @@ END SUBROUTINE
 
       end function vWq_Weyl
 
-
-
-!-------------------- KIRILLS ROUTINES ---------------------------
 
 
           subroutine ubarSpi(p,m,i,f)

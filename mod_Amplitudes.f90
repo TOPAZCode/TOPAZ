@@ -154,7 +154,7 @@ use ModMyWeylRecurrence
 use ModProcess
 use ModParameters
 implicit none
-integer :: Dv,Ds,tag_f
+integer :: Dv,Ds,tag_f,n
 complex(8) :: Res(1:Ds)
 type(TreeProcess) :: TreeProc
 logical :: Boson
@@ -184,33 +184,57 @@ logical :: Boson
           if( TreeProc%PartType(1).eq.Glu_ ) then
              call Error("current doesn't exist yet")
           elseif( IsAScalar(TreeProc%PartType(1)) ) then
-!TreeProc%Gluons(1)%Pol(1:4) = TreeProc%Gluons(1)%Mom(1:4)!   gauge check
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
              Res(2:Ds) = 0d0
-!print *, "result",res(1)
-!pause
+          else
+             call Error("current doesn't exist yet")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.2 .and. TreeProc%NumSca.eq.2 ) then!  2 quarks and 2 scalars 
+
+
           if( TreeProc%PartType(1).eq.Glu_ ) then
-             call Error("current doesn't exist yet")
-          elseif( IsAScalar(TreeProc%PartType(1)) .and. IsAScalar(TreeProc%PartType(1+TreeProc%NumGlu(1)+1))  ) then
-              Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:4))
-              Res(2:Ds) = 0d0
-          elseif( IsAScalar(TreeProc%PartType(1)) .and. IsAQuark(TreeProc%PartType(1+TreeProc%NumGlu(1)+1))  ) then
-!               Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:4))
-!               Res(2:Ds) = 0d0
+                if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) ) then 
+!                       Res(1:Ds) = cur_g_fssf(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      call Error("cur_g_fssf current doesn't exist yet")
+                elseif( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
+                      Res(1:Ds) = cur_g_ffss(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
+!                       Res(1:Ds) = cur_g_sffs(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      call Error("cur_g_sffs current doesn't exist yet") 
+                elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) )then 
+                      Res(1:Ds) = cur_g_ssff(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                else
+                      call Error("cur_g_xxxx current doesn't exist")
+                endif
+
+          elseif( IsAScalar(TreeProc%PartType(1))  ) then
+                if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1 ) then 
+                    Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
+                    Res(2:Ds) = 0d0
+                else
+                    Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
+                    Res(2:Ds) = 0d0
+                endif
+          elseif( IsAQuark(TreeProc%PartType(1))  ) then
+                if( TreeProc%Scalars(1)%ExtRef.lt.TreeProc%Quarks(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1 ) then 
+                    Res(1:Ds) = cur_f_fssf( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:2),TreeProc%NumGlu(0:4))
+                else
+                    Res(1:Ds) = cur_f_ffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:2),TreeProc%NumGlu(0:4))
+                endif
+          else
              call Error("current doesn't exist yet")
           endif
+
 !----------------------------------------
-      elseif( TreeProc%NumQua.eq.4 ) then!  4 quarks
+      elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  4 quarks, no scalars
           if( TreeProc%PartType(1).eq.Glu_ ) then
               Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
               Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
           endif
 !----------------------------------------
-      elseif( TreeProc%NumQua.eq.6 ) then!  6 quarks
+      elseif( TreeProc%NumQua.eq.6  .and. TreeProc%NumSca.eq.0) then!  6 quarks, no scalars
           if( IsAQuark(TreeProc%PartType(1)) ) then
               Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f )
           else
@@ -255,6 +279,8 @@ type(TreeProcess) :: TreeProc
                       do j1=1,Nj1
                         mur(j1,j2) = psp1_(POLI(j1,1:Ds),Res(1:Ds))
                       enddo
+                   else
+                        call Error("new_ampl")
                    endif
             enddo
     elseif( IsAQuark(TreeProc%PartType(TreeProc%NumPart)) ) then
@@ -269,8 +295,12 @@ type(TreeProcess) :: TreeProc
                       do j1=1,Nj1
                          mur(j1,j2) = psp1_(POLI(j1,1:Ds),Res(1:Ds))
                       enddo
+                   else
+                        call Error("new_ampl")
                    endif
             enddo
+    elseif( IsAScalar(TreeProc%PartType(TreeProc%NumPart)) ) then
+          call Error("hier we are")
     endif
 
 

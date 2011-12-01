@@ -3097,8 +3097,11 @@ endif
        res = (0d0,0d0)
 res1=(0d0,0d0); res2=(0d0,0d0); res3=(0d0,0d0); res4=(0d0,0d0); res5=(0d0,0d0)
 
+! print *, "enter ",ngluon,ng1,ng2
+
 !    s-s-g current to the right
        do m1=0,ng2-1
+! print *, "loop 1"
            k1 = SumMom(Gluons,ng1+1+m1,ngluon)
            e1 = cur_g(Gluons(ng1+1+m1:ngluon),ngluon-m1-ng1+1)
            k1sq=sc_(k1,k1)
@@ -3136,6 +3139,7 @@ res1=res1+tmp
 
 !     s-g-s current to the left
         do m1=1,ng1
+! print *, "loop 2"
            k1 = SumMom(Gluons,1,m1)
            e1 = cur_g(Gluons(1:m1),m1+1)
            k1sq = sc_(k1,k1)
@@ -3175,6 +3179,7 @@ res2=res2+tmp
 
 !     s-s-g-g current to the right
         do m2=2,ng2
+! print *, "loop 3"
            k3 = SumMom(Gluons,1,ngluon-m2)
            k3 = k3 + Scalar(2)%Mom
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
@@ -3221,16 +3226,19 @@ res3=res3+tmp
 
 !     s-g-g-s current to the left
         do m2=2,ng1
+! print *, "loop 4"
            k3 = SumMom(Gluons,m2+1,ngluon)
            k3 = k3 + Scalar(2)%Mom
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
            ms1 = ng1 - m2
            sc2 = cur_s_2s(Gluons(m2+1:ngluon),Scalar(2:2),(/ngluon-m2,ms1,ngluon-ng1/))
+           if( m2>2 ) then
            if (abs(k3sq) > propcut) then
                sc2= (0d0,1d0)/k3sq*sc2
            else
                sc2 = (0d0,0d0)
                cycle
+           endif
            endif
            do m1=1,m2-1
               k1 = SumMom(Gluons,1,m1)
@@ -3262,13 +3270,14 @@ res4=res4+tmp
         enddo
 
 
-
 !     s-g-s-g current to the left and right
+      if( ng1.ge.1 .and. ng2.ge.1 ) then
         do m1=1,ng1
+! print *, "loop 5"
            k1 = SumMom(Gluons,1,m1)
            e1 = cur_g(Gluons(1:m1),m1+1)
            k1sq = sc_(k1,k1)
-           do m2=1,ng2
+           do m2=0,ng2-1
               k2 = SumMom(Gluons,ng1+m2+1,ngluon)
               e2 = cur_g(Gluons(ng1+m2+1:ngluon),ngluon-ng1-m2-1+1+1)
               sc2 = cur_s_2s(Gluons(m1+1:ng1+m2),Scalar(2:2),(/ng1-m1+m2,ng1-m1,m2/))
@@ -3287,19 +3296,21 @@ res4=res4+tmp
 res5=res5+tmp
            enddo
         enddo
-!if( ng2.eq.2 ) print *,res1
-!if( ng2.eq.2 ) print *,res2
-!if( ng2.eq.2 ) print *,res3
-!if( ng2.eq.2 ) print *,res4
-!if( ng2.eq.2 ) print *,res5
+      endif
 
 
+! print *,res1
+! print *,res2
+! print *,res3
+! print *,res4
+! print *,res5
+! print *, "exit",ngluon,ng1,ng2
       end function cur_s_2s
 
 
 
 
-FUNCTION cur_s_ssff(Gluons,Quarks,Scalar,NumGlu) result(res)
+FUNCTION cur_s_ssff(Gluons,Scalar,Quarks,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(3:4),Scalar(2:2)      ! off-shell scalar is not included
@@ -3393,7 +3404,7 @@ END FUNCTION
 
 
 
-FUNCTION cur_s_sffs(Gluons,Quarks,Scalar,NumGlu) result(res)
+FUNCTION cur_s_sffs(Gluons,Scalar,Quarks,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(2:3),Scalar(4:4)      ! off-shell scalar is not included
@@ -3485,7 +3496,7 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_ffss(Gluons,Quarks,Scalars,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_ffss(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(2:2),Scalars(3:4)
@@ -3505,7 +3516,7 @@ integer :: rIn,rOut,i,counter
 
 
 !DEC$ IF (_DebugCheckMyImpl1==1)
-    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_4f"
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_ffss"
 !DEC$ ENDIF
 
 
@@ -3589,7 +3600,7 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_fssf(Gluons,Quarks,Scalars,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_fssf(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(4:4),Scalars(2:3)
@@ -3609,10 +3620,10 @@ integer :: rIn,rOut,i,counter
 
 
 !DEC$ IF (_DebugCheckMyImpl1==1)
-    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_4f"
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_fssf"
 !DEC$ ENDIF
 
-
+      Res(:) = (0d0,0d0)
       do n1a=0,NumGlu(1)
       do n3b=0,NumGlu(3)
          n1b = NumGlu(1)-n1a
@@ -3681,7 +3692,6 @@ integer :: rIn,rOut,i,counter
          enddo
       enddo
       enddo
-
 
 
 return
@@ -3836,50 +3846,6 @@ END FUNCTION
 
 
 
-FUNCTION cur_g_2s2f(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
-implicit none
-integer,intent(in) :: NumGlu(0:5)
-type(PtrToParticle) :: Gluons(1:),Scalars(1:),Quarks(1:)
-! integer :: na,nb,nc,nd,ne,nf,ng,nh,ni,nj,nk
-! integer :: rIn,rOut
-! integer :: tag_f,counter,i
-complex(8) :: res(Dv)
-! type(PtrToParticle) :: TmpGluons(1:2+NumGlu(1)+NumGlu(3)+NumGlu(5))
-! complex(8),target :: TmpMom1(1:Dv),TmpMom2(1:Dv)
-! integer,target :: TmpExtRef1,TmpExtRef2
-complex(8),target :: Eps1(1:Dv)
-complex(8),target :: Eps2(1:Dv)
-! complex(8) :: Eps3(1:Dv)
-! complex(8) :: u1(1:Ds)
-! complex(8) :: ubar2(1:Ds)
-complex(8) :: PropFac1,PropFac2
-complex(8) :: PMom1(1:Dv)
-complex(8) :: PMom2(1:Dv)
-! complex(8) :: PMom3(1:Dv)
-! complex(8) :: PMom4(1:Dv)
-
-!DEC$ IF (_DebugCheckMyImpl1==1)
-    if( NumGlu(0)-1-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5).ne.0 ) print *, "wrong number of gluons in cur_g_4f"
-!DEC$ ENDIF
-
-   if( Numglu(1).gt.0 .or. Numglu(3).gt.0 .or. NumGlu(5).gt.0 ) then
-        call Error("this current is not yet implemented: cur_g_2s2f")
-   endif
-
-!    copy from cur_g_4f
-
-   res(:) = vggg(Eps1,PMom1,Eps2,PMom2)
-
-
-return
-END FUNCTION
-
-
-
-
-
-
-
 FUNCTION cur_g_ssff(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
 implicit none
 integer,intent(in) :: NumGlu(0:5)
@@ -3903,7 +3869,7 @@ complex(8) :: PMom3(1:Dv)
 complex(8) :: PMom4(1:Dv)
 
 !DEC$ IF (_DebugCheckMyImpl1==1)
-    if( NumGlu(0)-1-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5).ne.0 ) print *, "wrong number of gluons in cur_g_4f"
+    if( NumGlu(0)-1-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5).ne.0 ) print *, "wrong number of gluons in cur_g_ssff"
 !DEC$ ENDIF
 
       res = (0d0,0d0)
@@ -3917,7 +3883,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-            Sca1 = cur_s_ssff(Gluons(rIn:rOut),Quarks(3:4),Scalars(2:2),(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/))
+            Sca1 = cur_s_ssff(Gluons(rIn:rOut),Scalars(2:2),Quarks(3:4),(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/))
             PMom2  = SumMom(Gluons,rIn,rOut)  + Scalars(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Scalars(1)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Scalars(1)%Mass2).lt.PropCut ) cycle
@@ -3981,7 +3947,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            u1 = cur_f_fssf(Gluons(rIn:rOut),Quarks(3:3),Scalars(1:2),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
+            u1 = cur_f_fssf(Gluons(rIn:rOut),Scalars(1:2),Quarks(3:3),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
             PMom2 =  SumMom(Gluons,rIn,rOut) + Scalars(1)%Mom + Scalars(2)%Mom + Quarks(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
@@ -4248,7 +4214,7 @@ END FUNCTION
 
 
 
-FUNCTION cur_g_ffss(Gluons,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
+FUNCTION cur_g_ffss(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
 implicit none
 integer,intent(in) :: NumGlu(0:5)
 type(PtrToParticle) :: Gluons(1:),Quarks(1:2),Scalars(3:4)
@@ -4285,7 +4251,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-            u1 = cur_f_ffss(Gluons(rIn:rOut),Quarks(2:2),Scalars(3:4),(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/))
+            u1 = cur_f_ffss(Gluons(rIn:rOut),Scalars(3:4),Quarks(2:2),(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/))
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Scalars(3)%Mom + Scalars(4)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -4359,7 +4325,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            Sca1 = cur_s_sffs(Gluons(rIn:rOut),Quarks(1:2),Scalars(3:4),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
+            Sca1 = cur_s_sffs(Gluons(rIn:rOut),Scalars(3:4),Quarks(1:2),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Scalars(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Scalars(3)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Scalars(4)%Mass2).lt.PropCut ) cycle

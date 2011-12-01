@@ -82,7 +82,7 @@ double complex :: Res(1:2)
 !DEC$ IF (_DebugPrintPentCoeff==1)
        print *, coeff5(CutNum,1)
       enddo
-      stop
+      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -220,7 +220,7 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
          print *, k,coeff4(CutNum,k)
       enddo
       enddo
-      stop
+      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -595,7 +595,7 @@ include "misc/global_import"
          print *, coeff3(Cutnum,k)
       enddo
       enddo
-      stop
+      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -959,7 +959,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          print *, cutnum,k,coeff2(Cutnum,k)
       enddo
       enddo
-      stop
+      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -1046,7 +1046,7 @@ double complex :: Res(1:2)
 !DEC$ IF (_DebugPrintSingCoeff==1)
          print *, coeff1(Cutnum,1)
       enddo
-      stop
+      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF

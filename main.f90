@@ -205,6 +205,10 @@ logical :: dirresult
           print *, "ObsSet:      see mod_Kinematics.f90"
           stop
     endif
+    if( Process.ge.41 .and. Process.eq.59 ) then
+          print *, "not enough input parameter"
+          print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
+    endif
 
     if((Correction.eq.3 .or. TopDecays.eq.5 .or. TopDecays.eq.6) .and. HelSampling) then
           print *, "Helicity sampling is not allowed here. This is simpliy due to assignments of random numbers in mod_CrossSection.f90"

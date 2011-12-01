@@ -112,7 +112,7 @@ integer, public, target :: AStr_ = -4
 integer, public, target :: ATop_ = -5
 integer, public, target :: ABot_ = -6
 integer, public, target :: Wm_   = -13
-integer, public, target :: HATop_= -14
+integer, public, target :: AHTop_= -14
 integer, public, target :: AStop_= -15
 integer, public, target :: ASBot_= -16
 

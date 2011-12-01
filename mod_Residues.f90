@@ -758,17 +758,23 @@ END SUBROUTINE
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q2neg(:)
-           endif
+          else
+                call Error("in momentum vector for last particle")
+          endif
           if( TreeProcs(2)%PartType(TreeProcs(2)%NumPart).eq.Glu_ ) then
                 TreeProcs(2)%Gluons(TreeProcs(2)%NumGlu(0))%Mom => q3neg(:)
           elseif( IsAQuark(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
                 TreeProcs(2)%Quarks(TreeProcs(2)%NumQua)%Mom => q3neg(:)
-           endif
+          else
+                call Error("in momentum vector for last particle")
+          endif
           if( TreeProcs(3)%PartType(TreeProcs(3)%NumPart).eq.Glu_ ) then
                 TreeProcs(3)%Gluons(TreeProcs(3)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
                 TreeProcs(3)%Quarks(TreeProcs(3)%NumQua)%Mom => q1neg(:)
-           endif
+          else
+                call Error("in momentum vector for last particle")
+          endif
 
 
           if (Ds.eq.4) then
@@ -1170,12 +1176,12 @@ END SUBROUTINE
           q12(1:5) = q1(1:5)+q2(1:5)
 
           call sc(5,q12,q12,r1)
+print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for??" 
           if(zabs(r1-dcmplx(m_Top**2,0d0)).lt.1D-6) then   !  r1=(q1+q2)^2 = q1^2+q2^2+2*q1.q2 = 0+mt**2+0    because lv^2=lv.k1=0
               tag_pol=1                                    !  tag_pol does not affect fermion loops!
           else
               tag_pol=0
           endif
-
           if( any(Lab_in(l2c(1:2)).eq.'glu') ) then
             tag_f = 0
           elseif( all(Lab_in(l2c(1:2)).eq.'top') .or. all(Lab_in(l2c(1:2)).eq.'str') ) then
@@ -1183,7 +1189,6 @@ END SUBROUTINE
           elseif( all(Lab_in(l2c(1:2)).eq.'bot') .or. all(Lab_in(l2c(1:2)).eq.'chm') ) then
             tag_f = 2
           endif
-
 
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
@@ -1235,7 +1240,6 @@ END SUBROUTINE
             enddo
 
 !--------- to multiply by proper power of I:
-
            do j=1,2
               if (Lab_in(l2c(j)).eq.'top'.or.Lab_in(l2c(j)).eq.'bot'.or.Lab_in(l2c(j)).eq.'str'.or.Lab_in(l2c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
@@ -2789,6 +2793,8 @@ END SUBROUTINE
                   BPOL(2,8)=dcmplx(0d0,1d0)
              endif
             Nj=Nhg
+          else
+              call Error("givepol")
           endif
 
           END SUBROUTINE

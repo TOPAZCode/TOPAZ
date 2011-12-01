@@ -70,6 +70,9 @@ type :: PrimitiveAmplitude
    integer :: FermLine1Out                      ! vertex number of termination of 1st quark line
    integer :: FermLine2In                       ! vertex number of beginning of 2nd quark line
    integer :: FermLine2Out                      ! vertex number of termination of 2nd quark line
+   integer :: ScalarLines                       ! number of scalar lines
+   integer :: ScaLine1In                        ! vertex number of beginning of 1st scalar line
+   integer :: ScaLine1Out                       ! vertex number of termination of 1st scalar line
    type(UnitarityCut) :: UCuts(1:5)             ! unitarity cuts for this prim.ampl.
    complex(8) :: Result(-2:1)
 !    integer :: NumInsertions1                    ! number of insertions of colorless particles in quark line 1 (corresp. to NCut)
@@ -1638,6 +1641,19 @@ ELSEIF( PROCESS.EQ.51 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 200000
       VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=12
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -1658,6 +1674,18 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 100000
       VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -2489,6 +2517,8 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
       NumPrimAmps = 2
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 10
+      NumBornAmps = 2
     ELSEIF( Correction.EQ.3 ) THEN
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
@@ -2537,6 +2567,9 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
       NumPrimAmps = 1
       NumBornAmps = 1
     ELSEIF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 6
+      NumPrimAmps = 2; print *, "reduced numprimamps for fermloop check"
+      NumBornAmps = 1
     ELSEIF( Correction.EQ.3 ) THEN
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
@@ -3519,11 +3552,49 @@ ELSEIF( MasterProcess.EQ.11 ) THEN
 ELSEIF( MASTERPROCESS.EQ.12 ) THEN
 
    IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
-   BornAmps(1)%ExtLine = (/1,2,3,4/)
-   BornAmps(2)%ExtLine = (/1,2,4,3/)
+      BornAmps(1)%ExtLine = (/1,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,2,4,3/)
 
-   PrimAmps(1)%ExtLine = (/1,2,3,4/)
-   PrimAmps(2)%ExtLine = (/1,2,4,3/)
+      PrimAmps(1)%ExtLine = (/1,2,3,4/)
+      PrimAmps(2)%ExtLine = (/1,2,4,3/)
+
+   ELSEIF ( Correction.EQ.1 ) THEN
+      BornAmps(1)%ExtLine = (/1,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,2,4,3/)
+
+      PrimAmps(1)%ExtLine = (/1,2,3,4/)
+      PrimAmps(1)%AmpType = 1
+
+      PrimAmps(2)%ExtLine = (/1,2,4,3/)
+      PrimAmps(2)%AmpType = 1
+
+      PrimAmps(3)%ExtLine = (/1,3,2,4/)
+      PrimAmps(3)%AmpType = 1
+
+      PrimAmps(4)%ExtLine = (/1,4,2,3/)
+      PrimAmps(4)%AmpType = 1
+
+      PrimAmps(5)%ExtLine = (/1,3,4,2/)
+      PrimAmps(5)%AmpType = 1
+
+      PrimAmps(6)%ExtLine = (/1,4,3,2/)
+      PrimAmps(6)%AmpType = 1
+
+      PrimAmps(7)%ExtLine = (/1,2,3,4/)
+      PrimAmps(7)%AmpType = 2
+      PrimAmps(7)%FermLoopPart = Chm_
+
+      PrimAmps(8)%ExtLine = (/1,2,4,3/)
+      PrimAmps(8)%AmpType = 2
+      PrimAmps(8)%FermLoopPart = Chm_
+
+      PrimAmps(9)%ExtLine = (/1,2,3,4/)
+      PrimAmps(9)%AmpType = 2
+      PrimAmps(9)%FermLoopPart = Bot_
+
+      PrimAmps(10)%ExtLine = (/1,2,4,3/)
+      PrimAmps(10)%AmpType = 2
+      PrimAmps(10)%FermLoopPart = Bot_
    ENDIF
 
 
@@ -3533,9 +3604,35 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
 ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
    IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
-   BornAmps(1)%ExtLine = (/1,2,3,4/)
+      BornAmps(1)%ExtLine = (/1,2,3,4/)
+      PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   ELSEIF( Correction.EQ.1 ) THEN 
+        BornAmps(1)%ExtLine = (/1,2,3,4/); print *, "reduced numprimamps for fermloop check"
+        BornAmps(2)%ExtLine = (/1,2,3,4/)
+!         BornAmps(3)%ExtLine = (/1,4,3,2/)
+!         BornAmps(4)%ExtLine = (/1,2,3,4/)
+!         BornAmps(5)%ExtLine = (/1,2,3,4/)
+!         BornAmps(6)%ExtLine = (/1,2,3,4/)
 
-   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+!         PrimAmps(1)%ExtLine = (/1,2,3,4/)
+!         PrimAmps(1)%AmpType = 1
+! 
+!         PrimAmps(2)%ExtLine = (/1,2,4,3/)
+!         PrimAmps(2)%AmpType = 1
+! 
+!         PrimAmps(3)%ExtLine = (/1,4,3,2/)
+!         PrimAmps(3)%AmpType = 3
+! 
+!         PrimAmps(4)%ExtLine = (/1,2,3,4/)
+!         PrimAmps(4)%AmpType = 4
+
+        PrimAmps(5-4)%ExtLine = (/1,2,3,4/)
+        PrimAmps(5-4)%AmpType = 2
+        PrimAmps(5-4)%FermLoopPart = Chm_
+
+        PrimAmps(6-4)%ExtLine = (/1,2,3,4/)
+        PrimAmps(6-4)%AmpType = 2
+        PrimAmps(6-4)%FermLoopPart = Bot_
    ENDIF
 
 
@@ -3585,7 +3682,7 @@ ENDIF
                TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca) = 0
             elseif( TheTree%PartType(1).eq.Glu_ ) then
                allocate( TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca+1), stat=AllocStatus )
-               TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca) = 0
+               TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca+1) = 0
             else
                call Error("TheTree%NumGlu")
             endif
@@ -3640,6 +3737,7 @@ ENDIF
                   TheTree%NumGlu(7) = TheTree%NumPart - QuarkPos(6)
             endif
             endif
+
 
 !          allocate memory for pointer to quarks
            allocate( TheTree%Quarks(1:TheTree%NumQua), stat=AllocStatus )
@@ -3711,6 +3809,8 @@ IF( Correction.EQ.1 ) THEN
          ThePrimAmp%FermLine1Out= 0
          ThePrimAmp%FermLine2In = 0
          ThePrimAmp%FermLine2Out= 0
+         ThePrimAmp%ScaLine1In = 0
+         ThePrimAmp%ScaLine1Out= 0
          do Vertex=1,NumExtParticles
             Propa       = Vertex + 1
             PropaMinus1 = Propa - 1
@@ -3725,8 +3825,12 @@ IF( Correction.EQ.1 ) THEN
                if( IsAQuark(ExtPartType) ) then
                   ThePrimAmp%FermionLines = 1
                   ThePrimAmp%FermLine1In  = 1
+               elseif( IsAScalar(ExtPartType) ) then
+                  ThePrimAmp%ScalarLines = 1
+                  ThePrimAmp%ScaLine1In  = 1
                else
                   ThePrimAmp%FermionLines = 0
+                  ThePrimAmp%ScalarLines  = 0
                endif
 
             elseif( IsAQuark(ExtPartType) ) then
@@ -3744,22 +3848,34 @@ IF( Correction.EQ.1 ) THEN
                    endif
 
                elseif( ThePrimamp%AmpType.eq.2 ) then
-                   if( ThePrimAmp%FermLine1Out.eq.0 ) then
+                   if( ThePrimAmp%FermLine1Out.eq.0 .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
                             ThePrimAmp%FermLine1Out = Vertex
                             ThePrimAmp%IntPart(1)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             ThePrimAmp%IntPart(Propa)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
                                 ThePrimAmp%IntPart(k)%PartType = 0
                             enddo
-                   elseif( ThePrimAmp%FermLine2In.eq.0 ) then
+                   elseif( ThePrimAmp%FermLine2In.eq.0  .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
                             ThePrimAmp%FermionLines = 2
                             ThePrimAmp%FermLine2In = Vertex
-                   elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+                   elseif( ThePrimAmp%FermLine2Out.eq.0  .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
                             ThePrimAmp%FermLine2Out = Vertex
                             do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
                                 ThePrimAmp%IntPart(k)%PartType = 0
                             enddo
                             do k=ThePrimAmp%FermLine2Out+1,NumExtParticles
+                                ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
+                            enddo
+
+                   elseif( ThePrimAmp%FermLine1In.eq.0 .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
+                            ThePrimAmp%FermionLines = 1
+                            ThePrimAmp%FermLine1In = Vertex
+                   elseif( ThePrimAmp%FermLine1Out.eq.0  .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
+                            ThePrimAmp%FermLine1Out = Vertex
+                            do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
+                                ThePrimAmp%IntPart(k)%PartType = 0
+                            enddo
+                            do k=ThePrimAmp%FermLine1Out+1,NumExtParticles
                                 ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             enddo
                    endif
@@ -3804,6 +3920,84 @@ IF( Correction.EQ.1 ) THEN
 
             elseif( (ExtPartType .eq. Glu_) ) then
                ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(PropaMinus1)%PartType
+
+            elseif( IsAScalar(ExtPartType) ) then
+               if( ThePrimAmp%AmpType.eq.1 ) then
+                   if( ThePrimAmp%ScaLine1Out.eq.0 ) then
+                      ThePrimAmp%ScaLine1Out = Vertex
+                      ThePrimAmp%IntPart(Propa)%PartType = Glu_
+!                    elseif( ThePrimAmp%ScaLine2In.eq.0 ) then!   not needed because there's always just one scalar line
+!                       ThePrimAmp%ScalarLines = 2
+!                       ThePrimAmp%ScaLine2In = Vertex
+!                       ThePrimAmp%IntPart(Propa)%PartType = ExtPartType
+!                    elseif( ThePrimAmp%ScaLine2Out.eq.0 ) then
+!                       ThePrimAmp%ScaLine2Out = Vertex
+!                       ThePrimAmp%IntPart(Propa)%PartType = Glu_
+                   else
+                        call Error("something's missing here")
+                   endif
+
+               elseif( ThePrimamp%AmpType.eq.2 ) then
+                   if( ThePrimAmp%ScaLine1Out.eq.0 ) then
+                            ThePrimAmp%ScaLine1Out = Vertex
+                            ThePrimAmp%IntPart(1)%PartType = -abs(ThePrimAmp%FermLoopPart)
+                            ThePrimAmp%IntPart(Propa)%PartType = -abs(ThePrimAmp%FermLoopPart)
+                            do k=ThePrimAmp%ScaLine1In+1,ThePrimAmp%ScaLine1Out
+                                ThePrimAmp%IntPart(k)%PartType = 0
+                            enddo
+!                    elseif( ThePrimAmp%FermLine2In.eq.0 ) then!   not needed because there's always just one scalar line
+!                             ThePrimAmp%FermionLines = 2
+!                             ThePrimAmp%FermLine2In = Vertex
+!                    elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+!                             ThePrimAmp%FermLine2Out = Vertex
+!                             do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
+!                                 ThePrimAmp%IntPart(k)%PartType = 0
+!                             enddo
+!                             do k=ThePrimAmp%FermLine2Out+1,NumExtParticles
+!                                 ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
+!                             enddo
+                    else
+                          call Error("something's missing here")
+                   endif
+
+               elseif( ThePrimamp%AmpType.eq.3 ) then
+                      call Error("AmpType.eq.3 not yet implemented for scalars")
+!                        if( ThePrimAmp%FermLine2In.eq.0 ) then
+!                           ThePrimAmp%FermionLines = 2
+!                           ThePrimAmp%FermLine2In = Vertex
+!                        elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+!                           ThePrimAmp%FermLine2Out = Vertex
+!                           ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(ThePrimAmp%FermLine2In)%PartType
+!                           do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
+!                               ThePrimAmp%IntPart(k)%PartType = 0
+!                           enddo
+!                        elseif( ThePrimAmp%FermLine1Out.eq.0 ) then
+!                            ThePrimAmp%FermLine1Out = Vertex
+!                            ThePrimAmp%IntPart(Propa)%PartType = Glu_
+!                        endif
+
+               elseif( ThePrimamp%AmpType.eq.4 ) then
+                      call Error("AmpType.eq.4 not yet implemented for scalars")
+!                        if( ThePrimAmp%FermLine1Out.eq.0 ) then
+!                            ThePrimAmp%FermLine1Out = Vertex
+!                            do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
+!                               ThePrimAmp%IntPart(k)%PartType = 0
+!                            enddo
+!                        elseif( ThePrimAmp%FermLine2In.eq.0 ) then
+!                            ThePrimAmp%FermionLines = 2
+!                            ThePrimAmp%FermLine2In = Vertex
+!                             ThePrimAmp%IntPart(Propa)%PartType = Glu_
+!                             do k=ThePrimAmp%FermLine1Out+1,ThePrimAmp%FermLine2In
+!                                 ThePrimAmp%IntPart(k)%PartType = -ExtPartType
+!                             enddo
+!                             ThePrimAmp%IntPart(1)%PartType = -ExtPartType
+!                        elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+!                             ThePrimAmp%FermLine2Out = Vertex
+!                             do k=ThePrimAmp%FermLine2Out+1,NumExtParticles
+!                                 ThePrimAmp%IntPart(k)%PartType = ExtPartType
+!                             enddo
+!                        endif
+               endif
 
             elseif( (ExtPartType .eq. Pho_) .or. (ExtPartType .eq. Z0_) ) then
                ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(PropaMinus1)%PartType
@@ -3915,6 +4109,10 @@ include 'misc/global_import'
          Lab_ex(Vertex)='str'
       elseif(ExtPartType.eq.Glu_ ) then
          Lab_ex(Vertex)='glu'
+      elseif(ExtPartType.eq.HTop_ .or. ExtPartType.eq.AHTop_ ) then! fix for HTop
+         Lab_ex(Vertex)='top'
+      elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
+         Lab_ex(Vertex)='top'
       else
          print *, "error in kirills conv, ExtPartType=", ExtPartType
       endif
@@ -3929,6 +4127,10 @@ include 'misc/global_import'
          Lab_in(Propa)='str'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.Glu_ ) then
          Lab_in(Propa)='glu'
+      elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.HTop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.AHTop_ ) then
+         Lab_in(Propa)='top'
+      elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.STop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASTop_ ) then
+         Lab_in(Propa)='top'
       else
          Lab_in(Propa)='notset'
       endif
@@ -3981,7 +4183,7 @@ integer :: i1,i2,i3,i4,i5
 type(PrimitiveAmplitude),target :: ThePrimAmp
 integer :: NumVertPart,NPart,NPoint,NTree
 logical :: MasslessExtLeg,MasslessIntParticles
-integer :: QuarkPos(1:6),counter,counterQ,counterG
+integer :: QuarkPos(1:6),counter,counterQ,counterG,counterS
 type(TreeProcess),pointer :: TheTree
 
 
@@ -3989,7 +4191,7 @@ type(TreeProcess),pointer :: TheTree
    if( ThePrimAmp%AmpType.eq.1 ) then
       ThePrimAmp%NPoint = NumExtParticles
    elseif( ThePrimAmp%AmpType.eq.2 ) then
-      ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine1Out-ThePrimAmp%FermLine1In)-(ThePrimAmp%FermLine2Out-ThePrimAmp%FermLine2In)
+      ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine1Out-ThePrimAmp%FermLine1In)-(ThePrimAmp%FermLine2Out-ThePrimAmp%FermLine2In)-(ThePrimAmp%ScaLine1Out-ThePrimAmp%ScaLine1In)
    elseif( ThePrimAmp%AmpType.eq.3 ) then
       ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine2Out-ThePrimAmp%FermLine2In)
    elseif( ThePrimAmp%AmpType.eq.4 ) then
@@ -4298,7 +4500,7 @@ type(TreeProcess),pointer :: TheTree
    enddo
    enddo
 
-   if ( NCut-1 .ne. ThePrimAmp%UCuts(4)%NumCuts ) call Error("Something went wrong while setting quad-cuts.")
+   if ( NCut-1 .ne. ThePrimAmp%UCuts(4)%NumCuts ) call Error("Something went wrong while setting quad-cuts.",ThePrimAmp%UCuts(4)%NumCuts)
 
 
 
@@ -4550,21 +4752,26 @@ type(TreeProcess),pointer :: TheTree
             TheTree => ThePrimAmp%UCuts(NPoint)%TreeProcess(NCut,NTree)
 !           set number of quarks and gluons
             TheTree%NumQua = 0
-            counter = 0
+            TheTree%NumSca = 0
+            counterQ = 0
             do NPart=1,TheTree%NumPart
                   if( IsAQuark(TheTree%PartType(NPart)) ) then
                      TheTree%NumQua = TheTree%NumQua + 1
-                     counter = counter + 1
-                     QuarkPos(counter) = NPart
+                     counterQ = counterQ + 1
+                     QuarkPos(counterQ) = NPart
+                  elseif( IsAScalar(TheTree%PartType(NPart)) ) then
+                     TheTree%NumSca = TheTree%NumSca + 1
+                     counterQ = counterQ + 1!     treat the scalar like a quark here because
+                     QuarkPos(counterQ) = NPart!  this is only to determine NumGlu 
                   endif
             enddo
 
-            if( IsAQuark(TheTree%PartType(1)) ) then
-               allocate( TheTree%NumGlu(0:TheTree%NumQua), stat=AllocStatus )
-               TheTree%NumGlu(0:TheTree%NumQua) = 0
+            if( IsAQuark(TheTree%PartType(1))  .or. IsAScalar(TheTree%PartType(1)) ) then
+               allocate( TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca), stat=AllocStatus )
+               TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca) = 0
             elseif( TheTree%PartType(1).eq.Glu_ ) then
-               allocate( TheTree%NumGlu(0:TheTree%NumQua+1), stat=AllocStatus )
-               TheTree%NumGlu(0:TheTree%NumQua) = 0
+               allocate( TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca+1), stat=AllocStatus )
+               TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca+1) = 0
             else
                call Error("TheTree%NumGlu")
             endif
@@ -4575,19 +4782,19 @@ type(TreeProcess),pointer :: TheTree
                   endif
             enddo
 
-!           set number of gluons between quark lines
-            if( IsAQuark(TheTree%PartType(1)) ) then
-            if( TheTree%NumQua .eq. 2 ) then
+!           set number of gluons between quark or scalar lines
+            if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(2) = TheTree%NumPart - QuarkPos(2)
             endif
-            if( TheTree%NumQua .eq. 4 ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
                   TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
                   TheTree%NumGlu(4) = TheTree%NumPart - QuarkPos(4)
             endif
-            if( TheTree%NumQua .eq. 6 ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
                   TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
@@ -4596,19 +4803,19 @@ type(TreeProcess),pointer :: TheTree
                   TheTree%NumGlu(6) = TheTree%NumPart - QuarkPos(6)
             endif
             elseif( TheTree%PartType(1).eq.Glu_ ) then
-            if( TheTree%NumQua .eq. 2 ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
                   TheTree%NumGlu(1) = QuarkPos(1) - 2
                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(3) = TheTree%NumPart - QuarkPos(2)
             endif
-            if( TheTree%NumQua .eq. 4 ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
                   TheTree%NumGlu(1) = QuarkPos(1) - 2
                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
                   TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
                   TheTree%NumGlu(5) = TheTree%NumPart - QuarkPos(4)
             endif
-            if( TheTree%NumQua .eq. 6 ) then
+            if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
                   TheTree%NumGlu(1) = QuarkPos(1) - 2
                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                   TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
@@ -4626,9 +4833,13 @@ type(TreeProcess),pointer :: TheTree
 !          allocate memory for pointer to gluons
            allocate( TheTree%Gluons(1:TheTree%NumGlu(0)), stat=AllocStatus )
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%Gluons")
+!          allocate memory for pointer to scalars
+           allocate( TheTree%Scalars(1:TheTree%NumSca), stat=AllocStatus )
+           if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%Scalars")
 
            counterQ = 0
            counterG = 0
+           counterS = 0
 
            do NPart=1,TheTree%NumPart
                if( IsAQuark(TheTree%PartType(NPart)) ) then
@@ -4671,6 +4882,26 @@ type(TreeProcess),pointer :: TheTree
                         TheTree%Gluons(counterG)%Pol => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Pol
                      endif
                endif
+               if( IsAScalar(TheTree%PartType(NPart)) ) then
+                     counterS = counterS + 1
+                     if( NPart.eq.1 .or. NPart.eq.TheTree%NumPart) then    ! first and last particles are in the loop
+                        TheTree%Scalars(counterS)%PartType => TheTree%PartType(NPart)
+                        TheTree%Scalars(counterS)%ExtRef => ThePrimAmp%IntPart( TheTree%PartRef(NPart) )%ExtRef
+                        TheTree%Scalars(counterS)%Mass => ThePrimAmp%IntPart( TheTree%PartRef(NPart) )%Mass
+                        TheTree%Scalars(counterS)%Mass2 => ThePrimAmp%IntPart( TheTree%PartRef(NPart) )%Mass2
+                        TheTree%Scalars(counterS)%Helicity => Null()
+                        TheTree%Scalars(counterS)%Mom => Null()
+                        TheTree%Scalars(counterS)%Pol => Null()
+                     else
+                        TheTree%Scalars(counterS)%PartType => TheTree%PartType(NPart)
+                        TheTree%Scalars(counterS)%ExtRef => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%ExtRef
+                        TheTree%Scalars(counterS)%Mass => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mass
+                        TheTree%Scalars(counterS)%Mass2 => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mass2
+                        TheTree%Scalars(counterS)%Helicity => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Helicity
+                        TheTree%Scalars(counterS)%Mom => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mom
+                        TheTree%Scalars(counterS)%Pol => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Pol
+                     endif
+               endif
            enddo
 
          enddo
@@ -4678,118 +4909,6 @@ type(TreeProcess),pointer :: TheTree
    enddo
 
 
-
-
-! !           similar as above for Born primitive amplitude
-!             TheTree => ThePrimAmp%TreeProc
-!             TheTree%NumPart = NumExtParticles
-!
-!             allocate( TheTree%PartType(1:NumExtParticles), stat=AllocStatus )
-!             if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType for Born")
-! !           set number of quarks and gluons
-!             TheTree%NumQua = 0
-!             counter = 0
-!
-!             do NPart=1,TheTree%NumPart
-!                   TheTree%PartType(NPart) = ExtParticle( ThePrimAmp%ExtLine(NPart) )%PartType
-!                   if( IsAQuark(TheTree%PartType(NPart)) ) then
-!                      TheTree%NumQua = TheTree%NumQua + 1
-!                      counter = counter + 1
-!                      QuarkPos(counter) = NPart
-!                   endif
-!             enddo
-!
-!             if( IsAQuark(TheTree%PartType(1)) ) then
-!                allocate( TheTree%NumGlu(0:TheTree%NumQua), stat=AllocStatus )
-!                TheTree%NumGlu(0:TheTree%NumQua) = 0
-!             elseif( TheTree%PartType(1).eq.Glu_ ) then
-!                allocate( TheTree%NumGlu(0:TheTree%NumQua+1), stat=AllocStatus )
-!                TheTree%NumGlu(0:TheTree%NumQua) = 0
-!             else
-!                call Error("TheTree%NumGlu")
-!             endif
-!             if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%NumGlu")
-!             do NPart=1,TheTree%NumPart
-!                   if( TheTree%PartType(NPart) .eq. Glu_ ) then
-!                      TheTree%NumGlu(0) = TheTree%NumGlu(0) + 1
-!                   endif
-!             enddo
-!
-! !           set number of gluons between quark lines
-!             if( IsAQuark(TheTree%PartType(1)) ) then
-!             if( TheTree%NumQua .eq. 2 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(2) = TheTree%NumPart - QuarkPos(2)
-!             endif
-!             if( TheTree%NumQua .eq. 4 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
-!                   TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-!                   TheTree%NumGlu(4) = TheTree%NumPart - QuarkPos(4)
-!             endif
-!             if( TheTree%NumQua .eq. 6 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
-!                   TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-!                   TheTree%NumGlu(4) = QuarkPos(5) - QuarkPos(4) - 1
-!                   TheTree%NumGlu(5) = QuarkPos(6) - QuarkPos(5) - 1
-!                   TheTree%NumGlu(6) = TheTree%NumPart - QuarkPos(6)
-!             endif
-!             elseif( TheTree%PartType(1).eq.Glu_ ) then
-!             if( TheTree%NumQua .eq. 2 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(1) - 2
-!                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(3) = TheTree%NumPart - QuarkPos(2)
-!             endif
-!             if( TheTree%NumQua .eq. 4 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(1) - 2
-!                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
-!                   TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-!                   TheTree%NumGlu(5) = TheTree%NumPart - QuarkPos(4)
-!             endif
-!             if( TheTree%NumQua .eq. 6 ) then
-!                   TheTree%NumGlu(1) = QuarkPos(1) - 2
-!                   TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-!                   TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
-!                   TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-!                   TheTree%NumGlu(5) = QuarkPos(5) - QuarkPos(4) - 1
-!                   TheTree%NumGlu(6) = QuarkPos(6) - QuarkPos(5) - 1
-!                   TheTree%NumGlu(7) = TheTree%NumPart - QuarkPos(6)
-!             endif
-!             endif
-!
-! !          allocate memory for pointer to quarks
-!            allocate( TheTree%Quarks(1:TheTree%NumQua), stat=AllocStatus )
-!            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%Quarks")
-! !          allocate memory for pointer to gluons
-!            allocate( TheTree%Gluons(1:TheTree%NumGlu(0)), stat=AllocStatus )
-!            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%Gluons")
-!
-!            counterQ = 0
-!            counterG = 0
-!            do NPart=1,TheTree%NumPart
-!                if( IsAQuark(TheTree%PartType(NPart)) ) then
-!                      counterQ = counterQ + 1
-!                      TheTree%Quarks(counterQ)%PartType => ExtParticle( ThePrimAmp%ExtLine(NPart) )%PartType
-!                      TheTree%Quarks(counterQ)%ExtRef => ExtParticle( ThePrimAmp%ExtLine(NPart) )%ExtRef
-!                      TheTree%Quarks(counterQ)%Mass => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mass
-!                      TheTree%Quarks(counterQ)%Mass2 => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mass2
-!                      TheTree%Quarks(counterQ)%Helicity => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Helicity
-!                      TheTree%Quarks(counterQ)%Mom => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mom
-!                      TheTree%Quarks(counterQ)%Pol => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Pol
-!                endif
-!                if( TheTree%PartType(NPart) .eq. Glu_ ) then
-!                      counterG = counterG + 1
-!                      TheTree%Gluons(counterG)%PartType => ExtParticle( ThePrimAmp%ExtLine(NPart) )%PartType
-!                      TheTree%Gluons(counterG)%ExtRef => ExtParticle( ThePrimAmp%ExtLine(NPart) )%ExtRef
-!                      TheTree%Gluons(counterG)%Mass => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mass
-!                      TheTree%Gluons(counterG)%Mass2 => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mass2
-!                      TheTree%Gluons(counterG)%Helicity => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Helicity
-!                      TheTree%Gluons(counterG)%Mom => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mom
-!                      TheTree%Gluons(counterG)%Pol => ExtParticle( ThePrimAmp%ExtLine(NPart) )%Pol
-!                endif
-!            enddo
 
 END SUBROUTINE
 
