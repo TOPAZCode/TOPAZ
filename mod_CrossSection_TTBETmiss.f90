@@ -738,10 +738,18 @@ IF( Correction.EQ.0 ) THEN
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
-          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+print *, "removed for cross checl"
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+print *, BornAmps(1)%Result,BornAmps(2)%Result;
+print *, BornAmps(3)%Result,BornAmps(4)%Result;
+! print *, BornAmps(1)%Result/BornAmps(3)%Result;
+! print *, BornAmps(2)%Result/BornAmps(4)%Result;
+pause
+
    enddo!helicity loop
 
 
@@ -982,10 +990,16 @@ IF( Correction.EQ.0 ) THEN
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
-          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+print *, "removed for cross checl"
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+
+print *, BornAmps(1)%Result;
+print *, BornAmps(2)%Result;
+print *, BornAmps(1)%Result/BornAmps(2)%Result;
+pause
    enddo!helicity loop
 
 !------------ 1 LOOP --------------

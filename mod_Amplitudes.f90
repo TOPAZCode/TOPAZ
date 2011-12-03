@@ -182,7 +182,7 @@ logical :: Boson
 !----------------------------------------
       elseif( TreeProc%NumSca.eq.2 .and. TreeProc%NumQua.eq.0 ) then!  2 scalars and no quarks
           if( TreeProc%PartType(1).eq.Glu_ ) then
-             call Error("current doesn't exist yet")
+             Res(1:Dv) = cur_g_2s(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:TreeProc%NumSca),TreeProc%NumGlu(0:3))
           elseif( IsAScalar(TreeProc%PartType(1)) ) then
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
              Res(2:Ds) = 0d0
@@ -317,12 +317,22 @@ END SUBROUTINE
 SUBROUTINE EvalTree(TheBornAmp)
 use ModProcess
 use ModMisc
+use ModParameters
 implicit none
 type(BornAmplitude) :: TheBornAmp
 complex(8) :: Res(1:4)
 
    call new_calc_ampl(4,4,0,TheBornAmp%TreeProc,Res(1:4))
-   TheBornAmp%Result = psp1_(Res(1:4),ExtParticle(TheBornAmp%ExtLine(1))%Pol(1:4))  ! assumes that first particle is an Quark!!!!
+
+   if( IsAQuark(TheBornAmp%TreeProc%PartType(1)) ) then
+      TheBornAmp%Result = psp1_(Res(1:4),ExtParticle(TheBornAmp%ExtLine(1))%Pol(1:4))
+   elseif( IsAScalar(TheBornAmp%TreeProc%PartType(1)) ) then
+      TheBornAmp%Result = Res(1) * ExtParticle(TheBornAmp%ExtLine(1))%Pol(1)
+   elseif( TheBornAmp%TreeProc%PartType(1).eq.Glu_ ) then
+      TheBornAmp%Result = (Res(1:4)).dot.(ExtParticle(TheBornAmp%ExtLine(1))%Pol(1:4))
+   else
+      call Error("EvalTree")
+   endif
 
 return
 END SUBROUTINE EvalTree
@@ -332,12 +342,18 @@ END SUBROUTINE EvalTree
 SUBROUTINE EvalTree2(TheTreeProcess,Res)
 use ModProcess
 use ModMisc
+use ModParameters
 implicit none
 type(TreeProcess) :: TheTreeProcess
 complex(8) :: Pol(1:4),Res
 
    call new_calc_ampl(4,4,0,TheTreeProcess,Pol(1:4))
-   Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))  ! assumes that first particle is an Quark!!!!
+
+   if( IsAQuark(TheTreeProcess%PartType(1)) ) then
+      Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))  ! assumes that first particle is an Quark!!!!
+   else
+      call Error("EvalTree2")
+   endif
 
 return
 END SUBROUTINE EvalTree2

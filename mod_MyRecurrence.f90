@@ -3822,13 +3822,15 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       endif
 
       Res(:) = Res(:) + Eps2(:)
+print *, n1a,n1b,n1c
+print *, "eps2",eps2
    enddo
    enddo
    enddo
    enddo
    enddo
    enddo
-
+pause
 
 return
 END FUNCTION
