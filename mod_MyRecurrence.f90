@@ -3298,12 +3298,15 @@ res5=res5+tmp
         enddo
       endif
 
-
-! print *,res1
-! print *,res2
-! print *,res3
-! print *,res4
-! print *,res5
+! if(ngluon.eq.2) then
+!  print *,"s_2s", ng1,ng2
+!  print *,res1
+!  print *,res2
+!  print *,res3
+!  print *,res4
+!  print *,res5
+! pause
+! endif
 ! print *, "exit",ngluon,ng1,ng2
       end function cur_s_2s
 
@@ -3738,6 +3741,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
    do n2c=0,NumGlu(2)-n2a
    do n3c=0,NumGlu(3)-n3a
 
+
       if( n1c.gt.0 .and. (n2c+n3c).gt.0  ) cycle
       if( n2c.gt.0 .and. (n1c+n3c).gt.0  ) cycle
       if( n3c.gt.0 .and. (n1c+n2c).gt.0  ) cycle
@@ -3745,6 +3749,8 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       n1b=NumGlu(1)-n1a-n1c
       n2b=NumGlu(2)-n2a-n2c
       n3b=NumGlu(3)-n3a-n3c
+
+! print *, n1a,n1b,n1c
 
       ! Fer1
       rIn=n1a+n1c+1
@@ -3793,7 +3799,6 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
 
       PMom3(:) = Scalars(1)%Mom(:)+Scalars(2)%Mom(:) + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+n3c)
 
-
       counter=1
       rIn =1
       rOut=n1a
@@ -3818,19 +3823,19 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       if(n1a.ge.1 .or. n3b.ge.1) then
          PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)
          if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
-         Eps2(:) = Eps2(:)*PropFac3
+         Eps2(:) = Eps2(:)*PropFac3  * (-1d0)! FUDGE FACTOR this one or the other two have wrong signs
+print *, "FUDGE FACTOR HERE!"
       endif
 
       Res(:) = Res(:) + Eps2(:)
-print *, n1a,n1b,n1c
-print *, "eps2",eps2
+! print *, "eps2",eps2
    enddo
    enddo
    enddo
    enddo
    enddo
    enddo
-pause
+! pause
 
 return
 END FUNCTION

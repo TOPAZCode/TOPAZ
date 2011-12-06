@@ -2279,7 +2279,7 @@ END SUBROUTINE
       integer :: Dv
       complex(8) :: vbss(1:Dv)
 
-          vbss(:) = -(0d0,1d0)/2d0 * ( pb(:)-p(:) )
+          vbss(:) = -(0d0,1d0)/dsqrt(2d0) * ( pb(:)-p(:) )! corrected: sqrt(2)
 
       end function vbss
 
@@ -2290,7 +2290,7 @@ END SUBROUTINE
       integer :: Dv
       complex(8) :: vsbs(1:Dv)
 
-          vsbs(:) = +(0d0,1d0)/2d0 * ( pb(:)-p(:) )
+          vsbs(:) = +(0d0,1d0)/dsqrt(2d0) * ( pb(:)-p(:) )! corrected: sqrt(2)
 
       end function vsbs
 
@@ -2302,7 +2302,7 @@ END SUBROUTINE
       integer :: Dv
       complex(8) :: vggss(1:Dv)
 
-          vggss(:) = 1d0 * e1(:)
+          vggss(:) = (0d0,1d0)/2d0 * e1(:)
 
       end function vggss
 

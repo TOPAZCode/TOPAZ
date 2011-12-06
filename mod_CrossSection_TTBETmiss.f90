@@ -680,12 +680,12 @@ include 'vegas_common.f'
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 
 !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
-! print *, "Test Boost activated"
-! MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
-! call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
-! call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
-! call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
-! call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
+print *, "Test Boost activated"
+MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
+call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
 !!!!!!!!!!!!!!!!!!!!
    ISFac = MomCrossing(MomExt)
 
@@ -732,6 +732,7 @@ IF( Correction.EQ.0 ) THEN
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,NumBornAmps
+print *, "CALL PRIMAMP",iprimamp
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 

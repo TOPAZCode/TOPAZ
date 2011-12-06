@@ -191,8 +191,6 @@ logical :: Boson
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.2 .and. TreeProc%NumSca.eq.2 ) then!  2 quarks and 2 scalars 
-
-
           if( TreeProc%PartType(1).eq.Glu_ ) then
                 if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) ) then 
 !                       Res(1:Ds) = cur_g_fssf(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
