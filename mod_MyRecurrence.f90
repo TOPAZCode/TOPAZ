@@ -3139,7 +3139,7 @@ res1=res1+tmp
 
 !     s-g-s current to the left
         do m1=1,ng1
-! print *, "loop 2"
+!  print *, "loop 2"
            k1 = SumMom(Gluons,1,m1)
            e1 = cur_g(Gluons(1:m1),m1+1)
            k1sq = sc_(k1,k1)

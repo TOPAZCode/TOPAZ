@@ -243,7 +243,7 @@ real(8)             :: MinkowskyProduct
      MinkowskyProduct = p1(1)*p2(1)  &
                       - p1(2)*p2(2)  &
                       - p1(3)*p2(3)  &
-                       -p1(4)*p2(4)
+                      -p1(4)*p2(4)
 END FUNCTION MinkowskyProduct
 
 
@@ -2197,9 +2197,11 @@ END SUBROUTINE
       complex(8) :: csg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          csg = -(0d0,+1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )!  minus sign corrected
+          csg = (0d0,+1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )!  minus sign corrected
 
       end function csg
+
+
 
       function cbsg(e1,k1,p)!! are all momenta really outgoing??
       implicit none
@@ -2209,7 +2211,7 @@ END SUBROUTINE
       complex(8) :: cbsg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cbsg = -(0d0,-1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )!  minus sign corrected
+          cbsg = (0d0,-1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )!  minus sign corrected
 
       end function cbsg
 
@@ -2223,7 +2225,7 @@ END SUBROUTINE
       complex(8) :: cgs
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cgs = -(0d0,-1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )
+          cgs = (0d0,-1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )
 
       end function cgs
 
@@ -2237,7 +2239,7 @@ END SUBROUTINE
       complex(8) :: cgbs
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cgbs = -(0d0,+1d0)/sqrt2*( -(k1.dot.e1)-2d0*(p.dot.e1) )
+          cgbs = (0d0,+1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )
 
       end function cgbs
 
