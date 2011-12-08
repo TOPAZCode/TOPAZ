@@ -3072,7 +3072,7 @@ endif
 
 
 !     assuming the color flow:   s = x--->----
-      recursive function cur_s_2s(Gluons,Scalar,NumGlu) result(res)
+      RECURSIVE FUNCTION cur_s_2s(Gluons,Scalar,NumGlu) result(res)
       implicit none
       type(PtrToParticle) :: Gluons(1:),Scalar(2:2)      ! off-shell scalar is not included
       integer ::  NumGlu(0:2)
@@ -3101,7 +3101,7 @@ res1=(0d0,0d0); res2=(0d0,0d0); res3=(0d0,0d0); res4=(0d0,0d0); res5=(0d0,0d0)
 
 !    s-s-g current to the right
        do m1=0,ng2-1
-! print *, "loop 1"
+!  print *, "loop 1"
            k1 = SumMom(Gluons,ng1+1+m1,ngluon)
            e1 = cur_g(Gluons(ng1+1+m1:ngluon),ngluon-m1-ng1+1)
            k1sq=sc_(k1,k1)
@@ -3362,9 +3362,9 @@ integer :: rIn,rOut,i,counter
                Sca1 = Sca1*PropFac2
             endif
             if( Scalar(2)%PartType.gt.0 ) then
-                Sca0 = csg(Eps2,PMom1,PMom1+PMom2) * Sca1
+                Sca0 = csg(Eps2,PMom1,PMom2) * Sca1
             else
-                Sca0 = cbsg(Eps2,PMom1,PMom1+PMom2) * Sca1
+                Sca0 = cbsg(Eps2,PMom1,PMom2) * Sca1
             endif
 
             PMom1 = Scalar(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
@@ -3373,6 +3373,7 @@ integer :: rIn,rOut,i,counter
                if( abs(sc_(PMom1,PMom1)-Scalar(2)%Mass2).lt.PropCut ) cycle
                Sca0 = Sca0*PropFac1
             endif
+
 
             TmpScalar(1)%Mom  => PMom1(:)
             TmpScalar(1)%Pol  => Sca0
@@ -3399,6 +3400,8 @@ integer :: rIn,rOut,i,counter
          enddo
       enddo
       enddo
+
+
 
 return
 END FUNCTION
@@ -3521,7 +3524,6 @@ integer :: rIn,rOut,i,counter
 !DEC$ IF (_DebugCheckMyImpl1==1)
     if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_ffss"
 !DEC$ ENDIF
-
 
    Res(:)=(0d0,0d0)
       do n2a=0,NumGlu(2)
@@ -3751,6 +3753,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       n3b=NumGlu(3)-n3a-n3c
 
 ! print *, n1a,n1b,n1c
+! print *, n3a,n3b,n3c
 
       ! Fer1
       rIn=n1a+n1c+1
@@ -3771,14 +3774,14 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       if(n2b.ge.1 .or. n3a.ge.1) then
          PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(2)%Mass2)
          if( abs(sc_(PMom2,PMom2)-Scalars(2)%Mass2).lt.PropCut ) cycle
-         sc2 = sc2*PropFac1
+         sc2 = sc2*PropFac2
       endif
 
       if( n1c.gt.0 ) then
           rIn =n1a+1
           rOut=n1a+n1c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n1c)
-          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2
+          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2 
       elseif( n2c.gt.0) then
           rIn =NumGlu(1)+n2a+1
           rOut=NumGlu(1)+n2a+n2c
@@ -3819,16 +3822,13 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       enddo
       Eps2(:) = cur_g(TmpGluons(1:counter-1),1+n1a+n3b+1)
 
-
       if(n1a.ge.1 .or. n3b.ge.1) then
          PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)
          if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
-         Eps2(:) = Eps2(:)*PropFac3  * (-1d0)! FUDGE FACTOR this one or the other two have wrong signs
-print *, "FUDGE FACTOR HERE!"
+         Eps2(:) = Eps2(:)*PropFac3
       endif
 
       Res(:) = Res(:) + Eps2(:)
-! print *, "eps2",eps2
    enddo
    enddo
    enddo

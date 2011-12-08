@@ -2516,8 +2516,8 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
     IF( Correction.EQ.0 ) THEN
       NumPrimAmps = 2
       NumBornAmps = 2
-      NumPrimAmps = 4  ; print *, "for crossed check"
-      NumBornAmps = 4  ; print *, "for crossed check"
+!       NumPrimAmps = 4  ; print *, "for crossed check"
+!       NumBornAmps = 4  ; print *, "for crossed check"
 
     ELSEIF( Correction.EQ.1 ) THEN
       NumPrimAmps = 10
@@ -2569,8 +2569,9 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
     IF( Correction.EQ.0 ) THEN
       NumPrimAmps = 1
       NumBornAmps = 1
-      NumPrimAmps = 2  ; print *, "for crossed check"
-      NumBornAmps = 2  ; print *, "for crossed check"
+!       NumPrimAmps = 2  ; print *, "for crossed check"
+!       NumBornAmps = 2  ; print *, "for crossed check"
+
     ELSEIF( Correction.EQ.1 ) THEN
       NumPrimAmps = 6
       NumPrimAmps = 2; print *, "reduced numprimamps for fermloop check"
@@ -3559,15 +3560,23 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
    IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
       BornAmps(1)%ExtLine = (/1,2,3,4/)
       BornAmps(2)%ExtLine = (/1,2,4,3/)
-
       PrimAmps(1)%ExtLine = (/1,2,3,4/)
       PrimAmps(2)%ExtLine = (/1,2,4,3/)
 
+!       BornAmps(3)%ExtLine = (/3,4,1,2/); print *, "for crossed check"
+!       BornAmps(4)%ExtLine = (/4,3,1,2/)
+!       PrimAmps(3)%ExtLine = (/3,4,1,2/)
+!       PrimAmps(4)%ExtLine = (/4,3,1,2/)
 
-      BornAmps(3)%ExtLine = (/3,4,1,2/); print *, "for crossed check"
-      BornAmps(4)%ExtLine = (/4,3,1,2/)
-      PrimAmps(3)%ExtLine = (/3,4,1,2/)
-      PrimAmps(4)%ExtLine = (/4,3,1,2/)
+!       BornAmps(3)%ExtLine = (/3,2,1,4/); print *, "for crossed check"
+!       BornAmps(4)%ExtLine = (/4,2,1,3/)
+!       PrimAmps(3)%ExtLine = (/3,2,1,4/)
+!       PrimAmps(4)%ExtLine = (/4,2,1,3/)
+
+!       BornAmps(1)%ExtLine = (/1,4,3,2/)
+!       BornAmps(2)%ExtLine = (/1,3,4,2/)
+!       PrimAmps(1)%ExtLine = (/1,4,3,2/)
+!       PrimAmps(2)%ExtLine = (/1,3,4,2/)
 
    ELSEIF ( Correction.EQ.1 ) THEN
       BornAmps(1)%ExtLine = (/1,2,3,4/)
@@ -3617,8 +3626,10 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
    IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
       BornAmps(1)%ExtLine = (/1,2,3,4/)
       PrimAmps(1)%ExtLine = (/1,2,3,4/)
-      BornAmps(2)%ExtLine = (/3,4,1,2/); print *, "for crossed check"
-      PrimAmps(2)%ExtLine = (/3,4,1,2/)
+!       BornAmps(2)%ExtLine = (/3,4,1,2/); print *, "for crossed check"
+!       PrimAmps(2)%ExtLine = (/3,4,1,2/)
+
+
    ELSEIF( Correction.EQ.1 ) THEN 
         BornAmps(1)%ExtLine = (/1,2,3,4/); print *, "reduced numprimamps for fermloop check"
         BornAmps(2)%ExtLine = (/1,2,3,4/)

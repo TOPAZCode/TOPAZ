@@ -679,14 +679,14 @@ include 'vegas_common.f'
    call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 
-!!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
-print *, "Test Boost activated"
-MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
-call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
-!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
+! print *, "Test Boost activated"
+! MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
+! call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
+! !!!!!!!!!!!!!!!!!!!!
    ISFac = MomCrossing(MomExt)
 
    IF(XTOPDECAYS.EQ.3) THEN
@@ -732,25 +732,16 @@ IF( Correction.EQ.0 ) THEN
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,NumBornAmps
-print *, "CALL PRIMAMP",iprimamp
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
-!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-print *, "removed for cross checl"
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
-
-print *, BornAmps(1)%Result,BornAmps(2)%Result;
-print *, BornAmps(3)%Result,BornAmps(4)%Result;
-! print *, BornAmps(1)%Result/BornAmps(3)%Result;
-! print *, BornAmps(2)%Result/BornAmps(4)%Result;
-pause
-
    enddo!helicity loop
 
 
@@ -762,13 +753,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,6
-! print *, "tree",iPrimAmp
-! print *, BornAmps(iPrimAmp)%ExtLine
-! print *, BornAmps(iPrimAmp)%TreeProc%Gluons(1)%ExtRef
-! print *, BornAmps(iPrimAmp)%TreeProc%Gluons(2)%ExtRef
           call EvalTree(BornAmps(iPrimAmp))
-! print *, "res", BornAmps(iPrimAmp)%Result
-! pause
       enddo
 
       LO_Res_Pol = (0d0,0d0)
@@ -826,7 +811,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=9,9; print *, "only primamp",iPrimAmp
+      do iPrimAmp=7,7; print *, "only primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
 
           call PentCut(PrimAmps(iPrimAmp))
@@ -852,8 +837,8 @@ ELSEIF( Correction.EQ.1 ) THEN
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
 
 print *, "hel",ihel
-print *, "LO",LO_Res_UnPol
-print *, "NLO",PrimAmps(9)%Result(-2:1)
+print *, "LO",BornAmps(1)%Result
+print *, "NLO",PrimAmps(7)%Result(-2:1)
 pause
 
    enddo! helicity loop
@@ -986,21 +971,20 @@ IF( Correction.EQ.0 ) THEN
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,NumBornAmps
+! print *,"EVAL PRIMAMP",iPrimAmp
           call EvalTree(BornAmps(iPrimAmp))
+! print *, BornAmps(iPrimAmp)%Result
       enddo
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
-!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-print *, "removed for cross checl"
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+! print *, "removed for cross check"
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
-
-print *, BornAmps(1)%Result;
-print *, BornAmps(2)%Result;
-print *, BornAmps(1)%Result/BornAmps(2)%Result;
 pause
+
    enddo!helicity loop
 
 !------------ 1 LOOP --------------

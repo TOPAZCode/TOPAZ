@@ -243,8 +243,8 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!         call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
       enddo
       FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
       FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)
@@ -256,6 +256,8 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       enddo
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
+
+
    enddo! helicity loop
 ENDIF
 
