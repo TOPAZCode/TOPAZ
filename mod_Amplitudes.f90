@@ -158,6 +158,7 @@ integer :: Dv,Ds,tag_f,n
 complex(8) :: Res(1:Ds)
 type(TreeProcess) :: TreeProc
 logical :: Boson
+integer :: i,j,Order(1:6)
 
       call setDim(Dv,Ds)
 
@@ -178,6 +179,8 @@ logical :: Boson
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
 !              Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
              Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
+          else
+             call Error("requested current is not available")
           endif
 !----------------------------------------
       elseif( TreeProc%NumSca.eq.2 .and. TreeProc%NumQua.eq.0 ) then!  2 scalars and no quarks
@@ -190,35 +193,49 @@ logical :: Boson
              call Error("current doesn't exist yet")
           endif
 !----------------------------------------
-      elseif( TreeProc%NumQua.eq.2 .and. TreeProc%NumSca.eq.2 ) then!  2 quarks and 2 scalars 
+      elseif( TreeProc%NumQua.eq.2 .and. TreeProc%NumSca.eq.2 ) then!  2 quarks and 2 scalars
+          j=1;
+          do i=1,TreeProc%NumPart-1
+              if( TreeProc%PartType(i).eq.Glu_ ) cycle
+              Order(j)=abs( TreeProc%PartType(i) )
+              j=j+1
+          enddo
+
           if( TreeProc%PartType(1).eq.Glu_ ) then
-                if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) ) then 
-!                       Res(1:Ds) = cur_g_fssf(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
-                      call Error("cur_g_fssf current doesn't exist yet")
-                elseif( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
+                if( IsAQuark(Order(1)) .and. IsAQuark(Order(2)) .and. IsAScalar(Order(3)) ) then 
+!                 elseif( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
                       Res(1:Ds) = cur_g_ffss(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
-                elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
-!                       Res(1:Ds) = cur_g_sffs(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
-                      call Error("cur_g_sffs current doesn't exist yet") 
-                elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) )then 
+!                       print *, "calling cur_g_ffss"
+!                       pause
+                elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAQuark(Order(3)) ) then 
+!                 elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) )then 
                       Res(1:Ds) = cur_g_ssff(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+!                       print *, "calling cur_g_ssff"
+!                       pause
                 else
                       call Error("cur_g_xxxx current doesn't exist")
                 endif
 
           elseif( IsAScalar(TreeProc%PartType(1))  ) then
-                if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1 ) then 
+!                 if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1 ) then 
+                if( IsAQuark(Order(2)) ) then 
                     Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
+!                     print *, "calling cur_s_sffs"
                     Res(2:Ds) = 0d0
                 else
                     Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
+!                     print *, "calling cur_s_ssff"
                     Res(2:Ds) = 0d0
                 endif
+
           elseif( IsAQuark(TreeProc%PartType(1))  ) then
-                if( TreeProc%Scalars(1)%ExtRef.lt.TreeProc%Quarks(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1 ) then 
+!                 if( TreeProc%Scalars(1)%ExtRef.lt.TreeProc%Quarks(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1 ) then 
+                if( IsAScalar(Order(2)) ) then 
                     Res(1:Ds) = cur_f_fssf( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:2),TreeProc%NumGlu(0:4))
+!                     print *, "calling cur_f_fssf"
                 else
                     Res(1:Ds) = cur_f_ffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:2),TreeProc%NumGlu(0:4))
+!                     print *, "calling cur_f_ffss"
                 endif
           else
              call Error("current doesn't exist yet")
@@ -228,8 +245,30 @@ logical :: Boson
       elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  4 quarks, no scalars
           if( TreeProc%PartType(1).eq.Glu_ ) then
               Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
+!                       print *, "calling cur_g_4f"
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
               Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
+!                       print *, "calling cur_f_4f"
+          else
+             call Error("requested current is not available")
+          endif
+!----------------------------------------
+      elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.2) then!  4 quarks, 2 scalars
+          j=1;
+          do i=1,TreeProc%NumPart-1
+              if( TreeProc%PartType(i).eq.Glu_ ) cycle
+              Order(j)=abs( TreeProc%PartType(i) )
+              j=j+1
+          enddo
+
+          if( IsAQuark(Order(1)) .and. IsAQuark(Order(2))  ) then
+              Res(1:Ds) = cur_f_fffssf( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
+!               print *, "calling cur_f_fffssf"
+          elseif( IsAQuark(Order(1)) .and. IsAScalar(Order(2))  ) then
+              Res(1:Ds) = cur_f_fssfff( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
+!               print *, "calling cur_f_fssfff"
+          else
+             call Error("requested current is not available")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.6  .and. TreeProc%NumSca.eq.0) then!  6 quarks, no scalars

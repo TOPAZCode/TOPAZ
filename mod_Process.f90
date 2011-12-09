@@ -36,6 +36,8 @@ type :: PtrToParticle
    complex(8),pointer :: Pol(:)
 end type
 
+
+
 type :: TreeProcess
    integer :: NumPart
    integer :: NumQua
@@ -47,6 +49,7 @@ type :: TreeProcess
    type(PtrToParticle),allocatable :: Gluons(:)
    type(PtrToParticle) :: Boson
    type(PtrToParticle),allocatable :: Scalars(:)
+!    procedure(), pointer, nopass :: EvalCurrent
 end type
 
 type :: UnitarityCut
@@ -95,6 +98,7 @@ type(BornAmplitude),allocatable, target :: BornAmps(:)
 integer, public :: NumExtParticles,NumHelicities,NumPrimAmps,NumBornAmps
 
 integer h1,h2,h3,h4,h5,h6,ih
+
 
 contains
 

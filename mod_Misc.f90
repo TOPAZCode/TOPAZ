@@ -2363,10 +2363,9 @@ END SUBROUTINE
       complex(8) :: csg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          csg = (0d0,+1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )!  minus sign corrected
+          csg = (0d0,+1d0)/sqrt2*( sc_(k1,e1)+2d0*sc_(p,e1) )!  minus sign corrected
 
       end function csg
-
 
       function cgs(e1,k1,p)
       implicit none
@@ -2376,7 +2375,7 @@ END SUBROUTINE
       complex(8) :: cgs
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cgs = (0d0,-1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )
+          cgs = (0d0,-1d0)/sqrt2*( sc_(k1,e1)+2d0*sc_(p,e1) )
 
       end function cgs
 
@@ -2392,7 +2391,7 @@ END SUBROUTINE
       complex(8) :: cbsg
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-          cbsg = (0d0,1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )
+          cbsg = (0d0,1d0)/sqrt2*( sc_(k1,e1)+2d0*sc_(p,e1) )
 
       end function cbsg
 
@@ -2405,7 +2404,7 @@ END SUBROUTINE
       complex(8) :: cgbs
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
  
-          cgbs = (0d0,-1d0)/sqrt2*( (k1.dot.e1)+2d0*(p.dot.e1) )
+          cgbs = (0d0,-1d0)/sqrt2*( sc_(k1,e1)+2d0*sc_(p,e1) )
 
       end function cgbs
 
@@ -2415,7 +2414,7 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:),e2(:)
       complex(8) :: cggs
 
-          cggs = (0d0,1d0)/2d0 * (e1.dot.e2)!  i/2 corrected
+          cggs = (0d0,1d0)/2d0 * sc_(e1,e2)!  i/2 corrected
 
       end function cggs
 
@@ -2425,7 +2424,7 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:),e2(:)
       complex(8) :: csgg
 
-          csgg =  (0d0,1d0)/2d0 * (e1.dot.e2)!  i/2 corrected
+          csgg =  (0d0,1d0)/2d0 * sc_(e1,e2)!  i/2 corrected
 
       end function csgg
 
@@ -2435,7 +2434,7 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:),e2(:)
       complex(8) :: cgsg
 
-          cgsg = -(0d0,1d0) * (e1.dot.e2)!  what??? why no factor two?
+          cgsg = -(0d0,1d0)/2d0 * sc_(e1,e2)
 
       end function cgsg
 
@@ -2476,27 +2475,6 @@ END SUBROUTINE
 
       end function vggss
 
-
-!       function vssgg(Dv,e1)
-!       implicit none
-!       complex(8), intent(in) :: e1(:)
-!       integer :: Dv
-!       complex(8) :: vssgg(1:Dv)
-! 
-!           vssgg(:) = 1d0 * e1(:)
-! 
-!       end function vssgg
-! 
-! 
-!       function vsgsg(Dv,e1)
-!       implicit none
-!       complex(8), intent(in) :: e1(:)
-!       integer :: Dv
-!       complex(8) :: vsgsg(1:Dv)
-! 
-!           vsgsg(:) = -1d0 * e1(:)
-! 
-!       end function vsgsg
 
 !-------------- END: color charged scalar couplings
 

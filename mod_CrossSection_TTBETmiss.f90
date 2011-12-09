@@ -678,7 +678,6 @@ include 'vegas_common.f'
 
    call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-
 ! !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
 ! print *, "Test Boost activated"
 ! MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
@@ -811,7 +810,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=7,7; print *, "only primamp",iPrimAmp
+      do iPrimAmp=7,10; print *, "only primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
 
           call PentCut(PrimAmps(iPrimAmp))
@@ -835,11 +834,6 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       enddo
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
-
-print *, "hel",ihel
-print *, "LO",BornAmps(1)%Result
-print *, "NLO",PrimAmps(7)%Result(-2:1)
-pause
 
    enddo! helicity loop
 
@@ -1040,7 +1034,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 !       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=1,1; print *, "Evaluate primamp only",iPrimAmp
+      do iPrimAmp=1,2; print *, "Evaluate primamp only",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -1066,10 +1060,11 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 print *, "hel",ihel
-print *, "LO ",BornAmps(1)%Result
-print *, "NLO",PrimAmps(1)%Result(-2:1)
-print *, "ratio",PrimAmps(1)%Result(-2:1)/BornAmps(1)%Result
+print *, "LO",BornAmps(1)%Result
+print *, "NLO",PrimAmps(2)%Result(-2:1)
+print *, "ratio",PrimAmps(2)%Result(-1)/BornAmps(1)%Result
 pause
+
 
    enddo!helicity loop
 ENDIF! Correction loop
