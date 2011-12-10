@@ -80,26 +80,36 @@
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q2neg(:)
+          elseif( IsAScalar(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
+                TreeProcs(1)%Scalars(TreeProcs(1)%NumSca)%Mom => q2neg(:)
           endif
           if( TreeProcs(2)%PartType(TreeProcs(2)%NumPart).eq.Glu_ ) then
                 TreeProcs(2)%Gluons(TreeProcs(2)%NumGlu(0))%Mom => q3neg(:)
           elseif( IsAQuark(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
                 TreeProcs(2)%Quarks(TreeProcs(2)%NumQua)%Mom => q3neg(:)
+          elseif( IsAScalar(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
+                TreeProcs(2)%Scalars(TreeProcs(2)%NumSca)%Mom => q3neg(:)
           endif
           if( TreeProcs(3)%PartType(TreeProcs(3)%NumPart).eq.Glu_ ) then
                 TreeProcs(3)%Gluons(TreeProcs(3)%NumGlu(0))%Mom => q4neg(:)
           elseif( IsAQuark(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
                 TreeProcs(3)%Quarks(TreeProcs(3)%NumQua)%Mom => q4neg(:)
+          elseif( IsAScalar(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
+                TreeProcs(3)%Scalars(TreeProcs(3)%NumSca)%Mom => q4neg(:)
           endif
           if( TreeProcs(4)%PartType(TreeProcs(4)%NumPart).eq.Glu_ ) then
                 TreeProcs(4)%Gluons(TreeProcs(4)%NumGlu(0))%Mom => q5neg(:)
           elseif( IsAQuark(TreeProcs(4)%PartType(TreeProcs(4)%NumPart)) ) then
                 TreeProcs(4)%Quarks(TreeProcs(4)%NumQua)%Mom => q5neg(:)
+          elseif( IsAScalar(TreeProcs(4)%PartType(TreeProcs(4)%NumPart)) ) then
+                TreeProcs(4)%Scalars(TreeProcs(4)%NumSca)%Mom => q5neg(:)
           endif
           if( TreeProcs(5)%PartType(TreeProcs(5)%NumPart).eq.Glu_ ) then
                 TreeProcs(5)%Gluons(TreeProcs(5)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(5)%PartType(TreeProcs(5)%NumPart)) ) then
                 TreeProcs(5)%Quarks(TreeProcs(5)%NumQua)%Mom => q1neg(:)
+          elseif( IsAScalar(TreeProcs(5)%PartType(TreeProcs(5)%NumPart)) ) then
+                TreeProcs(5)%Scalars(TreeProcs(5)%NumSca)%Mom => q1neg(:)
           endif
 
 
@@ -114,7 +124,6 @@
           res=dcmplx(0d0,0d0)
 
 !DEC$ IF (_DebugUseMyAmps==0)
-
           if( any(Lab_in(l5c(1:5)).eq.'glu') ) then
             tag_f = 0
           elseif( all(Lab_in(l5c(1:5)).eq.'top') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then
@@ -169,7 +178,6 @@
           elseif( all(Lab_in(l5c(1:5)).eq.'bot') .or. all(Lab_in(l5c(1:5)).eq.'chm') ) then
             tag_f = 2
           endif
-
 
             call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
             call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
@@ -376,28 +384,35 @@ END SUBROUTINE
             tag_f = 2
           endif
 
-
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q2neg(:)
-           endif
+          elseif( IsAScalar(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
+                TreeProcs(1)%Scalars(TreeProcs(1)%NumSca)%Mom => q2neg(:)
+          endif
           if( TreeProcs(2)%PartType(TreeProcs(2)%NumPart).eq.Glu_ ) then
                 TreeProcs(2)%Gluons(TreeProcs(2)%NumGlu(0))%Mom => q3neg(:)
           elseif( IsAQuark(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
                 TreeProcs(2)%Quarks(TreeProcs(2)%NumQua)%Mom => q3neg(:)
-           endif
+          elseif( IsAScalar(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
+                TreeProcs(2)%Scalars(TreeProcs(2)%NumSca)%Mom => q3neg(:)
+          endif
           if( TreeProcs(3)%PartType(TreeProcs(3)%NumPart).eq.Glu_ ) then
                 TreeProcs(3)%Gluons(TreeProcs(3)%NumGlu(0))%Mom => q4neg(:)
           elseif( IsAQuark(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
                 TreeProcs(3)%Quarks(TreeProcs(3)%NumQua)%Mom => q4neg(:)
-           endif
+          elseif( IsAScalar(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
+                TreeProcs(3)%Scalars(TreeProcs(3)%NumSca)%Mom => q4neg(:)
+          endif
           if( TreeProcs(4)%PartType(TreeProcs(4)%NumPart).eq.Glu_ ) then
                 TreeProcs(4)%Gluons(TreeProcs(4)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(4)%PartType(TreeProcs(4)%NumPart)) ) then
                 TreeProcs(4)%Quarks(TreeProcs(4)%NumQua)%Mom => q1neg(:)
-           endif
+          elseif( IsAScalar(TreeProcs(4)%PartType(TreeProcs(4)%NumPart)) ) then
+                TreeProcs(4)%Scalars(TreeProcs(4)%NumSca)%Mom => q1neg(:)
+          endif
 
 
           if (Ds.eq.4) then
@@ -758,22 +773,22 @@ END SUBROUTINE
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q2neg(:)
-          else
-                call Error("in momentum vector for last particle")
+          elseif( IsAScalar(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
+                TreeProcs(1)%Scalars(TreeProcs(1)%NumSca)%Mom => q2neg(:)
           endif
           if( TreeProcs(2)%PartType(TreeProcs(2)%NumPart).eq.Glu_ ) then
                 TreeProcs(2)%Gluons(TreeProcs(2)%NumGlu(0))%Mom => q3neg(:)
           elseif( IsAQuark(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
                 TreeProcs(2)%Quarks(TreeProcs(2)%NumQua)%Mom => q3neg(:)
-          else
-                call Error("in momentum vector for last particle")
+          elseif( IsAScalar(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
+                TreeProcs(2)%Scalars(TreeProcs(2)%NumSca)%Mom => q3neg(:)
           endif
           if( TreeProcs(3)%PartType(TreeProcs(3)%NumPart).eq.Glu_ ) then
                 TreeProcs(3)%Gluons(TreeProcs(3)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
                 TreeProcs(3)%Quarks(TreeProcs(3)%NumQua)%Mom => q1neg(:)
-          else
-                call Error("in momentum vector for last particle")
+          elseif( IsAScalar(TreeProcs(3)%PartType(TreeProcs(3)%NumPart)) ) then
+                TreeProcs(3)%Scalars(TreeProcs(3)%NumSca)%Mom => q1neg(:)
           endif
 
 
@@ -1195,11 +1210,15 @@ print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q2neg(:)
+          elseif( IsAScalar(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
+                TreeProcs(1)%Scalars(TreeProcs(1)%NumSca)%Mom => q2neg(:)
           endif
           if( TreeProcs(2)%PartType(TreeProcs(2)%NumPart).eq.Glu_ ) then
                 TreeProcs(2)%Gluons(TreeProcs(2)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
                 TreeProcs(2)%Quarks(TreeProcs(2)%NumQua)%Mom => q1neg(:)
+          elseif( IsAScalar(TreeProcs(2)%PartType(TreeProcs(2)%NumPart)) ) then
+                TreeProcs(2)%Scalars(TreeProcs(2)%NumSca)%Mom => q1neg(:)
           endif
 
           if (Ds.eq.4) then
@@ -1655,7 +1674,9 @@ print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q1neg(:)
           elseif( IsAQuark(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
                 TreeProcs(1)%Quarks(TreeProcs(1)%NumQua)%Mom => q1neg(:)
-           endif
+          elseif( IsAScalar(TreeProcs(1)%PartType(TreeProcs(1)%NumPart)) ) then
+                TreeProcs(1)%Scalars(TreeProcs(1)%NumSca)%Mom => q1neg(:)
+          endif
 
           if (Ds.eq.4) then
           call givepol(TreeProcs(1)%PartType(1),q1(1:5),4,4,tag_pol,Nj1,BPOL1,POL1)
@@ -2793,9 +2814,14 @@ print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for
                   BPOL(2,8)=dcmplx(0d0,1d0)
              endif
             Nj=Nhg
-          else
+
+         elseif( IsAScalar(PartType) ) then
+              Nj=1
+              POL(1,1)=(1d0,0d0)
+              BPOL(1,1)=(1d0,0d0)
+         else
               call Error("givepol")
-          endif
+         endif
 
           END SUBROUTINE
 

@@ -763,20 +763,26 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
-! !------------ bosonic loops --------------
-!        do iPrimAmp=1,6
-!           call SetKirill(PrimAmps(iPrimAmp))
-!           call PentCut(PrimAmps(iPrimAmp))
-!           call QuadCut(PrimAmps(iPrimAmp))
-!           call TripCut(PrimAmps(iPrimAmp))
-!           call DoubCut(PrimAmps(iPrimAmp))
-!           call SingCut(PrimAmps(iPrimAmp))
-!           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-!           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
-!           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-! !         call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
-! 
+!------------ bosonic loops --------------
+       do iPrimAmp=1,6
+          call SetKirill(PrimAmps(iPrimAmp))
+          call PentCut(PrimAmps(iPrimAmp))
+          call QuadCut(PrimAmps(iPrimAmp))
+          call TripCut(PrimAmps(iPrimAmp))
+          call DoubCut(PrimAmps(iPrimAmp))
+          call SingCut(PrimAmps(iPrimAmp))
+          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
+          PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!         call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+
+print *, "hel",ihel,"primamp",iPrimAmp
+print *, "LO",BornAmps(iPrimAmp)%Result
+print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
+print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
+pause
+
 ! !DEC$ IF (_QuadPrecImpr==1)
 !           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
 !           if( AccPoles.gt.1d-4 ) then
@@ -798,7 +804,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 !               endif
 !           endif
 ! !DEC$ ENDIF
-!       enddo
+      enddo
 ! 
 !       NLO_Res_Pol(-2:1) = (0d0,0d0)
 !       do jPrimAmp=1,6
@@ -834,6 +840,12 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       enddo
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
+
+print *, "hel",ihel
+print *, "LO",BornAmps(1)%Result
+print *, "NLO",PrimAmps(7)%Result(-2:1)
+print *, "ratio",PrimAmps(7)%Result(-1)/BornAmps(1)%Result
+pause
 
    enddo! helicity loop
 
@@ -1058,13 +1070,11 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
 
-
-print *, "hel",ihel
-print *, "LO",BornAmps(1)%Result
-print *, "NLO",PrimAmps(2)%Result(-2:1)
-print *, "ratio",PrimAmps(2)%Result(-1)/BornAmps(1)%Result
-pause
-
+! print *, "hel",ihel
+! print *, "LO",BornAmps(1)%Result
+! print *, "NLO",PrimAmps(2)%Result(-2:1)
+! print *, "ratio",PrimAmps(2)%Result(-1)/BornAmps(1)%Result
+! pause
 
    enddo!helicity loop
 ENDIF! Correction loop

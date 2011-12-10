@@ -316,6 +316,9 @@ type(TreeProcess) :: TreeProc
                       do j1=1,Nj1
                         mur(j1,j2) = psp1_(POLI(j1,1:Ds),Res(1:Ds))
                       enddo
+                   elseif( IsAScalar(TreeProc%PartType(1)) ) then
+                         j1=1
+                         mur(j1,j2) = POLI(j1,1)*Res(1)
                    else
                         call Error("new_ampl")
                    endif
@@ -332,12 +335,32 @@ type(TreeProcess) :: TreeProc
                       do j1=1,Nj1
                          mur(j1,j2) = psp1_(POLI(j1,1:Ds),Res(1:Ds))
                       enddo
+                   elseif( IsAScalar(TreeProc%PartType(1)) ) then
+                         j1=1
+                         mur(j1,j2) = POLI(j1,1)*Res(1)
                    else
                         call Error("new_ampl")
                    endif
             enddo
     elseif( IsAScalar(TreeProc%PartType(TreeProc%NumPart)) ) then
-          call Error("hier we are")
+            do j2=1,Nj2
+                   TreeProc%Scalars(TreeProc%NumSca)%Pol => BPOLF(j2,1:Ds)
+                   call new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res(1:Ds))
+                   if( TreeProc%PartType(1).eq.Glu_) then
+                      do j1=1,Nj1
+                         mur(j1,j2) = sc_(POLI(j1,1:Dv),Res(1:Dv))
+                      enddo
+                   elseif( IsAQuark(TreeProc%PartType(1)) ) then
+                      do j1=1,Nj1
+                         mur(j1,j2) = psp1_(POLI(j1,1:Ds),Res(1:Ds))
+                      enddo
+                   elseif( IsAScalar(TreeProc%PartType(1)) ) then
+                         j1=1
+                         mur(j1,j2) = POLI(j1,1)*Res(1)
+                   else
+                        call Error("new_ampl")
+                   endif
+            enddo
     endif
 
 
