@@ -2578,7 +2578,6 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
     ELSEIF( Correction.EQ.1 ) THEN
       NumPrimAmps = 6
-      NumPrimAmps = 2; print *, "reduced numprimamps for fermloop check"
       NumBornAmps = 1
     ELSEIF( Correction.EQ.3 ) THEN
     ENDIF
@@ -3635,32 +3634,36 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
 
    ELSEIF( Correction.EQ.1 ) THEN 
-        BornAmps(1)%ExtLine = (/1,2,3,4/); print *, "reduced numprimamps for fermloop check"
+        BornAmps(1)%ExtLine = (/1,2,3,4/)
         BornAmps(2)%ExtLine = (/1,2,3,4/)
-!         BornAmps(3)%ExtLine = (/1,4,3,2/)
-!         BornAmps(4)%ExtLine = (/1,2,3,4/)
-!         BornAmps(5)%ExtLine = (/1,2,3,4/)
-!         BornAmps(6)%ExtLine = (/1,2,3,4/)
+        BornAmps(3)%ExtLine = (/1,4,3,2/)
+        BornAmps(4)%ExtLine = (/1,2,3,4/)
+        BornAmps(5)%ExtLine = (/1,2,3,4/)
+        BornAmps(6)%ExtLine = (/1,2,3,4/)
 
-!         PrimAmps(1)%ExtLine = (/1,2,3,4/)
-!         PrimAmps(1)%AmpType = 1
-! 
-!         PrimAmps(2)%ExtLine = (/1,2,4,3/)
-!         PrimAmps(2)%AmpType = 1
-! 
+        PrimAmps(1)%ExtLine = (/1,2,3,4/)
+        PrimAmps(1)%AmpType = 1
+
+        PrimAmps(2)%ExtLine = (/1,2,4,3/)
+        PrimAmps(2)%AmpType = 1
+
+
+        PrimAmps(3)%ExtLine = (/1,2,3,4/); print *, "replaced because amptype 3,4 not yet implelemted"
+        PrimAmps(3)%AmpType = 1
+        PrimAmps(4)%ExtLine = (/1,2,4,3/)
+        PrimAmps(4)%AmpType = 1
 !         PrimAmps(3)%ExtLine = (/1,4,3,2/)
 !         PrimAmps(3)%AmpType = 3
-! 
 !         PrimAmps(4)%ExtLine = (/1,2,3,4/)
 !         PrimAmps(4)%AmpType = 4
 
-        PrimAmps(5-4)%ExtLine = (/1,2,3,4/)
-        PrimAmps(5-4)%AmpType = 2
-        PrimAmps(5-4)%FermLoopPart = Chm_
+        PrimAmps(5)%ExtLine = (/1,2,3,4/)
+        PrimAmps(5)%AmpType = 2
+        PrimAmps(5)%FermLoopPart = Chm_
 
-        PrimAmps(6-4)%ExtLine = (/1,2,3,4/)
-        PrimAmps(6-4)%AmpType = 2
-        PrimAmps(6-4)%FermLoopPart = Bot_
+        PrimAmps(6)%ExtLine = (/1,2,3,4/)
+        PrimAmps(6)%AmpType = 2
+        PrimAmps(6)%FermLoopPart = Bot_
    ENDIF
 
 
