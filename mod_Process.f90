@@ -3836,13 +3836,16 @@ IF( Correction.EQ.1 ) THEN
 
 
 !  determine number of quark lines
+!  scalar lines are treated like fermion lines here. in particular, FermLine1=Scalar line , FermLine2=Quark line, assuming the corresp. ordering of the prim.ampl.
          ThePrimAmp%FermLine1In = 0
          ThePrimAmp%FermLine1Out= 0
          ThePrimAmp%FermLine2In = 0
          ThePrimAmp%FermLine2Out= 0
          ThePrimAmp%ScaLine1In = 0
          ThePrimAmp%ScaLine1Out= 0
-         do Vertex=1,NumExtParticles
+         print *, "Primamp type",ThePrimAmp%ampType
+         print *, "Primamp",ThePrimAmp%ExtLine
+         do Vertex=1,NumExtParticles;  !      print *, "Vertex",Vertex
             Propa       = Vertex + 1
             PropaMinus1 = Propa - 1
             ExtPartType = ExtParticle( ThePrimAmp%ExtLine(Vertex) )%PartType
@@ -3850,21 +3853,20 @@ IF( Correction.EQ.1 ) THEN
                Propa       = 1
                PropaMinus1 = NumExtParticles
             endif
-
             if ( Vertex.eq.1 ) then
                ThePrimAmp%IntPart(Propa)%PartType = ExtPartType
                if( IsAQuark(ExtPartType) ) then
                   ThePrimAmp%FermionLines = 1
                   ThePrimAmp%FermLine1In  = 1
                elseif( IsAScalar(ExtPartType) ) then
-                  ThePrimAmp%ScalarLines = 1
-                  ThePrimAmp%ScaLine1In  = 1
+                  ThePrimAmp%FermionLines = 1
+                  ThePrimAmp%FermLine1In  = 1
                else
                   ThePrimAmp%FermionLines = 0
-                  ThePrimAmp%ScalarLines  = 0
                endif
 
             elseif( IsAQuark(ExtPartType) ) then
+!             print *, "IsAQuark(ExtPartType)"
                if( ThePrimAmp%AmpType.eq.1 ) then
                    if( ThePrimAmp%FermLine1Out.eq.0 ) then
                       ThePrimAmp%FermLine1Out = Vertex
@@ -3879,17 +3881,17 @@ IF( Correction.EQ.1 ) THEN
                    endif
 
                elseif( ThePrimamp%AmpType.eq.2 ) then
-                   if( ThePrimAmp%FermLine1Out.eq.0 .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
+                   if( ThePrimAmp%FermLine1Out.eq.0 ) then
                             ThePrimAmp%FermLine1Out = Vertex
                             ThePrimAmp%IntPart(1)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             ThePrimAmp%IntPart(Propa)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
                                 ThePrimAmp%IntPart(k)%PartType = 0
                             enddo
-                   elseif( ThePrimAmp%FermLine2In.eq.0  .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
+                   elseif( ThePrimAmp%FermLine2In.eq.0 ) then
                             ThePrimAmp%FermionLines = 2
                             ThePrimAmp%FermLine2In = Vertex
-                   elseif( ThePrimAmp%FermLine2Out.eq.0  .and. ThePrimAmp%ScaLine1Out.eq.0 ) then
+                   elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
                             ThePrimAmp%FermLine2Out = Vertex
                             do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
                                 ThePrimAmp%IntPart(k)%PartType = 0
@@ -3898,17 +3900,17 @@ IF( Correction.EQ.1 ) THEN
                                 ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             enddo
 
-                   elseif( ThePrimAmp%FermLine1In.eq.0 .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
-                            ThePrimAmp%FermionLines = 1
-                            ThePrimAmp%FermLine1In = Vertex
-                   elseif( ThePrimAmp%FermLine1Out.eq.0  .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
-                            ThePrimAmp%FermLine1Out = Vertex
-                            do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
-                                ThePrimAmp%IntPart(k)%PartType = 0
-                            enddo
-                            do k=ThePrimAmp%FermLine1Out+1,NumExtParticles
-                                ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
-                            enddo
+!                    elseif( ThePrimAmp%FermLine1In.eq.0 .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
+!                             ThePrimAmp%FermionLines = 1
+!                             ThePrimAmp%FermLine1In = Vertex
+!                    elseif( ThePrimAmp%FermLine1Out.eq.0  .and. ThePrimAmp%ScaLine1Out.ne.0 ) then! this is for the case when a scalar line is on the other side of the fermion loop
+!                             ThePrimAmp%FermLine1Out = Vertex
+!                             do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
+!                                 ThePrimAmp%IntPart(k)%PartType = 0
+!                             enddo
+!                             do k=ThePrimAmp%FermLine1Out+1,NumExtParticles
+!                                 ThePrimAmp%IntPart(k)%PartType = -abs(ThePrimAmp%FermLoopPart)
+!                             enddo
                    endif
 
                elseif( ThePrimamp%AmpType.eq.3 ) then
@@ -3953,27 +3955,28 @@ IF( Correction.EQ.1 ) THEN
                ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(PropaMinus1)%PartType
 
             elseif( IsAScalar(ExtPartType) ) then
+!             print *, "IsAScalar(ExtPartType)"
                if( ThePrimAmp%AmpType.eq.1 ) then
-                   if( ThePrimAmp%ScaLine1Out.eq.0 ) then
-                      ThePrimAmp%ScaLine1Out = Vertex
+                   if( ThePrimAmp%FermLine1Out.eq.0 ) then
+                      ThePrimAmp%FermLine1Out = Vertex
                       ThePrimAmp%IntPart(Propa)%PartType = Glu_
-!                    elseif( ThePrimAmp%ScaLine2In.eq.0 ) then!   not needed because there's always just one scalar line
-!                       ThePrimAmp%ScalarLines = 2
-!                       ThePrimAmp%ScaLine2In = Vertex
+!                    elseif( ThePrimAmp%FermLine1In.eq.0 ) then
+!                       ThePrimAmp%FermionLines = 1
+!                       ThePrimAmp%FermLine1In = Vertex
 !                       ThePrimAmp%IntPart(Propa)%PartType = ExtPartType
-!                    elseif( ThePrimAmp%ScaLine2Out.eq.0 ) then
-!                       ThePrimAmp%ScaLine2Out = Vertex
+!                    elseif( ThePrimAmp%FermLine1Out.eq.0 ) then
+!                       ThePrimAmp%FermLine1Out = Vertex
 !                       ThePrimAmp%IntPart(Propa)%PartType = Glu_
                    else
                         call Error("something's missing here")
                    endif
 
                elseif( ThePrimamp%AmpType.eq.2 ) then
-                   if( ThePrimAmp%ScaLine1Out.eq.0 ) then
-                            ThePrimAmp%ScaLine1Out = Vertex
+                   if( ThePrimAmp%FermLine1Out.eq.0 ) then
+                            ThePrimAmp%FermLine1Out = Vertex
                             ThePrimAmp%IntPart(1)%PartType = -abs(ThePrimAmp%FermLoopPart)
                             ThePrimAmp%IntPart(Propa)%PartType = -abs(ThePrimAmp%FermLoopPart)
-                            do k=ThePrimAmp%ScaLine1In+1,ThePrimAmp%ScaLine1Out
+                            do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
                                 ThePrimAmp%IntPart(k)%PartType = 0
                             enddo
 !                    elseif( ThePrimAmp%FermLine2In.eq.0 ) then!   not needed because there's always just one scalar line
@@ -4042,15 +4045,28 @@ IF( Correction.EQ.1 ) THEN
                ThePrimAmp%IntPart(Propa)%PartType = abs( ThePrimAmp%IntPart(PropaMinus1)%PartType +1)
                ColorLessParticles = .true.
             endif
-         enddo
+! print *, "propa",Propa,ThePrimAmp%IntPart(Propa)%PartType; !pause
+
+         enddo! Vertex
+
+         
 
          do Propa=1,NumExtParticles
             if( ThePrimAmp%IntPart(Propa)%PartType .eq. 99 ) call Error("internal particle type is 99")
             ThePrimAmp%IntPart(Propa)%Mass  = GetMass( ThePrimAmp%IntPart(Propa)%PartType )
             ThePrimAmp%IntPart(Propa)%Mass2 = (ThePrimAmp%IntPart(Propa)%Mass)**2
             ThePrimAmp%IntPart(Propa)%ExtRef = -1
+            if( IsAScalar(ExtParticle( ThePrimAmp%ExtLine(Propa) )%PartType) .and. ThePrimAmp%ScaLine1In.eq.0 ) then! just checking if there are scalars
+                    ThePrimAmp%ScaLine1In = ThePrimAmp%FermLine1In
+                    ThePrimAmp%ScaLine1Out= ThePrimAmp%FermLine1Out
+                    if( ThePrimAmp%FermLine2In.ne.0 ) then! just checking if there are scalars+fermions
+                        ThePrimAmp%FermLine1In  = ThePrimAmp%FermLine2In
+                        ThePrimAmp%FermLine1Out = ThePrimAmp%FermLine2Out
+                        ThePrimAmp%FermLine2In  = 0
+                        ThePrimAmp%FermLine2Out = 0
+                    endif
+            endif
          enddo
-
 !        set number of possible insertions of colorless particles into quark lines
 !          if ( ColorLessParticles ) then
 !             ThePrimAmp%NumInsertions1 = ThePrimAmp%FermLine1Out - ThePrimAmp%FermLine1In - 1
@@ -4059,8 +4075,10 @@ IF( Correction.EQ.1 ) THEN
 !             endif
 !          endif
 
+
+
          call InitUCuts(ThePrimAmp)
-   enddo
+   enddo! NPrimAmp
 ENDIF
 
 RETURN

@@ -180,7 +180,7 @@ integer :: i,j,Order(1:6)
 !              Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
              Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
           else
-             call Error("requested current is not available")
+             call Error("requested current is not available 2q")
           endif
 !----------------------------------------
       elseif( TreeProc%NumSca.eq.2 .and. TreeProc%NumQua.eq.0 ) then!  2 scalars and no quarks
@@ -190,7 +190,7 @@ integer :: i,j,Order(1:6)
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
              Res(2:Ds) = 0d0
           else
-             call Error("current doesn't exist yet")
+             call Error("requested current is not available 2s")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.2 .and. TreeProc%NumSca.eq.2 ) then!  2 quarks and 2 scalars
@@ -213,7 +213,7 @@ integer :: i,j,Order(1:6)
 !                       print *, "calling cur_g_ssff"
 !                       pause
                 else
-                      call Error("cur_g_xxxx current doesn't exist")
+                      call Error("requested current is not available 2q+2s")
                 endif
 
           elseif( IsAScalar(TreeProc%PartType(1))  ) then
@@ -238,7 +238,7 @@ integer :: i,j,Order(1:6)
 !                     print *, "calling cur_f_ffss"
                 endif
           else
-             call Error("current doesn't exist yet")
+             call Error("requested current is not available 2q+2s")
           endif
 
 !----------------------------------------
@@ -250,7 +250,15 @@ integer :: i,j,Order(1:6)
               Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
 !                       print *, "calling cur_f_4f"
           else
-             call Error("requested current is not available")
+             call Error("requested current is not available 4q")
+          endif
+!----------------------------------------
+      elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  0 quarks, 4 scalars
+          if( IsAScalar(TreeProc%PartType(1)) ) then
+              Res(1:Ds) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
+!                       print *, "calling cur_s_4s"
+          else
+             call Error("requested current is not available 4s")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.2) then!  4 quarks, 2 scalars
@@ -268,17 +276,33 @@ integer :: i,j,Order(1:6)
               Res(1:Ds) = cur_f_fssfff( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
 !               print *, "calling cur_f_fssfff"
           else
-             call Error("requested current is not available")
+             call Error("requested current is not available 4q+2s")
+          endif
+!----------------------------------------
+      elseif( TreeProc%NumQua.eq.2  .and. TreeProc%NumSca.eq.4) then!  2 quarks, 4 scalars
+          j=1;
+          do i=1,TreeProc%NumPart-1
+              if( TreeProc%PartType(i).eq.Glu_ ) cycle
+              Order(j)=abs( TreeProc%PartType(i) )
+              j=j+1
+          enddo
+          if( IsAScalar(Order(1)) .and. IsAQuark(Order(3))  ) then
+              Res(1) = cur_s_ssffss( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+              Res(2:Ds) = 0d0
+!               print *, "calling cur_s_ssffss"
+          else
+             call Error("requested current is not available 2q+4s")
           endif
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.6  .and. TreeProc%NumSca.eq.0) then!  6 quarks, no scalars
           if( IsAQuark(TreeProc%PartType(1)) ) then
               Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f )
           else
-              call Error("requested current is not available")
+              call Error("requested current is not available 6q")
           endif
       else
-           call Error("requested current is not available")
+
+           call Error("requested current is not available xx")
       endif
 
 
