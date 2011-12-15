@@ -3635,11 +3635,10 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
    ELSEIF( Correction.EQ.1 ) THEN 
         BornAmps(1)%ExtLine = (/1,2,3,4/)
-        BornAmps(2)%ExtLine = (/1,2,3,4/)
-        BornAmps(3)%ExtLine = (/1,4,3,2/)
+        BornAmps(2)%ExtLine = (/1,2,4,3/)
+        BornAmps(3)%ExtLine = (/1,2,3,4/)
         BornAmps(4)%ExtLine = (/1,2,3,4/)
-        BornAmps(5)%ExtLine = (/1,2,3,4/)
-        BornAmps(6)%ExtLine = (/1,2,3,4/)
+
 
         PrimAmps(1)%ExtLine = (/1,2,3,4/)
         PrimAmps(1)%AmpType = 1
@@ -4049,7 +4048,11 @@ IF( Correction.EQ.1 ) THEN
 
          enddo! Vertex
 
-         
+!          print *, "check1"
+!          print *, ThePrimAmp%FermLine1In,ThePrimAmp%FermLine1Out
+!          print *, ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out
+!          print *, ThePrimAmp%ScaLine1In,ThePrimAmp%ScaLine1Out
+!          pause
 
          do Propa=1,NumExtParticles
             if( ThePrimAmp%IntPart(Propa)%PartType .eq. 99 ) call Error("internal particle type is 99")
@@ -4064,6 +4067,11 @@ IF( Correction.EQ.1 ) THEN
                         ThePrimAmp%FermLine1Out = ThePrimAmp%FermLine2Out
                         ThePrimAmp%FermLine2In  = 0
                         ThePrimAmp%FermLine2Out = 0
+                    else
+                        ThePrimAmp%FermLine1In  = 0
+                        ThePrimAmp%FermLine1Out = 0
+                        ThePrimAmp%FermLine2In  = 0
+                        ThePrimAmp%FermLine2Out = 0
                     endif
             endif
          enddo
@@ -4076,6 +4084,11 @@ IF( Correction.EQ.1 ) THEN
 !          endif
 
 
+!          print *, "check2"
+!          print *, ThePrimAmp%FermLine1In,ThePrimAmp%FermLine1Out
+!          print *, ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out
+!          print *, ThePrimAmp%ScaLine1In,ThePrimAmp%ScaLine1Out
+!          pause
 
          call InitUCuts(ThePrimAmp)
    enddo! NPrimAmp

@@ -2434,7 +2434,7 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:),e2(:)
       complex(8) :: cgsg
 
-          cgsg = -(0d0,1d0)/2d0 * sc_(e1,e2)
+          cgsg = -(0d0,1d0)/1d0 * sc_(e1,e2)!  factor 1/2 removed!
 
       end function cgsg
 
@@ -2474,6 +2474,29 @@ END SUBROUTINE
           vggss(:) = +(0d0,1d0)/2d0 * e1(:)
 
       end function vggss
+
+
+      function vgssg(Dv,e1)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      integer :: Dv
+      complex(8) :: vgssg(1:Dv)
+
+          vgssg(:) = +(0d0,1d0)/2d0 * e1(:)
+
+      end function vgssg
+
+
+
+      function vgsgs(Dv,e1)
+      implicit none
+      complex(8), intent(in) :: e1(:)
+      integer :: Dv
+      complex(8) :: vgsgs(1:Dv)
+
+          vgsgs(:) = -(0d0,1d0)/1d0 * e1(:)!  factor 1/2 removed!
+
+      end function vgsgs
 
 
 !-------------- END: color charged scalar couplings

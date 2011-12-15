@@ -673,6 +673,7 @@ ENDIF
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
 !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+
       enddo
       BosonicPartAmp(1,-2:1) =  &
                              + Nc * PrimAmps(PrimAmp1_1234)%Result(-2:1) &

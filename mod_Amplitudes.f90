@@ -173,6 +173,9 @@ integer :: i,j,Order(1:6)
           endif
           if( TreeProc%PartType(1).eq.Glu_ ) then
               Res(1:Dv) = cur_g_2f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:3) )
+! print *, "CHECK POINT cur_g_2f"
+! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom)
+! pause
           elseif( IsAQuark(TreeProc%PartType(1)) .and. .not.Boson ) then
              Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
@@ -186,6 +189,9 @@ integer :: i,j,Order(1:6)
       elseif( TreeProc%NumSca.eq.2 .and. TreeProc%NumQua.eq.0 ) then!  2 scalars and no quarks
           if( TreeProc%PartType(1).eq.Glu_ ) then
              Res(1:Dv) = cur_g_2s(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:TreeProc%NumSca),TreeProc%NumGlu(0:3))
+! print *, "CHECK POINT cur_g_2s"
+! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
+! pause
           elseif( IsAScalar(TreeProc%PartType(1)) ) then
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
              Res(2:Ds) = 0d0
@@ -204,12 +210,18 @@ integer :: i,j,Order(1:6)
           if( TreeProc%PartType(1).eq.Glu_ ) then
                 if( IsAQuark(Order(1)) .and. IsAQuark(Order(2)) .and. IsAScalar(Order(3)) ) then 
 !                 elseif( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
-                      Res(1:Ds) = cur_g_ffss(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      Res(1:Dv) = cur_g_ffss(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+! print *, "CHECK POINT cur_g_ffss"
+! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
+! pause
 !                       print *, "calling cur_g_ffss"
 !                       pause
                 elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAQuark(Order(3)) ) then 
 !                 elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) )then 
-                      Res(1:Ds) = cur_g_ssff(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      Res(1:Dv) = cur_g_ssff(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+! print *, "CHECK POINT cur_g_ssff"
+! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
+! pause
 !                       print *, "calling cur_g_ssff"
 !                       pause
                 else
@@ -245,6 +257,9 @@ integer :: i,j,Order(1:6)
       elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  4 quarks, no scalars
           if( TreeProc%PartType(1).eq.Glu_ ) then
               Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
+! print *, "CHECK POINT cur_g_4f"
+! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Quarks(3)%Mom+ TreeProc%Quarks(4)%Mom)
+! pause
 !                       print *, "calling cur_g_4f"
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
               Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
@@ -253,9 +268,10 @@ integer :: i,j,Order(1:6)
              call Error("requested current is not available 4q")
           endif
 !----------------------------------------
-      elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  0 quarks, 4 scalars
+      elseif( TreeProc%NumQua.eq.0  .and. TreeProc%NumSca.eq.4) then!  0 quarks, 4 scalars
           if( IsAScalar(TreeProc%PartType(1)) ) then
-              Res(1:Ds) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
+              Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
+              Res(2:Ds) = 0d0
 !                       print *, "calling cur_s_4s"
           else
              call Error("requested current is not available 4s")

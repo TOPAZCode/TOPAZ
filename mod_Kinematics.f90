@@ -7195,8 +7195,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         print *, "gauge invariance check"
-!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4)
+!         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

@@ -290,7 +290,6 @@
               endif
            enddo
 
-
 !          intermediate 8-dim result
            res8 = res
 
@@ -1191,11 +1190,10 @@ END SUBROUTINE
           q12(1:5) = q1(1:5)+q2(1:5)
 
           call sc(5,q12,q12,r1)
-print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for??" 
-          if(zabs(r1-dcmplx(m_Top**2,0d0)).lt.1D-6) then   !  r1=(q1+q2)^2 = q1^2+q2^2+2*q1.q2 = 0+mt**2+0    because lv^2=lv.k1=0
-              tag_pol=1                                    !  tag_pol does not affect fermion loops!
-          else
-              tag_pol=0
+          if(zabs(r1-dcmplx(ExtParticle(1)%Mass2)).lt.1D-6) then   !  r1=(q1+q2)^2 = q1^2+q2^2+2*q1.q2 = 0+mt**2+0    because lv^2=lv.k1=0
+              tag_pol=1                                    !  this checks if there is a self-energy contribution
+          else                                             !  if yes (i.e. tag_pol=1) then use full gluon polarization sum
+              tag_pol=0                                    !  note: tag_pol does not affect fermion loops!
           endif
           if( any(Lab_in(l2c(1:2)).eq.'glu') ) then
             tag_f = 0
@@ -2659,7 +2657,7 @@ print *, "this might effect HTop/Stop production!! check !!  what is tag_pol for
         SUBROUTINE givepol(PartType,q1,Dv,Ds,tag_pol,Nj,BPOL,POL)
 !!      q1: momentum
 !!      Nj: number of helicity states
-!!      tag_pol: 0=phys. gluon pol.sum, 1=full gluon pol.sum (needed for doubcuts)
+!!      tag_pol: 0=phys. gluon pol.sum, 1=full gluon pol.sum (needed for doubcuts+single cuts)
 !!      POL: first spinors
 !!      BPOL: last spinors
         use ModNVBasis

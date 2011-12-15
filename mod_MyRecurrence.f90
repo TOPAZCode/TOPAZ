@@ -3298,7 +3298,7 @@ res5=res5+tmp
         enddo
       endif
 
-! if(ngluon.eq.2) then
+! if(ng1.eq.1 .and. ng2.eq.1) then
 !  print *,"s_2s", ng1,ng2
 !  print *,res1
 !  print *,res2
@@ -4160,12 +4160,12 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
           rIn =NumGlu(1)+n2a+1
           rOut=NumGlu(1)+n2a+n2c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n2c)
-          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2
+          Eps1(:) = vgsgs(Dv,EpsX) * sc1*sc2
       elseif( n3c.gt.0 ) then
           rIn =NumGlu(1)+NumGlu(2)+n3a+1
           rOut=NumGlu(1)+NumGlu(2)+n3a+n3c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n3c)
-          Eps1(:) = vggss(Dv,EpsX) * sc1*sc2
+          Eps1(:) = vgssg(Dv,EpsX) * sc1*sc2
       else
           if( Scalars(1)%PartType.gt.0 ) then
              Eps1(:) = vbss(Dv,PMom1(:),PMom2(:))*sc1*sc2
@@ -4552,7 +4552,7 @@ complex(8) :: PMom4(1:Dv)
             Eps1 = Eps1*PropFac3
 
 
-            Eps2(:) = vggss(Dv,Eps1) * Sca1*Sca2
+            Eps2(:) = vgssg(Dv,Eps1) * Sca1*Sca2
 
 
             counter=1
@@ -4813,7 +4813,6 @@ complex(8) :: PMom4(1:Dv)
             if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
 
-
             rIn = NumGlu(1)+NumGlu(2)+ne+nf+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nh
             Sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(3:3),(/ng+nh,ng,nh/))
@@ -4823,6 +4822,7 @@ complex(8) :: PMom4(1:Dv)
                if( abs(sc_(PMom3,PMom3) - Scalars(3)%Mass2).lt.PropCut ) cycle
                Sca1 = Sca1 * PropFac3
             endif
+
 
             rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+nh+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+nj
@@ -4839,10 +4839,12 @@ complex(8) :: PMom4(1:Dv)
             else
                 Eps2(:) = vsbs(Dv,PMom3(:),PMom4(:)) * Sca1*Sca2
             endif
-            TmpMom1 = PMom3 + PMom4
-            PropFac3 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
-            if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
+            TmpMom2 = PMom3 + PMom4
+            PropFac3 = (0d0,-1d0)/sc_(TmpMom2,TmpMom2)
+            if( abs(sc_(TmpMom2,TmpMom2)).lt.PropCut ) cycle
             Eps2 = Eps2*PropFac3
+
+
 
 
             counter=1
@@ -4881,7 +4883,6 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
          enddo
-
 
 
 !        type(4)
@@ -4960,6 +4961,8 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
          enddo
+
+
 
 return
 END FUNCTION
