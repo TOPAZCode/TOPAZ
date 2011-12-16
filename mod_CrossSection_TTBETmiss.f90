@@ -679,12 +679,12 @@ include 'vegas_common.f'
    call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 ! !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
-print *, "Test Boost activated"
-MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
-call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
-call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
+! print *, "Test Boost activated"
+! MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
+! call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
+! call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
 ! !!!!!!!!!!!!!!!!!!!!
    ISFac = MomCrossing(MomExt)
 
@@ -746,7 +746,8 @@ IF( Correction.EQ.0 ) THEN
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
-   do iHel=nHel(1),nHel(2)
+!    do iHel=nHel(1),nHel(2)
+   do iHel=1,1; print *, "fixed heli"
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
       call HelCrossing(Helicities(iHel,1:4))
@@ -764,7 +765,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
 !------------ bosonic loops --------------
-       do iPrimAmp=1,6
+       do iPrimAmp=3,3!1,6
 print *, "hel",ihel,"primamp no",iPrimAmp
 print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
@@ -774,16 +775,17 @@ print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call DoubCut(PrimAmps(iPrimAmp))
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-!           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
+          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!         call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
 
-
-print *, "LO",BornAmps(iPrimAmp)%Result
+print *, "------"
+print *, "LO", BornAmps(iPrimAmp)%Result
 print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
+print *, "NLO",PrimAmps(iPrimAmp)%Result(-1)
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
 pause
 
 ! !DEC$ IF (_QuadPrecImpr==1)
@@ -1017,6 +1019,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,2!         4
+
 print *, "hel",ihel,"primamp no",iPrimAmp
 print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
@@ -1027,16 +1030,20 @@ print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 
-!           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
+!         call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
 
-
+print *, "----------------"
 print *, "LO",BornAmps(iPrimAmp)%Result
 print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
+
+! print *, "check",PrimAmps(iPrimAmp)%UCuts(2)%Coeff(1:4,:)
+! print *, "check",PrimAmps(iPrimAmp)%UCuts(1)%Coeff(1:1,:)
+
 pause
 
       enddo

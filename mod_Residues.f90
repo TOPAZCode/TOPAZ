@@ -130,6 +130,8 @@
             tag_f = 1
           elseif( all(Lab_in(l5c(1:5)).eq.'bot') .or. all(Lab_in(l5c(1:5)).eq.'chm') ) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
 
 !------------ next loop
@@ -177,6 +179,8 @@
             tag_f = 1
           elseif( all(Lab_in(l5c(1:5)).eq.'bot') .or. all(Lab_in(l5c(1:5)).eq.'chm') ) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
 
             call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
@@ -381,6 +385,8 @@ END SUBROUTINE
             tag_f = 1
           elseif( all(Lab_in(l4c(1:4)).eq.'bot') .or. all(Lab_in(l4c(1:4)).eq.'chm')) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
 
 !         set momentum vector for last particle
@@ -763,6 +769,8 @@ END SUBROUTINE
             tag_f = 1
           elseif( all(Lab_in(l3c(1:3)).eq.'bot') .or. all(Lab_in(l3c(1:3)).eq.'chm') ) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
 
 
@@ -1201,7 +1209,10 @@ END SUBROUTINE
             tag_f = 1
           elseif( all(Lab_in(l2c(1:2)).eq.'bot') .or. all(Lab_in(l2c(1:2)).eq.'chm') ) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
+
 
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
@@ -1383,8 +1394,6 @@ END SUBROUTINE
          endif
 
 
-
-
 !     subtracting the 5-cut
 
          call mymatch2_5(l2c,n25,lmatch25)
@@ -1457,6 +1466,8 @@ END SUBROUTINE
 
 
          enddo
+
+
 
 !        subtracting the 4-cut
 
@@ -1532,7 +1543,6 @@ END SUBROUTINE
         enddo
 
 
-
 !        subtracting the triple -cut contribution
          call mymatch2_3(l2c,n23,lmatch23)
 
@@ -1599,6 +1609,7 @@ END SUBROUTINE
        enddo
 !        res = res - res_Impr
 
+
        return
        end subroutine
 
@@ -1645,6 +1656,8 @@ END SUBROUTINE
             tag_f = 1
           elseif( Lab_in(l1c(1)).eq.'bot' .or. Lab_in(l1c(1)).eq.'chm' ) then
             tag_f = 2
+          else
+            tag_f = 99
           endif
 
           if( lv(5).eq.0d0 ) then
@@ -1680,10 +1693,7 @@ END SUBROUTINE
           call givepol(TreeProcs(1)%PartType(1),q1(1:5),4,4,tag_pol,Nj1,BPOL1,POL1)
 
 
-            res=dcmplx(0d0,0d0)
-
-
-
+          res=dcmplx(0d0,0d0)
 !DEC$ IF (_DebugUseMyAmps==0)
             ib = Npoint
             lab1=Lab_in(l1c(1))
@@ -1692,9 +1702,13 @@ END SUBROUTINE
 !DEC$ ELSE
             call new_ampl(4,4,Nj1,Nj1,POL1,BPOL1,tag_f,TreeProcs(1),mur1)
 !DEC$ ENDIF
+
+
             do j1=1,Nj1
                res = res + mur1(j1,j1)
             enddo
+
+
 
               if (Lab_in(l1c(1)).eq.'top'.or.Lab_in(l1c(1)).eq.'bot'.or.Lab_in(l1c(1)).eq.'str'.or.Lab_in(l1c(1)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
@@ -1704,6 +1718,11 @@ END SUBROUTINE
 
 !ccccccccccccccccccccccccc Ds=4 end
           endif
+
+
+
+
+
 
 
 !        matching and subtracting computed contributions
@@ -1792,6 +1811,7 @@ END SUBROUTINE
          enddo
 
 
+
 !     the 4-cut
 
          call mymatch1_4(l1c,n14,lmatch14)
@@ -1874,6 +1894,7 @@ END SUBROUTINE
 
 
 
+
 !        subtracting the triple -cut contribution
 
          call mymatch1_3(l1c,n13,lmatch13)
@@ -1949,6 +1970,7 @@ END SUBROUTINE
         enddo
 
 
+
 !      subtracting a double cut
          call mymatch1_2(l1c,n12,lmatch12)
 
@@ -2015,6 +2037,7 @@ END SUBROUTINE
         if (tagdcut(im,1).eq.999) then
          bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*r2*r2        +b(6)*r2*r3                +b(7)*r2*r4+b(8)*(r3**2-r4**2)+b(9)*r3*r4+ b(10)*re**2
         endif
+
 
 
        res=res-bkoeff/prop1

@@ -50,7 +50,7 @@ real(8), public, parameter :: m_BH    = 50d0*GeV! remember: changes here require
 real(8), public            :: Ga_HTop
 real(8), public            :: Ga_Htop_A0Top
 real(8), public            :: Ga_Htop_BHTop
-real(8), public, parameter :: m_STop  = 600d0*GeV
+real(8), public, parameter :: m_STop  = 172d0*GeV
 real(8), public            :: Ga_STop
 real(8), public            :: Ga_Stop_ChiTop
 real(8), public, parameter :: m_Chi   = 50d0*GeV

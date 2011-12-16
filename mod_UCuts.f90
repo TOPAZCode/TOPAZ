@@ -1027,11 +1027,13 @@ double complex :: Res(1:2)
        LoopMom(5)   = 0d0
        call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(1))
 
+
        LoopMom(1:4) = - LoopMom(1:4)
        LoopMom(5)   = 0d0
        call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(2))
 
        SingCuts%Coeff(CutNum,0) = 0.5d0 * ( Res(1) + Res(2) )
+
 
 !     set vars. for kirill's routines
       coeff1(CutNum,1) = SingCuts%Coeff(CutNum,0)

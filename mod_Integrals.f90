@@ -34,7 +34,7 @@ contains
       real(8) s11,s22,s33,s44,s12,s23
       real(8)  m12,m22,m32,m42
       real(8) argk(5,6),argm(5,4)
-      real(8) mu2
+      real(8) mu2,MassSq
       complex(8)  qlI4,qlI3,qlI2,pr1dc,pr2dc
       complex(8) d(5,1)
 !       complex(8) tBub,vBub
@@ -146,17 +146,20 @@ contains
          m42=ThePrimAmp%IntPart(ThePrimAmp%UCuts(4)%CutProp(i,4))%Mass2
 
 
-         if (dabs(s11-m_Top**2).lt.1D-6) then
-         s11=m_Top**2
+         MassSq= ExtParticle(1)%Mass2! this assumes that the first particle is always a top or stop
+
+
+         if (dabs(s11-MassSq).lt.1D-6) then
+         s11=MassSq
          endif
-         if (dabs(s22-m_Top**2).lt.1D-6) then
-         s22=m_Top**2
+         if (dabs(s22-MassSq).lt.1D-6) then
+         s22=MassSq
          endif
-         if (dabs(s33-m_Top**2).lt.1D-6) then
-         s33=m_Top**2
+         if (dabs(s33-MassSq).lt.1D-6) then
+         s33=MassSq
          endif
-         if (dabs(s44-m_Top**2).lt.1D-6) then
-         s44=m_Top**2
+         if (dabs(s44-MassSq).lt.1D-6) then
+         s44=MassSq
          endif
          if (dabs(s11).lt.1D-6) then
          s11=0d0
@@ -235,16 +238,20 @@ contains
          m32=ThePrimAmp%IntPart(ThePrimAmp%UCuts(3)%CutProp(i,3))%Mass2
 
 
-         if (dabs(s11-m_Top**2).lt.1D-6) then
-         s11=m_Top**2
+         MassSq= ExtParticle(1)%Mass2! this assumes that the first particle is always a top or stop
+
+
+
+         if (dabs(s11-MassSq).lt.1D-6) then
+         s11=MassSq
          endif
 
-         if (dabs(s22-m_Top**2).lt.1D-6) then
-         s22=m_Top**2
+         if (dabs(s22-MassSq).lt.1D-6) then
+         s22=MassSq
          endif
 
-         if (dabs(s33-m_Top**2).lt.1D-6) then
-         s33=m_Top**2
+         if (dabs(s33-MassSq).lt.1D-6) then
+         s33=MassSq
          endif
 
          if (dabs(s11).lt.1D-6) then
@@ -305,6 +312,7 @@ contains
 
          do xe=-2,0
             res(xe) = res(xe) + b1*qlI2(s11,m12,m22,mu2,xe)
+!             if(xe.eq.-1) print *, "B0: ",i,b1,qlI2(s11,m12,m22,mu2,xe)
          enddo
          endif
 
@@ -358,6 +366,9 @@ contains
 
          do xe=-2,0
             res(xe) = res(xe)+ b1*qlI2(s11,m12,m22,mu2,xe)+ b2*vBub(pr1dc,pr2dc,m12,m22,mu2,xe)+ b5*tBub(pr1dc,pr2dc,m12,m22,mu2,xe)
+!             if(xe.eq.-1) print *, "B0(lightcone): ",i,b1,qlI2(s11,m12,m22,mu2,xe)
+!             if(xe.eq.-1) print *, "B0(lightcone): ",i,b2,vBub(pr1dc,pr2dc,m12,m22,mu2,xe)
+!             if(xe.eq.-1) print *, "B0(lightcone): ",i,b5,tBub(pr1dc,pr2dc,m12,m22,mu2,xe)
          enddo
 
          endif
@@ -367,10 +378,14 @@ contains
 
          enddo
 
+
+
+
 !     1 cut
       do i=1,N1
          a1=ThePrimAmp%UCuts(1)%Coeff(i,0)
          m12=ThePrimAmp%IntPart(ThePrimAmp%UCuts(1)%CutProp(i,1))%Mass2
+! print *, "A0: ",i,a1,dcmplx(m12,0d0)
 
          res(-1)=res(-1) + a1*dcmplx(m12,0d0)
          res(0)=res(0) + a1*dcmplx(m12*(1d0-dlog(m12/mu2)),0d0)

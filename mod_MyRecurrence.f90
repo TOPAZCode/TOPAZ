@@ -3184,7 +3184,7 @@ res2=res2+tmp
            k3 = k3 + Scalar(2)%Mom
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
            sc2 = cur_s_2s(Gluons(1:ngluon-m2),Scalar(2:2),(/ngluon-m2,ng1,ngluon-m2-ng1/))
-           if( m2>2 ) then
+           if( ngluon-m2-ng1>0 ) then! here was a bug
              if (abs(k3sq) > propcut) then
                sc2= (0d0,1d0)/k3sq*sc2
              else
@@ -3232,7 +3232,7 @@ res3=res3+tmp
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
            ms1 = ng1 - m2
            sc2 = cur_s_2s(Gluons(m2+1:ngluon),Scalar(2:2),(/ngluon-m2,ms1,ngluon-ng1/))
-           if( m2>2 ) then
+           if( ms1>0 ) then
            if (abs(k3sq) > propcut) then
                sc2= (0d0,1d0)/k3sq*sc2
            else
@@ -3298,7 +3298,7 @@ res5=res5+tmp
         enddo
       endif
 
-! if(ng1.eq.1 .and. ng2.eq.1) then
+! if(ng1.eq.0 .and. ng2.eq.3) then
 !  print *,"s_2s", ng1,ng2
 !  print *,res1
 !  print *,res2
@@ -4155,16 +4155,34 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
           rIn =n1a+1
           rOut=n1a+n1c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n1c)
+          if(n1c.gt.1) then
+              PMom4 = SumMom(Gluons,rIn,rOut)
+              PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+              if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+              EpsX(:) = EpsX(:)*PropFac4
+          endif
           Eps1(:) = vggss(Dv,EpsX) * sc1*sc2 
       elseif( n2c.gt.0) then
           rIn =NumGlu(1)+n2a+1
           rOut=NumGlu(1)+n2a+n2c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n2c)
+          if(n2c.gt.1) then
+              PMom4 = SumMom(Gluons,rIn,rOut)
+              PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+              if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+              EpsX(:) = EpsX(:)*PropFac4
+          endif
           Eps1(:) = vgsgs(Dv,EpsX) * sc1*sc2
       elseif( n3c.gt.0 ) then
           rIn =NumGlu(1)+NumGlu(2)+n3a+1
           rOut=NumGlu(1)+NumGlu(2)+n3a+n3c
           EpsX(:) = cur_g(Gluons(rIn:rOut),1+n3c)
+          if(n3c.gt.1) then
+              PMom4 = SumMom(Gluons,rIn,rOut)
+              PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+              if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+              EpsX(:) = EpsX(:)*PropFac4
+          endif
           Eps1(:) = vgssg(Dv,EpsX) * sc1*sc2
       else
           if( Scalars(1)%PartType.gt.0 ) then
@@ -4209,7 +4227,12 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
    enddo
    enddo
    enddo
+
+
+! if(  numglu(0).eq.3 ) then
 ! pause
+! endif
+
 
 return
 END FUNCTION
@@ -5014,17 +5037,18 @@ integer :: rIn,rOut,i,counter
             n1b = NumGlu(1)-n1a
             rIn =n1a+1
             rOut=NumGlu(1)+n2a
-            sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n1b+n2a,n1b,n2a/) )
+            sca1(1) = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n1b+n2a,n1b,n2a/) )
+            PMom2(:) = Scalars(2)%Mom + SumMom(Gluons,rIn,rOut)
             if(n1b.ge.1 .or. n2a.ge.1) then
-               PMom2(:) = Scalars(2)%Mom + SumMom(Gluons,rIn,rOut)
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(2)%Mass2)
                if( abs(sc_(PMom2,PMom2)-Scalars(2)%Mass2).lt.PropCut ) cycle
-               sca1 = sca1*PropFac2
+               sca1(1) = sca1(1)*PropFac2
             endif
+
            if( Scalars(2)%PartType.gt.0 ) then
-              sca1 = csg(Eps2,PMom1,PMom2) * sca1
+              sca1(1) = csg(Eps2,PMom1,PMom2) * sca1(1)
            else
-              sca1 = cbsg(Eps2,PMom1,PMom2) * sca1
+              sca1(1) = cbsg(Eps2,PMom1,PMom2) * sca1(1)
            endif
 
             rIn = n1a+1
@@ -5033,7 +5057,7 @@ integer :: rIn,rOut,i,counter
             if(n1a.ge.1 .or. n6b.ge.1) then
                PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Scalars(2)%Mass2)
                if( abs(sc_(PMom1,PMom1)-Scalars(2)%Mass2).lt.PropCut ) cycle
-               sca1 = sca1*PropFac2
+               sca1(1) = sca1(1)*PropFac2
             endif
 
             TmpScalar(1)%Mom  => PMom1(:)
@@ -5059,12 +5083,9 @@ integer :: rIn,rOut,i,counter
             tmp = cur_s_2s(TmpGluons(1:counter-1),TmpScalar(1:1),(/counter-1,n1a,n6b/) )
 
             Res = Res + tmp
-!             Res1(:) = Res1(:) + tmp(:)
-!             print *, "1",tmp(:)
          enddo
       enddo
       enddo
-
 
 
 
@@ -5131,8 +5152,8 @@ integer :: rIn,rOut,i,counter
             rIn =n1a+1
             rOut=NumGlu(1)+n2a
             sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n1b+n2a,n1b,n2a/) )
+            PMom2(:) = Scalars(2)%Mom + SumMom(Gluons,rIn,rOut)
             if(n1b.ge.1 .or. n2a.ge.1) then
-               PMom2(:) = Scalars(2)%Mom + SumMom(Gluons,rIn,rOut)
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(2)%Mass2)
                if( abs(sc_(PMom2,PMom2)-Scalars(2)%Mass2).lt.PropCut ) cycle
                sca1 = sca1*PropFac2
@@ -5200,7 +5221,6 @@ integer :: rIn,rOut,i,counter
 
 
 
-
 return
 END FUNCTION
 
@@ -5219,9 +5239,9 @@ complex(8) :: Sca1
 complex(8) :: EpsX(1:Dv)
 complex(8) :: Eps2(1:Dv)
 type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(4)),TmpScalar(1:1)
-complex(8) :: PropFac1,PropFac2
+complex(8) :: PropFac1,PropFac2,PropFac4
 complex(8),target :: pmom1(1:Dv)
-complex(8) :: pmom2(1:Dv)
+complex(8) :: pmom2(1:Dv),pmom4(1:Dv)
 integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b,n1c,n2c,n4c
 integer :: rIn,rOut,i,counter
 
@@ -5270,16 +5290,34 @@ integer :: rIn,rOut,i,counter
                 rIn =n1a+1
                 rOut=n1a+n1c
                 EpsX(:) = cur_g(Gluons(rIn:rOut),1+n1c)
+                if(n1c.gt.1) then
+                    PMom4 = SumMom(Gluons,rIn,rOut)
+                    PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+                    if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+                    EpsX(:) = EpsX(:)*PropFac4
+                endif
                 Sca0 = csgg(Eps2,EpsX) * Sca1
             elseif( n2c.gt.0) then
                 rIn =NumGlu(1)+n2a+1
                 rOut=NumGlu(1)+n2a+n2c
                 EpsX(:) = cur_g(Gluons(rIn:rOut),1+n2c)
+                if(n2c.gt.1) then
+                    PMom4 = SumMom(Gluons,rIn,rOut)
+                    PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+                    if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+                    EpsX(:) = EpsX(:)*PropFac4
+                endif
                 Sca0 = csgg(Eps2,EpsX) * Sca1
             elseif( n4c.gt.0 ) then
                 rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                 rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+n4c
                 EpsX(:) = cur_g(Gluons(rIn:rOut),1+n4c)
+                if(n4c.gt.1) then
+                    PMom4 = SumMom(Gluons,rIn,rOut)
+                    PropFac4 = (0d0,-1d0)/sc_(PMom4,PMom4)
+                    if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
+                    EpsX(:) = EpsX(:)*PropFac4
+                endif
                 Sca0 = csgg(Eps2,EpsX) * Sca1
             else
                   if( Scalars(2)%PartType.gt.0 ) then
@@ -5330,6 +5368,69 @@ integer :: rIn,rOut,i,counter
 
 return
 END FUNCTION
+
+
+
+
+
+!     assuming the color flow:   s = x--->----
+      FUNCTION cur_s_2s_massCT(Gluons,Scalar,NumGlu) result(res)
+      implicit none
+      type(PtrToParticle) :: Gluons(1:),Scalar(2:2)      ! off-shell scalar is not included
+      integer ::  NumGlu(0:2)
+      integer :: ms1,m1,m2,ng1, ng2, ngluon
+      complex(8) :: res,tmp 
+      complex(8) :: sc2
+      complex(8) :: k1(1:Dv),k2(1:Dv),k3(1:Dv)
+      complex(8) :: e1(1:Dv)
+      complex(8) :: e2(1:Dv)
+      complex(8) :: k1sq,k2sq,k3sq
+
+
+
+       ngluon = NumGlu(0)
+       ng1 = NumGlu(1)           !#gluons to the left of a s-line
+       ng2 = NumGlu(2)           !#gluons to the right of the s-line
+
+       if (ngluon.ne.2) then
+         call Error("scalar mass counterterm needs modification")
+       endif
+       res = (0d0,0d0)
+
+
+       k1 = Gluons(1)%Mom
+       e1 = Gluons(1)%Pol
+
+       sc2 = Scalar(2)%Pol(1)
+       k2 = Scalar(2)%Mom
+       if( Scalar(2)%PartType.gt.0 ) then
+           tmp = csg(e1,k1,k2) * sc2
+       else
+           tmp = cbsg(e1,k1,k2) * sc2
+       endif
+
+       k2 = k1 + k2
+       k2sq = sc_(k2,k2) - Scalar(2)%Mass2
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+       ! here the CT is inserted
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+
+       k1 = Gluons(2)%Mom
+       e1 = Gluons(2)%Pol
+       if( Scalar(2)%PartType.gt.0 ) then
+           res = csg(e1,k1,k2) * tmp
+       else
+           res = cbsg(e1,k1,k2) * tmp
+       endif
+
+
+        if( ng1.eq.1 .and. ng2.eq.1 ) res=-res
+
+
+      end function cur_s_2s_massCT
+
+
+
 
 
 

@@ -191,7 +191,6 @@ integer :: i,j,Order(1:6)
              Res(1:Dv) = cur_g_2s(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:TreeProc%NumSca),TreeProc%NumGlu(0:3))
 ! print *, "CHECK POINT cur_g_2s"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
-! pause
           elseif( IsAScalar(TreeProc%PartType(1)) ) then
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
              Res(2:Ds) = 0d0
@@ -210,7 +209,7 @@ integer :: i,j,Order(1:6)
           if( TreeProc%PartType(1).eq.Glu_ ) then
                 if( IsAQuark(Order(1)) .and. IsAQuark(Order(2)) .and. IsAScalar(Order(3)) ) then 
 !                 elseif( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1) )then 
-                      Res(1:Dv) = cur_g_ffss(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      Res(1:Dv) = cur_g_ffss(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
 ! print *, "CHECK POINT cur_g_ffss"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
 ! pause
@@ -218,7 +217,7 @@ integer :: i,j,Order(1:6)
 !                       pause
                 elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAQuark(Order(3)) ) then 
 !                 elseif( TreeProc%Quarks(1)%ExtRef.gt.TreeProc%Scalars(1)%ExtRef .and. (TreeProc%Quarks(2)%ExtRef.gt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Quarks(2)%ExtRef.eq.-1) )then 
-                      Res(1:Dv) = cur_g_ssff(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
+                      Res(1:Dv) = cur_g_ssff(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
 ! print *, "CHECK POINT cur_g_ssff"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
 ! pause
@@ -286,10 +285,10 @@ integer :: i,j,Order(1:6)
           enddo
 
           if( IsAQuark(Order(1)) .and. IsAQuark(Order(2))  ) then
-              Res(1:Ds) = cur_f_fffssf( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
+              Res(1:Ds) = cur_f_fffssf( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
 !               print *, "calling cur_f_fffssf"
           elseif( IsAQuark(Order(1)) .and. IsAScalar(Order(2))  ) then
-              Res(1:Ds) = cur_f_fssfff( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
+              Res(1:Ds) = cur_f_fssfff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(2:4),TreeProc%NumGlu(0:6) )
 !               print *, "calling cur_f_fssfff"
           else
              call Error("requested current is not available 4q+2s")
@@ -303,7 +302,7 @@ integer :: i,j,Order(1:6)
               j=j+1
           enddo
           if( IsAScalar(Order(1)) .and. IsAQuark(Order(3))  ) then
-              Res(1) = cur_s_ssffss( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+              Res(1) = cur_s_ssffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
               Res(2:Ds) = 0d0
 !               print *, "calling cur_s_ssffss"
           else
@@ -479,15 +478,26 @@ complex(8) :: pol_glu(1:4,1:NumExtParticles-2), p_glu(1:4,1:NumExtParticles-2)
 complex(8) :: pol_q(1:4,1:2), p_q(1:4,1:2)
 real(8) :: Mu2Ren
 
-       if( TheBornAmp%TreeProc%NumQua.eq.2 ) then
+       if( TheBornAmp%TreeProc%NumQua.eq.2 .and. TheBornAmp%TreeProc%NumSca.eq.0 ) then
           ResSpi = cur_f_2f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
-       elseif( TheBornAmp%TreeProc%NumQua.eq.4 ) then
-          ResSpi = cur_f_4f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:4),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
-       endif
-       ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+          ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+          res(-1) = res(-1) + ResMCT*3d0/2d0
+          res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
 
-       res(-1) = res(-1) + ResMCT*3d0/2d0
-       res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+       elseif( TheBornAmp%TreeProc%NumQua.eq.4 .and. TheBornAmp%TreeProc%NumSca.eq.0 ) then
+          ResSpi = cur_f_4f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:4),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
+          ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+          res(-1) = res(-1) + ResMCT*3d0/2d0
+          res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+
+       elseif( TheBornAmp%TreeProc%NumQua.eq.0 .and. TheBornAmp%TreeProc%NumSca.eq.2 ) then
+          ResSpi(1) = cur_s_2s_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Scalars(2:2),TheBornAmp%TreeProc%NumGlu)
+          ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
+          res(-1) = res(-1) + ResMCT*3d0/2d0
+          res(0)  = res(0)  + ResMCT*( 22d0/3d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
+! print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
+       endif
+
 return
 END SUBROUTINE EvalMassCTs
 
@@ -503,8 +513,9 @@ type(BornAmplitude) :: TheBornAmp
 real(8) :: Mu2,beta0,massCT
 integer :: q
 
-   if( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.0) then
-   elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.1) then
+
+   if( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.0 .and. ThePrimAmp%ScalarLines.eq.0) then
+   elseif( ThePrimAmp%AmpType.eq.1 .and. (ThePrimAmp%FermionLines.eq.1 .or. ThePrimAmp%ScalarLines.eq.1)) then
       call EvalMassCTs(TheBornAmp,Mu2,ThePrimAmp%Result(-2:1))
    elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.2) then
       call EvalMassCTs(TheBornAmp,Mu2,ThePrimAmp%Result(-2:1))
@@ -534,14 +545,14 @@ type(PrimitiveAmplitude) :: ThePrimAmp
 complex(8) :: MomV(1:4,NumExtParticles)
 integer :: FermionLoop
 
+
    do NPart=1,NumExtParticles
       MomV(1:4,NPart) = ExtParticle( ThePrimAmp%ExtLine(NPart) )%Mom(1:4)
    enddo
 
    rdiv2 = (0d0,0d0)
    rdiv1 = (0d0,0d0)
-
-   if( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.0) then
+   if( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.0 .and. ThePrimAmp%ScalarLines.eq.0) then
       FermionLoop = 0
       do NPart=1,NumExtParticles
               i = NPart
@@ -562,8 +573,8 @@ integer :: FermionLoop
       beta0 = q/2d0*11d0/3d0
       dZ2_top= 0d0
 
-
-   elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.1) then
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.1 .and. ThePrimAmp%ScalarLines.eq.0) then
       FermionLoop = 0
       do NPart=ThePrimAmp%FermLine1Out,NumExtParticles
               i = NPart
@@ -592,6 +603,7 @@ integer :: FermionLoop
 !      dZ2_top=0d0
 
 
+!--------------------------------------------------------------------------
    elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.2) then
       FermionLoop = 0
       do NPart=ThePrimAmp%FermLine1Out,ThePrimAmp%FermLine2In-1
@@ -625,7 +637,8 @@ integer :: FermionLoop
       endif
       dZ2_top= 3d0/2d0
 
-   elseif( ThePrimAmp%AmpType.eq.2 ) then
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.2  .and. ThePrimAmp%ScalarLines.eq.0) then
       if( GetMass(ThePrimAmp%FermLoopPart).eq.0d0 ) then
           FermionLoop = 1
           q = NumExtParticles-2
@@ -640,7 +653,8 @@ integer :: FermionLoop
       dZ2_top= 0d0
 
 
-   elseif( ThePrimAmp%AmpType.eq.3 ) then
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.3  .and. ThePrimAmp%ScalarLines.eq.0) then
       FermionLoop = 0
       do NPart=ThePrimAmp%FermLine1Out,NumExtParticles
               i = NPart
@@ -670,7 +684,8 @@ integer :: FermionLoop
       dZ2_top= 3d0/2d0
 
 
-   elseif( ThePrimAmp%AmpType.eq.4 ) then
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.4  .and. ThePrimAmp%ScalarLines.eq.0) then
       FermionLoop = 0
       do NPart=ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out-1
               i = NPart
@@ -691,6 +706,73 @@ integer :: FermionLoop
            beta0 = q/2d0*11d0/3d0 - q*10d0/3d0
       endif
       dZ2_top= 0d0
+
+
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.0 .and. ThePrimAmp%ScalarLines.eq.1) then
+      FermionLoop = 0
+      do NPart=ThePrimAmp%ScaLine1Out,NumExtParticles
+              i = NPart
+              j = NPart+1
+              if( NPart.eq.NumExtParticles ) then
+                i = 1
+                j = NPart
+              endif
+              s_ij = 2d0*sc_(MomV(1:4,i),MomV(1:4,j)) + (0d0,1d-15)
+              Mass_i = ExtParticle(ThePrimAmp%ExtLine(i))%Mass
+              Mass_j = ExtParticle(ThePrimAmp%ExtLine(j))%Mass
+              call J_sing(s_ij,Mass_i,Mass_j,mu2,rdiv2,rdiv1)
+      enddo
+      do NPart=1,NumExtParticles
+            call Gamma_sing(ExtParticle(ThePrimAmp%ExtLine(NPart))%PartType,FermionLoop,rdiv1)
+      enddo
+
+      q = NumExtParticles-2
+      if( Ng.eq.2 ) then
+         beta0 = -q/2d0*11d0/3d0   +2d0/3d0!- 4d0/3d0*TR*Nf_light
+      elseif( Ng.eq.3 ) then
+         beta0 = -q/2d0*11d0/3d0   +3d0/3d0!- 4d0/3d0*TR*Nf_light
+      endif
+      dZ2_top= 3d0/2d0 - 5d0/2d0! needs to be checked
+!      beta0 = 0d0
+!      dZ2_top=0d0
+
+!--------------------------------------------------------------------------
+   elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.1 .and. ThePrimAmp%ScalarLines.eq.1) then
+      FermionLoop = 0
+      do NPart=ThePrimAmp%ScaLine1Out,ThePrimAmp%FermLine1In-1
+              i = NPart
+              j = NPart+1
+              s_ij = 2d0*sc_(MomV(1:4,i),MomV(1:4,j)) + (0d0,1d-15)
+              Mass_i = ExtParticle(ThePrimAmp%ExtLine(i))%Mass
+              Mass_j = ExtParticle(ThePrimAmp%ExtLine(j))%Mass
+              call J_sing(s_ij,Mass_i,Mass_j,mu2,rdiv2,rdiv1)
+      enddo
+      do NPart=ThePrimAmp%FermLine1Out,NumExtParticles
+              i = NPart
+              j = NPart+1
+              if( NPart.eq.NumExtParticles ) then
+                i = 1
+                j = NPart
+              endif
+              s_ij = 2d0*sc_(MomV(1:4,i),MomV(1:4,j)) + (0d0,1d-15)
+              Mass_i = ExtParticle(ThePrimAmp%ExtLine(i))%Mass
+              Mass_j = ExtParticle(ThePrimAmp%ExtLine(j))%Mass
+              call J_sing(s_ij,Mass_i,Mass_j,mu2,rdiv2,rdiv1)
+      enddo
+      do NPart=1,NumExtParticles
+            call Gamma_sing(ExtParticle(ThePrimAmp%ExtLine(NPart))%PartType,FermionLoop,rdiv1)
+      enddo
+      q = NumExtParticles-2
+      if( Ng.eq.2 ) then
+        beta0 = q/2d0*11d0/3d0
+      elseif( Ng.eq.3 ) then
+         beta0 = q/2d0*11d0/3d0 - 10d0/3d0
+      endif
+      dZ2_top= 3d0/2d0
+
+
+
    endif
 
    rdiv1 = rdiv1 + beta0 + dZ2_top
@@ -787,7 +869,7 @@ implicit none
 type(PrimitiveAmplitude) :: ThePrimAmp
 type(BornAmplitude) :: TheBornAmp
 complex(8) :: rdiv(1:2)
-real(8)  :: other(:)
+real(8),optional  :: other(:)
 
 !            write(*,"(A,I2,A,10I10)") "Primitive Amplitude (type ",ThePrimAmp%AmpType,")",ThePrimAmp%ExtLine(:)
 !            print *, "tree amp:",TheBornAmp%Result
@@ -819,7 +901,7 @@ real(8)  :: other(:)
 !           if(rdiv(2).ne.(0d0,0d0) ) then
 !             if(cdabs(ThePrimAmp%Result(-2)/TheBornAmp%Result/rdiv(2) - 1d0).gt.1d-9) then
               print *, ""
-              write(*,"(A,10I10)") "Primitive Amplitude ",ThePrimAmp%ExtLine(1:5)
+              write(*,"(A,10I10)") "Primitive Amplitude ",ThePrimAmp%ExtLine(1:ThePrimAmp%NPoint)
 !               print *, "precision res(-2):",ThePrimAmp%Result(-2)/TheBornAmp%Result/rdiv(2) - 1d0
               print *, "norm. div. res(-2):", ThePrimAmp%Result(-2)/TheBornAmp%Result
               print *, "check div. res(-2):", rdiv(2)
@@ -829,12 +911,12 @@ real(8)  :: other(:)
 !           if( rdiv(1).ne.(0d0,0d0) ) then
 !             if(cdabs(ThePrimAmp%Result(-1)/TheBornAmp%Result/rdiv(1) - 1d0).gt.1d0) then
               print *, ""
-              write(*,"(A,10I10)") "Primitive Amplitude ",ThePrimAmp%ExtLine(1:5)
+              write(*,"(A,10I10)") "Primitive Amplitude ",ThePrimAmp%ExtLine(1:ThePrimAmp%NPoint)
 !               print *, "rel. dev(-1):",cdabs(ThePrimAmp%Result(-1)/TheBornAmp%Result/rdiv(1) - 1d0)
               print *, "norm. div. res(-1):", ThePrimAmp%Result(-1)/TheBornAmp%Result
               print *, "check div. res(-1):", rdiv(1)
-              print *, "norm. div. res(0+1):", (ThePrimAmp%Result(0)+ThePrimAmp%Result(1))/TheBornAmp%Result
-              print *, "tree", TheBornAmp%Result
+!               print *, "norm. div. res(0+1):", (ThePrimAmp%Result(0)+ThePrimAmp%Result(1))/TheBornAmp%Result
+!               print *, "tree", TheBornAmp%Result
 !               print *, other(:)
 !            endif
 !           endif

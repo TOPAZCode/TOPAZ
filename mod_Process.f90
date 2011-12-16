@@ -4067,11 +4067,15 @@ IF( Correction.EQ.1 ) THEN
                         ThePrimAmp%FermLine1Out = ThePrimAmp%FermLine2Out
                         ThePrimAmp%FermLine2In  = 0
                         ThePrimAmp%FermLine2Out = 0
+                        ThePrimAmp%FermionLines = 1
+                        ThePrimAmp%ScalarLines  = 1
                     else
                         ThePrimAmp%FermLine1In  = 0
                         ThePrimAmp%FermLine1Out = 0
                         ThePrimAmp%FermLine2In  = 0
                         ThePrimAmp%FermLine2Out = 0
+                        ThePrimAmp%FermionLines = 0
+                        ThePrimAmp%ScalarLines  = 1
                     endif
             endif
          enddo
