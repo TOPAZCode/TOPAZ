@@ -495,7 +495,7 @@ real(8) :: Mu2Ren
           ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
           res(-1) = res(-1) + ResMCT*3d0/2d0
           res(0)  = res(0)  + ResMCT*( 22d0/3d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
-print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
+! print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
        endif
 
 return
@@ -772,8 +772,6 @@ integer :: FermionLoop
          beta0 = q/2d0*11d0/3d0 - 10d0/3d0
       endif
       dZ2_top= 3d0/2d0
-
-
 
    endif
 

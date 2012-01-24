@@ -765,9 +765,9 @@ ELSEIF( Correction.EQ.1 ) THEN
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
 !------------ bosonic loops --------------
-       do iPrimAmp=1,6!1,6
+       do iPrimAmp=1,6
 print *, "hel",ihel,"primamp no",iPrimAmp
-print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
+! print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -786,7 +786,7 @@ print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
 print *, "NLO",PrimAmps(iPrimAmp)%Result(-1)
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
-pause;cycle
+pause
 
 ! !DEC$ IF (_QuadPrecImpr==1)
 !           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))

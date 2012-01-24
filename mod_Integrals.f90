@@ -180,7 +180,7 @@ contains
 !             if(xe.eq.-2) print *, "D0: ",i,d1,qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,xe)
          enddo
          res(1) = res(1)+d5*dcmplx(-1d0/6d0,0d0)
-! 	  print *, qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,0)
+!  	  print *, qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,0)
          enddo
 
 
@@ -269,11 +269,12 @@ contains
 
          do xe=-2,0
           res(xe) = res(xe) + c1*qlI3(s11,s22,s33,m12,m22,m32,mu2,xe)
-!           if(xe.eq.-2) print *, "C0: ",i,c1,qlI3(s11,s22,s33,m12,m22,m32,mu2,xe)
+!            if(xe.eq.-2) print *, "C0: ",i,c1,qlI3(s11,s22,s33,m12,m22,m32,mu2,xe)
          enddo
          res(1) = res(1) + c8*dcmplx(-0.5d0,0d0)
 
          enddo
+
 
 
 !     2 cut

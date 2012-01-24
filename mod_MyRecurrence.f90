@@ -5416,6 +5416,8 @@ END FUNCTION
        res = (0d0,0d0)
 
 
+if( NumGlu(1).eq.0 .and. NumGlu(2).eq.2 ) then
+
        k1 = Gluons(1)%Mom
        e1 = Gluons(1)%Pol
 
@@ -5442,7 +5444,92 @@ END FUNCTION
        endif
 
 
-        if( ng1.eq.1 .and. ng2.eq.1 ) res=-res
+elseif( NumGlu(1).eq.2 .and. NumGlu(2).eq.0 ) then
+
+       k1 = Gluons(2)%Mom
+       e1 = Gluons(2)%Pol
+
+       sc2 = Scalar(2)%Pol(1)
+       k2 = Scalar(2)%Mom
+       if( Scalar(2)%PartType.gt.0 ) then
+           tmp = cgs(e1,k1,k2) * sc2
+       else
+           tmp = cgbs(e1,k1,k2) * sc2
+       endif
+
+       k2 = k1 + k2
+       k2sq = sc_(k2,k2) - Scalar(2)%Mass2
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+       ! here the CT is inserted
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+
+       k1 = Gluons(1)%Mom
+       e1 = Gluons(1)%Pol
+       if( Scalar(2)%PartType.gt.0 ) then
+           res = cgs(e1,k1,k2) * tmp
+       else
+           res = cgbs(e1,k1,k2) * tmp
+       endif
+
+elseif( NumGlu(1).eq.1 .and. NumGlu(2).eq.1 ) then
+
+       k1 = Gluons(1)%Mom
+       e1 = Gluons(1)%Pol
+
+       sc2 = Scalar(2)%Pol(1)
+       k2 = Scalar(2)%Mom
+       if( Scalar(2)%PartType.gt.0 ) then
+           tmp = cgs(e1,k1,k2) * sc2
+       else
+           tmp = cgbs(e1,k1,k2) * sc2
+       endif
+
+       k2 = k1 + k2
+       k2sq = sc_(k2,k2) - Scalar(2)%Mass2
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+       ! here the CT is inserted
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+
+       k1 = Gluons(2)%Mom
+       e1 = Gluons(2)%Pol
+       if( Scalar(2)%PartType.gt.0 ) then
+           res = csg(e1,k1,k2) * tmp
+       else
+           res = cbsg(e1,k1,k2) * tmp
+       endif
+
+
+!------
+
+       k1 = Gluons(2)%Mom
+       e1 = Gluons(2)%Pol
+
+       sc2 = Scalar(2)%Pol(1)
+       k2 = Scalar(2)%Mom
+       if( Scalar(2)%PartType.gt.0 ) then
+           tmp = csg(e1,k1,k2) * sc2
+       else
+           tmp = cbsg(e1,k1,k2) * sc2
+       endif
+
+       k2 = k1 + k2
+       k2sq = sc_(k2,k2) - Scalar(2)%Mass2
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+       ! here the CT is inserted
+       tmp =  (0d0,1d0)/k2sq*tmp! scalar prop
+
+       k1 = Gluons(1)%Mom
+       e1 = Gluons(1)%Pol
+       if( Scalar(2)%PartType.gt.0 ) then
+           res = res + cgs(e1,k1,k2) * tmp
+       else
+           res = res + cgbs(e1,k1,k2) * tmp
+       endif
+
+
+
+endif
+
 
 
       end function cur_s_2s_massCT
