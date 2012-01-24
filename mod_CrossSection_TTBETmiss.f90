@@ -765,7 +765,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
 !------------ bosonic loops --------------
-       do iPrimAmp=3,3!1,6
+       do iPrimAmp=1,6!1,6
 print *, "hel",ihel,"primamp no",iPrimAmp
 print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
@@ -786,7 +786,7 @@ print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
 print *, "NLO",PrimAmps(iPrimAmp)%Result(-1)
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
-pause
+pause;cycle
 
 ! !DEC$ IF (_QuadPrecImpr==1)
 !           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
@@ -1127,6 +1127,154 @@ return
 END FUNCTION
 
 
+
+
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_1L_ststbgggg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModUCuts
+use ModUCuts_128
+use ModIntegrals
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+implicit none
+real(8) ::  EvalCS_1L_ststbgggg,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(7:8,-2:1)
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+!include 'misc/global_import'
+include 'vegas_common.f'
+
+! yrnd(1)=0.8d0; yrnd(2)=0.65d0
+   
+
+   EvalCS_1L_ststbgggg = 0d0
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.4d0*m_STop ) then
+      EvalCS_1L_ststbgggg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhasespace_2toN(4,EHat,yRnd(3:10),MomExt(1:4,1:6),(/m_Stop,m_Stop,m_Stop,m_Stop,0d0,0d0/),PSWgt)! AStop, Stop
+   call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
+!    call EvalPhasespace_2toN(3,EHat,yRnd(3:7),MomExt(1:4,1:5),(/m_Stop,m_Stop,0d0,0d0,0d0/),PSWgt)! AStop, Stop
+!    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+
+! !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
+print *, "Test Boost activated"
+MomBoost(1:4) = 1.8d0*MomExt(1:4,3)
+call boost(MomExt(1:4,1),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,2),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,3),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,4),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,5),MomBoost(1:4),1.8d0*m_sTop)
+call boost(MomExt(1:4,6),MomBoost(1:4),1.8d0*m_sTop)
+! !!!!!!!!!!!!!!!!!!!!
+   ISFac = MomCrossing(MomExt)
+!    print *, MomExt(1:4,1).dot.MomExt(1:4,1)
+!    print *, MomExt(1:4,2).dot.MomExt(1:4,2)
+!    print *, MomExt(1:4,3).dot.MomExt(1:4,3)
+!    print *, MomExt(1:4,4).dot.MomExt(1:4,4)
+!    print *, MomExt(1:4,5).dot.MomExt(1:4,5)
+!    print *, MomExt(1:4,6).dot.MomExt(1:4,6)
+!    print *, MomExt(1,1)+MomExt(1,2)-MomExt(1,3)-MomExt(1,4)-MomExt(1,5)-MomExt(1,6)
+!    print *, MomExt(2,1)+MomExt(2,2)-MomExt(2,3)-MomExt(2,4)-MomExt(2,5)-MomExt(2,6)
+!    print *, MomExt(3,1)+MomExt(3,2)-MomExt(3,3)-MomExt(3,4)-MomExt(3,5)-MomExt(3,6)
+!    print *, MomExt(4,1)+MomExt(4,2)-MomExt(4,3)-MomExt(4,4)-MomExt(4,5)-MomExt(4,6)
+! pause
+!    IF(XTOPDECAYS.EQ.3) THEN
+!       call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
+!       call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
+!       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+!       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+!       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+!    ENDIF
+ 
+!    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+!    if( applyPSCut ) then
+!       EvalCS_1L_ststbgggg = 0d0
+!       return
+!    endif
+
+   call InitCurrCache()
+   call SetPropagators()
+
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac = pdf(0,1) * pdf(0,2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+   nHel(1:2) = getHelicity(yrnd(17))
+   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+
+!!!!! for of total cross section (fix y1,y2!)
+!   beta = dsqrt(1d0-4d0*m_stop**2/EHat**2)
+!   SigmaTot = (alpha_s*RunFactor)**2*DblPi/EHat**2*( beta*(5d0/48d0+31d0*m_stop**2/24d0/EHat**2) + &
+!                                                     dlog((1d0-beta)/(1d0+beta))*(2d0*m_stop**2/3d0/EHat**2+m_stop**4/6d0/Ehat**4)  )
+!   SigmaTot = SigmaTot * fbGeV2*SHatJacobi*PDFFac 
+!   PreFac = PreFac/SigmaTot
+!!!!!!
+
+   LO_Res_Unpol = (0d0,0d0)
+!------------ LO ----------------
+IF( Correction.EQ.0 ) THEN
+   do iHel=nHel(1),nHel(2)
+!       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+!       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+      ExtParticle(1)%Pol(1:4) = (/1d0,0d0,0d0,0d0/)
+      ExtParticle(2)%Pol(1:4) = (/1d0,0d0,0d0,0d0/)
+      ExtParticle(3)%Pol(1:4) = (/1d0,0d0,0d0,0d0/)
+      ExtParticle(4)%Pol(1:4) = (/1d0,0d0,0d0,0d0/)
+      call HelCrossing(Helicities(iHel,1:6))
+!       call HelCrossing(Helicities(iHel,1:5))
+      call SetPolarizations()
+      do iPrimAmp=1,1!  NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+      print *, "Helicity",iHel
+      print *, "Result",BornAmps(1)%Result
+!       print *, "Result",BornAmps(2)%Result
+      pause
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+   enddo!helicity loop
+ENDIF
+
+
+IF( Correction.EQ.0 ) THEN
+!  normalization
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * WidthExpansion
+   EvalCS_1L_ststbgggg = LO_Res_Unpol * PreFac
+ENDIF
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbgggg)
+   enddo
+
+   EvalCS_1L_ststbgggg = EvalCS_1L_ststbgggg/VgsWgt
+
+return
+END FUNCTION
 
 
 

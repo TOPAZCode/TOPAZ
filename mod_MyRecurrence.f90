@@ -3072,7 +3072,7 @@ endif
 
 
 !     assuming the color flow:   s = x--->----
-      RECURSIVE FUNCTION cur_s_2s(Gluons,Scalar,NumGlu) result(res)
+      RECURSIVE FUNCTION cur_s_2s(Gluons,Scalar,NumGlu) result(res)! gauge invariance checked for up to 4 gluons
       implicit none
       type(PtrToParticle) :: Gluons(1:),Scalar(2:2)      ! off-shell scalar is not included
       integer ::  NumGlu(0:2)
@@ -3097,11 +3097,9 @@ endif
        res = (0d0,0d0)
 res1=(0d0,0d0); res2=(0d0,0d0); res3=(0d0,0d0); res4=(0d0,0d0); res5=(0d0,0d0)
 
-! print *, "enter ",ngluon,ng1,ng2
 
 !    s-s-g current to the right
        do m1=0,ng2-1
-!  print *, "loop 1"
            k1 = SumMom(Gluons,ng1+1+m1,ngluon)
            e1 = cur_g(Gluons(ng1+1+m1:ngluon),ngluon-m1-ng1+1)
            k1sq=sc_(k1,k1)
@@ -3139,7 +3137,7 @@ res1=res1+tmp
 
 !     s-g-s current to the left
         do m1=1,ng1
-!  print *, "loop 2"
+!  print *, "loop 2",ng1,ng2
            k1 = SumMom(Gluons,1,m1)
            e1 = cur_g(Gluons(1:m1),m1+1)
            k1sq = sc_(k1,k1)
@@ -3163,7 +3161,7 @@ res1=res1+tmp
               endif
            endif
 
-           if (ng2 > 0.or. m1 < ng1) then
+           if (ng2 > 0.or. m1<ng1) then
             if (abs(k2sq) > propcut) then
               tmp=(0d0,1d0)/k2sq*tmp
             else
@@ -3179,12 +3177,12 @@ res2=res2+tmp
 
 !     s-s-g-g current to the right
         do m2=2,ng2
-! print *, "loop 3"
+! print *, "loop 3",ng1,ng2
            k3 = SumMom(Gluons,1,ngluon-m2)
            k3 = k3 + Scalar(2)%Mom
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
            sc2 = cur_s_2s(Gluons(1:ngluon-m2),Scalar(2:2),(/ngluon-m2,ng1,ngluon-m2-ng1/))
-           if( ngluon-m2-ng1>0 ) then! here was a bug
+           if( ngluon-m2-ng1>0 .or. ng1>0) then! here was a bug! here was another bug
              if (abs(k3sq) > propcut) then
                sc2= (0d0,1d0)/k3sq*sc2
              else
@@ -3201,7 +3199,6 @@ res2=res2+tmp
               k2 = SumMom(Gluons,ngluon-m2+m1+1,ngluon)
               e2 = cur_g(Gluons(ngluon-m2+m1+1:ngluon),m2-m1+1)
               k2sq = sc_(k2,k2)
-
               tmp = csgg(e1,e2) * sc2
               if( m1>1 ) then
                 if (abs(k1sq) > propcut) then
@@ -3226,13 +3223,13 @@ res3=res3+tmp
 
 !     s-g-g-s current to the left
         do m2=2,ng1
-! print *, "loop 4"
+! print *, "loop 4",ng1,ng2
            k3 = SumMom(Gluons,m2+1,ngluon)
            k3 = k3 + Scalar(2)%Mom
            k3sq = sc_(k3,k3) - Scalar(2)%Mass2
            ms1 = ng1 - m2
            sc2 = cur_s_2s(Gluons(m2+1:ngluon),Scalar(2:2),(/ngluon-m2,ms1,ngluon-ng1/))
-           if( ms1>0 ) then
+           if( ms1>0 .or. ngluon-ng1>0) then! here was a bug
            if (abs(k3sq) > propcut) then
                sc2= (0d0,1d0)/k3sq*sc2
            else
@@ -3270,23 +3267,43 @@ res4=res4+tmp
         enddo
 
 
+
 !     s-g-s-g current to the left and right
       if( ng1.ge.1 .and. ng2.ge.1 ) then
+! print *, "loop 5",ng1,ng2
         do m1=1,ng1
-! print *, "loop 5"
            k1 = SumMom(Gluons,1,m1)
            e1 = cur_g(Gluons(1:m1),m1+1)
-           k1sq = sc_(k1,k1)
+           if( m1.gt.1 ) then 
+              k1sq = sc_(k1,k1)
+              if (abs(k1sq) > propcut) then
+                  e1 = -(0d0,1d0)/k1sq * e1
+              else
+                  e1 = (0d0,0d0)
+                  cycle
+              endif
+           endif
            do m2=0,ng2-1
+! print *, "loop 5 ", ng1,ng2
+! print *, "loop 5 ", m1,m2
               k2 = SumMom(Gluons,ng1+m2+1,ngluon)
               e2 = cur_g(Gluons(ng1+m2+1:ngluon),ngluon-ng1-m2-1+1+1)
+              if( ngluon-ng1-m2-1+1.gt.1 ) then
+                  k2sq = sc_(k2,k2)
+                  if (abs(k2sq) > propcut) then
+                      e2 = -(0d0,1d0)/k2sq * e2
+                  else
+                      e2 = (0d0,0d0)
+                      cycle
+                  endif
+              endif 
               sc2 = cur_s_2s(Gluons(m1+1:ng1+m2),Scalar(2:2),(/ng1-m1+m2,ng1-m1,m2/))
               if( ng1-m1.gt.0 .or. m2.gt.0 ) then
                 k3 = SumMom(Gluons,m1+1,ng1+m2)
                 k3 = k3 + Scalar(2)%Mom
                 k3sq = sc_(k3,k3) - Scalar(2)%Mass2
                 if (abs(k3sq) > propcut) then
-                   sc2=(0d0,1d0)/k3sq*sc2
+                   sc2 = (0d0,1d0)/k3sq*sc2
                 else
                    sc2 = (0d0,0d0)
                 endif
@@ -3298,7 +3315,7 @@ res5=res5+tmp
         enddo
       endif
 
-! if(ng1.eq.0 .and. ng2.eq.3) then
+! if(ng1.eq.2 .and. ng2.eq.2) then
 !  print *,"s_2s", ng1,ng2
 !  print *,res1
 !  print *,res2
@@ -4088,7 +4105,7 @@ END FUNCTION
 
 
 FUNCTION cur_g_2s(Gluons,Scalars,NumGlu) result(Res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu(0) is the number of all gluons
-implicit none
+implicit none                                                  ! checked gauge invariance for up to 4 gluons
 integer :: NumGlu(0:3),i,counter
 type(PtrToParticle) :: Gluons(1:),Scalars(1:2)
 integer :: rIn,rOut,n1a,n1b,n1c,n2a,n2b,n2c,n3a,n3b,n3c
@@ -4162,6 +4179,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
               EpsX(:) = EpsX(:)*PropFac4
           endif
           Eps1(:) = vggss(Dv,EpsX) * sc1*sc2 
+
       elseif( n2c.gt.0) then
           rIn =NumGlu(1)+n2a+1
           rOut=NumGlu(1)+n2a+n2c
@@ -4173,6 +4191,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
               EpsX(:) = EpsX(:)*PropFac4
           endif
           Eps1(:) = vgsgs(Dv,EpsX) * sc1*sc2
+
       elseif( n3c.gt.0 ) then
           rIn =NumGlu(1)+NumGlu(2)+n3a+1
           rOut=NumGlu(1)+NumGlu(2)+n3a+n3c
@@ -4192,7 +4211,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
           endif
       endif
 
-      PMom3(:) = Scalars(1)%Mom(:)+Scalars(2)%Mom(:) + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+n3c)
+      PMom3(:) = Scalars(1)%Mom(:)+Scalars(2)%Mom(:) + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+n3a+n3c)! here was a bug
 
       counter=1
       rIn =1
@@ -4229,7 +4248,8 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
    enddo
 
 
-! if(  numglu(0).eq.3 ) then
+! if(  numglu(0).eq.4 ) then
+! print *, "cur_g_2s",Res(1:4)
 ! pause
 ! endif
 
@@ -5228,7 +5248,7 @@ END FUNCTION
 
 
 
-FUNCTION cur_s_4s(Gluons,Scalars,NumGlu) result(res)
+FUNCTION cur_s_4s(Gluons,Scalars,NumGlu) result(res)!  checked gauge invariance for 2 gluons
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Scalars(2:4)      ! off-shell scalar is not included
@@ -5249,7 +5269,6 @@ integer :: rIn,rOut,i,counter
 !DEC$ IF (_DebugCheckMyImpl1==1)
     if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_s_4s"
 !DEC$ ENDIF
-
 
 
       Res=(0d0,0d0)
@@ -5296,7 +5315,7 @@ integer :: rIn,rOut,i,counter
                     if( abs(sc_(PMom4,PMom4)).lt.PropCut ) cycle
                     EpsX(:) = EpsX(:)*PropFac4
                 endif
-                Sca0 = csgg(Eps2,EpsX) * Sca1
+                Sca0 = cgsg(EpsX,Eps2) * Sca1!   here was a bug
             elseif( n2c.gt.0) then
                 rIn =NumGlu(1)+n2a+1
                 rOut=NumGlu(1)+n2a+n2c
@@ -5363,7 +5382,6 @@ integer :: rIn,rOut,i,counter
       enddo
       enddo
       enddo
-
 
 
 return

@@ -6999,8 +6999,6 @@ real(8) :: Mom(1:4,1:NumExtParticles),MomCrossing
 integer :: NPart
 !real(8) :: QuarkCrossing=-1d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
 
-
-
 do NPart=1,NumExtParticles
    ExtParticle(NPart)%Mom(1:4) = sign(1,Crossing(NPart)) * Mom(1:4,abs(Crossing(NPart)))
    ExtParticle(NPart)%Mom(5:8) = (0d0,0d0)
@@ -7177,7 +7175,7 @@ use ModProcess
 use ModMisc
 use ModParameters
 implicit none
-complex(8) e(1:NumExtParticles,1:4), tmp(1:4)
+! complex(8) e(1:NumExtParticles,1:4), tmp(1:4)
 integer :: NPart
 
    do NPart=1,NumExtParticles
@@ -7195,12 +7193,11 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-        ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 !         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
 
+
 END SUBROUTINE
-
-
 
 
 

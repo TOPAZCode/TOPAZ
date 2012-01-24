@@ -495,7 +495,7 @@ real(8) :: Mu2Ren
           ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
           res(-1) = res(-1) + ResMCT*3d0/2d0
           res(0)  = res(0)  + ResMCT*( 22d0/3d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
-! print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
+print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
        endif
 
 return
@@ -507,6 +507,7 @@ END SUBROUTINE EvalMassCTs
 SUBROUTINE  RenormalizeUV(ThePrimAmp,TheBornAmp,Mu2)
 use ModProcess
 use ModParameters
+use ModMisc
 implicit none
 type(PrimitiveAmplitude) :: ThePrimAmp
 type(BornAmplitude) :: TheBornAmp
@@ -521,6 +522,7 @@ integer :: q
       call EvalMassCTs(TheBornAmp,Mu2,ThePrimAmp%Result(-2:1))
    elseif( ThePrimAmp%AmpType.eq.3 ) then
       call EvalMassCTs(TheBornAmp,Mu2,ThePrimAmp%Result(-2:1))
+      if( ThePrimAmp%ScalarLines.ne.0 ) call Error("check again if CT is correct here")
    endif
 
 
