@@ -1697,19 +1697,19 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop
 
 
 
-ELSEIF( PROCESS.EQ.56 ) THEN !   test process: 1_ASTop + 2_STop + 3_Glu + 4_Glu + 5_Glu + 6_Glu
-  IF( CORRECTION.EQ.0 ) THEN
-      NumExtParticles = 6
-!       NumExtParticles = 5
+ELSEIF( PROCESS.EQ.56 ) THEN !   test process
+  IF( CORRECTION.LE.1 ) THEN
+!       NumExtParticles = 6
+      NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
-      Crossing(:) = (/3,4,5,6,-1,-2/)
+      Crossing(:) = (/3,4,-1,-2,5/)
 !       Crossing(:) = (/3,4,-1,-2,5,6/)
 !       Crossing(:) = (/3,4,-1,-2,5/)
       MasterProcess=16
       AvgFactor = SpinAvg * GluonColAvg**2
-      NDim = NDim + 8    ! st stbar PS integration
-!       NDim = NDim + 5    ! st stbar PS integration
+!       NDim = NDim + 8    ! st stbar PS integration
+      NDim = NDim + 5    ! st stbar PS integration
       NDim = NDim + 2    ! shat integration
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 200000
@@ -2644,13 +2644,12 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
     ExtParticle(1)%PartType = ASTop_
     ExtParticle(2)%PartType = STop_
-    ExtParticle(3)%PartType = ASTop_
-    ExtParticle(4)%PartType = STop_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
     ExtParticle(5)%PartType = Glu_
-    ExtParticle(6)%PartType = Glu_
-    IF( Correction.EQ.0 ) THEN
-      NumPrimAmps = 2
-      NumBornAmps = 2
+    IF( Correction.LE.1 ) THEN
+      NumPrimAmps = 1
+      NumBornAmps = 1
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -2662,12 +2661,14 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
     IF( XTOPDECAYS.EQ.0 ) THEN
        NumHelicities = 2
-       allocate(Helicities(1:NumHelicities,1:6))
-       Helicities(1,1:6) = (/0,0,+1,-1,+1,-1/)
-       Helicities(2,1:6) = (/0,0,+1,+1,-1,-1/)
-!        allocate(Helicities(1:NumHelicities,1:5))
-!        Helicities(1,1:5) = (/0,0,+1,-1,+1/)
-!        Helicities(2,1:5) = (/0,0,+1,+1,-1/)
+!        allocate(Helicities(1:NumHelicities,1:6))
+!        Helicities(1,1:6) = (/0,0,+1,-1,+1,-1/)
+!        Helicities(2,1:6) = (/0,0,+1,+1,-1,-1/)
+       allocate(Helicities(1:NumHelicities,1:5))
+       Helicities(1,1:5) = (/0,0,+1,-1,+1/)
+       Helicities(2,1:5) = (/0,0,+1,-1,-1/)
+
+
     ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
        call Error("Top decay not yet implemented for Masterprocess 16")
     ENDIF
@@ -3738,13 +3739,19 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
    IF( Correction.EQ.0 ) THEN
-      BornAmps(1)%ExtLine = (/1,6,2,3,4,5/)
-!       BornAmps(1)%ExtLine = (/3,6,1,5,2,4/)
-!       BornAmps(1)%ExtLine = (/3,4,1,2,5/)
-!       BornAmps(1)%ExtLine = (/3,4,5,1,2/)
-      BornAmps(2)%ExtLine = BornAmps(1)%ExtLine
+!       BornAmps(1)%ExtLine = (/1,6,2,3,4,5/)
+! !       BornAmps(1)%ExtLine = (/3,6,1,5,2,4/)
+! !       BornAmps(1)%ExtLine = (/3,4,1,2,5/)
+! !       BornAmps(1)%ExtLine = (/3,4,5,1,2/)
+!       BornAmps(2)%ExtLine = BornAmps(1)%ExtLine
+!       PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
+!       PrimAmps(2)%ExtLine = BornAmps(1)%ExtLine
+
+   ELSEIF( Correction.EQ.1 ) THEN
+
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
-      PrimAmps(2)%ExtLine = BornAmps(1)%ExtLine
+      PrimAmps(1)%AmpType = 1
    ENDIF
 
 
@@ -3947,7 +3954,6 @@ IF( Correction.EQ.1 ) THEN
                endif
 
             elseif( IsAQuark(ExtPartType) ) then
-!             print *, "IsAQuark(ExtPartType)"
                if( ThePrimAmp%AmpType.eq.1 ) then
                    if( ThePrimAmp%FermLine1Out.eq.0 ) then
                       ThePrimAmp%FermLine1Out = Vertex

@@ -63,6 +63,8 @@ real(8), public, parameter :: Q_Wp    =+1d0
 real(8), public, parameter :: Q_Wm    =-1d0
 real(8), public            :: Q_in
 real(8), public :: Ga_Top(0:1),Ga_W(0:1), WidthExpansion
+real(8), public :: Ga_TopExp = 1.99d0*GeV
+real(8), public :: Ga_WExp   = 2.14d0*GeV
 real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
 
 
@@ -275,7 +277,7 @@ END SUBROUTINE
 SUBROUTINE InitParameters
 use ModMisc
 implicit none
-real(8) :: r2, TopWidthExpansion,WWidthExpansion
+real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice
 
 
 m_Bot   = m_Top ! this is NOT the bottom mass! it is the mass for massive particles in closed fermion loops
@@ -289,10 +291,16 @@ IF( COLLIDER.EQ.1 ) THEN
    if( ObsSet.eq.3 ) then
         Collider_Energy  = 7000d0*GeV
    endif
+   if( ObsSet.eq.5 ) then
+        Collider_Energy  = 7000d0*GeV
+   endif
    if( ObsSet.eq.8 ) then
         Collider_Energy  = 7000d0*GeV
    endif
    if( ObsSet.eq.13 ) then
+        Collider_Energy  = 7000d0*GeV
+   endif
+   if( ObsSet.eq.25 ) then
         Collider_Energy  = 7000d0*GeV
    endif
 ELSEIF( COLLIDER.EQ.2 ) THEN
@@ -335,8 +343,18 @@ Ga_Top(1) = Ga_Top(0) * ( - RUNALPHAS(2,MuRen)*alpha_sOver2Pi*4d0/3d0*(   &   ! 
                          +(3d0+27d0*dlog(1d0-r2)-4d0*dlog(r2))/9d0/(1d0+2d0*r2)  &
                         ))   ! taken from eq.(26), hep-ph/0408158
 
-Ga_W(0) = (2d0*3d0+3d0)*GF*M_W**3/(6d0*dsqrt(2d0)*DblPi)
-Ga_W(1) = Ga_W(0) * RUNALPHAS(2,MuRen)*alpha_s/DblPi
+
+
+WWidthChoice = 0
+IF( WWidthChoice.eq. 1 ) THEN
+!   calculated W width:
+    Ga_W(0) = (2d0*3d0+3d0)*GF*M_W**3/(6d0*dsqrt(2d0)*DblPi)
+    Ga_W(1) = Ga_W(0) * RUNALPHAS(2,MuRen)*alpha_s/DblPi
+ELSE
+!   experimental W width:
+    Ga_W(0) = Ga_WExp
+    Ga_W(1) = 0d0
+ENDIF
 
 
 TopWidthExpansion = -2d0*Ga_Top(1)/Ga_Top(0) 

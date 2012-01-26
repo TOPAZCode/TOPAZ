@@ -187,8 +187,6 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !------------ bosonic loops --------------
        do iPrimAmp=1,6
-print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
-
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -673,11 +671,8 @@ ENDIF
 
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-
-pause
-
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
       enddo
       BosonicPartAmp(1,-2:1) =  &
                              + Nc * PrimAmps(PrimAmp1_1234)%Result(-2:1) &

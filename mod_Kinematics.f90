@@ -87,14 +87,23 @@ ELSEIF( ObsSet.EQ.4 ) THEN! ! set of observables for ttb production with hadr. A
     HT_cut      = 220d0*GeV
 
 ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top, lept. Atop decay at LHC
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 20d0*GeV
-    eta_bjet_cut= 2.0d0
-    pT_jet_cut  = 20d0*GeV
-    eta_jet_cut = 2.5d0
+
+!   these are the cuts for muons
     pT_lep_cut  = 20d0*GeV
     eta_lep_cut = 2.5d0
-    pT_miss_cut = 20d0*GeV
+
+    pT_bjet_cut = 25d0*GeV
+    pT_jet_cut  = 25d0*GeV
+    eta_bjet_cut= 2.5d0
+    eta_jet_cut = 2.5d0
+
+    pT_miss_cut = 25d0*GeV
+!   Mwt cut is hard coded below
+
+    Rsep_LepJet = 0.4d0
+    Rsep_jet    = 0.4d0
+
+
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay at LHC
@@ -247,22 +256,50 @@ ELSEIF( ObsSet.EQ.24 ) THEN! set of observables for ttbgamma production with sem
 
 ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production with semi-lept.decays(hadr.Atop, lept.top decay) at LHC
 
-    pT_pho_cut  = 20d0*GeV
-    eta_pho_cut = 2.5d0
-    Rsep_Plep   = 0.4d0
-    Rsep_Pj     = 0.4d0
-    Rsep_Pbj    = 0.4d0
-
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 20d0*GeV
-    pT_jet_cut  = 20d0*GeV
-    eta_bjet_cut= 2d0
-    eta_jet_cut = 2.5d0
-
+!   these are the cuts for muons
     pT_lep_cut  = 20d0*GeV
     eta_lep_cut = 2.5d0
 
-    pT_miss_cut = 20d0*GeV
+    pT_bjet_cut = 25d0*GeV
+    pT_jet_cut  = 25d0*GeV
+    eta_bjet_cut= 2.5d0
+    eta_jet_cut = 2.5d0
+
+    pT_pho_cut  = 15d0*GeV
+    eta_pho_cut = 2.37d0
+!   cracks for photon are hard coded below
+
+    pT_miss_cut = 25d0*GeV
+!   Mwt cut is hard coded below
+
+
+    Rsep_LepJet = 0.4d0
+    Rsep_jet    = 0.4d0
+    Rsep_Pj     = 0.5d0
+    Rsep_Pbj    = 0.5d0
+    Rsep_Plep   = 0.4d0!  not specified
+
+
+
+
+!   below is a copy of the ObsSet=28 case
+!     pT_pho_cut  = 20d0*GeV
+!     eta_pho_cut = 2.5d0
+!     Rsep_Plep   = 0.4d0
+!     Rsep_Pj     = 0.4d0
+!     Rsep_Pbj    = 0.4d0
+! 
+!     Rsep_jet    = 0.4d0
+!     pT_bjet_cut = 20d0*GeV
+!     pT_jet_cut  = 20d0*GeV
+!     eta_bjet_cut= 2d0
+!     eta_jet_cut = 2.5d0
+! 
+!     pT_lep_cut  = 20d0*GeV
+!     eta_lep_cut = 2.5d0
+! 
+!     pT_miss_cut = 20d0*GeV
+!     HT_cut      = 200d0*GeV
 
 
 
@@ -847,14 +884,12 @@ ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with semi hadr
 
 ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top, lept. Atop decay
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
-          if(TopDecays.ne.3) call Error("TopDecays needs to be 3!")
-          NumHistograms = 11
+          if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
+          NumHistograms = 12
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
-          call Error("I think the binning routine is not set up properly for TopDK=3")
-
 
           Histo(1)%Info   = "pT_ATop"
           Histo(1)%NBins  = 40
@@ -921,6 +956,17 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
           Histo(11)%BinSize= 20d0*GeV
           Histo(11)%LowVal = 20d0*GeV
           Histo(11)%SetScale= 100d0
+
+          Histo(12)%Info   = "pT_ttbar"
+          Histo(12)%NBins  = 40
+          Histo(12)%BinSize= 15d0*GeV
+          Histo(12)%LowVal = 0d0
+          Histo(12)%SetScale= 100d0
+
+
+
+
+
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay
@@ -2126,8 +2172,8 @@ ELSEIF( ObsSet.EQ.24 ) THEN! set of observables for ttbgamma production semi-lep
 
 ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lept. decays at the LHC
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
-          if(TopDecays.ne.4  .and. TopDecays.ne.3 ) call Error("TopDecays needs to be 3 (for Qt=-4/3) or 4 (for Qt=Qup)")
-          NumHistograms = 19
+          if(TopDecays.ne.4) call Error("TopDecays needs to be 3 (for Qt=-4/3) or 4 (for Qt=Qup)")
+          NumHistograms = 15
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -2157,13 +2203,13 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
           Histo(4)%LowVal =-5.0d0
           Histo(4)%SetScale= 1d0
 
-          Histo(5)%Info   = "etaFB_Lep"
+          Histo(5)%Info   = "etaFB_ATop"
           Histo(5)%NBins  = 2
           Histo(5)%BinSize= 5d0
           Histo(5)%LowVal =-5.0d0
           Histo(5)%SetScale= 1d0
 
-          Histo(6)%Info   = "etaFB_Pho"
+          Histo(6)%Info   = "etaFB_Top"
           Histo(6)%NBins  = 2
           Histo(6)%BinSize= 5d0
           Histo(6)%LowVal =-5.0d0
@@ -2171,8 +2217,8 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
 
           Histo(7)%Info   = "pT_Photon"
           Histo(7)%NBins  = 40
-          Histo(7)%BinSize= 20d0*GeV
-          Histo(7)%LowVal = 20d0*GeV
+          Histo(7)%BinSize= 25d0*GeV
+          Histo(7)%LowVal = 0d0*GeV
           Histo(7)%SetScale= 100d0
 
           Histo(8)%Info   = "eta_Photon"
@@ -2183,8 +2229,8 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
 
           Histo(9)%Info   = "pT_LepP"
           Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 20d0*GeV
-          Histo(9)%LowVal = 20d0*GeV
+          Histo(9)%BinSize= 25d0*GeV
+          Histo(9)%LowVal =  0d0*GeV
           Histo(9)%SetScale= 100d0
 
           Histo(10)%Info   = "eta_LepP"
@@ -2195,57 +2241,33 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
 
           Histo(11)%Info   = "pT_miss"
           Histo(11)%NBins  = 40
-          Histo(11)%BinSize= 20d0*GeV
-          Histo(11)%LowVal = 20d0*GeV
+          Histo(11)%BinSize= 25d0*GeV
+          Histo(11)%LowVal =  0d0*GeV
           Histo(11)%SetScale= 100d0
 
           Histo(12)%Info   = "HT(jets+lept+pho)"
           Histo(12)%NBins  = 40
-          Histo(12)%BinSize= 20d0*GeV
+          Histo(12)%BinSize= 50d0*GeV
           Histo(12)%LowVal = 150d0*GeV
           Histo(12)%SetScale= 100d0
 
           Histo(13)%Info   = "R(pho,bjet)"
           Histo(13)%NBins  = 25
-          Histo(13)%BinSize= 0.2d0
+          Histo(13)%BinSize= 0.25d0
           Histo(13)%LowVal = 0d0
           Histo(13)%SetScale= 1d0
 
           Histo(14)%Info   = "m(lep+bjet)"
-          Histo(14)%NBins  = 40
-          Histo(14)%BinSize= 20d0*GeV
+          Histo(14)%NBins  = 90
+          Histo(14)%BinSize= 5d0*GeV
           Histo(14)%LowVal = 20d0*GeV
           Histo(14)%SetScale= 100d0
 
-          Histo(15)%Info   = "m(jet+jet+pho)"
-          Histo(15)%NBins  = 40
-          Histo(15)%BinSize= 20d0*GeV
-          Histo(15)%LowVal = 20d0*GeV
-          Histo(15)%SetScale= 100d0
-
-          Histo(16)%Info   = "mT(lep,pho;pTmiss)"
-          Histo(16)%NBins  = 40
-          Histo(16)%BinSize= 20d0*GeV
-          Histo(16)%LowVal = 20d0*GeV
-          Histo(16)%SetScale= 100d0
-
-          Histo(17)%Info   = "m(bjet+jet+jet+pho)"
-          Histo(17)%NBins  = 40
-          Histo(17)%BinSize= 20d0*GeV
-          Histo(17)%LowVal = 20d0*GeV
-          Histo(17)%SetScale= 100d0
-
-          Histo(18)%Info   = "mT(bjet+lep+pho;pTmiss)"
-          Histo(18)%NBins  = 40
-          Histo(18)%BinSize= 20d0*GeV
-          Histo(18)%LowVal = 20d0*GeV
-          Histo(18)%SetScale= 100d0
-
-          Histo(19)%Info   = "phi(photon,lept)"
-          Histo(19)%NBins  = 20
-          Histo(19)%BinSize= 0.2d0
-          Histo(19)%LowVal = 0d0
-          Histo(19)%SetScale= 1d0
+          Histo(15)%Info   = "phi(photon,lept)"
+          Histo(15)%NBins  = 20
+          Histo(15)%BinSize= 0.2d0
+          Histo(15)%LowVal = 0d0
+          Histo(15)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.26 ) THEN! set of observables for ttbgamma production semi-lept. decays at the TEV
@@ -5097,15 +5119,15 @@ elseif( ObsSet.eq.22 .or. ObsSet.eq.23 ) then! set of observables for ttb+gamma 
     NBin(14)= WhichBin(14,Phi_LL)
 
 
-
 elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma production with semi-lept. at the Tevatron/LHC
 
+! below is a copy of the ObsSet=28 case:
    do k=1,NJet
       pt_jet(k)  = get_PT(MomJet(1:4,k))
       eta_jet(k) = get_eta(MomJet(1:4,k))
       R_Pj(k)    = get_R(MomJet(1:4,k),Mom(1:4,pho))
+      R_Lj(k)    = get_R(MomJet(1:4,k),Mom(1:4,L))
    enddo
-
 
 !   request two separated b-jets
     if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
@@ -5114,36 +5136,39 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     endif
 
 !   request b-jets to be outside the Frixione cone
-    if( R_Pj(1).lt.Rsep_Pj .or. R_Pj(2).lt.Rsep_Pj ) then
+    if( R_Pj(1).lt.Rsep_Pbj .or. R_Pj(2).lt.Rsep_Pbj ) then
         applyPSCut = .true.
         RETURN
     endif
 
 !   check if b-jets pass cuts
-    if(  pT_jet(1).lt.pT_bjet_cut .or. abs(eta_jet(1)).gt.eta_bjet_cut ) then
+    if(  pT_jet(1).lt.pT_bjet_cut .or. abs(eta_jet(1)).gt.eta_bjet_cut .or. R_Lj(1).lt.Rsep_LepJet  ) then
         applyPSCut = .true.
         RETURN
     endif
-    if( pT_jet(2).lt.pT_bjet_cut .or. abs(eta_jet(2)).gt.eta_bjet_cut ) then
+    if( pT_jet(2).lt.pT_bjet_cut .or. abs(eta_jet(2)).gt.eta_bjet_cut .or. R_Lj(2).lt.Rsep_LepJet ) then
         applyPSCut = .true.
         RETURN
     endif
     HT = pT_jet(1) + pT_jet(2)
 
+
 !   determine observable light jets
     NObsJet = 2! these are the b-jets
     do k=3,NJet
-        if( R_Pj(k).gt.Rsep_Pj .and. pT_jet(k).gt.pT_jet_cut .and. abs(eta_jet(k)).lt.eta_jet_cut ) then! count jets outside Frixione cone and outside beam pipe
+        if( R_Pj(k).gt.Rsep_Pj .and. R_Lj(k).gt.Rsep_LepJet .and. pT_jet(k).gt.pT_jet_cut .and. abs(eta_jet(k)).lt.eta_jet_cut ) then! count jets outside Frixione cone and outside beam pipe
             NObsJet = NObsJet +1
-            HT = HT + get_pT(MomJet(1:4,k))
+            if( k.ne.NObsJet ) MomJet(1:4,NObsJet) = MomJet(1:4,k)
+            HT = HT + pT_jet(k)
         endif
     enddo
 
-    NObsJet_Tree = 3! request two b-jets and at least one light jet
+    NObsJet_Tree = 4! request two b-jets and at least two light jets
     if( NObsJet.lt.NObsJet_Tree ) then
         applyPSCut = .true.
         RETURN
     endif
+
 
     pT_ATop = get_PT(Mom(1:4,tbar))
     pT_Top  = get_PT(Mom(1:4,t))
@@ -5159,24 +5184,18 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     Phi_LP = dabs( Get_PHI(Mom(1:4,pho)) - Get_PHI(Mom(1:4,L)) )
     if( Phi_LP.gt.Pi ) Phi_LP=2d0*Pi-Phi_LP
 
-    if( get_pT(MomJet(1:4,1)).gt.get_pT(MomJet(1:4,2)) ) then
-        ET_bjet  = get_ET(MomJet(1:4,1))
-        m_lb = get_Minv(Mom(1:4,L)+MomJet(1:4,1))
-        Rphobjet = get_R(Mom(1:4,pho),MomJet(1:4,1))
-    else
-        ET_bjet  = get_ET(MomJet(1:4,2))
-        m_lb = get_Minv(Mom(1:4,L)+MomJet(1:4,1))
-        Rphobjet = get_R(Mom(1:4,pho),MomJet(1:4,1))
-    endif
     pT_lepP  = get_PT(Mom(1:4,L))
     eta_lepP = get_ETA(Mom(1:4,L))
 
-!    MomObs(1:4) = MomObs(1:4) + Mom(1:4,pho) + Mom(1:4,L)
-!    MomMiss(1:4) = Mom(1:4,inLeft) + Mom(1:4,inRight) - MomObs(1:4)
+!     MomObs(1:4) = MomObs(1:4) + Mom(1:4,pho) + Mom(1:4,L)
+!     MomMiss(1:4) = Mom(1:4,inLeft) + Mom(1:4,inRight) - MomObs(1:4)
     MomMiss(1:4) = Mom(1:4,N)
     ET_miss  = get_ET(MomMiss(1:4))
-    HT = HT + pT_lepP + ET_miss + pT_Pho
+    HT = HT + pT_lepP + pT_Pho + ET_miss
 
+
+    m_lb = get_Minv(Mom(1:4,L)+MomJet(1:4,1))    ! these are the pT-hardest b-jets
+    Rphobjet = get_R(Mom(1:4,pho),MomJet(1:4,1))
 
 
 ! check cuts
@@ -5190,12 +5209,7 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
         RETURN
     endif
 
-    if( R_PlepP.lt.Rsep_Plep ) then
-        applyPSCut = .true.
-        RETURN
-    endif
-
-    if( HT.lt.HT_cut ) then
+    if(abs(eta_Pho).gt.1.37d0 .and. abs(eta_Pho).lt.1.52d0 ) then! this is the crack in the detector
         applyPSCut = .true.
         RETURN
     endif
@@ -5210,10 +5224,30 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
         RETURN
     endif
 
-    if( ET_miss.lt.pT_miss_cut ) then
+    if( R_PlepP.lt.Rsep_Plep ) then
         applyPSCut = .true.
         RETURN
     endif
+
+    mT_lp = get_MT(Mom(1:4,L),MomMiss(1:4))! this is the transverse W mass
+
+    if( ET_miss.lt.pT_miss_cut .or. ET_miss+mT_lp.lt.60*GeV  ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+
+
+!     print *, "old def",mt_lp
+!     
+!     mT_lp = dsqrt( 2d0*pT_lepP*ET_miss*(1d0 - (Mom(2,L)*MomMiss(2)+Mom(3,L)*MomMiss(3))/dsqrt(Mom(2,L)**2+Mom(3,L)**2)/dsqrt(MomMiss(2)**2+MomMiss(3)**2) )   )
+!     print *, "new def",mt_lp
+! 
+!     Phi_LL = dabs( Get_PHI(Mom(1:4,L)) - Get_PHI(MomMiss(1:4)) )
+!     if( Phi_LL.gt.Pi ) Phi_LL=2d0*Pi-Phi_LL
+!     print *, dcos(Phi_LL),(Mom(2,L)*MomMiss(2)+Mom(3,L)*MomMiss(3))/dsqrt(Mom(2,L)**2+Mom(3,L)**2)/dsqrt(MomMiss(2)**2+MomMiss(3)**2)
+!     pause
 
 
 ! binning
@@ -5221,8 +5255,8 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     NBin(2) = WhichBin(2,eta_ATop)
     NBin(3) = WhichBin(3,pT_Top)
     NBin(4) = WhichBin(4,eta_Top)
-    NBin(5) = WhichBin(5,eta_lepP)
-    NBin(6) = WhichBin(6,eta_Pho)
+    NBin(5) = WhichBin(5,eta_ATop)
+    NBin(6) = WhichBin(6,eta_Top)
     NBin(7) = WhichBin(7,pT_Pho)
     NBin(8) = WhichBin(8,eta_Pho)
     NBin(9) = WhichBin(9,pT_lepP)
@@ -5231,9 +5265,8 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     NBin(12) = WhichBin(12,HT)
     NBin(13) = WhichBin(13,Rphobjet)
     NBin(14) = WhichBin(14,m_lb)
-    NBin(15) = WhichBin(15,mT_lpmiss)
-    NBin(16) = WhichBin(16,Phi_LP)
-    NBin(17) = WhichBin(17,ET_bjet)
+    NBin(15) = WhichBin(15,Phi_LP)
+
 
 
 
@@ -5520,7 +5553,7 @@ real(8) :: MInv_lepP_lepM,pT_lept,ET_lept,pT_x,pT_y,mT,MinvLept,E_lept,m_lb
 real(8),save :: EMin=1d12
 real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),MomJet_aux(1:4,1:7)
 real(8) :: second_pair, first_pair, pT_bjet_min, mtop_reconstr,ptaux,pt_cand(4),pij(4)
-real(8) :: ptmax, xij, MomBBar(1:4),diff,cosLeBb,Ebjets,r_sc
+real(8) :: ptmax, xij, MomBBar(1:4),diff,cosLeBb,Ebjets,r_sc,mT_lp
 integer :: i1,i,j,n,k
 
 ! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top    ! HERE WAS A BUG: tops need to be at the end
@@ -6127,6 +6160,122 @@ elseif( ObsSet.eq.4 ) then! set of observables for ttb production with hadr. Ato
     NBin(10)= WhichBin(10,HT)
     NBin(11)= WhichBin(11,m_lb)
     NBin(12)= WhichBin(12,pT_Top)
+
+
+
+!-------------------------------------------------------
+elseif( ObsSet.eq.5 ) then! set of observables for ttb production with hadr. Atop, lept. top decay
+
+
+!   request at least two b-jets
+    if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    call pT_order(2,MomJet(1:4,1:2))
+    call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
+
+    pT_bjet1 = get_PT(MomJet(1:4,1))
+    pT_bjet2 = get_PT(MomJet(1:4,2))
+    eta_bjet1 = get_ETA(MomJet(1:4,1))
+    eta_bjet2 = get_ETA(MomJet(1:4,2))
+
+!   check if b-jets pass cuts
+    if(  pT_bjet1.lt.pT_bjet_cut .or. abs(eta_bjet1).gt.eta_bjet_cut .or. get_R(MomLept(1:4,3),MomJet(1:4,1)).lt.Rsep_LepJet ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_bjet2.lt.pT_bjet_cut .or. abs(eta_bjet2).gt.eta_bjet_cut .or. get_R(MomLept(1:4,3),MomJet(1:4,2)).lt.Rsep_LepJet ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    HT = pT_bjet1 + pT_bjet2
+
+!   determine observable light jets
+    NObsJet = 2! these are the b-jets
+    do k=3,NJet
+        if( get_PT(MomJet(1:4,k)).gt.pT_jet_cut .and. abs(get_ETA(MomJet(1:4,k))).lt.eta_jet_cut .and. get_R(MomLept(1:4,3),MomJet(1:4,k)).gt.Rsep_LepJet ) then! count jets outside beam pipe
+            NObsJet = NObsJet +1
+            if( k.ne.NObsJet ) MomJet(1:4,NObsJet) = MomJet(1:4,k)
+            HT = HT + get_PT(MomJet(1:4,k))
+        endif
+    enddo
+
+    NObsJet_Tree = 4! request two b-jets and at least two light jets
+    if( NObsJet.lt.NObsJet_Tree ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+
+    pT_lepP = get_PT(MomLept(1:4,3))
+    eta_lepP = get_ETA(MomLept(1:4,3))
+
+    ET_miss  = get_ET(MomLept(1:4,4))
+    HT = HT + pT_lepP + ET_miss
+
+    if( pT_bjet1.gt.pT_bjet2 ) then
+        m_lb = get_Minv(MomLept(1:4,3)+MomJet(1:4,1))
+    else
+        m_lb = get_Minv(MomLept(1:4,3)+MomJet(1:4,2))
+    endif
+
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
+
+    eta_ATop = get_ETA(MomTops(1:4,1))
+    eta_Top  = get_ETA(MomTops(1:4,2))
+
+
+! check cuts
+    if( pT_lepP.lt.pT_lep_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_lepP).gt.eta_lep_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( ET_miss.lt.pT_miss_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    mT_lp = get_MT(MomLept(1:4,3),MomLept(1:4,4))! this is the transverse W mass
+
+    if( ET_miss+mT_lp.lt.60*GeV  ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+!   construct hadr. W momentum
+    MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
+    if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+        pT_Top = get_pT(MomTops(1:4,1))
+    else
+        pT_Top   = -1d0
+    endif
+
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,eta_ATop)
+    NBin(3) = WhichBin(3,pT_Top)
+    NBin(4) = WhichBin(4,eta_Top)
+    NBin(5) = WhichBin(5,eta_ATop)
+    NBin(6) = WhichBin(6,eta_Top)
+    NBin(7) = WhichBin(7,pT_lepP)
+    NBin(8) = WhichBin(8,eta_lepP)
+    NBin(9) = WhichBin(9,ET_miss)
+    NBin(10)= WhichBin(10,HT)
+    NBin(11)= WhichBin(11,m_lb)
+    NBin(12)= WhichBin(12,pT_Top)
+
 
 
 
@@ -7193,7 +7342,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
 
 
 END SUBROUTINE

@@ -3419,7 +3419,6 @@ integer :: rIn,rOut,i,counter
       enddo
 
 
-
 return
 END FUNCTION
 
