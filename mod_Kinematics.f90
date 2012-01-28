@@ -885,7 +885,7 @@ ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with semi hadr
 ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top, lept. Atop decay
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
-          NumHistograms = 12
+          NumHistograms = 11
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -897,7 +897,7 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "eta_ATop"
+          Histo(2)%Info   = "y_ATop"
           Histo(2)%NBins  = 40
           Histo(2)%BinSize= 0.25d0
           Histo(2)%LowVal =-5.0d0
@@ -909,7 +909,7 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
           Histo(3)%LowVal = 0d0
           Histo(3)%SetScale= 100d0
 
-          Histo(4)%Info   = "eta_Top"
+          Histo(4)%Info   = "y_Top"
           Histo(4)%NBins  = 40
           Histo(4)%BinSize= 0.25d0
           Histo(4)%LowVal =-5.0d0
@@ -933,7 +933,7 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
           Histo(7)%LowVal =  0d0*GeV
           Histo(7)%SetScale= 100d0
 
-          Histo(8)%Info   = "eta_LepP"
+          Histo(8)%Info   = "y_LepP"
           Histo(8)%NBins  = 40
           Histo(8)%BinSize= 0.25d0
           Histo(8)%LowVal =-5.0d0
@@ -952,19 +952,10 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
           Histo(10)%SetScale= 100d0
 
           Histo(11)%Info   = "m(lep+bjet)"
-          Histo(11)%NBins  = 40
-          Histo(11)%BinSize= 20d0*GeV
+          Histo(11)%NBins  = 90
+          Histo(11)%BinSize= 5d0*GeV
           Histo(11)%LowVal = 20d0*GeV
           Histo(11)%SetScale= 100d0
-
-          Histo(12)%Info   = "pT_ttbar"
-          Histo(12)%NBins  = 40
-          Histo(12)%BinSize= 15d0*GeV
-          Histo(12)%LowVal = 0d0
-          Histo(12)%SetScale= 100d0
-
-
-
 
 
 
@@ -3555,6 +3546,48 @@ END SUBROUTINE
 
 
 
+
+
+
+SUBROUTINE EvalPhasespace_2to3Stops(EHat,xRndPS,Mom,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
+real(8) :: Mom(1:4,1:5),MomW(1:4),xRndPS(1:5)
+real(8),parameter :: N3=3, PiWgt3 = (2d0*Pi)**(4-N3*3) * (4d0*Pi)**(N3-1)
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+
+!  generate PS: massless + massless --> massive(anti-top) + massive(top)
+   call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Stop,m_Stop/),Mom(1:4,3:5),PSWgt)
+   PSWgt = PSWgt*PiWgt3
+
+
+     Pcol1= 1 -1
+     Pcol2= 3 -1
+     SingDepth = 1e-10
+     Steps = 15
+     PSWgt = 1d0
+     call gensing(3,EHat,(/0d0,m_sTop,m_sTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps)
+
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
 
 
 
@@ -6274,7 +6307,6 @@ elseif( ObsSet.eq.5 ) then! set of observables for ttb production with hadr. Ato
     NBin(9) = WhichBin(9,ET_miss)
     NBin(10)= WhichBin(10,HT)
     NBin(11)= WhichBin(11,m_lb)
-    NBin(12)= WhichBin(12,pT_Top)
 
 
 
@@ -7342,7 +7374,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
 
 
 END SUBROUTINE

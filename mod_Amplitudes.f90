@@ -494,8 +494,8 @@ real(8) :: Mu2Ren
           ResSpi(1) = cur_s_2s_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Scalars(2:2),TheBornAmp%TreeProc%NumGlu)
           ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
           res(-1) = res(-1) + ResMCT*3d0/2d0
-          res(0)  = res(0)  + ResMCT*( 22d0/3d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
-! print *, "SCALAR CT:",ResMCT*3d0/2d0 * (0d0,1d0)
+          res(0)  = res(0)  + ResMCT*( 7d0/2d0 - 3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
+! print *, "SCALAR CT:", (0d0,1d0)* ResMCT*( 21d0/3d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
        endif
 
 return

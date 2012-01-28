@@ -182,6 +182,13 @@ DipoleObjTTBP = $(ObjectDir)/mod_Dipoles_GGTTBGP.o \
 
 
 
+
+DipoleDepSTSTB = $(Here)/dipoles/mod_Dipoles_GGSTSTBG.f90 
+
+DipoleObjSTSTB = $(ObjectDir)/mod_Dipoles_GGSTSTBG.o
+
+
+
 MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(Here)/MadGraph/gg_ttb.o \
 				  $(Here)/MadGraph/gg_ttba.o \
@@ -288,6 +295,7 @@ allObjects =   $(ObjectDir)/mod_Misc.o \
 					$(DipoleObjTTB) \
 					$(DipoleObjTTBJ) \
 					$(DipoleObjTTBP) \
+					$(DipoleObjSTSTB) \
 					$(ObjectDir)/mod_SixFermionProcs2.o \
 					$(ObjectDir)/mod_CrossSection_TTB.o \
 					$(ObjectDir)/mod_CrossSection_TTBJ.o \

@@ -1696,6 +1696,25 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop
 
 
 
+ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in production)
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=14
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
 
 ELSEIF( PROCESS.EQ.56 ) THEN !   test process
   IF( CORRECTION.LE.1 ) THEN
@@ -2636,6 +2655,60 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
        enddo
        enddo
     ENDIF
+
+
+
+
+
+ELSEIF( MASTERPROCESS.EQ.14 ) THEN
+
+    ExtParticle(1)%PartType = ASTop_
+    ExtParticle(2)%PartType = STop_
+    ExtParticle(3)%PartType = Glu_
+    ExtParticle(4)%PartType = Glu_
+    ExtParticle(5)%PartType = Glu_
+    IF( Correction.EQ.2 ) THEN
+      NumPrimAmps = 6
+      NumBornAmps = 6
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( XTOPDECAYS.EQ.0 ) THEN
+       NumHelicities = 8
+       allocate(Helicities(1:NumHelicities,1:7))
+       Helicities(1,1:5) = (/0,0,+1,+1,+1/)
+       Helicities(2,1:5) = (/0,0,+1,-1,+1/)
+       Helicities(3,1:5) = (/0,0,-1,+1,+1/)
+       Helicities(4,1:5) = (/0,0,-1,-1,+1/)
+       Helicities(5,1:5) = (/0,0,+1,+1,-1/)
+       Helicities(6,1:5) = (/0,0,+1,-1,-1/)
+       Helicities(7,1:5) = (/0,0,-1,+1,-1/)
+       Helicities(8,1:5) = (/0,0,-1,-1,-1/)
+    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+       NumHelicities = 32
+       allocate(Helicities(1:NumHelicities,1:7))
+       ih=1
+       do h2=-1,1,2
+       do h3=-1,1,2
+       do h4=-1,1,2
+       do h5=-1,1,2
+       do h6=-1,1,2
+          if( ih.ge.33 ) cycle
+          Helicities(ih,1:7) = (/0,0,h2,h3,h4,h5,h6/)
+          ih=ih+1
+       enddo
+       enddo
+       enddo
+       enddo
+       enddo
+    ENDIF
+
 
 
 
@@ -3734,6 +3807,26 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
         PrimAmps(6)%FermLoopPart = Bot_
    ENDIF
 
+
+
+
+ELSEIF( MASTERPROCESS.EQ.14 ) THEN
+
+   IF( Correction.EQ.2 ) THEN
+        BornAmps(1)%ExtLine = (/1,2,3,4,5/)
+        BornAmps(2)%ExtLine = (/1,2,3,5,4/)
+        BornAmps(3)%ExtLine = (/1,2,4,3,5/)
+        BornAmps(4)%ExtLine = (/1,2,4,5,3/)
+        BornAmps(5)%ExtLine = (/1,2,5,3,4/)
+        BornAmps(6)%ExtLine = (/1,2,5,4,3/)
+
+        PrimAmps(1)%ExtLine = (/1,2,3,4,5/)
+        PrimAmps(2)%ExtLine = (/1,2,3,5,4/)
+        PrimAmps(3)%ExtLine = (/1,2,4,3,5/)
+        PrimAmps(4)%ExtLine = (/1,2,4,5,3/)
+        PrimAmps(5)%ExtLine = (/1,2,5,3,4/)
+        PrimAmps(6)%ExtLine = (/1,2,5,4,3/)
+   ENDIF
 
 
 ELSEIF( MASTERPROCESS.EQ.16 ) THEN
