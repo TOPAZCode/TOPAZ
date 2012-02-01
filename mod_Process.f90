@@ -4024,8 +4024,8 @@ IF( Correction.EQ.1 ) THEN
          ThePrimAmp%FermLine2Out= 0
          ThePrimAmp%ScaLine1In = 0
          ThePrimAmp%ScaLine1Out= 0
-         print *, "Primamp type",ThePrimAmp%ampType
-         print *, "Primamp",ThePrimAmp%ExtLine
+!          print *, "Primamp type",ThePrimAmp%ampType
+!          print *, "Primamp",ThePrimAmp%ExtLine
          do Vertex=1,NumExtParticles;  !      print *, "Vertex",Vertex
             Propa       = Vertex + 1
             PropaMinus1 = Propa - 1

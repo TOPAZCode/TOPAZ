@@ -688,14 +688,12 @@ ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.2 ) THEN
    if( TOPDECAYS.LT.0 ) call vegas1(EvalCS_NLODK_ttb_noSC,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.23 ) THEN
-  if( TOPDECAYS.GT.0 ) call vegas(EvalCS_NLODK_ttb,     VG_Result,VG_Error,VG_Chi2)
-  if( TOPDECAYS.LT.0 ) call vegas(EvalCS_NLODK_ttb_noSC,VG_Result,VG_Error,VG_Chi2)
+  call vegas(EvalCS_NLODKP_ttb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
    ncall= VegasNc1
    call InitHisto()
-  if( TOPDECAYS.GT.0 ) call vegas1(EvalCS_NLODK_ttb,     VG_Result,VG_Error,VG_Chi2)
-  if( TOPDECAYS.LT.0 ) call vegas1(EvalCS_NLODK_ttb_noSC,VG_Result,VG_Error,VG_Chi2)
+   call vegas1(EvalCS_NLODKP_ttb,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.34 ) THEN
   call vegas(EvalCS_REDKJ_ttb,VG_Result,VG_Error,VG_Chi2)

@@ -653,6 +653,7 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModIntDipoles_GGSTSTBG
 implicit none
 real(8) ::  EvalCS_1L_ststbgg,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(7:8,-2:1)
@@ -892,7 +893,37 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 ELSEIF( Correction.EQ.3 ) THEN
 
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+   IF( TOPDECAYS.GE.1 ) THEN
+       xE = yRnd(16+HelSampling)
+   ELSEIF( TOPDECAYS.EQ.0 ) THEN
+       xE = yRnd(8+HelSampling)
+   ENDIF
+   call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
+
+   call EvalIntDipoles_GGSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:11),xE,HOp(1:3))
+   HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+   EvalCS_1L_ststbgg = HOp(1)    * pdf(0,1)  * pdf(0,2)   &
+                    + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
+                    + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
+
 ENDIF
+
+
+   if( IsNan(EvalCS_1L_ststbgg) ) then
+        print *, "NAN:",EvalCS_1L_ststbgg
+        print *, yRnd(:)
+        print *, NLO_Res_UnPol(0),NLO_Res_UnPol(1),NLO_Res_UnPol_Ferm(0),NLO_Res_UnPol_Ferm(1)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,((1d0-eta1)*xE+eta1),((1d0-eta2)*xE+eta2),MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1:11)
+        print *, "SKIP EVENT!!!!!"
+        EvalCS_1L_ststbgg = 0d0
+        return
+   endif
+
 
 
    do NHisto=1,NumHistograms
