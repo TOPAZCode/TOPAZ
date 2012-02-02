@@ -1709,6 +1709,53 @@ ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 2000000
       VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=12
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.56 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop + 5_Glu(in production)
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=15
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -1716,7 +1763,7 @@ ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in
 
 
 
-ELSEIF( PROCESS.EQ.56 ) THEN !   test process
+ELSEIF( PROCESS.EQ.59 ) THEN !   test process
   IF( CORRECTION.LE.1 ) THEN
 !       NumExtParticles = 6
       NumExtParticles = 5
@@ -2708,6 +2755,52 @@ ELSEIF( MASTERPROCESS.EQ.14 ) THEN
        enddo
        enddo
     ENDIF
+
+
+
+ELSEIF( MASTERPROCESS.EQ.15 ) THEN
+
+    ExtParticle(1)%PartType = ASTop_
+    ExtParticle(2)%PartType = STop_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
+    ExtParticle(5)%PartType = Glu_
+    IF( Correction.EQ.2 ) THEN
+      NumPrimAmps = 4
+      NumBornAmps = 4
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( XTOPDECAYS.EQ.0 ) THEN
+       NumHelicities = 4
+       allocate(Helicities(1:NumHelicities,1:7))
+       Helicities(1,1:5) = (/0,0,+1,-1,+1/)
+       Helicities(2,1:5) = (/0,0,-1,+1,+1/)
+       Helicities(3,1:5) = (/0,0,+1,-1,-1/)
+       Helicities(4,1:5) = (/0,0,-1,+1,-1/)
+    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+       NumHelicities = 16
+       allocate(Helicities(1:NumHelicities,1:7))
+       ih=1
+       do h2=-1,1,2
+       do h4=-1,1,2
+       do h5=-1,1,2
+       do h6=-1,1,2
+          if( ih.ge.17 ) cycle
+          Helicities(ih,1:7) = (/0,0,h2,-h2,h4,h5,h6/)
+          ih=ih+1
+       enddo
+       enddo
+       enddo
+       enddo
+    ENDIF
+
 
 
 
@@ -3827,6 +3920,17 @@ ELSEIF( MASTERPROCESS.EQ.14 ) THEN
         PrimAmps(5)%ExtLine = (/1,2,5,3,4/)
         PrimAmps(6)%ExtLine = (/1,2,5,4,3/)
    ENDIF
+
+
+ELSEIF( MASTERPROCESS.EQ.15 ) THEN
+
+   IF( Correction.EQ.2 ) THEN
+        PrimAmps(1)%ExtLine = (/1,2,3,4,5/)
+        PrimAmps(2)%ExtLine = (/1,5,2,3,4/)
+        PrimAmps(3)%ExtLine = (/1,2,5,3,4/)
+        PrimAmps(4)%ExtLine = (/1,2,3,5,4/)
+   ENDIF
+
 
 
 ELSEIF( MASTERPROCESS.EQ.16 ) THEN

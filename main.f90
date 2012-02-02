@@ -986,6 +986,15 @@ IF( CORRECTION.LE.1 .AND. PROCESS.EQ.51 ) THEN
     call InitHisto()
     call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
   endif
+
+ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.55 ) THEN
+  call vegas(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
 ENDIF
 ENDIF
 
@@ -994,6 +1003,15 @@ ENDIF
 
 IF( MASTERPROCESS.EQ.13 ) THEN
 IF( CORRECTION.LE.1 .AND. PROCESS.EQ.52 ) THEN
+  call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.56 ) THEN
   call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
@@ -1018,6 +1036,23 @@ IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.55 ) THEN
   endif
 ENDIF
 ENDIF
+
+
+
+
+
+IF( MASTERPROCESS.EQ.15 ) THEN
+IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.56 ) THEN
+  call vegas(EvalCS_Real_ststbqqbg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Real_ststbqqbg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
 
 
 

@@ -747,8 +747,8 @@ IF( Correction.EQ.0 ) THEN
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
-!    do iHel=nHel(1),nHel(2)
-   do iHel=1,1; print *, "fixed heli"
+   do iHel=nHel(1),nHel(2)
+!    do iHel=1,1; print *, "fixed heli"
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
       call HelCrossing(Helicities(iHel,1:4))
@@ -869,15 +869,16 @@ IF( Correction.EQ.0 ) THEN
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * WidthExpansion
    EvalCS_1L_ststbgg = LO_Res_Unpol * PreFac
 
+
 ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
-!  CT contributions                           ! beta        !top WFRC
-   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 )*LO_Res_Unpol
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu) contrib. from  top WFRC
+!  CT contributions                           ! beta        !stop WFRC
+   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 + 4d0)*LO_Res_Unpol  ! THE LAST PIECE +4d0  is not understoood yet!!
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_stop)*LO_Res_Unpol  ! finite log(mu) contrib. from  stop WFRC
 
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) - (-2d0/3d0*Nf_light)*LO_Res_Unpol
 
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-7d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from stop WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
 
 
@@ -888,27 +889,33 @@ ELSEIF( Correction.EQ.1 ) THEN
 
    EvalCS_1L_ststbgg = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
-
-
+!    print *, "1L check",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+!    print *, "1L check",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
 
 ELSEIF( Correction.EQ.3 ) THEN
 
-
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-   IF( TOPDECAYS.GE.1 ) THEN
-       xE = yRnd(16+HelSampling)
-   ELSEIF( TOPDECAYS.EQ.0 ) THEN
-       xE = yRnd(8+HelSampling)
+   IF( XTOPDECAYS.GE.1 ) THEN
+       xE = yRnd(17+HelSampling)
+   ELSEIF( XTOPDECAYS.EQ.0 ) THEN
+       xE = yRnd(5+HelSampling)
    ENDIF
+!    xe = 0.35d0; print *, "fixed xe"
+
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-
-   call EvalIntDipoles_GGSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:11),xE,HOp(1:3))
-   HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+   call EvalIntDipoles_GGSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+   HOp(1:3) = HOp(1:3)*RunFactor**3
    EvalCS_1L_ststbgg = HOp(1)    * pdf(0,1)  * pdf(0,2)   &
-                    + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
-                    + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
+                     + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
+                     + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
 
+!    print *, "LO cross",LO_Res_Unpol
+!    print *, "HOp check",HOp(1)/(alpha_sOver2Pi*RunFactor)
+!    pause
+
+    EvalCS_1L_ststbgg = EvalCS_1L_ststbgg * PreFac
 ENDIF
+
 
 
    if( IsNan(EvalCS_1L_ststbgg) ) then
@@ -923,8 +930,6 @@ ENDIF
         EvalCS_1L_ststbgg = 0d0
         return
    endif
-
-
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbgg)
@@ -1051,8 +1056,6 @@ IF( Correction.EQ.0 ) THEN
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
-pause
-
    enddo!helicity loop
 
 !------------ 1 LOOP --------------
@@ -1517,6 +1520,10 @@ include 'vegas_common.f'
    FluxFac = 1d0/(2d0*EHat**2)
 
    call EvalPhaseSpace_2to3Stops(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu AStop, Stop
+   if( PSWgt.eq.0d0 )  then
+      EvalCS_Real_ststbggg = 0d0
+      return
+   endif
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 ! !!!!!!!!!!!!!!!!!!!!! this is just for checking gauge invariance with gluon off the beam pipe
 ! print *, "Test Boost activated"
@@ -1628,6 +1635,122 @@ endif! applyPSCut
 return
 END FUNCTION
 
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_Real_ststbqqbg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModUCuts
+use ModUCuts_128
+use ModIntegrals
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+implicit none
+real(8) ::  EvalCS_Real_ststbqqbg,yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a,PDFFac_b,PDFFac
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),npdf
+real(8),parameter :: Nc=3d0
+!include 'misc/global_import'
+include 'vegas_common.f'
+
+
+   EvalCS_Real_ststbqqbg = 0d0
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_STop ) then
+      EvalCS_Real_ststbqqbg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+
+   IF(XTOPDECAYS.EQ.3) THEN
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   ENDIF
+ 
+   call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+   if( applyPSCut ) then
+      EvalCS_Real_ststbqqbg = 0d0
+      return
+   endif
+
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+            + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+            + pdf(Bot_,1)*pdf(ABot_,2)
+   PDFFac_b = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+            + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+            + pdf(Bot_,2)*pdf(ABot_,1)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+   nHel(1:2) = getHelicity(yrnd(17))
+   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+
+
+  LO_Res_Unpol             = (0d0,0d0)
+  do npdf=1,2
+    if(npdf.eq.1) then
+        PDFFac = PDFFac_a
+    elseif(npdf.eq.2) then
+        PDFFac = PDFFac_b
+        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
+    ISFac = MomCrossing(MomExt)
+    call InitCurrCache()
+    call SetPropagators()
+
+!------------ LO ----------------
+   do iHel=nHel(1),nHel(2)
+      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+
+      call HelCrossing(Helicities(iHel,1:4))
+      call SetPolarizations()
+      do iPrimAmp=1,NumBornAmps
+! print *,"EVAL PRIMAMP",iPrimAmp
+          call EvalTree(BornAmps(iPrimAmp))
+! print *, BornAmps(iPrimAmp)%Result
+      enddo
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+! print *, "removed for cross check"
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+   enddo!helicity loop
+  enddo! npdf loop
+  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+
+
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbqqbg)
+   enddo
+
+   EvalCS_Real_ststbqqbg = EvalCS_Real_ststbqqbg/VgsWgt
+
+return
+END FUNCTION
 
 
 

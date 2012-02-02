@@ -3560,19 +3560,18 @@ real(8) :: Mom(1:4,1:5),MomW(1:4),xRndPS(1:5)
 real(8),parameter :: N3=3, PiWgt3 = (2d0*Pi)**(4-N3*3) * (4d0*Pi)**(N3-1)
 integer :: Pcol1,Pcol2,Steps
 real(8) :: SingDepth,velo,parx
+real(8) :: s13,s23
 
 !  generate PS: massless + massless --> massive(anti-top) + massive(top)
    call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Stop,m_Stop/),Mom(1:4,3:5),PSWgt)
    PSWgt = PSWgt*PiWgt3
 
-
-     Pcol1= 1 -1
-     Pcol2= 3 -1
-     SingDepth = 1e-10
-     Steps = 15
-     PSWgt = 1d0
-     call gensing(3,EHat,(/0d0,m_sTop,m_sTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps)
-
+!      Pcol1= 1 -1
+!      Pcol2= 3 -1
+!      SingDepth = 1e-10
+!      Steps = 15
+!      PSWgt = 1d0
+!      call gensing(3,EHat,(/0d0,m_sTop,m_sTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -3584,6 +3583,11 @@ real(8) :: SingDepth,velo,parx
    Mom(2,2) =  0d0
    Mom(3,2) =  0d0
    Mom(4,2) = -EHat*0.5d0
+
+   s13 = Mom(1:4,1).dot.Mom(1:4,3)
+   s23 = Mom(1:4,2).dot.Mom(1:4,3)
+   if( abs(s13)/EHat**2.lt.1d-9 .or. abs(s23)/EHat**2.lt.1d-9 ) PSWgt=0d0
+   if( abs(Mom(1,3)/EHat).lt.1d-5  ) PSWgt=0d0
 
 
 return
