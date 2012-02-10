@@ -66,8 +66,8 @@ ENDIF
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    ISFac = MomCrossing(MomExt)
 
-!    muren=m_top+get_pt(MomExt(1:4,3))
-!    mufac=m_top+get_pt(MomExt(1:4,3))
+!    muren= dsqrt( m_top**2 + get_pt(MomExt(1:4,3))**2 )
+!    mufac= dsqrt( m_top**2 + get_pt(MomExt(1:4,3))**2 )
 
    NRndHel=5
 IF( TOPDECAYS.NE.0 ) THEN
@@ -513,8 +513,8 @@ ENDIF
       return
    endif
 
-!    muren=m_top+get_pt(MomExt(1:4,3))
-!    mufac=m_top+get_pt(MomExt(1:4,3))
+!    muren= dsqrt( m_top**2 + get_pt(MomExt(1:4,3))**2 )
+!    mufac= dsqrt( m_top**2 + get_pt(MomExt(1:4,3))**2 )
 
    call setPDFs(eta1,eta2,MuFac,pdf)
    PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &

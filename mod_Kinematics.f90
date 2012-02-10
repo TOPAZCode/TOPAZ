@@ -107,14 +107,14 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay at LHC
-    Rsep_jet    = 0.5d0
-    pT_bjet_cut = 20d0*GeV
-    eta_bjet_cut= 2.0d0
-    pT_jet_cut  = 20d0*GeV
-    eta_jet_cut = 2.0d0
-    pT_lep_cut  = 20d0*GeV
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 25d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut  = 25d0*GeV
+    eta_jet_cut = 2.5d0
+    pT_lep_cut  = 25d0*GeV
     eta_lep_cut = 2.5d0
-    pT_miss_cut = 20d0*GeV
+    pT_miss_cut = 25d0*GeV
 
 
 ELSEIF( ObsSet.EQ.7 ) THEN! set of observables for ttb production with lept. top and J/Psi fragmentation, hadr. Atop decay at LHC
@@ -138,7 +138,7 @@ ELSEIF( ObsSet.EQ.10 ) THEN! set of observables for ttbjet production without de
     Rsep_jet    = 1d0
 
 ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without decays at LHC
-    pT_jet_cut  = 25d0*GeV
+    pT_jet_cut  = 10d0*GeV
     Rsep_jet    = 0.4d0
 
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
@@ -678,21 +678,21 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
-          Histo(1)%Info    = "pT_lepMinus"
-          Histo(1)%NBins   = 40
-          Histo(1)%BinSize = 50d0*GeV
-          Histo(1)%LowVal  = 0d0
+          Histo(1)%Info   = "pT_ATop"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "eta_lepMinus"
-          Histo(2)%NBins  = 50
-          Histo(2)%BinSize= 0.2d0
+          Histo(2)%Info   = "eta_ATop"
+          Histo(2)%NBins  = 40
+          Histo(2)%BinSize= 0.25d0
           Histo(2)%LowVal =-5.0d0
           Histo(2)%SetScale= 1d0
 
           Histo(3)%Info   = "pT_lepPlus"
           Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 50d0*GeV
+          Histo(3)%BinSize= 25d0*GeV
           Histo(3)%LowVal = 0d0
           Histo(3)%SetScale= 100d0
 
@@ -4111,6 +4111,12 @@ if( ObsSet.eq.10 .or. ObsSet.eq.11 ) then! set of observables for ttbjet product
         RETURN
     endif
 
+!     if( pT_Top.lt.800d0*GeV ) then!   this is for the boosted observable
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+
+
 ! binning
     NBin(1) = WhichBin(1,pT_ATop)
     NBin(2) = WhichBin(2,pT_Top)
@@ -5797,6 +5803,10 @@ if( ObsSet.eq.0 .or. ObsSet.eq.1 .or. ObsSet.eq.9) then! set of observables for 
     eta_ATop = get_ETA(MomTops(1:4,1))
     eta_Top  = get_ETA(MomTops(1:4,2))
 
+!     if( pT_Top.lt.800d0*GeV .or. pT_ATop.lt.800*GeV ) then!   this is for the boosted observable
+!         applyPSCut = .true.
+!         RETURN
+!     endif
 
 ! binning
     NBin(1) = WhichBin(1,pT_ATop)
@@ -5853,6 +5863,8 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
     endif
 !MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomDK(1:4,4) )
 
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
     eta_ATop = get_ETA(MomTops(1:4,1))
     eta_Top  = get_ETA(MomTops(1:4,2))
 
@@ -5897,7 +5909,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
 
    DeltaPhi = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
    if( DeltaPhi.gt.Pi ) DeltaPhi=2d0*Pi-DeltaPhi
-  Psi_LepLep  = dacos( ( MomLept(4,1)*MomLept(4,3) +MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) )/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2+MomLept(4,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2+MomLept(4,3)**2) )
+   Psi_LepLep  = dacos( ( MomLept(4,1)*MomLept(4,3) +MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) )/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2+MomLept(4,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2+MomLept(4,3)**2) )
 
 
 
@@ -6062,8 +6074,8 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
 
 
 ! binning
-    NBin(1) = WhichBin(1,pT_lepM)
-    NBin(2) = WhichBin(2,eta_lepM)
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,eta_ATop)
     NBin(3) = WhichBin(3,pT_lepP)
     NBin(4) = WhichBin(4,eta_lepP)
     NBin(5) = WhichBin(5,HT)
@@ -6398,14 +6410,14 @@ elseif( ObsSet.eq.6 ) then! set of observables for ttb production with hadr. Ato
         RETURN
     endif
 
-    if( HT.lt.HT_cut ) then
-        applyPSCut = .true.
-        RETURN
-    endif
+!     if( HT.lt.HT_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
 
 
 
-!   construct hadr. W momentum
+!   construct hadr. ttb pT
     MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
     if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
         pT_Top = get_pT(MomTops(1:4,1))

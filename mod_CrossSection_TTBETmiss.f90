@@ -1602,7 +1602,7 @@ endif! applyPSCut
 
 
 ! IF( TopDecays.GE.1 ) THEN
-     call EvalDipoles_GGSTSTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_Top**2,m_Top**2,0d0/),yRnd(8:19),PreFac,DipoleResult)
+     call EvalDipoles_GGSTSTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFac,DipoleResult)
 ! ELSE
 !      call EvalDipoles_GGSTSTBG_noDK((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_Top**2,m_Top**2,0d0/),yRnd(8:19),PreFac,DipoleResult)
 ! ENDIF
@@ -1657,16 +1657,15 @@ real(8) ::  EvalCS_Real_ststbqqbg,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
-real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
+real(8) :: MomExt(1:4,1:15)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a,PDFFac_b,PDFFac
-real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
+real(8) :: pdf(-6:6,1:2)
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),npdf
 real(8),parameter :: Nc=3d0
-!include 'misc/global_import'
 include 'vegas_common.f'
 
-
+call Error("this routine needs some work")
    EvalCS_Real_ststbqqbg = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_STop ) then
@@ -1705,7 +1704,7 @@ include 'vegas_common.f'
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
 
-  LO_Res_Unpol             = (0d0,0d0)
+  LO_Res_Unpol = (0d0,0d0)
   do npdf=1,2
     if(npdf.eq.1) then
         PDFFac = PDFFac_a

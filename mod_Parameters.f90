@@ -294,7 +294,13 @@ IF( COLLIDER.EQ.1 ) THEN
    if( ObsSet.eq.5 ) then
         Collider_Energy  = 7000d0*GeV
    endif
+   if( ObsSet.eq.6 ) then
+        Collider_Energy  = 7000d0*GeV
+   endif
    if( ObsSet.eq.8 ) then
+        Collider_Energy  = 7000d0*GeV
+   endif
+   if( ObsSet.eq.11 ) then
         Collider_Energy  = 7000d0*GeV
    endif
    if( ObsSet.eq.13 ) then
@@ -345,7 +351,7 @@ Ga_Top(1) = Ga_Top(0) * ( - RUNALPHAS(2,MuRen)*alpha_sOver2Pi*4d0/3d0*(   &   ! 
 
 
 
-WWidthChoice = 0
+WWidthChoice = 0!          0=experimental W width,    =calculated W width
 IF( WWidthChoice.eq. 1 ) THEN
 !   calculated W width:
     Ga_W(0) = (2d0*3d0+3d0)*GF*M_W**3/(6d0*dsqrt(2d0)*DblPi)

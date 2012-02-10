@@ -228,6 +228,7 @@ logical :: dirresult
          AlgoType = +1       ! kT
     endif
 
+
     if(Correction.eq.0) then
         if(NLOParam.le.1) then
           CorrectionStr = "LOLO"
