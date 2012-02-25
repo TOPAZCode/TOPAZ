@@ -443,7 +443,7 @@
       do i5=-1,1,2
 
          Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+  Bm(i1,c1,i2,i3,i4,i5)*dconjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -473,10 +473,11 @@
        xm = scc(POL1(-1,:),paux)
        xp = scc(POL1(1,:),paux)
 
-      HH(-1,1)=offdiag*conjg(xm)*xp
-      HH(1,-1)=offdiag*conjg(xp)*xm
-      HH(-1,-1)=diag + offdiag*conjg(xm)*xm
-      HH(1,1) = diag + offdiag*conjg(xp)*xp
+      HH(-1,1)=offdiag*dconjg(xm)*xp
+      HH(1,-1)=offdiag*dconjg(xp)*xm
+      HH(-1,-1)=diag + offdiag*dconjg(xm)*xm
+      HH(1,1) = diag + offdiag*dconjg(xp)*xp
+
 
 
       endif
@@ -782,7 +783,7 @@
       do i5=-1,1,2
 
          Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+  Bm(i1,c1,i2,i3,i4,i5)*dconjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -809,10 +810,10 @@
        xm = scc(POL1(-1,:),paux)
        xp = scc(POL1(1,:),paux)
 
-      HH(-1,1)=offdiag*conjg(xm)*xp
-      HH(1,-1)=offdiag*conjg(xp)*xm
-      HH(-1,-1)=diag + offdiag*conjg(xm)*xm
-      HH(1,1) = diag + offdiag*conjg(xp)*xp
+      HH(-1,1)=offdiag*dconjg(xm)*xp
+      HH(1,-1)=offdiag*dconjg(xp)*xm
+      HH(-1,-1)=diag + offdiag*dconjg(xm)*xm
+      HH(1,1) = diag + offdiag*dconjg(xp)*xp
 
 
       endif
@@ -836,7 +837,7 @@
            do i4=1,6
 
 
-!      cres = cres + C(i3,i4)*Am(i1,i3)*conjg(Am(i2,i4))*HH(i1,i2)
+!      cres = cres + C(i3,i4)*Am(i1,i3)*dconjg(Am(i2,i4))*HH(i1,i2)
       cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
 
@@ -1140,7 +1141,7 @@
       do i5=-1,1,2
 
          Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+  Bm(i1,c1,i2,i3,i4,i5)*dconjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -1169,10 +1170,10 @@
        xm = scc(POL1(-1,:),paux)
        xp = scc(POL1(1,:),paux)
 
-      HH(-1,1)=offdiag*conjg(xm)*xp
-      HH(1,-1)=offdiag*conjg(xp)*xm
-      HH(-1,-1)=diag + offdiag*conjg(xm)*xm
-      HH(1,1) = diag + offdiag*conjg(xp)*xp
+      HH(-1,1)=offdiag*dconjg(xm)*xp
+      HH(1,-1)=offdiag*dconjg(xp)*xm
+      HH(-1,-1)=diag + offdiag*dconjg(xm)*xm
+      HH(1,1) = diag + offdiag*dconjg(xp)*xp
 
 
       endif
@@ -1187,7 +1188,7 @@
            do i4=1,6
 
       cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-!      cres = cres + C(i3,i4)*Am(i1,i3)*conjg(Am(i2,i4))*HH(i1,i2)
+!      cres = cres + C(i3,i4)*Am(i1,i3)*dconjg(Am(i2,i4))*HH(i1,i2)
 
             enddo
            enddo
@@ -1476,7 +1477,7 @@
       do i5=-1,1,2
 
          Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+  Bm(i1,c1,i2,i3,i4,i5)*dconjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -1505,10 +1506,10 @@
        xm = scc(POL1(-1,:),paux)
        xp = scc(POL1(1,:),paux)
 
-      HH(-1,1)=offdiag*conjg(xm)*xp
-      HH(1,-1)=offdiag*conjg(xp)*xm
-      HH(-1,-1)=diag + offdiag*conjg(xm)*xm
-      HH(1,1) = diag + offdiag*conjg(xp)*xp
+      HH(-1,1)=offdiag*dconjg(xm)*xp
+      HH(1,-1)=offdiag*dconjg(xp)*xm
+      HH(-1,-1)=diag + offdiag*dconjg(xm)*xm
+      HH(1,1) = diag + offdiag*dconjg(xp)*xp
 
       endif
 
@@ -1522,7 +1523,7 @@
            do i4=1,6
 
 
-!      cres = cres + C(i3,i4)*Am(i1,i3)*conjg(Am(i2,i4))*HH(i1,i2)
+!      cres = cres + C(i3,i4)*Am(i1,i3)*dconjg(Am(i2,i4))*HH(i1,i2)
       cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
             enddo

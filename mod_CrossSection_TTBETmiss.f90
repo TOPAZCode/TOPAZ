@@ -1496,7 +1496,7 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
-use ModDipoles_DKP_GGSTSTBG
+use ModDipoles_GGSTSTBG
 implicit none
 real(8) :: EvalCS_Real_ststbggg,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: LO_Res_Pol,LO_Res_Unpol
@@ -1652,20 +1652,22 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModDipoles_QQBSTSTBG
 implicit none
-real(8) ::  EvalCS_Real_ststbqqbg,yRnd(1:VegasMxDim),VgsWgt
+real(8) ::  EvalCS_Real_ststbqqbg,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,PreFacDip
 real(8) :: MomExt(1:4,1:15)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a,PDFFac_b,PDFFac
-real(8) :: pdf(-6:6,1:2)
+real(8) :: pdf(-6:6,1:2),s12,s13
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),npdf
 real(8),parameter :: Nc=3d0
 include 'vegas_common.f'
 
-call Error("this routine needs some work")
+
+
    EvalCS_Real_ststbqqbg = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_STop ) then
@@ -1674,22 +1676,21 @@ call Error("this routine needs some work")
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
-   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+   call EvalPhaseSpace_2to3Stops(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu AStop, Stop
+   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    IF(XTOPDECAYS.EQ.3) THEN
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  Chi top
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    ENDIF
  
-   call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
-   if( applyPSCut ) then
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+if(  applyPSCut ) then
       EvalCS_Real_ststbqqbg = 0d0
-      return
-   endif
+else
 
    call SetPDFs(eta1,eta2,MuFac,pdf)
    PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
@@ -1700,12 +1701,10 @@ call Error("this routine needs some work")
             + pdf(Bot_,2)*pdf(ABot_,1)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
-   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
-
 
   LO_Res_Unpol = (0d0,0d0)
-  do npdf=1,2
+!   do npdf=1,2
+  do npdf=1,1; print *, "npdf=1"
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
@@ -1717,38 +1716,69 @@ call Error("this routine needs some work")
     call SetPropagators()
 
 !------------ LO ----------------
-   do iHel=nHel(1),nHel(2)
-      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
-      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
-
-      call HelCrossing(Helicities(iHel,1:4))
+   do iHel=1,NumHelicities
+      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,6:10))
+      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,7),MomExt(1:4,11:15))
+      call HelCrossing(Helicities(iHel,1:5))
       call SetPolarizations()
+      
       do iPrimAmp=1,NumBornAmps
-! print *,"EVAL PRIMAMP",iPrimAmp
           call EvalTree(BornAmps(iPrimAmp))
-! print *, BornAmps(iPrimAmp)%Result
       enddo
+
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
-          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-! print *, "removed for cross check"
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
    enddo!helicity loop
   enddo! npdf loop
-  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+!   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+print *, "swap back off"
 
 
+!  normalization
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3
+   EvalCS_Real_ststbqqbg = LO_Res_Unpol * PreFac
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbqqbg)
    enddo
 
-   EvalCS_Real_ststbqqbg = EvalCS_Real_ststbqqbg/VgsWgt
+endif! applyPSCut
 
-return
+
+  PreFacDip = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+  call EvalDipoles_QQBSTSTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+
+
+  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
+  s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_ststbqqbg,DipoleResult, (EvalCS_Real_ststbqqbg/(-DipoleResult)-1d0)
+  pause
+
+
+
+   if( IsNan(EvalCS_Real_ststbqqbg) .or. IsNan(DipoleResult) ) then
+        print *, "NAN:",EvalCS_Real_ststbqqbg,DipoleResult
+        print *, yRnd(:)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1)
+        print *, MomExt(1:4,2)
+        print *, MomExt(1:4,3)
+        print *, MomExt(1:4,4)
+        print *, MomExt(1:4,5)
+        stop
+   endif
+
+        EvalCS_Real_ststbqqbg = (EvalCS_Real_ststbqqbg + DipoleResult)/VgsWgt
+
+
+
 END FUNCTION
 
 

@@ -1,7 +1,7 @@
 #DEFINE _CHECK_DIPOLE_MOMMAP 0
 #DEFINE _APPLY_CUTS 0
 
-      MODULE ModDipoles_DKP_GGSTSTBG
+      MODULE ModDipoles_GGSTSTBG
       use ModParameters
       use ModTopdecay
       implicit none
@@ -12,7 +12,6 @@
       double precision, private, parameter :: TR=1d0
       double precision, private, parameter :: CA=2d0*TR*NCol
       double precision, private, parameter :: CF=TR*(NCol**2-1d0)/NCol
-
 
       type :: Dipole
          double precision DipoleValue

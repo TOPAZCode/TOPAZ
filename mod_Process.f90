@@ -2784,6 +2784,7 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
        Helicities(2,1:5) = (/0,0,-1,+1,+1/)
        Helicities(3,1:5) = (/0,0,+1,-1,-1/)
        Helicities(4,1:5) = (/0,0,-1,+1,-1/)
+
     ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
        NumHelicities = 16
        allocate(Helicities(1:NumHelicities,1:7))

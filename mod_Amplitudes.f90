@@ -235,7 +235,7 @@ integer :: i,j,Order(1:6)
                     Res(2:Ds) = 0d0
                 else
                     Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
-                    print *, "calling cur_s_ssff"
+!                     print *, "calling cur_s_ssff"
                     Res(2:Ds) = 0d0
                 endif
 

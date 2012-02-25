@@ -3566,12 +3566,12 @@ real(8) :: s13,s23
    call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Stop,m_Stop/),Mom(1:4,3:5),PSWgt)
    PSWgt = PSWgt*PiWgt3
 
-!      Pcol1= 1 -1
-!      Pcol2= 3 -1
-!      SingDepth = 1e-10
-!      Steps = 15
-!      PSWgt = 1d0
-!      call gensing(3,EHat,(/0d0,m_sTop,m_sTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
+     Pcol1= 1 -1
+     Pcol2= 3 -1
+     SingDepth = 1e-10
+     Steps = 15
+     PSWgt = 1d0
+     call gensing(3,EHat,(/0d0,m_sTop,m_sTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -7390,8 +7390,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
-
+!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 
