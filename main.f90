@@ -1043,7 +1043,7 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.15 ) THEN
-IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.56 ) THEN
+IF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.53 .OR. PROCESS.EQ.54 .OR. PROCESS.EQ.56 ) ) THEN
   call vegas(EvalCS_Real_ststbqqbg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
@@ -1053,8 +1053,6 @@ IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.56 ) THEN
   endif
 ENDIF
 ENDIF
-
-
 
 
 

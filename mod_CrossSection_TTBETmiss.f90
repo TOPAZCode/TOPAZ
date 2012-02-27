@@ -1653,8 +1653,9 @@ use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
 use ModDipoles_QQBSTSTBG
+use ModDipoles_QGSTSTBQ
 implicit none
-real(8) ::  EvalCS_Real_ststbqqbg,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
+real(8) ::  EvalCS_Real_ststbqqbg,EvalCS_Dips_ttbqqbgp,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,PreFacDip
@@ -1669,6 +1670,7 @@ include 'vegas_common.f'
 
 
    EvalCS_Real_ststbqqbg = 0d0
+   EvalCS_Dips_ttbqqbgp = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_STop ) then
       EvalCS_Real_ststbqqbg = 0d0
@@ -1687,24 +1689,39 @@ include 'vegas_common.f'
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    ENDIF
  
-   call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+
+
+DO NPDF=1,2
+    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
 if(  applyPSCut ) then
-      EvalCS_Real_ststbqqbg = 0d0
+    EvalCS_Real_ststbqqbg = 0d0
 else
+    call SetPDFs(eta1,eta2,MuFac,pdf)
+   IF( PROCESS.EQ.56 ) THEN
+          PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+                   + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+                   + pdf(Bot_,1)*pdf(ABot_,2)
+          PDFFac_b = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+                   + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+                   + pdf(Bot_,2)*pdf(ABot_,1)
+    ELSEIF( PROCESS.EQ.53 ) THEN
+          PDFFac_a = pdf(Up_,1) *pdf(0,2) + pdf(Dn_,1) *pdf(0,2)  &
+                   + pdf(Chm_,1)*pdf(0,2) + pdf(Str_,1)*pdf(0,2)  &
+                   + pdf(Bot_,1)*pdf(0,2)
+          PDFFac_b = pdf(Up_,2) *pdf(0,1) + pdf(Dn_,2) *pdf(0,1)  &
+                   + pdf(Chm_,2)*pdf(0,1) + pdf(Str_,2)*pdf(0,1)  &
+                   + pdf(Bot_,2)*pdf(0,1)
+    ELSEIF( PROCESS.EQ.54 ) THEN
+          PDFFac_a = pdf(AUp_,2) *pdf(0,1) + pdf(ADn_,2) *pdf(0,1)  &
+                   + pdf(AChm_,2)*pdf(0,1) + pdf(AStr_,2)*pdf(0,1)  &
+                   + pdf(ABot_,2)*pdf(0,1)
+          PDFFac_b = pdf(AUp_,1) *pdf(0,2) + pdf(ADn_,1) *pdf(0,2)  &
+                   + pdf(AChm_,1)*pdf(0,2) + pdf(AStr_,1)*pdf(0,2)  &
+                   + pdf(ABot_,1)*pdf(0,2)
+    ENDIF
+    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+    RunFactor = RunAlphaS(NLOParam,MuRen)
 
-   call SetPDFs(eta1,eta2,MuFac,pdf)
-   PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
-            + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
-            + pdf(Bot_,1)*pdf(ABot_,2)
-   PDFFac_b = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
-            + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
-            + pdf(Bot_,2)*pdf(ABot_,1)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-   RunFactor = RunAlphaS(NLOParam,MuRen)
-
-  LO_Res_Unpol = (0d0,0d0)
-!   do npdf=1,2
-  do npdf=1,1; print *, "npdf=1"
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
@@ -1716,13 +1733,14 @@ else
     call SetPropagators()
 
 !------------ LO ----------------
-   do iHel=1,NumHelicities
+   LO_Res_Unpol = (0d0,0d0)
+    do iHel=1,NumHelicities
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,6:10))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,7),MomExt(1:4,11:15))
       call HelCrossing(Helicities(iHel,1:5))
       call SetPolarizations()
       
-      do iPrimAmp=1,NumBornAmps
+       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 
@@ -1732,37 +1750,39 @@ else
           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
       enddo
-      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
-  enddo! npdf loop
-!   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
-print *, "swap back off"
-
 
 !  normalization
-   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3
-   EvalCS_Real_ststbqqbg = LO_Res_Unpol * PreFac
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * PreFac *  PDFFac 
+   EvalCS_Real_ststbqqbg = EvalCS_Real_ststbqqbg + LO_Res_Unpol
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbqqbg)
    enddo
-
 endif! applyPSCut
 
 
   PreFacDip = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-  call EvalDipoles_QQBSTSTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  IF( PROCESS.EQ.56 ) THEN
+      call EvalDipoles_QQBSTSTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ELSEIF( PROCESS.EQ.53 ) THEN
+      call EvalDipoles_QGSTSTBQ((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ELSEIF( PROCESS.EQ.54 ) THEN
+      call EvalDipoles_QGSTSTBQ((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_STop**2,m_STop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ENDIF
+  EvalCS_Dips_ttbqqbgp = EvalCS_Dips_ttbqqbgp + DipoleResult
 
+ENDDO! npdf loop
+! call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back, not necessary here
 
-  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
-  s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
-  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_ststbqqbg,DipoleResult, (EvalCS_Real_ststbqqbg/(-DipoleResult)-1d0)
-  pause
+!  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
+!  s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+!  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_ststbqqbg,EvalCS_Dips_ttbqqbgp, (EvalCS_Real_ststbqqbg/(-EvalCS_Dips_ttbqqbgp)- 1d0)
+!  pause
 
-
-
-   if( IsNan(EvalCS_Real_ststbqqbg) .or. IsNan(DipoleResult) ) then
-        print *, "NAN:",EvalCS_Real_ststbqqbg,DipoleResult
+   if( IsNan(EvalCS_Real_ststbqqbg) .or. IsNan(EvalCS_Dips_ttbqqbgp) ) then
+        print *, "NAN:",EvalCS_Real_ststbqqbg,EvalCS_Dips_ttbqqbgp
         print *, yRnd(:)
         print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
         print *, eta1,eta2,MuFac,EHat
@@ -1775,9 +1795,7 @@ endif! applyPSCut
         stop
    endif
 
-        EvalCS_Real_ststbqqbg = (EvalCS_Real_ststbqqbg + DipoleResult)/VgsWgt
-
-
+   EvalCS_Real_ststbqqbg = (EvalCS_Real_ststbqqbg + EvalCS_Dips_ttbqqbgp)/VgsWgt
 
 END FUNCTION
 

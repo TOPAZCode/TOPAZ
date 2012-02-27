@@ -185,11 +185,13 @@ DipoleObjTTBP = $(ObjectDir)/mod_Dipoles_GGTTBGP.o \
 
 DipoleDepSTSTB = $(Here)/dipoles/mod_Dipoles_GGSTSTBG.f90 \
 		 $(Here)/dipoles/mod_IntDipoles_GGSTSTBG.f90 \
-		 $(Here)/dipoles/mod_Dipoles_QQBSTSTBG.f90
+		 $(Here)/dipoles/mod_Dipoles_QQBSTSTBG.f90  \
+		 $(Here)/dipoles/mod_Dipoles_QGSTSTBQ.f90
 
 DipoleObjSTSTB = $(ObjectDir)/mod_Dipoles_GGSTSTBG.o \
 		 $(ObjectDir)/mod_IntDipoles_GGSTSTBG.o \
-		 $(ObjectDir)/mod_Dipoles_QQBSTSTBG.o
+		 $(ObjectDir)/mod_Dipoles_QQBSTSTBG.o  \
+		 $(ObjectDir)/mod_Dipoles_QGSTSTBQ.o
 
 
 

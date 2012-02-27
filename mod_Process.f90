@@ -1696,6 +1696,75 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop
 
 
 
+
+ELSEIF( PROCESS.EQ.53 ) THEN !   3_Str  + 4_Glu  --> 1_ASTop + 2_STop + 5_Str
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,3,-2/)
+      MasterProcess=15
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.54 ) THEN !   3_Glu  + 4_AStr  --> 1_ASTop + 2_STop + 5_AStr
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,3,-1,-2/)
+      MasterProcess=15
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
+
 ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in production)
   IF( CORRECTION.EQ.2 ) THEN
       NumExtParticles = 5
@@ -2778,12 +2847,16 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
     enddo
 
     IF( XTOPDECAYS.EQ.0 ) THEN
-       NumHelicities = 4
+       NumHelicities = 8
        allocate(Helicities(1:NumHelicities,1:7))
        Helicities(1,1:5) = (/0,0,+1,-1,+1/)
        Helicities(2,1:5) = (/0,0,-1,+1,+1/)
        Helicities(3,1:5) = (/0,0,+1,-1,-1/)
        Helicities(4,1:5) = (/0,0,-1,+1,-1/)
+       Helicities(5,1:5) = (/0,0,+1,+1,+1/)
+       Helicities(6,1:5) = (/0,0,-1,-1,+1/)
+       Helicities(7,1:5) = (/0,0,-1,-1,-1/)
+       Helicities(8,1:5) = (/0,0,+1,+1,-1/)
 
     ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
        NumHelicities = 16
@@ -3930,6 +4003,12 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
         PrimAmps(2)%ExtLine = (/1,5,2,3,4/)
         PrimAmps(3)%ExtLine = (/1,2,5,3,4/)
         PrimAmps(4)%ExtLine = (/1,2,3,5,4/)
+
+!         PrimAmps(1)%ExtLine = (/4,5,1,2,3/)
+!         PrimAmps(2)%ExtLine = (/4,1,5,2,3/)
+!         PrimAmps(3)%ExtLine = (/4,1,2,5,3/)
+!         PrimAmps(4)%ExtLine = (/4,1,2,3,5/)
+
    ENDIF
 
 

@@ -3351,7 +3351,6 @@ integer :: rIn,rOut,i,counter
     if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_s_ssff"
 !DEC$ ENDIF
 
-
       Res=(0d0,0d0)
       do n1a=0,NumGlu(1)
       do n2a=0,NumGlu(2)
@@ -3367,6 +3366,10 @@ integer :: rIn,rOut,i,counter
          if( n2c.gt.0 .and. (n1c+n4c).gt.0  ) cycle
          if( n4c.gt.0 .and. (n1c+n2c).gt.0  ) cycle
 
+!print *, "n1",n1a,n1b,n1c
+!print *, "n2",n2a,n2b,n2c
+!print *, "n4",n4a,n4b,n4c
+
          rIn =NumGlu(1)+n2a+n2c+1
          rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(3:4),(/1+n2b+NumGlu(3)+n4a,n2b,NumGlu(3),n4a/))
@@ -3378,6 +3381,9 @@ integer :: rIn,rOut,i,counter
             rIn =n1a+n1c+1
             rOut=NumGlu(1)+n2a
             Sca1 = cur_s_2s(Gluons(rIn:rOut),Scalar(2:2),(/n2a+n1b,n1b,n2a/))
+!if(n1b.eq.1) print *, "xx",(0d0,1d0)/dsqrt(2d0)*2d0*(Scalar(2)%Mom.dot.Gluons(1)%Pol) & 
+!                          *(0d0,1d0)/2d0/(Scalar(2)%Mom.dot.Gluons(1)%Mom) & 
+!                          *(0d0,-1d0)/dsqrt(2d0)*(2d0*(Scalar(2)%Mom+Gluons(1)%Mom).dot.Eps2) 
             PMom2(:) = Scalar(2)%Mom + SumMom(Gluons,rIn,rOut)
             if(n1b.ge.1 .or. n2a.ge.1) then
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalar(2)%Mass2)
@@ -3456,13 +3462,22 @@ integer :: rIn,rOut,i,counter
               counter=counter+1
             enddo
             tmp = cur_s_2s(TmpGluons(1:counter-1),TmpScalar(1:1),(/counter-1,n1a,n4b/) )
+!if(n1a.eq.1) print *, "yy",(0d0,-1d0)/dsqrt(2d0)*2d0*(Scalar(2)%Mom.dot.Eps2) & 
+!                          *(0d0,1d0)/2d0/((Scalar(2)%Mom.dot.Quarks(3)%Mom)+(Scalar(2)%Mom.dot.Quarks(4)%Mom)+(Quarks(4)%Mom.dot.Quarks(3)%Mom)) &
+!                          *(0d0,1d0)/dsqrt(2d0)*2d0*((Scalar(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom).dot.Gluons(1)%Pol)
+
+
+! print *, "before",res
             Res = Res + tmp
+! print *,"add",(tmp)
+! print *,"sum",(res)
       enddo
       enddo
       enddo
       enddo
       enddo
       enddo
+!print *,"sum",(res)
 
 
 return
