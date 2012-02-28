@@ -959,6 +959,8 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModIntDipoles_QQBSTSTBG
+use ModIntDipoles_QGSTSTBQ
 implicit none
 real(8) ::  EvalCS_1L_ststbqqb,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:2,-2:1)
@@ -1024,7 +1026,8 @@ include 'vegas_common.f'
   LO_Res_Unpol             = (0d0,0d0)
   NLO_Res_Unpol(-2:1)      = (0d0,0d0)
   NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
-  do npdf=1,2
+
+ do npdf=1,2
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
@@ -1076,6 +1079,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,2!         4
@@ -1170,9 +1174,71 @@ IF( Correction.EQ.0 ) THEN
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * WidthExpansion
    EvalCS_1L_ststbqqb = LO_Res_Unpol * PreFac
 
-ELSEIF( Correction.EQ.1 ) THEN
+! ELSEIF( Correction.EQ.1 ) THEN
 
 ELSEIF( Correction.EQ.3 ) THEN
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+   IF( XTOPDECAYS.GE.1 ) THEN
+       xE = yRnd(17+HelSampling)
+   ELSEIF( XTOPDECAYS.EQ.0 ) THEN
+       xE = yRnd(5+HelSampling)
+   ENDIF
+! xe = 0.35d0; print *, "fixed xe"
+
+   call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
+
+   IF( PROCESS.eq.56 ) THEN
+      call EvalIntDipoles_QQBSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+! print *, "LO_Res_Unpol",dreal(LO_Res_Unpol)
+! pause
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = HOp(1) * (pdf(Up_,1)*pdf(AUp_,2)+pdf(Dn_,1)*pdf(ADn_,2)+pdf(Chm_,1)*pdf(AChm_,2)+pdf(Str_,1)*pdf(AStr_,2)+pdf(Bot_,1)*pdf(ABot_,2) ) &
+                         + HOp(2)/xE * (pdf_z(Up_,1)*pdf(AUp_,2)+pdf_z(Dn_,1)*pdf(ADn_,2)+pdf_z(Chm_,1)*pdf(AChm_,2)+pdf_z(Str_,1)*pdf(AStr_,2)+pdf_z(Bot_,1)*pdf(ABot_,2) ) &
+                         + HOp(3)/xE * (pdf(Up_,1)*pdf_z(AUp_,2)+pdf(Dn_,1)*pdf_z(ADn_,2)+pdf(Chm_,1)*pdf_z(AChm_,2)+pdf(Str_,1)*pdf_z(AStr_,2)+pdf(Bot_,1)*pdf_z(ABot_,2) )
+
+      call EvalIntDipoles_QQBSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb &
+                         + HOp(1)    * (pdf(Up_,2)*pdf(AUp_,1)+pdf(Dn_,2)*pdf(ADn_,1)+pdf(Chm_,2)*pdf(AChm_,1)+pdf(Str_,2)*pdf(AStr_,1)+pdf(Bot_,2)*pdf(ABot_,1) ) &
+                         + HOp(2)/xE * (pdf_z(Up_,2)*pdf(AUp_,1)+pdf_z(Dn_,2)*pdf(ADn_,1)+pdf_z(Chm_,2)*pdf(AChm_,1)+pdf_z(Str_,2)*pdf(AStr_,1)+pdf_z(Bot_,2)*pdf(ABot_,1) ) &
+                         + HOp(3)/xE * (pdf(Up_,2)*pdf_z(AUp_,1)+pdf(Dn_,2)*pdf_z(ADn_,1)+pdf(Chm_,2)*pdf_z(AChm_,1)+pdf(Str_,2)*pdf_z(AStr_,1)+pdf(Bot_,2)*pdf_z(ABot_,1) )
+
+   ELSEIF( PROCESS.eq.53 ) THEN
+! print *, "added if"
+      call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+! print *, "LO_Res_Unpol",dreal(LO_Res_Unpol)
+! pause
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = HOp(1) * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
+                         + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
+
+      call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb &
+                         + HOp(1) * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
+                         + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
+
+   ELSEIF( PROCESS.eq.54 ) THEN
+      call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = HOp(1) * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
+                         + HOp(2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(AUp_,1)*pdf_z(0,2)+pdf(ADn_,1)*pdf_z(0,2)+pdf(AChm_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
+
+      call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb &
+                         + HOp(1) * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
+                         + HOp(2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(AUp_,1)*pdf_z(0,2)+pdf(ADn_,1)*pdf_z(0,2)+pdf(AChm_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
+   ENDIF
+
+!    print *, "LO cross",LO_Res_Unpol
+!    print *, "HOp check",HOp(1)/(alpha_sOver2Pi*RunFactor)
+!    pause
 
 ENDIF
 

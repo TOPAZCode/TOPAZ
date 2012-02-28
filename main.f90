@@ -1012,7 +1012,7 @@ IF( CORRECTION.LE.1 .AND. PROCESS.EQ.52 ) THEN
     call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
 
-ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.56 ) THEN
+ELSEIF( CORRECTION.EQ.3 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.53 .OR. PROCESS.EQ.54 ) ) THEN
   call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1

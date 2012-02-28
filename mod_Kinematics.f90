@@ -272,6 +272,9 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production with sem
     pT_miss_cut = 25d0*GeV
 !   Mwt cut is hard coded below
 
+    pT_pho_cut  = 15d0*GeV
+    eta_pho_cut = 2.37d0
+!   cracks for photon are hard coded below
 
     Rsep_LepJet = 0.4d0
     Rsep_jet    = 0.4d0
@@ -4861,7 +4864,7 @@ real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
 logical :: applyPSCut,isolated
 integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree,NJet_CHECK
 real(8) :: pT_lepM,pT_lepP,ET_miss,pT_ATop,pT_Top,HT,ET_bjet
-real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb,mT_lpmiss,mT_blpmiss,m_jj,mTblP,m_jjb,mT_lp
+real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb,m_jj,mTblP,m_jjb,mT_lp
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,pt_Pho,eta_Pho,Rphobjet,mT_bln(1:2),mT_blnp(1:2)
 real(8) :: R_Pj(1:5),R_lj(1:5),R_PlepP,R_PlepM,pT_lept,ET_lept,mT,MInvPb1jj,mTb2lP,MInvPb2jj,mTb1lP,Phi_LP,Phi_LL
 integer :: tbar,t,pho,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N
@@ -5309,7 +5312,6 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     NBin(13) = WhichBin(13,Rphobjet)
     NBin(14) = WhichBin(14,m_lb)
     NBin(15) = WhichBin(15,Phi_LP)
-
 
 
 
