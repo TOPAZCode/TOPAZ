@@ -2702,7 +2702,7 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
        Helicities(2,1:4) = (/0,0,+1,-1/)
        Helicities(3,1:4) = (/0,0,-1,+1/)
        Helicities(4,1:4) = (/0,0,-1,-1/)
-    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+    ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
        NumHelicities = 16
        allocate(Helicities(1:NumHelicities,1:6))
        ih=1
@@ -2755,7 +2755,7 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
        Helicities(2,1:4) = (/0,0,+1,-1/)
        Helicities(3,1:4) = (/0,0,-1,+1/)
        Helicities(4,1:4) = (/0,0,-1,-1/)
-    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+    ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
        NumHelicities = 16
        allocate(Helicities(1:NumHelicities,1:6))
        ih=1
@@ -2806,7 +2806,7 @@ ELSEIF( MASTERPROCESS.EQ.14 ) THEN
        Helicities(6,1:5) = (/0,0,+1,-1,-1/)
        Helicities(7,1:5) = (/0,0,-1,+1,-1/)
        Helicities(8,1:5) = (/0,0,-1,-1,-1/)
-    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+    ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
        NumHelicities = 32
        allocate(Helicities(1:NumHelicities,1:7))
        ih=1
@@ -2858,17 +2858,19 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
        Helicities(7,1:5) = (/0,0,-1,-1,-1/)
        Helicities(8,1:5) = (/0,0,+1,+1,-1/)
 
-    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
-       NumHelicities = 16
+    ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
+       NumHelicities = 32
        allocate(Helicities(1:NumHelicities,1:7))
        ih=1
        do h2=-1,1,2
+       do h3=-1,1,2
        do h4=-1,1,2
        do h5=-1,1,2
        do h6=-1,1,2
-          if( ih.ge.17 ) cycle
-          Helicities(ih,1:7) = (/0,0,h2,-h2,h4,h5,h6/)
+          if( ih.ge.33 ) cycle
+          Helicities(ih,1:7) = (/0,0,h2,h3,h4,h5,h6/)
           ih=ih+1
+       enddo
        enddo
        enddo
        enddo
@@ -2909,7 +2911,7 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
        Helicities(2,1:5) = (/0,0,+1,-1,-1/)
 
 
-    ELSEIF( XTOPDECAYS.EQ.1 ) THEN   
+    ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
        call Error("Top decay not yet implemented for Masterprocess 16")
     ENDIF
 

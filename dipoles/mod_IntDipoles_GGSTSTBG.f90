@@ -152,6 +152,7 @@ contains
         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
       endif
+
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 

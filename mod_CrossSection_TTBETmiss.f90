@@ -702,7 +702,6 @@ include 'vegas_common.f'
       EvalCS_1L_ststbgg = 0d0
       return
    endif
-
    call InitCurrCache()
    call SetPropagators()
 
@@ -713,6 +712,7 @@ include 'vegas_common.f'
    nHel(1:2) = getHelicity(yrnd(17))
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
+
 !!!!! for of total cross section (fix y1,y2!)
 !   beta = dsqrt(1d0-4d0*m_stop**2/EHat**2)
 !   SigmaTot = (alpha_s*RunFactor)**2*DblPi/EHat**2*( beta*(5d0/48d0+31d0*m_stop**2/24d0/EHat**2) + &
@@ -720,7 +720,6 @@ include 'vegas_common.f'
 !   SigmaTot = SigmaTot * fbGeV2*SHatJacobi*PDFFac 
 !   PreFac = PreFac/SigmaTot
 !!!!!!
-
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
@@ -779,7 +778,8 @@ ELSEIF( Correction.EQ.1 ) THEN
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
 !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-
+print *, "gauge inv. fails for XTopDK=3", PrimAmps(iPrimAmp)%Result(-2:-1)
+pause
 ! print *, "------"
 ! print *, "LO", BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
@@ -792,8 +792,8 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! !DEC$ IF (_QuadPrecImpr==1)
 !           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
 !           if( AccPoles.gt.1d-4 ) then
-!               coeff4_128(:,:) = qcmplx( coeff4(:,:) )
-!               coeff5_128(:,:) = qcmplx( coeff5(:,:) )
+!               call PentCut_128(PrimAmps(iPrimAmp))
+!               call QuadCut_128(PrimAmps(iPrimAmp))
 !               call TripCut_128(PrimAmps(iPrimAmp))
 !               call DoubCut_128(PrimAmps(iPrimAmp))
 !               call SingCut_128(PrimAmps(iPrimAmp))
@@ -822,7 +822,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=7,10; print *, "only primamp",iPrimAmp
+      do iPrimAmp=7,10; !print *, "only primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
 
           call PentCut(PrimAmps(iPrimAmp))
@@ -910,7 +910,7 @@ ELSEIF( Correction.EQ.3 ) THEN
                      + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
 
 !    print *, "LO cross",LO_Res_Unpol
-!    print *, "HOp check",HOp(1)/(alpha_sOver2Pi*RunFactor)
+!    print *, "HOp check",HOp(1)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
 !    pause
 
     EvalCS_1L_ststbgg = EvalCS_1L_ststbgg * PreFac
@@ -1602,10 +1602,10 @@ include 'vegas_common.f'
    ISFac = MomCrossing(MomExt)
 
    IF(XTOPDECAYS.EQ.3) THEN
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  Chi top
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  Chi top
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,5),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,7),yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,12),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    ENDIF
  
@@ -1616,9 +1616,8 @@ include 'vegas_common.f'
 
    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
 if(  applyPSCut ) then
-       EvalCS_Real_ststbggg = 0d0
+   EvalCS_Real_ststbggg = 0d0
 else
-
    call InitCurrCache()
    call SetPropagators()
    PreFac = PreFac
@@ -1748,13 +1747,12 @@ include 'vegas_common.f'
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    IF(XTOPDECAYS.EQ.3) THEN
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  Chi top
-      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
-      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  Chi top
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,5),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,7),yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,12),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    ENDIF
- 
 
 
 DO NPDF=1,2
@@ -1786,7 +1784,7 @@ else
                    + pdf(ABot_,1)*pdf(0,2)
     ENDIF
     PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-    RunFactor = RunAlphaS(NLOParam,MuRen)
+    RunFactor = RunAlphaS(2,MuRen)
 
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
@@ -1843,7 +1841,7 @@ ENDDO! npdf loop
 ! call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back, not necessary here
 
 !  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
-!  s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+!  s13 = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
 !  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_ststbqqbg,EvalCS_Dips_ttbqqbgp, (EvalCS_Real_ststbqqbg/(-EvalCS_Dips_ttbqqbgp)- 1d0)
 !  pause
 

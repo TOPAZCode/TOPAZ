@@ -219,6 +219,9 @@ endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
 
+! print *, "check", StopQuark%PartType
+! print *,  barspi(1:4)
+! print *, spi(1:4)
 ! print *, "check"
 ! call uMajoSpi_Weyl(dcmplx(-Mom(1:4,4)),+1,Spi(1:4))
 ! call ubarMajoSpi_Weyl(dcmplx(Mom(1:4,5)),+1,BarSpi(1:4))

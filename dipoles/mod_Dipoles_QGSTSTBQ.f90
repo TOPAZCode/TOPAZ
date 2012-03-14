@@ -22,7 +22,7 @@
 
       type(Dipole),private :: TheDipoles(1:2)
 
-      double precision, private :: yRndDK(1:12)
+      double precision, private :: yRndDK(8:19)
       integer, private :: NBin(1:NumMaxHisto)
 
 
@@ -44,10 +44,10 @@
       double precision Mom(0:3,1:5),Mass2(1:5),Wgt
       double precision, parameter :: DipMinus=-1d0, ColorConv=0.5d0
       integer NHisto
-      double precision ResultSum,yRnd(1:12)
+      double precision ResultSum,yRnd(8:19)
       double precision RunFactor
 
-      yRndDK(1:12)=yRnd(1:12)
+      yRndDK(8:19)=yRnd(8:19)
 
 
 
@@ -306,10 +306,10 @@
 
 
           IF(XTOPDECAYS.EQ.3) THEN
-              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRndDK(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
-              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRndDK(7:8),MomExt(1:4,10:11),PSWgt3)
-              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRndDK( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
-              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRndDK(13:16),MomExt(1:4,12:14),PSWgt5)
+              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRndDK(8:9),MomExt(1:4,5:6),PSWgt2)!  Chi top
+              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRndDK(10:11),MomExt(1:4,10:11),PSWgt3)
+              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRndDK(12:15),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRndDK(16:19),MomExt(1:4,12:14),PSWgt5)
           ENDIF
 
           call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
@@ -476,10 +476,10 @@
       TopQuark(2)%Mom(1:4) = MomTd(0:3,4)
 
           IF(XTOPDECAYS.EQ.3) THEN
-              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRndDK(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
-              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRndDK(7:8),MomExt(1:4,10:11),PSWgt3)
-              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRndDK( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
-              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRndDK(13:16),MomExt(1:4,12:14),PSWgt5)
+              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRndDK(8:9),MomExt(1:4,5:6),PSWgt2)!  Chi top
+              call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRndDK(10:11),MomExt(1:4,10:11),PSWgt3)
+              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRndDK(12:15),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+              call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRndDK(16:19),MomExt(1:4,12:14),PSWgt5)
           ENDIF
 
           call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)

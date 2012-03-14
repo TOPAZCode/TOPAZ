@@ -2744,8 +2744,9 @@ ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for TTbar + A0/BH production
           Histo(9)%SetScale= 1d0
 
 
-ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar + Chi production (stable tops)
+ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar (stable stops)
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(XTopDecays.ne.0)  call Error("XTopDecays needs to be 0")
           NumHistograms = 1
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -2764,6 +2765,7 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
+          if(XTopDecays.ne.3  ) call Error("XTopDecays needs to be 3!")
           NumHistograms = 5
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -6633,9 +6635,9 @@ endif
 !DEC$ IF(_CheckMomenta .EQ.1)
 IF(XTOPDECAYS.NE.0) THEN
    zeros(1:4) = Mom(1:4,1)+Mom(1:4,2) - (Mom(1:4,X0bar)+Mom(1:4,X0)+Mom(1:4,bbar)+Mom(1:4,lepM)+Mom(1:4,nubar)+Mom(1:4,b)+Mom(1:4,lepP)+Mom(1:4,nu))
-   if( NPlus1PS ) zeros(1:4) = zeros(1:4) + Mom(1:4,realp)
+   if( NPlus1PS ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
    if( any(abs(zeros(1:4)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 1 in SUBROUTINE Kinematics_HTTBARDM: ",zeros(1:4)
+      print *, "ERROR: energy-momentum violation 1 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:4)
       print *, "momentum dump:"
       print *, Mom(:,:)
    endif
@@ -6643,7 +6645,7 @@ IF(XTOPDECAYS.NE.0) THEN
    zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar)-Mom(1:4,tbar)
    zeros(5:8) = Mom(1:4,Ht)-Mom(1:4,X0)-Mom(1:4,t)
    if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_HTTBARDM: ",zeros(1:8)
+      print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
       print *, "momentum dump:"
       print *, Mom(:,:)
       pause
@@ -6652,7 +6654,7 @@ IF(XTOPDECAYS.NE.0) THEN
    zeros(1:4) = Mom(1:4,tbar)-Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar)
    zeros(5:8) = Mom(1:4,t)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
    if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_HTTBARDM: ",zeros(1:8)
+      print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
       print *, "momentum dump:"
       print *, Mom(:,:)
       pause
@@ -6679,7 +6681,7 @@ endif
    if(NPlus1PS) zeros(13) = (Mom(1:4,realp).dot.Mom(1:4,realp))
 
    if( any(abs(zeros(1:13)/1d0).gt.1d-5) ) then
-      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_HTTBARDM: ",zeros(1:13)
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:13)
       print *, "momentum dump:"
       print *, Mom(:,:)
       pause
@@ -7392,7 +7394,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 
