@@ -633,8 +633,6 @@ ELSEIF( PROCESS.EQ.12 ) THEN !   3_Str + 5_Glu --> 4_Str  + 1_ATop + 2_Top + 6_G
       VegasNc0_default = 2000000
       VegasNc1_default = 2000000
 
-      VegasNc1_default = 2000000
-
   ELSEIF( CORRECTION.EQ.3 ) THEN
       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
@@ -3953,24 +3951,17 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
         PrimAmps(1)%ExtLine = (/1,2,3,4/)
         PrimAmps(1)%AmpType = 1
-
         PrimAmps(2)%ExtLine = (/1,2,4,3/)
         PrimAmps(2)%AmpType = 1
 
-
-        PrimAmps(3)%ExtLine = (/1,2,3,4/); print *, "replaced because amptype 3,4 not yet implelemted"
-        PrimAmps(3)%AmpType = 1
-        PrimAmps(4)%ExtLine = (/1,2,4,3/)
-        PrimAmps(4)%AmpType = 1
-!         PrimAmps(3)%ExtLine = (/1,4,3,2/)
-!         PrimAmps(3)%AmpType = 3
-!         PrimAmps(4)%ExtLine = (/1,2,3,4/)
-!         PrimAmps(4)%AmpType = 4
+        PrimAmps(3)%ExtLine = (/1,4,3,2/)
+        PrimAmps(3)%AmpType = 3
+        PrimAmps(4)%ExtLine = (/1,2,3,4/)
+        PrimAmps(4)%AmpType = 4
 
         PrimAmps(5)%ExtLine = (/1,2,3,4/)
         PrimAmps(5)%AmpType = 2
         PrimAmps(5)%FermLoopPart = Chm_
-
         PrimAmps(6)%ExtLine = (/1,2,3,4/)
         PrimAmps(6)%AmpType = 2
         PrimAmps(6)%FermLoopPart = Bot_
@@ -4361,42 +4352,40 @@ IF( Correction.EQ.1 ) THEN
                    endif
 
                elseif( ThePrimamp%AmpType.eq.3 ) then
-                      call Error("AmpType.eq.3 not yet implemented for scalars")
-!                        if( ThePrimAmp%FermLine2In.eq.0 ) then
-!                           ThePrimAmp%FermionLines = 2
-!                           ThePrimAmp%FermLine2In = Vertex
-!                        elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
-!                           ThePrimAmp%FermLine2Out = Vertex
-!                           ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(ThePrimAmp%FermLine2In)%PartType
-!                           do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
-!                               ThePrimAmp%IntPart(k)%PartType = 0
-!                           enddo
-!                        elseif( ThePrimAmp%FermLine1Out.eq.0 ) then
-!                            ThePrimAmp%FermLine1Out = Vertex
-!                            ThePrimAmp%IntPart(Propa)%PartType = Glu_
-!                        endif
+                       if( ThePrimAmp%FermLine2In.eq.0 ) then
+                          ThePrimAmp%FermionLines = 2
+                          ThePrimAmp%FermLine2In = Vertex
+                       elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+                          ThePrimAmp%FermLine2Out = Vertex
+                          ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(ThePrimAmp%FermLine2In)%PartType
+                          do k=ThePrimAmp%FermLine2In+1,ThePrimAmp%FermLine2Out
+                              ThePrimAmp%IntPart(k)%PartType = 0
+                          enddo
+                       elseif( ThePrimAmp%FermLine1Out.eq.0 ) then
+                           ThePrimAmp%FermLine1Out = Vertex
+                           ThePrimAmp%IntPart(Propa)%PartType = Glu_
+                       endif
 
                elseif( ThePrimamp%AmpType.eq.4 ) then
-                      call Error("AmpType.eq.4 not yet implemented for scalars")
-!                        if( ThePrimAmp%FermLine1Out.eq.0 ) then
-!                            ThePrimAmp%FermLine1Out = Vertex
-!                            do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
-!                               ThePrimAmp%IntPart(k)%PartType = 0
-!                            enddo
-!                        elseif( ThePrimAmp%FermLine2In.eq.0 ) then
-!                            ThePrimAmp%FermionLines = 2
-!                            ThePrimAmp%FermLine2In = Vertex
-!                             ThePrimAmp%IntPart(Propa)%PartType = Glu_
-!                             do k=ThePrimAmp%FermLine1Out+1,ThePrimAmp%FermLine2In
-!                                 ThePrimAmp%IntPart(k)%PartType = -ExtPartType
-!                             enddo
-!                             ThePrimAmp%IntPart(1)%PartType = -ExtPartType
-!                        elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
-!                             ThePrimAmp%FermLine2Out = Vertex
-!                             do k=ThePrimAmp%FermLine2Out+1,NumExtParticles
-!                                 ThePrimAmp%IntPart(k)%PartType = ExtPartType
-!                             enddo
-!                        endif
+                       if( ThePrimAmp%FermLine1Out.eq.0 ) then
+                           ThePrimAmp%FermLine1Out = Vertex
+                           do k=ThePrimAmp%FermLine1In+1,ThePrimAmp%FermLine1Out
+                              ThePrimAmp%IntPart(k)%PartType = 0
+                           enddo
+                       elseif( ThePrimAmp%FermLine2In.eq.0 ) then
+                           ThePrimAmp%FermionLines = 2
+                           ThePrimAmp%FermLine2In = Vertex
+                            ThePrimAmp%IntPart(Propa)%PartType = Glu_
+                            do k=ThePrimAmp%FermLine1Out+1,ThePrimAmp%FermLine2In
+                                ThePrimAmp%IntPart(k)%PartType = -ExtPartType
+                            enddo
+                            ThePrimAmp%IntPart(1)%PartType = -ExtPartType
+                       elseif( ThePrimAmp%FermLine2Out.eq.0 ) then
+                            ThePrimAmp%FermLine2Out = Vertex
+                            do k=ThePrimAmp%FermLine2Out+1,NumExtParticles
+                                ThePrimAmp%IntPart(k)%PartType = ExtPartType
+                            enddo
+                       endif
                endif
 
             elseif( (ExtPartType .eq. Pho_) .or. (ExtPartType .eq. Z0_) ) then
@@ -4415,7 +4404,7 @@ IF( Correction.EQ.1 ) THEN
 
          enddo! Vertex
 
-!          print *, "check1"
+!          print *, "check1",ThePrimamp%AmpType
 !          print *, ThePrimAmp%FermLine1In,ThePrimAmp%FermLine1Out
 !          print *, ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out
 !          print *, ThePrimAmp%ScaLine1In,ThePrimAmp%ScaLine1Out
@@ -4426,10 +4415,10 @@ IF( Correction.EQ.1 ) THEN
             ThePrimAmp%IntPart(Propa)%Mass  = GetMass( ThePrimAmp%IntPart(Propa)%PartType )
             ThePrimAmp%IntPart(Propa)%Mass2 = (ThePrimAmp%IntPart(Propa)%Mass)**2
             ThePrimAmp%IntPart(Propa)%ExtRef = -1
-            if( IsAScalar(ExtParticle( ThePrimAmp%ExtLine(Propa) )%PartType) .and. ThePrimAmp%ScaLine1In.eq.0 ) then! just checking if there are scalars
+            if( IsAScalar(ExtParticle( ThePrimAmp%ExtLine(Propa) )%PartType) .and. ThePrimAmp%ScaLine1In.eq.0 ) then! checking if there are scalars
                     ThePrimAmp%ScaLine1In = ThePrimAmp%FermLine1In
                     ThePrimAmp%ScaLine1Out= ThePrimAmp%FermLine1Out
-                    if( ThePrimAmp%FermLine2In.ne.0 ) then! just checking if there are scalars+fermions
+                    if( ThePrimAmp%FermLine2In.ne.0 ) then! checking if there are scalars+fermions
                         ThePrimAmp%FermLine1In  = ThePrimAmp%FermLine2In
                         ThePrimAmp%FermLine1Out = ThePrimAmp%FermLine2Out
                         ThePrimAmp%FermLine2In  = 0
@@ -4455,7 +4444,7 @@ IF( Correction.EQ.1 ) THEN
 !          endif
 
 
-!          print *, "check2"
+!          print *, "check2",ThePrimamp%AmpType
 !          print *, ThePrimAmp%FermLine1In,ThePrimAmp%FermLine1Out
 !          print *, ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out
 !          print *, ThePrimAmp%ScaLine1In,ThePrimAmp%ScaLine1Out
@@ -4625,11 +4614,16 @@ type(TreeProcess),pointer :: TheTree
       ThePrimAmp%NPoint = NumExtParticles
    elseif( ThePrimAmp%AmpType.eq.2 ) then
       ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine1Out-ThePrimAmp%FermLine1In)-(ThePrimAmp%FermLine2Out-ThePrimAmp%FermLine2In)-(ThePrimAmp%ScaLine1Out-ThePrimAmp%ScaLine1In)
-   elseif( ThePrimAmp%AmpType.eq.3 ) then
+   elseif( ThePrimAmp%AmpType.eq.3 .and. ThePrimAmp%ScaLine1In.eq.0) then
       ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine2Out-ThePrimAmp%FermLine2In)
-   elseif( ThePrimAmp%AmpType.eq.4 ) then
+   elseif( ThePrimAmp%AmpType.eq.3 .and. ThePrimAmp%ScaLine1In.ne.0) then
       ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine1Out-ThePrimAmp%FermLine1In)
+   elseif( ThePrimAmp%AmpType.eq.4 .and. ThePrimAmp%ScaLine1In.eq.0) then
+      ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%FermLine1Out-ThePrimAmp%FermLine1In)
+   elseif( ThePrimAmp%AmpType.eq.4 .and. ThePrimAmp%ScaLine1In.ne.0) then
+      ThePrimAmp%NPoint = NumExtParticles-(ThePrimAmp%ScaLine1Out-ThePrimAmp%ScaLine1In)
    endif
+
 
 !  set number of cuts
    ThePrimAmp%UCuts(5)%CutType = 5

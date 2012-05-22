@@ -893,8 +893,8 @@ contains
        endif
 
        if (s.eq.2) then
-    ii_qq = -(epinv-L+lx)*Pqqreg+two*Pqqreg*dlog(one-x) - two*dlog(x)/(one-x)+one-x      ! CET eq.(A.4)
-    if (alpha_ii/(1d0-x) .lt. 1d0) ii_qq=ii_qq + (2d0/(1d0-x)+Pqqreg)*dlog(alpha_ii/(1d0-x))   ! NEW
+          ii_qq = -(epinv-L+lx)*Pqqreg+two*Pqqreg*dlog(one-x) - two*dlog(x)/(one-x)+one-x      ! CET eq.(A.4)
+          if (alpha_ii/(1d0-x) .lt. 1d0) ii_qq=ii_qq + (2d0/(1d0-x)+Pqqreg)*dlog(alpha_ii/(1d0-x))   ! NEW
        endif
 
        if (s.eq.3) ii_qq = four*dlog(one-x)/(one-x) &      ! CET eq.(A.4)

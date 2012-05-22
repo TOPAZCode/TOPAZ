@@ -138,7 +138,7 @@ ELSEIF( ObsSet.EQ.10 ) THEN! set of observables for ttbjet production without de
     Rsep_jet    = 1d0
 
 ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without decays at LHC
-    pT_jet_cut  = 10d0*GeV
+    pT_jet_cut  = 50d0*GeV
     Rsep_jet    = 0.4d0
 
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
@@ -179,12 +179,11 @@ ELSEIF( ObsSet.EQ.15 ) THEN! set of observables for ttbjet production as signal 
     pT_bjet_cut = pT_jet_cut
     eta_jet_cut = 2.5d0
     eta_bjet_cut= eta_jet_cut
-    pT_lep_cut  = 25d0*GeV
+    pT_lep_cut  = 20d0*GeV
     eta_lep_cut = 2.5d0
-    pT_miss_cut = 25d0*GeV
+    pT_miss_cut = 20d0*GeV
     Rsep_jet    = 0.4d0
-    Rsep_LepJet = 0.4d0
-
+!   added an additional cut on MT(W)+ET_miss for ATLAS analysis, see kinematics_ttbjet subroutine
 
 
 ELSEIF( ObsSet.EQ.19 ) THEN! for checks of ttbjet
@@ -748,9 +747,9 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
           Histo(11)%SetScale= 100d0
 
           Histo(12)%Info   = "pt_bj1"
-          Histo(12)%NBins  = 50
-          Histo(12)%BinSize= 5d0*GeV
-          Histo(12)%LowVal = 20d0*GeV
+          Histo(12)%NBins  = 40
+          Histo(12)%BinSize= 20d0*GeV
+          Histo(12)%LowVal = 0d0*GeV
           Histo(12)%SetScale= 100d0
 
           Histo(13)%Info   = "pt_bj2"
@@ -1578,7 +1577,7 @@ ELSEIF( ObsSet.EQ.15 ) THEN! set of observables for ttbjet production as signal 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
           if(Collider_Energy.ne.7000d0*GeV) call Error("wrong collider energy for ObsSet=15!")
-          NumHistograms = 15
+          NumHistograms = 13
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -1663,17 +1662,6 @@ ELSEIF( ObsSet.EQ.15 ) THEN! set of observables for ttbjet production as signal 
           Histo(13)%LowVal = 0d0
           Histo(13)%SetScale= 100d0
 
-          Histo(14)%Info   = "reconst. mTop(hadr)"
-          Histo(14)%NBins  = 50
-          Histo(14)%BinSize= 1d0*GeV
-          Histo(14)%LowVal = 140d0*GeV
-          Histo(14)%SetScale= 100d0
-
-          Histo(15)%Info   = "reconst. mTop(lept)"
-          Histo(15)%NBins  = 50
-          Histo(15)%BinSize= 1d0*GeV
-          Histo(15)%LowVal = 140d0*GeV
-          Histo(15)%SetScale= 100d0
 
 
 
@@ -3901,7 +3889,7 @@ integer :: NBin(:),PartList(1:8),JetList(1:8),NJet,NObsJet,n,NObsJet_Tree,nWJets
 real(8) :: pT_lepM,pT_lepP,pT_miss,pT_ATop,pT_Top,HT,m_lb,R_lb,m_bb,m_bj
 real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,eta_miss
 real(8) :: pT_jet(1:8),eta_jet(1:8),eta_sepa,eta_Zeppi,s34,s35,s36,s45,s46,s56,mTopHadr,mTopLept
-real(8) :: R_bb,MinvJets,MinvLept,phi_Lept,pT_lept,ET_lept,ET_miss,mT,pT_x,pT_y
+real(8) :: R_bb,MinvJets,MinvLept,phi_Lept,pT_lept,ET_lept,ET_miss,mT,pT_x,pT_y,MTW
 
 
 
@@ -4066,12 +4054,8 @@ elseif( TopDecays.eq.4 ) then  ! hadr. Atop, lept. top decay
       MomTops(1:4,2) = MomExt(1:4,5)   ! Top
   endif
 
-elseif( TopDecays.eq.5 ) then  ! hadr.  top, lept. top decay with J/Psi fragmentation
-  print *, "do something"
-  stop
-elseif( TopDecays.eq.6 ) then  ! hadr. Atop, lept. top decay with J/Psi fragmentation
-  print *, "do something"
-  stop
+else
+  call Error("this TopDecay is not implemented in Kinematics_TTBARJET")
 endif
 
 
@@ -4529,20 +4513,58 @@ print *, "STOP! proper jet selectin needs to be implemented first! see ObsSet=12
 
 elseif( ObsSet.eq.15 ) then! set of observables for ttbjet production as signal process at LHC (semi-lept decay)
 
-print *, "STOP! proper jet selectin needs to be implemented first! see ObsSet=12,13"; stop
-
-
     NObsJet_Tree = 5
-!   request at least two b-jets and three non-b-jet
-    if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+
+!   check that there are at least NObsJet_Tree resolved jets
+    if( NJet.lt.NObsJet_Tree ) then
         applyPSCut = .true.
         RETURN
     endif
+
+!   check that there are two b jets    
+    if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+!   check that b jets pass pT and y cut
+    if( get_pT(MomJet(1:4,1)).lt.pT_bjet_cut .or. abs(get_eta(MomJet(1:4,1))).gt.eta_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( get_pT(MomJet(1:4,2)).lt.pT_bjet_cut .or. abs(get_eta(MomJet(1:4,2))).gt.eta_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+!   calculate number of observable jets
+    NObsJet = 2 != two b-jets that already passed all criteria
+    do n=3,NJet
+        if( get_pT(MomJet(1:4,n)).gt.pT_jet_cut .and. abs(get_eta(MomJet(1:4,n))).lt.eta_jet_cut ) then
+             NObsJet = NObsJet +1
+            if( n.ne.NObsJet ) MomJet(1:4,NObsJet) = MomJet(1:4,n)
+        endif
+    enddo
+    MomJet(1:4,NObsJet+1:NJet) = 0d0!  purging the remaining array
+
+!   check that there are at least NObsJet_Tree observable jets
+    if( NObsJet.lt.NObsJet_Tree ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+
+
+
+!   evaluate kinematic variables
 
     pT_lepP  = get_PT(MomLept(1:4,3))
     eta_lepP = get_eta(MomLept(1:4,3))
 
     pT_miss  = get_PT(MomLept(1:4,4))
+
+    MTW = dsqrt( (MomLept(2,3)+MomLept(2,4))**2 + (MomLept(3,3)+MomLept(3,4))**2 )
 
     phi_Lept = dabs( Get_PHI(MomLept(1:4,3)) - Get_PHI(MomJet(1:4,1)) )
     if( phi_Lept.gt.Pi ) phi_Lept=2d0*Pi-phi_Lept
@@ -4550,57 +4572,46 @@ print *, "STOP! proper jet selectin needs to be implemented first! see ObsSet=12
     m_lb = get_MInv(MomLept(1:4,3)+MomJet(1:4,1))
     R_lb = get_R(MomLept(1:4,3),MomJet(1:4,1))
 
-
-    do n=1,NJet! first two jets are always b-jets
+    HT = pT_lepP + pT_miss
+    do n=1,NObsJet
       pT_jet(n)  = get_pT( MomJet(1:4,n))
       eta_jet(n) = get_eta(MomJet(1:4,n))
+      HT = HT + pT_jet(n)
     enddo
 
-    HT = pT_lepP + pT_miss
 
-! check cuts
-    if( pT_jet(1).lt.pT_bjet_cut .or. pT_jet(2).lt.pT_bjet_cut ) then
-        applyPSCut = .true.
-        RETURN
-    endif
-    if( abs(eta_jet(1)).gt.eta_bjet_cut .or. abs(eta_jet(2)).gt.eta_bjet_cut) then
-        applyPSCut = .true.
-        RETURN
-    endif
-    if( get_R(MomJet(1:4,1),MomLept(1:4,3)).lt.Rsep_LepJet .or. get_R(MomJet(1:4,2),MomLept(1:4,3)).lt.Rsep_LepJet ) then
-        applyPSCut = .true.
-        RETURN
-    endif
 
-    HT = HT + pT_jet(1) + pT_jet(2)
+!    check cuts
+     if( pT_lepP.lt.pT_lep_cut ) then
+         applyPSCut = .true.
+         RETURN
+     endif
 
-    NObsJet = 0
-    do n=3,NJet
-        if( pT_jet(n).gt.pT_jet_cut ) NObsJet = NObsJet +1
-    enddo
-    if( NObsJet.lt.NObsJet_Tree-2 ) then
-        applyPSCut = .true.
-        RETURN
-    endif
-    do n=3,NJet
-        if( pT_jet(n).gt.pT_jet_cut .and. ( abs(eta_jet(n)).gt.eta_jet_cut .or. get_R(MomJet(1:4,n),MomLept(1:4,3)).lt.Rsep_LepJet ) ) then
-            applyPSCut = .true.
-            RETURN
-        endif
-        if( pT_jet(n).gt.pT_jet_cut .and. abs(eta_jet(n)).lt.eta_jet_cut ) HT = HT + pT_jet(n)
-    enddo
+     if( abs(eta_lepP).gt.eta_lep_cut ) then
+         applyPSCut = .true.
+         RETURN
+     endif
 
-!   construct the t+bar system
-    MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
+     if( pT_miss.lt.pT_miss_cut ) then
+         applyPSCut = .true.
+         RETURN
+     endif
+
+     if( pT_miss+MTW.lt.60d0*GeV ) then!   additional cut for ATLAS analysis
+         applyPSCut = .true.
+         RETURN
+     endif
+
+
 !   find two non-b jets that are closest to MW mass
-    if( NObsJet.eq.4 ) then
+    if( NObsJet.eq.6 ) then
         s34= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W )
         s35= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,5))-M_W )
         s36= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,6))-M_W )
         s45= dabs( get_MInv(MomJet(1:4,4)+MomJet(1:4,5))-M_W )
         s46= dabs( get_MInv(MomJet(1:4,4)+MomJet(1:4,6))-M_W )
         s56= dabs( get_MInv(MomJet(1:4,5)+MomJet(1:4,6))-M_W )
-    elseif( NObsJet.eq.3 ) then
+    elseif( NObsJet.eq.5 ) then
         s34= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W )
         s35= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,5))-M_W )
         s45= dabs( get_MInv(MomJet(1:4,4)+MomJet(1:4,5))-M_W )
@@ -4626,51 +4637,24 @@ print *, "STOP! proper jet selectin needs to be implemented first! see ObsSet=12
         MomW(1:4) = 0d0
     endif
     MomTops(1:4,1) = MomTops(1:4,1) + MomW(1:4)!   construct the t+bar system
-    if( dmin1(s34,s35,s45,s36,s46,s56).lt.20d0*GeV ) then!   require a 20GeV window for M_W
-        pT_Top = get_pt(MomTops(1:4,1))
-
-!       reconstruct mTop
-        if( get_MInv(MomJet(1:4,1)+MomLept(1:4,3)) .lt. get_MInv(MomJet(1:4,2)+MomLept(1:4,3)) ) then! pair bjet and lepton wrt. inv.mass
-            mTopLept = get_MInv( MomJet(1:4,1)+MomLept(1:4,3)+MomLept(1:4,4) )
-            mTopHadr = get_MInv( MomJet(1:4,2)+MomW(1:4) )
-        else
-            mTopLept = get_MInv( MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) )
-            mTopHadr = get_MInv( MomJet(1:4,1)+MomW(1:4) )
-        endif
+    if( dmin1(s34,s35,s45,s36,s46,s56).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+        pT_Top = get_pT(MomTops(1:4,1))
     else
         pT_Top   = -1d0
-        mTopHadr = -1d0
-        mTopLept = -1d0
     endif
 
 
-     if( pT_lepP.lt.pT_lep_cut ) then
-         applyPSCut = .true.
-         RETURN
-     endif
-
-     if( abs(eta_lepP).gt.eta_lep_cut ) then
-         applyPSCut = .true.
-         RETURN
-     endif
-
-     if( pT_miss.lt.pT_miss_cut ) then
-         applyPSCut = .true.
-         RETURN
-     endif
-
 
 ! binning
-    call pT_order(NJet,MomJet(1:4,1:NJet))! pT ordering of jet momenta for b- AND non-b-jets
-    pT_jet(5)  = get_pT(MomJet(1:4,5))
-    eta_jet(5) = get_eta(MomJet(1:4,5))
-
     NBin(1) = WhichBin(1,pT_lepP)
     NBin(2) = WhichBin(2,eta_lepP)
-    NBin(3) = WhichBin(3,get_pT(MomJet(1:4,1)))
-    NBin(4) = WhichBin(4,get_eta(MomJet(1:4,1)))
+    NBin(3) = WhichBin(3,pT_jet(3))
+    NBin(4) = WhichBin(4,eta_jet(3))
+
+    call pT_order(NObsJet,MomJet(1:4,1:NObsJet))! pT ordering of jet momenta for b AND non-b jets
     NBin(5) = WhichBin(5,get_pT(MomJet(1:4,5)))
     NBin(6) = WhichBin(6,get_eta(MomJet(1:4,5)))
+
     NBin(7) = WhichBin(7,pT_miss)
     NBin(8) = WhichBin(8,HT)
     NBin(9) = WhichBin(9,m_lb)
@@ -4678,8 +4662,7 @@ print *, "STOP! proper jet selectin needs to be implemented first! see ObsSet=12
     NBin(11)= WhichBin(11,R_lb)
     NBin(12)= WhichBin(12,eta_lepP)
     NBin(13)= WhichBin(13,pT_Top)
-    NBin(14)= WhichBin(14,mTopHadr)
-    NBin(15)= WhichBin(15,mTopLept)
+
 
 
 
@@ -5830,6 +5813,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
         RETURN
     endif
    call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
+   call pT_order(2,MomJet(1:4,1:2))
 
 
 ! evaluate kinematic variables

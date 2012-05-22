@@ -735,9 +735,11 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = -q/2d0*11d0/3d0   +3d0/3d0!- 4d0/3d0*TR*Nf_light
       endif
-      dZ2_top= 3d0/2d0 - 5d0/2d0! needs to be checked
+      dZ2_top= 3d0/2d0 - 5d0/2d0 + 1d0 ! needs to be checked, +1d0 comes from new contribution in gamma_sing
 !      beta0 = 0d0
 !      dZ2_top=0d0
+
+
 
 !--------------------------------------------------------------------------
    elseif( ThePrimAmp%AmpType.eq.1 .and. ThePrimAmp%FermionLines.eq.1 .and. ThePrimAmp%ScalarLines.eq.1) then
@@ -771,12 +773,11 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = q/2d0*11d0/3d0 - 10d0/3d0
       endif
-      dZ2_top= 3d0/2d0
+      dZ2_top= +3d0/4d0 
 
    endif
 
-   rdiv1 = rdiv1 + beta0 + dZ2_top
-
+   rdiv1 = rdiv1 + beta0 + dZ2_top ! needs to be checked
 
 
 return
@@ -833,6 +834,10 @@ integer :: NfTerms
         if(GetMass(PartType).eq.0d0) then
             rdiv1 = rdiv1 - 3d0/2d0/2d0
         else
+            rdiv1 = rdiv1 - 1d0/2d0
+        endif
+    elseif( IsAScalar(PartType) .and. NfTerms.eq.0) then
+        if(GetMass(PartType).ne.0d0) then
             rdiv1 = rdiv1 - 1d0/2d0
         endif
     endif

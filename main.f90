@@ -179,10 +179,10 @@ logical :: dirresult
    enddo
    write(MuStr,"(F4.2)") MuRen
 
-   if(alpha_ii.ne.1d0) alpha_ii = Dipalpha2 * alpha_ii
-   if(alpha_if.ne.1d0)alpha_if = Dipalpha2 * alpha_if
-   if(alpha_fi.ne.1d0)alpha_fi = Dipalpha2 * alpha_fi
-   if(alpha_ff.ne.1d0)alpha_ff = Dipalpha2 * alpha_ff
+   if (alpha_ii.ne.1d0) alpha_ii = DipAlpha2 * alpha_ii
+   if (alpha_if.ne.1d0) alpha_if = DipAlpha2 * alpha_if
+   if (alpha_fi.ne.1d0) alpha_fi = DipAlpha2 * alpha_fi
+   if (alpha_ff.ne.1d0) alpha_ff = DipAlpha2 * alpha_ff
 
    alpha_DKTfi = alpha_DK; alpha_DKTff = alpha_DK; alpha_DKWff = alpha_DK;
    if(iDKAlpha(1).ne.0) then

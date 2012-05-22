@@ -1082,7 +1082,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ bosonic loops --------------
-      do iPrimAmp=1,2!         4
+      do iPrimAmp=3,4!         1,4
 
 print *, "hel",ihel,"primamp no",iPrimAmp
 print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
