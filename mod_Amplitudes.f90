@@ -223,8 +223,10 @@ integer :: i,j,Order(1:6)
 ! pause
 !                       print *, "calling cur_g_ssff"
 !                       pause
+                elseif( IsAScalar(Order(1)) .and. IsAQuark(Order(2)) .and. IsAQuark(Order(3)) ) then 
+                      Res(1:Dv) = cur_g_sffs(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
                 else
-                      call Error("requested current is not available 2q+2s")
+                      call Error("requested current is not available g_2q+2s")
                 endif
 
           elseif( IsAScalar(TreeProc%PartType(1))  ) then
@@ -301,10 +303,18 @@ integer :: i,j,Order(1:6)
               Order(j)=abs( TreeProc%PartType(i) )
               j=j+1
           enddo
-          if( IsAScalar(Order(1)) .and. IsAQuark(Order(3))  ) then
+          if( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAQuark(Order(3))  ) then
+!               print *, "calling cur_s_ssffss"
               Res(1) = cur_s_ssffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
               Res(2:Ds) = 0d0
-!               print *, "calling cur_s_ssffss"
+          elseif( IsAScalar(Order(1)) .and. IsAQuark(Order(2)) .and. IsAQuark(Order(3))  ) then
+!               print *, "calling cur_s_sffsss"
+              Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+              Res(2:Ds) = 0d0
+          elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAScalar(Order(3))  ) then
+!               print *, "calling cur_s_sssffs"
+              Res(1) = cur_s_sssffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+              Res(2:Ds) = 0d0
           else
              call Error("requested current is not available 2q+4s")
           endif

@@ -3851,7 +3851,7 @@ integer :: rIn,rOut,i,counter
 
 
 !DEC$ IF (_DebugCheckMyImpl1==1)
-    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5)-NumGlu(6).ne.0 ) print *, "wrong number of gluons in cur_f_ffssf"
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5)-NumGlu(6).ne.0 ) print *, "wrong number of gluons in cur_f_fffssf"
 !DEC$ ENDIF
     if( .not.(Quarks(2)%PartType.eq.-Quarks(3)%PartType .AND. abs(Quarks(2)%PartType).ne.abs(Quarks(4)%PartType)) ) call Error("this flavor combination is not yet implemented in cur_f_ffssf")
 
@@ -4857,9 +4857,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            Sca1 = cur_s_sffs(Gluons(rIn:rOut),Scalars(3:4),Quarks(1:2),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
- call Error("the above current is incorreclty called with two scalars!")
-
+            Sca1 = cur_s_sffs(Gluons(rIn:rOut),Scalars(3:3),Quarks(1:2),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Scalars(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Scalars(3)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Scalars(4)%Mass2).lt.PropCut ) cycle
@@ -5124,7 +5122,7 @@ END FUNCTION
 
 
 
-
+! this current only appears in AmpType 3
 FUNCTION cur_g_sffs(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
 implicit none
 integer,intent(in) :: NumGlu(0:5)
@@ -5601,7 +5599,7 @@ END FUNCTION
 
 
 
-
+! this current only appears in AmpType 3
 FUNCTION cur_s_sffsss(Gluons,Scalars,Quarks,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:6)
@@ -5705,7 +5703,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6b
-            sca1 = cur_s_4s(Gluons(rIn:rOut),Scalars(2:4),(/n1b+NumGlu(2)+NumGlu(3)+n4a, n3b,NumGlu(4),NumGlu(5),n6a/))
+            sca1 = cur_s_4s(Gluons(rIn:rOut),Scalars(2:4),(/n3b+NumGlu(4)+NumGlu(5)+n6a, n3b,NumGlu(4),NumGlu(5),n6a/))
             PMom1  = SumMom(Gluons,rIn,rOut)  + Scalars(2)%Mom + Scalars(3)%Mom + Scalars(4)%Mom
             PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1) - Scalars(4)%Mass2)
             if( abs(sc_(PMom1,PMom1) - Scalars(4)%Mass2).lt.PropCut ) cycle
@@ -5731,7 +5729,7 @@ integer :: rIn,rOut,i,counter
               call CopyParticlePtr(Gluons(i),TmpGluons(counter))
               counter=counter+1
             enddo
-            tmp = cur_s_sffs(TmpGluons(1:counter-1),TmpScalar(1),Quarks(3:4),(/counter-1,n1a,NumGlu(2),n3a,n6b/) )
+            tmp = cur_s_sffs(TmpGluons(1:counter-1),TmpScalar(1),Quarks(3:4),(/NumGlu(1)+NumGlu(2)+n3a+n6b,NumGlu(1),NumGlu(2),n3a,n6b/) )
             Res = Res + tmp
       enddo
       enddo
@@ -5827,7 +5825,7 @@ END FUNCTION
 
 
 
-
+! this current only appears in AmpType 3
 FUNCTION cur_s_sssffs(Gluons,Scalars,Quarks,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:6)

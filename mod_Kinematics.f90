@@ -1287,7 +1287,7 @@ ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without de
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
           if(Collider.ne.2)  call Error("Collider needs to be Tevatron!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
-          NumHistograms = 15
+          NumHistograms = 40
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -1366,23 +1366,188 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
           Histo(12)%LowVal =-5.0d0
           Histo(12)%SetScale= 1d0
 
-          Histo(13)%Info   = "pT_ttbar"
+          Histo(13)%Info   = "pT(ttbar)"
           Histo(13)%NBins  = 40
           Histo(13)%BinSize= 15d0*GeV
           Histo(13)%LowVal = 0d0
           Histo(13)%SetScale= 100d0
 
-          Histo(14)%Info   = "reconst. mTop(hadr)"
+! new stuff for A_FB analysis, this is for ideally reconstructed tops
+          Histo(14)%Info   = "pT(ttbar) FWD"
           Histo(14)%NBins  = 50
-          Histo(14)%BinSize= 1d0*GeV
-          Histo(14)%LowVal = 140d0*GeV
+          Histo(14)%BinSize= 20d0*GeV
+          Histo(14)%LowVal =  0d0*GeV
           Histo(14)%SetScale= 100d0
 
-          Histo(15)%Info   = "reconst. mTop(lept)"
+          Histo(15)%Info   = "pT(ttbar) BWD"
           Histo(15)%NBins  = 50
-          Histo(15)%BinSize= 1d0*GeV
-          Histo(15)%LowVal = 140d0*GeV
+          Histo(15)%BinSize= 20d0*GeV
+          Histo(15)%LowVal =  0d0*GeV
           Histo(15)%SetScale= 100d0
+
+          Histo(16)%Info   = "m(ttbar) FWD"
+          Histo(16)%NBins  = 50
+          Histo(16)%BinSize= 20d0*GeV
+          Histo(16)%LowVal =  0d0*GeV
+          Histo(16)%SetScale= 100d0
+
+          Histo(17)%Info   = "m(ttbar) BWD"
+          Histo(17)%NBins  = 50
+          Histo(17)%BinSize= 20d0*GeV
+          Histo(17)%LowVal =  0d0*GeV
+          Histo(17)%SetScale= 100d0
+
+          Histo(18)%Info   = "y(ttbar) FWD"
+          Histo(18)%NBins  = 40
+          Histo(18)%BinSize= 0.25d0
+          Histo(18)%LowVal =-5.0d0
+          Histo(18)%SetScale= 1d0
+
+          Histo(19)%Info   = "y(ttbar) BWD"
+          Histo(19)%NBins  = 40
+          Histo(19)%BinSize= 0.25d0
+          Histo(19)%LowVal =-5.0d0
+          Histo(19)%SetScale= 1d0
+
+          Histo(20)%Info   = "dy(tops) FWD"
+          Histo(20)%NBins  = 40
+          Histo(20)%BinSize= 0.25d0
+          Histo(20)%LowVal = 0.0d0
+          Histo(20)%SetScale= 1d0
+
+          Histo(21)%Info   = "dy(tops) BWD"
+          Histo(21)%NBins  = 40
+          Histo(21)%BinSize= 0.25d0
+          Histo(21)%LowVal = 0.0d0
+          Histo(21)%SetScale= 1d0
+
+          Histo(22)%Info   = "y(top)"
+          Histo(22)%NBins  = 40
+          Histo(22)%BinSize= 0.25d0
+          Histo(22)%LowVal =-5.0d0
+          Histo(22)%SetScale= 1d0
+
+          Histo(23)%Info   = "y(Atop)"
+          Histo(23)%NBins  = 40
+          Histo(23)%BinSize= 0.25d0
+          Histo(23)%LowVal =-5.0d0
+          Histo(23)%SetScale= 1d0
+
+          Histo(24)%Info   = "y_FB(top)"
+          Histo(24)%NBins  = 2
+          Histo(24)%BinSize= 5d0
+          Histo(24)%LowVal =-5.0d0
+          Histo(24)%SetScale= 1d0
+
+          Histo(25)%Info   = "pT(top)"
+          Histo(25)%NBins  = 40
+          Histo(25)%BinSize= 20d0*GeV
+          Histo(25)%LowVal = 0d0
+          Histo(25)%SetScale= 100d0
+
+          Histo(26)%Info   = "phi(ttbar) FWD" 
+          Histo(26)%NBins  = 15
+          Histo(26)%BinSize= 0.25d0
+          Histo(26)%LowVal = 0d0
+          Histo(26)%SetScale= 1d0
+
+          Histo(27)%Info   = "phi(ttbar) BWD" 
+          Histo(27)%NBins  = 15
+          Histo(27)%BinSize= 0.25d0
+          Histo(27)%LowVal = 0d0
+          Histo(27)%SetScale= 1d0
+
+
+! new stuff for A_FB analysis, this is for realistically reconstructed tops
+          Histo(28)%Info   = "pT(ttbar)"
+          Histo(28)%NBins  = 40
+          Histo(28)%BinSize= 15d0*GeV
+          Histo(28)%LowVal = 0d0
+          Histo(28)%SetScale= 100d0
+
+          Histo(29)%Info   = "pT(ttbar) FWD"
+          Histo(29)%NBins  = 50
+          Histo(29)%BinSize= 20d0*GeV
+          Histo(29)%LowVal =  0d0*GeV
+          Histo(29)%SetScale= 100d0
+
+          Histo(30)%Info   = "pT(ttbar) BWD"
+          Histo(30)%NBins  = 50
+          Histo(30)%BinSize= 20d0*GeV
+          Histo(30)%LowVal =  0d0*GeV
+          Histo(30)%SetScale= 100d0
+
+          Histo(31)%Info   = "m(ttbar) FWD"
+          Histo(31)%NBins  = 50
+          Histo(31)%BinSize= 20d0*GeV
+          Histo(31)%LowVal =  0d0*GeV
+          Histo(31)%SetScale= 100d0
+
+          Histo(32)%Info   = "m(ttbar) BWD"
+          Histo(32)%NBins  = 50
+          Histo(32)%BinSize= 20d0*GeV
+          Histo(32)%LowVal =  0d0*GeV
+          Histo(32)%SetScale= 100d0
+
+          Histo(33)%Info   = "y(ttbar) FWD"
+          Histo(33)%NBins  = 40
+          Histo(33)%BinSize= 0.25d0
+          Histo(33)%LowVal =-5.0d0
+          Histo(33)%SetScale= 1d0
+
+          Histo(34)%Info   = "y(ttbar) BWD"
+          Histo(34)%NBins  = 40
+          Histo(34)%BinSize= 0.25d0
+          Histo(34)%LowVal =-5.0d0
+          Histo(34)%SetScale= 1d0
+
+          Histo(35)%Info   = "dy(tops) FWD"
+          Histo(35)%NBins  = 40
+          Histo(35)%BinSize= 0.25d0
+          Histo(35)%LowVal = 0.0d0
+          Histo(35)%SetScale= 1d0
+
+          Histo(36)%Info   = "dy(tops) BWD"
+          Histo(36)%NBins  = 40
+          Histo(36)%BinSize= 0.25d0
+          Histo(36)%LowVal = 0.0d0
+          Histo(36)%SetScale= 1d0
+
+          Histo(37)%Info   = "y(top)"
+          Histo(37)%NBins  = 40
+          Histo(37)%BinSize= 0.25d0
+          Histo(37)%LowVal =-5.0d0
+          Histo(37)%SetScale= 1d0
+
+          Histo(38)%Info   = "y(Atop)"
+          Histo(38)%NBins  = 40
+          Histo(38)%BinSize= 0.25d0
+          Histo(38)%LowVal =-5.0d0
+          Histo(38)%SetScale= 1d0
+
+          Histo(39)%Info   = "y_FB(top)"
+          Histo(39)%NBins  = 2
+          Histo(39)%BinSize= 5d0
+          Histo(39)%LowVal =-5.0d0
+          Histo(39)%SetScale= 1d0
+
+          Histo(40)%Info   = "pT(top)"
+          Histo(40)%NBins  = 40
+          Histo(40)%BinSize= 20d0*GeV
+          Histo(40)%LowVal = 0d0
+          Histo(40)%SetScale= 100d0
+
+          Histo(41)%Info   = "phi(ttbar) FWD" 
+          Histo(41)%NBins  = 15
+          Histo(41)%BinSize= 0.25d0
+          Histo(41)%LowVal = 0d0
+          Histo(41)%SetScale= 1d0
+
+          Histo(42)%Info   = "phi(ttbar) BWD" 
+          Histo(42)%NBins  = 15
+          Histo(42)%BinSize= 0.25d0
+          Histo(42)%LowVal = 0d0
+          Histo(42)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.13 ) THEN! set of observables for ttbjet production as signal process at LHC (di-lept. decay)
@@ -4073,6 +4238,7 @@ endif
 !-------------------------------------------------------------------------
 pT_jet(1:8)  = 0d0
 eta_jet(1:8) = 0d0
+
 if( ObsSet.eq.10 .or. ObsSet.eq.11 ) then! set of observables for ttbjet production without decays at Tevatron & LHC
 
     call pT_order(NJet,MomJet(1:4,1:NJet))! pT ordering of jet momenta
@@ -4209,6 +4375,52 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
      endif
 
 
+! binning
+    NBin(1) = WhichBin(1,pT_lepP)
+    NBin(2) = WhichBin(2,eta_lepP)
+    NBin(3) = WhichBin(3,pT_jet(3))
+    NBin(4) = WhichBin(4,eta_jet(3))
+
+    call pT_order(NObsJet,MomJet(1:4,1:NObsJet))! pT ordering of jet momenta for b AND non-b jets
+    NBin(5) = WhichBin(5,get_pT(MomJet(1:4,5)))
+    NBin(6) = WhichBin(6,get_eta(MomJet(1:4,5)))
+
+    NBin(7) = WhichBin(7,pT_miss)
+    NBin(8) = WhichBin(8,HT)
+    NBin(9) = WhichBin(9,m_lb)
+    NBin(10)= WhichBin(10,phi_Lept)
+    NBin(11)= WhichBin(11,R_lb)
+    NBin(12)= WhichBin(12,eta_lepP)
+
+
+! additional histograms for A_FB analysis
+! ideally reconstructed tops
+
+    MomTTbar(1:4,1) = MomTops(1:4,1)+MomTops(1:4,2)
+
+
+
+    NBin(13)= WhichBin(13,pT_ttbar)
+    if(y_top.ge.0d0) NBin(14)= WhichBin(14,pT_ttbar)
+    if(y_top.lt.0d0) NBin(15)= WhichBin(15,pT_ttbar)
+    if(y_top.ge.0d0) NBin(16)= WhichBin(16,m_ttbar)
+    if(y_top.lt.0d0) NBin(17)= WhichBin(17,m_ttbar)
+    if(y_top.ge.0d0) NBin(18)= WhichBin(18,y_ttbar)
+    if(y_top.lt.0d0) NBin(19)= WhichBin(19,y_ttbar)
+    if(y_top.ge.0d0) NBin(20)= WhichBin(20,dy_tops)
+    if(y_top.lt.0d0) NBin(21)= WhichBin(21,dy_tops)
+    NBin(22)= WhichBin(22,y_top)
+    NBin(23)= WhichBin(23,y_Atop)
+    NBin(24)= WhichBin(24,y_top)
+    NBin(25)= WhichBin(25,pT_top)
+    if(y_top.ge.0d0) NBin(26)= WhichBin(26,phi_top)
+    if(y_top.lt.0d0) NBin(27)= WhichBin(27,phi_top)
+
+
+
+
+
+
 
 !   find two non-b jets that are closest to MW mass
     if( NObsJet.eq.6 ) then
@@ -4227,7 +4439,7 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     nWJets=minloc((/s34,s35,s45,s36,s46,s56/),1)
 
 !   construct hadr. W momentum
-    MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
+    MomTTbar(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
     if(nWJets.eq.1) then
         MomW(1:4) = MomJet(1:4,3)+MomJet(1:4,4)
     elseif(nWJets.eq.2) then
@@ -4243,18 +4455,19 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     else
         MomW(1:4) = 0d0
     endif
-    MomTops(1:4,1) = MomTops(1:4,1) + MomW(1:4)!   construct the t+bar system
-    if( dmin1(s34,s35,s45,s36,s46,s56).lt.20d0*GeV ) then!   require a 20GeV window around M_W
-        pT_Top = get_pT(MomTops(1:4,1))
+    MomTTbar(1:4,1) = MomTTbar(1:4,1) + MomW(1:4)!   construct the t+bar system
 
-!       reconstruct mTop
-        if( get_MInv(MomJet(1:4,1)+MomLept(1:4,3)) .lt. get_MInv(MomJet(1:4,2)+MomLept(1:4,3)) ) then! pair bjet and lepton wrt. inv.mass
-            mTopLept = get_MInv( MomJet(1:4,1)+MomLept(1:4,3)+MomLept(1:4,4) )
-            mTopHadr = get_MInv( MomJet(1:4,2)+MomW(1:4) )
-        else
-            mTopLept = get_MInv( MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) )
-            mTopHadr = get_MInv( MomJet(1:4,1)+MomW(1:4) )
-        endif
+    if( dmin1(s34,s35,s45,s36,s46,s56).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+        pT_ttbar = get_pT(MomTTbar(1:4,1))
+!
+!!       reconstruct mTop
+!        if( get_MInv(MomJet(1:4,1)+MomLept(1:4,3)) .lt. get_MInv(MomJet(1:4,2)+MomLept(1:4,3)) ) then! pair bjet and lepton wrt. inv.mass
+!            mTopLept = get_MInv( MomJet(1:4,1)+MomLept(1:4,3)+MomLept(1:4,4) )
+!            mTopHadr = get_MInv( MomJet(1:4,2)+MomW(1:4) )
+!        else
+!            mTopLept = get_MInv( MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) )
+!            mTopHadr = get_MInv( MomJet(1:4,1)+MomW(1:4) )
+!        endif
     else
         pT_Top   = -1d0
         mTopHadr = -1d0
@@ -4263,25 +4476,23 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
 
 
 
-! binning
-    NBin(1) = WhichBin(1,pT_lepP)
-    NBin(2) = WhichBin(2,eta_lepP)
-    NBin(3) = WhichBin(3,pT_jet(3))
-    NBin(4) = WhichBin(4,eta_jet(3))
+    NBin(28)= WhichBin(28,pT_ttbar)
+    if(y_top.ge.0d0) NBin(29)= WhichBin(29,pT_ttbar)
+    if(y_top.lt.0d0) NBin(30)= WhichBin(30,pT_ttbar)
+    if(y_top.ge.0d0) NBin(31)= WhichBin(31,m_ttbar)
+    if(y_top.lt.0d0) NBin(32)= WhichBin(32,m_ttbar)
+    if(y_top.ge.0d0) NBin(33)= WhichBin(33,y_ttbar)
+    if(y_top.lt.0d0) NBin(34)= WhichBin(34,y_ttbar)
+    if(y_top.ge.0d0) NBin(35)= WhichBin(35,dy_tops)
+    if(y_top.lt.0d0) NBin(36)= WhichBin(36,dy_tops)
+    NBin(37)= WhichBin(37,y_top)
+    NBin(38)= WhichBin(38,y_Atop)
+    NBin(39)= WhichBin(39,y_top)
+    NBin(40)= WhichBin(40,pT_top)
+    if(y_top.ge.0d0) NBin(41)= WhichBin(41,phi_top)
+    if(y_top.lt.0d0) NBin(42)= WhichBin(42,phi_top)
 
-    call pT_order(NObsJet,MomJet(1:4,1:NObsJet))! pT ordering of jet momenta for b AND non-b jets
-    NBin(5) = WhichBin(5,get_pT(MomJet(1:4,5)))
-    NBin(6) = WhichBin(6,get_eta(MomJet(1:4,5)))
 
-    NBin(7) = WhichBin(7,pT_miss)
-    NBin(8) = WhichBin(8,HT)
-    NBin(9) = WhichBin(9,m_lb)
-    NBin(10)= WhichBin(10,phi_Lept)
-    NBin(11)= WhichBin(11,R_lb)
-    NBin(12)= WhichBin(12,eta_lepP)
-    NBin(13)= WhichBin(13,pT_Top)
-    NBin(14)= WhichBin(14,mTopHadr)
-    NBin(15)= WhichBin(15,mTopLept)
 
 
 !-------------------------------------------------------
