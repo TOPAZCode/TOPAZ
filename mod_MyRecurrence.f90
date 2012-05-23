@@ -1218,7 +1218,6 @@ complex(8) :: PMom4(1:Dv)
             nb=NumGlu(1)-na
             nd=NumGlu(2)-nc
             nf=NumGlu(5)-ne
-
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
             u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
@@ -1282,6 +1281,7 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
          enddo
+
 
 !        type (2)
          do na=0,NumGlu(1)
@@ -1365,7 +1365,6 @@ complex(8) :: PMom4(1:Dv)
          do nf=0,NumGlu(3)-ne
          do nh=0,NumGlu(4)   ! this loop can be placed after Eps1 has been calculated
          do nj=0,NumGlu(5)
-
             nb=NumGlu(1)-na
             nd=NumGlu(2)-nc
             ng=NumGlu(3)-ne-nf
@@ -3628,7 +3627,7 @@ END FUNCTION
 
 
 FUNCTION cur_f_ffss(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
-implicit none
+implicit none                                                           ! checked gauge inv. for one gluon
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(2:2),Scalars(3:4)
 integer :: tag_f
@@ -3731,7 +3730,7 @@ END FUNCTION
 
 
 FUNCTION cur_f_fssf(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
-implicit none
+implicit none                                                           ! checked gauge inv. for one gluon
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Quarks(4:4),Scalars(2:3)
 integer :: tag_f
@@ -4379,7 +4378,7 @@ END FUNCTION
 
 
 FUNCTION cur_g_ssff(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
-implicit none
+implicit none                                                           ! checked gauge inv. for one gluon                                                        
 integer,intent(in) :: NumGlu(0:5)
 type(PtrToParticle) :: Gluons(1:),Scalars(1:2),Quarks(3:4)
 integer :: na,nb,nc,nd,ne,nf,ng,nh,ni,nj,nk
@@ -4432,9 +4431,9 @@ complex(8) :: PMom4(1:Dv)
             endif
 
             if( Scalars(1)%PartType.gt.0 ) then
-                Eps1(:) = vbss(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2
+                Eps1(:) = vbss(Dv,PMom3(:),PMom2(:)) * Sca1*Sca2! here was a bug: PMom2 <-->PMom3
             else
-                Eps1(:) = vsbs(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2
+                Eps1(:) = vsbs(Dv,PMom3(:),PMom2(:)) * Sca1*Sca2! here was a bug: PMom2 <-->PMom3
             endif
             counter=1
             rIn =1
@@ -4535,7 +4534,6 @@ complex(8) :: PMom4(1:Dv)
                if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
                Eps2 = Eps2*PropFac1
             endif
-
             Res = Res + Eps2
          enddo
          enddo
@@ -4577,9 +4575,9 @@ complex(8) :: PMom4(1:Dv)
             endif
 
             if( Scalars(1)%PartType.gt.0 ) then
-                Eps1(:) = vbss(Dv,PMom1(:),PMom2(:)) * Sca1*Sca2
+                Eps1(:) = vbss(Dv,PMom1(:),PMom2(:)) * Sca1*Sca2! checked
             else
-                Eps1(:) = vsbs(Dv,PMom1(:),PMom2(:)) * Sca1*Sca2
+                Eps1(:) = vsbs(Dv,PMom1(:),PMom2(:)) * Sca1*Sca2! checked
             endif
             TmpMom1 = PMom1 + PMom2
             PropFac3 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
@@ -4698,7 +4696,7 @@ complex(8) :: PMom4(1:Dv)
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+nj
             Eps1(:) = cur_g_2f(Gluons(rIn:rOut),Quarks(3:4),(/1+nf+NumGlu(4)+nj,nf,NumGlu(4),nj/))
             PMom3 = SumMom(Gluons,rIn,rOut) + Quarks(3)%Mom + Quarks(4)%Mom
-            PropFac3 = (0d0,1d0)/sc_(PMom3,PMom3)
+            PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)! here was a bug: minus sign was missing
             if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
 
@@ -4739,7 +4737,6 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
 
-
 return
 END FUNCTION
 
@@ -4747,7 +4744,7 @@ END FUNCTION
 
 
 FUNCTION cur_g_ffss(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
-implicit none
+implicit none                                                           ! checked gauge inv. for one gluon
 integer,intent(in) :: NumGlu(0:5)
 type(PtrToParticle) :: Gluons(1:),Quarks(1:2),Scalars(3:4)
 integer :: na,nb,nc,nd,ne,nf,ng,nh,ni,nj,nk
@@ -4874,9 +4871,9 @@ complex(8) :: PMom4(1:Dv)
             endif
 
             if( Scalars(3)%PartType.gt.0 ) then
-                Eps1(:) = vbss(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2
+                Eps1(:) = vbss(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2! checked
             else
-                Eps1(:) = vsbs(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2
+                Eps1(:) = vsbs(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2! checked
             endif
 
             counter=1
@@ -4964,6 +4961,8 @@ complex(8) :: PMom4(1:Dv)
             if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
 
+
+
             rIn = NumGlu(1)+NumGlu(2)+ne+nf+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nh
             Sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(3:3),(/ng+nh,ng,nh/))
@@ -4973,7 +4972,6 @@ complex(8) :: PMom4(1:Dv)
                if( abs(sc_(PMom3,PMom3) - Scalars(3)%Mass2).lt.PropCut ) cycle
                Sca1 = Sca1 * PropFac3
             endif
-
 
             rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+nh+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+nj
@@ -4994,8 +4992,6 @@ complex(8) :: PMom4(1:Dv)
             PropFac3 = (0d0,-1d0)/sc_(TmpMom2,TmpMom2)
             if( abs(sc_(TmpMom2,TmpMom2)).lt.PropCut ) cycle
             Eps2 = Eps2*PropFac3
-
-
 
 
             counter=1
@@ -5036,6 +5032,7 @@ complex(8) :: PMom4(1:Dv)
          enddo
 
 
+
 !        type(4)
          do na=0,NumGlu(1)
          do ne=0,NumGlu(3)
@@ -5047,12 +5044,11 @@ complex(8) :: PMom4(1:Dv)
             ni=NumGlu(4)-nh
             nk=NumGlu(5)-nj
 
-
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+ne
             Eps1(:) = cur_g_2f(Gluons(rIn:rOut),Quarks(1:2),(/1+nb+NumGlu(2)+ne,nb,NumGlu(2),ne/))
             PMom3 = SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom
-            PropFac3 = (0d0,1d0)/sc_(PMom3,PMom3)
+            PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)! here was a bug: minus sign was missing
             if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
             
@@ -5124,7 +5120,7 @@ END FUNCTION
 
 ! this current only appears in AmpType 3
 FUNCTION cur_g_sffs(Gluons,Scalars,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
-implicit none
+implicit none                                                           ! checked gauge inv. for one gluon   
 integer,intent(in) :: NumGlu(0:5)
 type(PtrToParticle) :: Gluons(1:),Scalars(1:2),Quarks(3:4)
 integer :: na,nb,nc,nd,ne,nf,ng,nh,ni,nj,nk
@@ -5357,6 +5353,8 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
 
+print *, "XXX"
+pause
 
 return
 END FUNCTION
@@ -6064,7 +6062,6 @@ integer :: rIn,rOut,i,counter
       enddo
       enddo
       enddo
-
 
 return
 END FUNCTION

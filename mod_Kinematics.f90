@@ -4055,7 +4055,7 @@ real(8) :: pT_lepM,pT_lepP,pT_miss,pT_ATop,pT_Top,HT,m_lb,R_lb,m_bb,m_bj
 real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,eta_miss
 real(8) :: pT_jet(1:8),eta_jet(1:8),eta_sepa,eta_Zeppi,s34,s35,s36,s45,s46,s56,mTopHadr,mTopLept
 real(8) :: R_bb,MinvJets,MinvLept,phi_Lept,pT_lept,ET_lept,ET_miss,mT,pT_x,pT_y,MTW
-
+real(8) :: MomTTbar(1:4),pT_ttbar,m_ttbar,y_top,y_Atop,y_ttbar,dy_tops,dphi_ttbar
 
 
 !DEC$ IF(_CheckMomenta .EQ.1)
@@ -4393,11 +4393,20 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     NBin(12)= WhichBin(12,eta_lepP)
 
 
+
+
 ! additional histograms for A_FB analysis
 ! ideally reconstructed tops
-
-    MomTTbar(1:4,1) = MomTops(1:4,1)+MomTops(1:4,2)
-
+    MomTTbar(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
+    pT_ttbar = get_PT(MomTTbar(1:4))
+    m_ttbar = get_MInv(MomTTbar(1:4))
+    y_ttbar = get_ETA(MomTTbar(1:4))
+    y_top = get_ETA(MomTops(1:4,2))
+    y_ATop = get_ETA(MomTops(1:4,1))
+    dy_tops  = abs( y_top-y_ATop )
+    pT_top = get_PT(MomTops(1:4,2))
+    dphi_ttbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2)) )
+    if( dphi_ttbar.gt.Pi ) dphi_ttbar=2d0*Pi-dphi_ttbar
 
 
     NBin(13)= WhichBin(13,pT_ttbar)
@@ -4413,13 +4422,17 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     NBin(23)= WhichBin(23,y_Atop)
     NBin(24)= WhichBin(24,y_top)
     NBin(25)= WhichBin(25,pT_top)
-    if(y_top.ge.0d0) NBin(26)= WhichBin(26,phi_top)
-    if(y_top.lt.0d0) NBin(27)= WhichBin(27,phi_top)
+    if(y_top.ge.0d0) NBin(26)= WhichBin(26,dphi_ttbar)
+    if(y_top.lt.0d0) NBin(27)= WhichBin(27,dphi_ttbar)
 
 
 
 
 
+
+
+! additional histograms for A_FB analysis
+! realistically reconstructed tops
 
 
 !   find two non-b jets that are closest to MW mass
@@ -4439,7 +4452,7 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     nWJets=minloc((/s34,s35,s45,s36,s46,s56/),1)
 
 !   construct hadr. W momentum
-    MomTTbar(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
+    MomTTbar(1:4) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
     if(nWJets.eq.1) then
         MomW(1:4) = MomJet(1:4,3)+MomJet(1:4,4)
     elseif(nWJets.eq.2) then
@@ -4455,42 +4468,41 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     else
         MomW(1:4) = 0d0
     endif
-    MomTTbar(1:4,1) = MomTTbar(1:4,1) + MomW(1:4)!   construct the t+bar system
 
-    if( dmin1(s34,s35,s45,s36,s46,s56).lt.20d0*GeV ) then!   require a 20GeV window around M_W
-        pT_ttbar = get_pT(MomTTbar(1:4,1))
-!
-!!       reconstruct mTop
-!        if( get_MInv(MomJet(1:4,1)+MomLept(1:4,3)) .lt. get_MInv(MomJet(1:4,2)+MomLept(1:4,3)) ) then! pair bjet and lepton wrt. inv.mass
-!            mTopLept = get_MInv( MomJet(1:4,1)+MomLept(1:4,3)+MomLept(1:4,4) )
-!            mTopHadr = get_MInv( MomJet(1:4,2)+MomW(1:4) )
-!        else
-!            mTopLept = get_MInv( MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) )
-!            mTopHadr = get_MInv( MomJet(1:4,1)+MomW(1:4) )
-!        endif
-    else
-        pT_Top   = -1d0
-        mTopHadr = -1d0
-        mTopLept = -1d0
+    MomTTbar(1:4) = MomTTbar(1:4) + MomW(1:4)!   construct the t+bar system
+
+
+    if( dmin1(s34,s35,s45,s36,s46,s56).lt.30d0*GeV ) then!   require a 30GeV window around M_W
+
+        pT_ttbar = get_PT(MomTTbar(1:4))
+        m_ttbar = get_MInv(MomTTbar(1:4))
+        y_ttbar = get_ETA(MomTTbar(1:4))
+        y_top = get_ETA(MomTops(1:4,2))
+        y_ATop = get_ETA(MomTops(1:4,1))
+        dy_tops  = abs( y_top-y_ATop )
+        pT_top = get_PT(MomTops(1:4,2))
+        dphi_ttbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2)) )
+        if( dphi_ttbar.gt.Pi ) dphi_ttbar=2d0*Pi-dphi_ttbar
+
+        NBin(28)= WhichBin(28,pT_ttbar)
+        if(y_top.ge.0d0) NBin(29)= WhichBin(29,pT_ttbar)
+        if(y_top.lt.0d0) NBin(30)= WhichBin(30,pT_ttbar)
+        if(y_top.ge.0d0) NBin(31)= WhichBin(31,m_ttbar)
+        if(y_top.lt.0d0) NBin(32)= WhichBin(32,m_ttbar)
+        if(y_top.ge.0d0) NBin(33)= WhichBin(33,y_ttbar)
+        if(y_top.lt.0d0) NBin(34)= WhichBin(34,y_ttbar)
+        if(y_top.ge.0d0) NBin(35)= WhichBin(35,dy_tops)
+        if(y_top.lt.0d0) NBin(36)= WhichBin(36,dy_tops)
+        NBin(37)= WhichBin(37,y_top)
+        NBin(38)= WhichBin(38,y_Atop)
+        NBin(39)= WhichBin(39,y_top)
+        NBin(40)= WhichBin(40,pT_top)
+        if(y_top.ge.0d0) NBin(41)= WhichBin(41,dphi_ttbar)
+        if(y_top.lt.0d0) NBin(42)= WhichBin(42,dphi_ttbar)
+
     endif
 
 
-
-    NBin(28)= WhichBin(28,pT_ttbar)
-    if(y_top.ge.0d0) NBin(29)= WhichBin(29,pT_ttbar)
-    if(y_top.lt.0d0) NBin(30)= WhichBin(30,pT_ttbar)
-    if(y_top.ge.0d0) NBin(31)= WhichBin(31,m_ttbar)
-    if(y_top.lt.0d0) NBin(32)= WhichBin(32,m_ttbar)
-    if(y_top.ge.0d0) NBin(33)= WhichBin(33,y_ttbar)
-    if(y_top.lt.0d0) NBin(34)= WhichBin(34,y_ttbar)
-    if(y_top.ge.0d0) NBin(35)= WhichBin(35,dy_tops)
-    if(y_top.lt.0d0) NBin(36)= WhichBin(36,dy_tops)
-    NBin(37)= WhichBin(37,y_top)
-    NBin(38)= WhichBin(38,y_Atop)
-    NBin(39)= WhichBin(39,y_top)
-    NBin(40)= WhichBin(40,pT_top)
-    if(y_top.ge.0d0) NBin(41)= WhichBin(41,phi_top)
-    if(y_top.lt.0d0) NBin(42)= WhichBin(42,phi_top)
 
 
 
@@ -7589,7 +7601,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

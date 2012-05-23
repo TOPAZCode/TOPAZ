@@ -1063,7 +1063,7 @@ IF( Correction.EQ.0 ) THEN
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
-    do iHel=nHel(1),nHel(2)
+    do iHel=2,2 !nHel(1),nHel(2)
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -1082,10 +1082,10 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ bosonic loops --------------
-      do iPrimAmp=3,4!         1,4
+      do iPrimAmp=3,3!         1,4
 
 print *, "hel",ihel,"primamp no",iPrimAmp
-print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
+! print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -1102,8 +1102,8 @@ print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
 print *, "----------------"
 print *, "LO",BornAmps(iPrimAmp)%Result
 print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
+! ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
+! ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
 
 ! print *, "check",PrimAmps(iPrimAmp)%UCuts(2)%Coeff(1:4,:)
 ! print *, "check",PrimAmps(iPrimAmp)%UCuts(1)%Coeff(1:1,:)
@@ -1806,6 +1806,9 @@ else
       
        do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
+          print *, "amp",BornAmps(iPrimAmp)%ExtLine
+          print *, "res",BornAmps(iPrimAmp)%Result
+          pause
       enddo
 
       LO_Res_Pol = (0d0,0d0)
