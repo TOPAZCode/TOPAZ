@@ -5353,8 +5353,6 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
 
-print *, "XXX"
-pause
 
 return
 END FUNCTION
@@ -5851,7 +5849,6 @@ integer :: rIn,rOut,i,counter
       do n1a=0,NumGlu(1)
       do n2a=0,NumGlu(2)
       do n6a=0,NumGlu(6)
-
          n1b = NumGlu(1)-n1a
          n2b = NumGlu(2)-n2a
          n6b = NumGlu(6)-n6a
@@ -5889,6 +5886,7 @@ integer :: rIn,rOut,i,counter
                if( abs(sc_(PMom1,PMom1)-Scalars(2)%Mass2).lt.PropCut ) cycle
                Sca0 = Sca0*PropFac1
             endif
+
 
             TmpScalar(1)%Mom  => PMom1(:)
             TmpScalar(1)%Pol  => Sca0

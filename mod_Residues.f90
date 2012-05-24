@@ -1600,7 +1600,6 @@ END SUBROUTINE
        r42=r4**2
        r32=r3**2
 
-
       trikoeff=c(1)+c(2)*r3+c(3)*r4+c(4)*r3*r4+c(5)*(r32-r42)+c(6)*r32*r4+c(7)*r3*r42+re**2*(c(8)+c(9)*r3+c(10)*r4)
       res=res-trikoeff/propX
 
@@ -1608,7 +1607,6 @@ END SUBROUTINE
 
        enddo
 !        res = res - res_Impr
-
 
        return
        end subroutine
@@ -1709,7 +1707,6 @@ END SUBROUTINE
             enddo
 
 
-
               if (Lab_in(l1c(1)).eq.'top'.or.Lab_in(l1c(1)).eq.'bot'.or.Lab_in(l1c(1)).eq.'str'.or.Lab_in(l1c(1)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
@@ -1718,7 +1715,6 @@ END SUBROUTINE
 
 !ccccccccccccccccccccccccc Ds=4 end
           endif
-
 
 
 
@@ -1809,6 +1805,7 @@ END SUBROUTINE
        res=res - e(1)*lvt(5)**2/prop1/prop2/prop3/prop4
 
          enddo
+
 
 
 
@@ -2031,14 +2028,12 @@ END SUBROUTINE
        call sc(5,vne,lvt,re)
 
        if (tagdcut(im,1).eq.666) then
-         bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*(r2**2-r3**2)+b(6)*(r2**2+r3**2-2*r4**2)+b(7)*r2*r3+b(8)*r2*r4        +b(9)*r3*r4+b(10)*re**2
+          bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*(r2**2-r3**2)+b(6)*(r2**2+r3**2-2*r4**2)+b(7)*r2*r3+b(8)*r2*r4        +b(9)*r3*r4+b(10)*re**2
+       elseif (tagdcut(im,1).eq.999) then
+          bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*r2*r2        +b(6)*r2*r3                +b(7)*r2*r4+b(8)*(r3**2-r4**2)+b(9)*r3*r4+ b(10)*re**2
+       else
+          call Error("Error in bub subtraction in resid1")
        endif
-
-        if (tagdcut(im,1).eq.999) then
-         bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*r2*r2        +b(6)*r2*r3                +b(7)*r2*r4+b(8)*(r3**2-r4**2)+b(9)*r3*r4+ b(10)*re**2
-        endif
-
-
 
        res=res-bkoeff/prop1
 

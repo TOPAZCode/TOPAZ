@@ -661,6 +661,7 @@ ENDIF
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,4
+!       do iPrimAmp=3,3; print *, "only evaluating pa3"
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))

@@ -4396,7 +4396,7 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
 
 
 ! additional histograms for A_FB analysis
-! ideally reconstructed tops
+! ** ideally reconstructed tops
     MomTTbar(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
     pT_ttbar = get_PT(MomTTbar(1:4))
     m_ttbar = get_MInv(MomTTbar(1:4))
@@ -4431,10 +4431,13 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
 
 
 
+
 ! additional histograms for A_FB analysis
-! realistically reconstructed tops
+! ** realistically reconstructed tops
 
 
+! reconstruct top (decays leptonically)
+! reconstruct anti-top (decays hadronically)
 !   find two non-b jets that are closest to MW mass
     if( NObsJet.eq.6 ) then
         s34= dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W )
@@ -4452,7 +4455,6 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     nWJets=minloc((/s34,s35,s45,s36,s46,s56/),1)
 
 !   construct hadr. W momentum
-    MomTTbar(1:4) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4)
     if(nWJets.eq.1) then
         MomW(1:4) = MomJet(1:4,3)+MomJet(1:4,4)
     elseif(nWJets.eq.2) then
@@ -4469,11 +4471,22 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
         MomW(1:4) = 0d0
     endif
 
-    MomTTbar(1:4) = MomTTbar(1:4) + MomW(1:4)!   construct the t+bar system
+
+    if( get_R(MomJet(1:4,1),MomLept(1:4,3)) .lt. get_R(MomJet(1:4,2),MomLept(1:4,3))  ) then ! find smaller R-distance between lepton and bjet
+        MomTops(1:4,2) = MomJet(1:4,1) + MomLept(1:4,3)+MomLept(1:4,4)
+        MomTops(1:4,1) = MomJet(1:4,2) + MomW(1:4)
+    else
+        MomTops(1:4,2) = MomJet(1:4,2) + MomLept(1:4,3)+MomLept(1:4,4)
+        MomTops(1:4,1) = MomJet(1:4,1) + MomW(1:4)
+    endif
 
 
-    if( dmin1(s34,s35,s45,s36,s46,s56).lt.30d0*GeV ) then!   require a 30GeV window around M_W
+!   require a 30 GeV window around M_W
+!   require a 50 GeV window around M_Top
+    if( dabs(get_MInv(MomW(1:4))-M_W).lt.30d0*GeV .and. & 
+        dabs(get_MInv(MomTops(1:4,1))-M_Top).lt.50d0*GeV .and. dabs(get_MInv(MomTops(1:4,2))-M_Top).lt.50d0*GeV) then
 
+        MomTTbar(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
         pT_ttbar = get_PT(MomTTbar(1:4))
         m_ttbar = get_MInv(MomTTbar(1:4))
         y_ttbar = get_ETA(MomTTbar(1:4))
