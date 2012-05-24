@@ -143,7 +143,6 @@ contains
       endif
 
 
-!  dipplus =0d0
       if(emi.eq.1) then
         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
         res(2) = res(2) + (dipfini+dipplus)*mtrsq
@@ -157,6 +156,7 @@ contains
         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
       endif
+! res(1) = res(1) +  dipsoft*mtrsq  ! for delta-fct. check
 
 
    enddo
@@ -170,10 +170,10 @@ contains
        AP(3)= 2d0*CF/(1d0-z)
        AP(1:3) = AP(1:3) * alpha_sOver2Pi *epcorr * mtrsq
 
-!   ap(2:3)=0d0
        res(1) = res(1) + 2d0*(AP(1)-AP(3))
        res(2) = res(2) + (AP(2) + AP(3))
        res(3) = res(3) + (AP(2) + AP(3))
+! res(1) = res(1) + 2d0*AP(1)  ! for delta-fct. check
 
   RETURN
   END SUBROUTINE

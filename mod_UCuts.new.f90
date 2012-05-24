@@ -1098,7 +1098,7 @@ double complex :: Res(1:2)
 
 !DEC$ IF (_DebugPrintSingCoeff==1)
       print *, "1 cut"
-      print *, coeff1(Cutnum,1)
+      print *, cutnum,coeff1(Cutnum,1)
       enddo
 !DEC$ ELSE
       enddo

@@ -1832,17 +1832,17 @@ ELSEIF( PROCESS.EQ.56 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop + 5_Glu(i
 
 ELSEIF( PROCESS.EQ.59 ) THEN !   test process
   IF( CORRECTION.LE.1 ) THEN
-!       NumExtParticles = 6
-      NumExtParticles = 5
+      NumExtParticles = 6
+!       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
-      Crossing(:) = (/3,4,-1,-2,5/)
-!       Crossing(:) = (/3,4,-1,-2,5,6/)
+!       Crossing(:) = (/3,4,-1,-2,5/)
+      Crossing(:) = (/3,4,-1,-2,5,6/)
 !       Crossing(:) = (/3,4,-1,-2,5/)
       MasterProcess=16
       AvgFactor = SpinAvg * GluonColAvg**2
-!       NDim = NDim + 8    ! st stbar PS integration
-      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 8    ! st stbar PS integration
+!       NDim = NDim + 5    ! st stbar PS integration
       NDim = NDim + 2    ! shat integration
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 200000
@@ -2886,10 +2886,12 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
     ExtParticle(2)%PartType = STop_
     ExtParticle(3)%PartType = AStr_
     ExtParticle(4)%PartType = Str_
-    ExtParticle(5)%PartType = Glu_
+!     ExtParticle(5)%PartType = Glu_
+    ExtParticle(5)%PartType = AStop_
+    ExtParticle(6)%PartType = STop_
     IF( Correction.LE.1 ) THEN
-      NumPrimAmps = 1
-      NumBornAmps = 1
+      NumPrimAmps = 2
+      NumBornAmps = 2
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -2901,12 +2903,12 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
     IF( XTOPDECAYS.EQ.0 ) THEN
        NumHelicities = 2
-!        allocate(Helicities(1:NumHelicities,1:6))
-!        Helicities(1,1:6) = (/0,0,+1,-1,+1,-1/)
-!        Helicities(2,1:6) = (/0,0,+1,+1,-1,-1/)
-       allocate(Helicities(1:NumHelicities,1:5))
-       Helicities(1,1:5) = (/0,0,+1,-1,+1/)
-       Helicities(2,1:5) = (/0,0,+1,-1,-1/)
+       allocate(Helicities(1:NumHelicities,1:6))
+       Helicities(1,1:6) = (/0,0,+1,-1,0,0/)
+       Helicities(2,1:6) = (/0,0,+1,+1,0,0/)
+!        allocate(Helicities(1:NumHelicities,1:5))
+!        Helicities(1,1:5) = (/0,0,+1,-1,+1/)
+!        Helicities(2,1:5) = (/0,0,+1,-1,-1/)
 
 
     ELSEIF( XTOPDECAYS.EQ.3 ) THEN   
@@ -3951,20 +3953,31 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
         PrimAmps(1)%ExtLine = (/1,2,3,4/)
         PrimAmps(1)%AmpType = 1
+
         PrimAmps(2)%ExtLine = (/1,2,4,3/)
         PrimAmps(2)%AmpType = 1
 
         PrimAmps(3)%ExtLine = (/1,4,3,2/)
         PrimAmps(3)%AmpType = 3
+
         PrimAmps(4)%ExtLine = (/1,2,3,4/)
         PrimAmps(4)%AmpType = 4
 
         PrimAmps(5)%ExtLine = (/1,2,3,4/)
         PrimAmps(5)%AmpType = 2
         PrimAmps(5)%FermLoopPart = Chm_
+
         PrimAmps(6)%ExtLine = (/1,2,3,4/)
         PrimAmps(6)%AmpType = 2
         PrimAmps(6)%FermLoopPart = Bot_
+
+        PrimAmp1_1234 = 1
+        PrimAmp1_1243 = 2
+        PrimAmp3_1432 = 3
+        PrimAmp4_1234 = 4
+        PrimAmp2_1234 = 5
+        PrimAmp2m_1234 = 6
+
    ENDIF
 
 
@@ -4019,7 +4032,7 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
 !         PrimAmps(1)%ExtLine = (/5,1,3,4,2/)
 !  res (-9.012782366790076E-003,0.106388279674873)
 !  res (-9.012782366790081E-003,0.106388279674873)
-!  res (9.012782366790076E-003,-0.106388279674873)
+!  res (-9.012782366790076E-003,0.106388279674873)
 
 
 ! check 3
@@ -4027,7 +4040,7 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
 !         PrimAmps(1)%ExtLine = (/3,4,1,2,5/)
 !         PrimAmps(1)%ExtLine = (/2,5,3,4,1/)
 !         PrimAmps(1)%ExtLine = (/1,2,5,3,4/)
-        PrimAmps(1)%ExtLine = (/5,3,4,1,2/)
+!         PrimAmps(1)%ExtLine = (/5,3,4,1,2/)
 !  res (4.705295763449123E-003,-5.019139065796818E-002)
 !  res (4.705295763449118E-003,-5.019139065796809E-002)
 !  res (4.705295763449123E-003,-5.019139065796817E-002)
@@ -4042,13 +4055,20 @@ ELSEIF( MASTERPROCESS.EQ.15 ) THEN
 ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
    IF( Correction.EQ.0 ) THEN
-!       BornAmps(1)%ExtLine = (/1,6,2,3,4,5/)
-! !       BornAmps(1)%ExtLine = (/3,6,1,5,2,4/)
-! !       BornAmps(1)%ExtLine = (/3,4,1,2,5/)
-! !       BornAmps(1)%ExtLine = (/3,4,5,1,2/)
-!       BornAmps(2)%ExtLine = BornAmps(1)%ExtLine
-!       PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
-!       PrimAmps(2)%ExtLine = BornAmps(1)%ExtLine
+!       BornAmps(1)%ExtLine = (/1,2,3,4,5,6/)
+!       BornAmps(2)%ExtLine = (/2,3,4,5,6,1/)! this requires call to cur_s_sffsss_FERMLOOPCONTRIB
+!  (3.553617730648898E-005,-4.248905967780229E-004)
+!  (3.553617730648904E-005,-4.248905967780231E-004)
+
+      BornAmps(1)%ExtLine = (/6,1,2,3,4,5/)
+      BornAmps(2)%ExtLine = (/2,3,4,5,6,1/)! this requires call to cur_s_sffsss
+!  (2.484313163916796E-004,-5.444781253106519E-004)
+!  (2.484313163916795E-004,-5.444781253106517E-004)
+
+      PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
+      PrimAmps(2)%ExtLine = BornAmps(2)%ExtLine
+
+
 
    ELSEIF( Correction.EQ.1 ) THEN
 

@@ -1716,8 +1716,7 @@ END SUBROUTINE
 !ccccccccccccccccccccccccc Ds=4 end
           endif
 
-
-
+! print *, "resid1a",res
 
 
 
@@ -1966,6 +1965,7 @@ END SUBROUTINE
 
         enddo
 
+! print *, "resid1b",res
 
 
 !      subtracting a double cut
@@ -2036,6 +2036,8 @@ END SUBROUTINE
        endif
 
        res=res-bkoeff/prop1
+
+! print *, "resid1c",res,tagdcut(im,1)
 
         enddo
 

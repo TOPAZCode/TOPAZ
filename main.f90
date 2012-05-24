@@ -206,7 +206,7 @@ logical :: dirresult
           print *, "ObsSet:      see mod_Kinematics.f90"
           stop
     endif
-    if( Process.ge.41 .and. Process.eq.59 ) then
+    if( Process.ge.41 .and. Process.le.59 .and. XTopDecays.eq.-100) then
           print *, "not enough input parameter"
           print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
     endif
@@ -1062,7 +1062,7 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.16 ) THEN
-IF( CORRECTION.LE.1 .AND. PROCESS.EQ.56 ) THEN
+IF( CORRECTION.LE.1 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.59) ) THEN
   call vegas(EvalCS_1L_ststbgggg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1

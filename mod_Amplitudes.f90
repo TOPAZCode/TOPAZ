@@ -161,7 +161,6 @@ logical :: Boson
 integer :: i,j,Order(1:6)
 
       call setDim(Dv,Ds)
-
       if ( TreeProc%NumQua+TreeProc%NumSca.eq.0 ) then!  no quarks and scalars
           Res(1:Dv) = cur_g(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%NumGlu(0))
 !----------------------------------------
@@ -226,6 +225,7 @@ integer :: i,j,Order(1:6)
                 elseif( IsAScalar(Order(1)) .and. IsAQuark(Order(2)) .and. IsAQuark(Order(3)) ) then 
                       Res(1:Dv) = cur_g_sffs(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:5))
 !                       print *, "calling cur_g_sffs"
+!                       print *, "check gauge",sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
                 else
                       call Error("requested current is not available g_2q+2s")
                 endif
@@ -313,8 +313,8 @@ integer :: i,j,Order(1:6)
               Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
               Res(2:Ds) = 0d0
           elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAScalar(Order(3))  ) then
-!               print *, "calling cur_s_sssffs"
               Res(1) = cur_s_sssffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+!               print *, "calling cur_s_sssffs"
               Res(2:Ds) = 0d0
           else
              call Error("requested current is not available 2q+4s")
@@ -784,7 +784,7 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = q/2d0*11d0/3d0 - 10d0/3d0
       endif
-      dZ2_top= +3d0/4d0 
+      dZ2_top= +3d0/4d0 -3d0/4d0
 
 
 !--------------------------------needs modification-------------------------------------------
@@ -839,8 +839,10 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = q/2d0*11d0/3d0 - q*10d0/3d0
       endif
-      dZ2_top= 3d0/2d0
+      dZ2_top= 3d0/2d0 -3d0/2d0
    endif
+
+
 
 
    rdiv1 = rdiv1 + beta0 + dZ2_top ! needs to be checked

@@ -3090,6 +3090,10 @@ endif
        ng1 = NumGlu(1)           !#gluons to the left of a s-line
        ng2 = NumGlu(2)           !#gluons to the right of the s-line
 
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2).ne.0 ) print *, "wrong number of gluons in cur_s_2s"
+!DEC$ ENDIF
+
        if (ngluon .eq. 0) then
          res = Scalar(2)%Pol(1)
          return
@@ -4250,9 +4254,6 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       n2b=NumGlu(2)-n2a-n2c
       n3b=NumGlu(3)-n3a-n3c
 
-! print *, n1a,n1b,n1c
-! print *, n3a,n3b,n3c
-
       ! Fer1
       rIn=n1a+n1c+1
       rOut=NumGlu(1)+n2a
@@ -5173,9 +5174,9 @@ complex(8) :: PMom4(1:Dv)
             endif
 
             if( Scalars(1)%PartType.gt.0 ) then
-                Eps1(:) = vbss(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2!  check that order of PMom2,3 is correct
+                Eps1(:) = vbss(Dv,PMom3(:),PMom2(:)) * Sca1*Sca2!  here was a bug: P2,P3
             else
-                Eps1(:) = vsbs(Dv,PMom2(:),PMom3(:)) * Sca1*Sca2!  check that order of PMom2,3 is correct
+                Eps1(:) = vsbs(Dv,PMom3(:),PMom2(:)) * Sca1*Sca2!  here was a bug: P2,P3
             endif
             counter=1
             rIn =1
@@ -5220,7 +5221,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            Sca1 = cur_s_sffs(Gluons(rIn:rOut),Scalars(1:1),Quarks(3:4),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
+            Sca1 = cur_s_ssff(Gluons(rIn:rOut),Scalars(1:1),Quarks(3:4),(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/))
             PMom2 =  SumMom(Gluons,rIn,rOut) + Scalars(1)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Scalars(2)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Scalars(2)%Mass2).lt.PropCut ) cycle
@@ -5312,7 +5313,7 @@ complex(8) :: PMom4(1:Dv)
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+ne
             Eps1(:) = cur_g_2f(Gluons(rIn:rOut),Quarks(3:4),(/1+nd+NumGlu(3)+ne,nd,NumGlu(3),ne/))
             PMom3 = SumMom(Gluons,rIn,rOut) + Quarks(3)%Mom + Quarks(4)%Mom
-            PropFac3 = (0d0,1d0)/sc_(PMom3,PMom3)
+            PropFac3 = (0d0,-1d0)/sc_(PMom3,PMom3)! here was a bug: minus sign was missing
             if( abs(sc_(PMom3,PMom3)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
 
@@ -5352,7 +5353,6 @@ complex(8) :: PMom4(1:Dv)
          enddo
          enddo
          enddo
-
 
 return
 END FUNCTION
@@ -5459,7 +5459,7 @@ integer :: rIn,rOut,i,counter
 
 
 
-!   (C)
+!   (B)
       do n1a=0,NumGlu(1)
       do n4a=0,NumGlu(4)
          n1b = NumGlu(1)-n1a
@@ -5499,7 +5499,6 @@ integer :: rIn,rOut,i,counter
 
             Res = Res + tmp
 !             Res3(:) = Res3(:) + tmp(:)
-!             print *, "3",tmp(:)
       enddo
       enddo
 
@@ -5509,7 +5508,7 @@ integer :: rIn,rOut,i,counter
 
 
 
-!   (A)
+!   (C)
       do n1a=0,NumGlu(1)
       do n2a=0,NumGlu(2)
       do n6a=0,NumGlu(6)
@@ -5595,8 +5594,214 @@ END FUNCTION
 
 
 
+
+
 ! this current only appears in AmpType 3
 FUNCTION cur_s_sffsss(Gluons,Scalars,Quarks,NumGlu) result(res)
+implicit none
+integer :: NumGlu(0:6)
+type(PtrToParticle) :: Gluons(1:),Quarks(3:4),Scalars(2:4)      ! off-shell scalar is not included
+integer,target :: TmpExtRef
+complex(8) :: res,tmp
+complex(8),target :: Sca1(1:1)
+complex(8) :: eps1(1:Dv)
+complex(8) :: eps2(1:Dv)
+type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(4)),TmpScalar(1:3)
+complex(8) :: PropFac1,PropFac2
+complex(8),target :: pmom1(1:Dv)
+complex(8) :: pmom2(1:Dv)
+integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b,n5a,n5b,n6a,n6b
+integer :: rIn,rOut,i,counter
+
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4)-NumGlu(5)-NumGlu(6).ne.0 ) print *, "wrong number of gluons in cur_s_sffsss"
+!DEC$ ENDIF
+
+
+if( NumGlu(0).ne.0 ) call Error("cur_s_sffsss works only with no gluons so far")
+
+    res = (0d0,0d0)
+
+!   type (A)
+      do n3a=0,NumGlu(3)
+      do n6a=0,NumGlu(6)
+         n3b = NumGlu(3)-n3a
+         n6b = NumGlu(6)-n6a
+
+            rIn = NumGlu(1)+NumGlu(2)+n3a+1
+            rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6b
+            sca1 = cur_s_sffs(Gluons(rIn:rOut),Scalars(2:2),Quarks(3:4),(/n3b+NumGlu(4)+NumGlu(5)+n6a, n3b,NumGlu(4),NumGlu(5),n6a/))
+            PMom1  = SumMom(Gluons,rIn,rOut)  + Scalars(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
+            PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1) - Scalars(2)%Mass2)
+            if( abs(sc_(PMom1,PMom1) - Scalars(2)%Mass2).lt.PropCut ) cycle
+            sca1 = sca1 * PropFac1
+
+            TmpScalar(1)%Mom  => PMom1(:)
+            TmpScalar(1)%Pol  => sca1
+            TmpScalar(1)%Mass => Scalars(2)%Mass
+            TmpScalar(1)%Mass2=> Scalars(2)%Mass2
+            TmpExtRef = -1
+            TmpScalar(1)%ExtRef => TmpExtRef
+            TmpScalar(1)%PartType => Scalars(2)%PartType      
+            counter=1
+            rIn =1
+            rOut=NumGlu(1)+NumGlu(2)+n3a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+NumGlu(6)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp = cur_s_4s(TmpGluons(1:counter-1),(/TmpScalar(1),Scalars(3),Scalars(4)/),(/NumGlu(1)+NumGlu(2)+n3a+n6b,NumGlu(1),NumGlu(2),n3a,n6b/) )
+            Res = Res + tmp
+      enddo
+      enddo
+
+
+
+
+!   type (B)
+      do n3a=0,NumGlu(3)
+      do n6a=0,NumGlu(6)
+         n3b = NumGlu(3)-n3a
+         n6b = NumGlu(6)-n6a
+
+            rIn = NumGlu(1)+NumGlu(2)+n3a+1
+            rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6b
+            sca1 = cur_s_4s(Gluons(rIn:rOut),Scalars(2:4),(/n3b+NumGlu(4)+NumGlu(5)+n6a, n3b,NumGlu(4),NumGlu(5),n6a/))
+            PMom1  = SumMom(Gluons,rIn,rOut)  + Scalars(2)%Mom + Scalars(3)%Mom + Scalars(4)%Mom
+            PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1) - Scalars(2)%Mass2)
+            if( abs(sc_(PMom1,PMom1) - Scalars(2)%Mass2).lt.PropCut ) cycle
+            sca1 = sca1 * PropFac1
+
+            TmpScalar(1)%Mom  => PMom1(:)
+            TmpScalar(1)%Pol  => sca1
+            TmpScalar(1)%Mass => Scalars(2)%Mass
+            TmpScalar(1)%Mass2=> Scalars(2)%Mass2
+            TmpExtRef = -1
+            TmpScalar(1)%ExtRef => TmpExtRef
+            TmpScalar(1)%PartType => Scalars(2)%PartType        
+            counter=1
+            rIn =1
+            rOut=NumGlu(1)+NumGlu(2)+n3a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+NumGlu(6)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp = cur_s_sffs(TmpGluons(1:counter-1),TmpScalar(1),Quarks(3:4),(/NumGlu(1)+NumGlu(2)+n3a+n6b,NumGlu(1),NumGlu(2),n3a,n6b/) )
+            Res = Res + tmp
+      enddo
+      enddo
+
+
+
+
+
+
+
+!   type (C)
+      do n1a=0,NumGlu(1)
+      do n5a=0,NumGlu(5)
+      do n6a=0,NumGlu(6)
+         n1b = NumGlu(1)-n1a
+         n5b = NumGlu(5)-n5a
+         n6b = NumGlu(6)-n6a
+
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
+            sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n5b+n6a,n5b,n6a/) )! here was a bug n5b,n6a
+
+            PMom2(:) = Scalars(2)%Mom + SumMom(Gluons,rIn,rOut)
+            if(n5b.ge.1 .or. n6a.ge.1) then
+               PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(2)%Mass2)
+               if( abs(sc_(PMom2,PMom2)-Scalars(2)%Mass2).lt.PropCut ) cycle
+               sca1 = sca1*PropFac2
+            endif
+
+            do n3a=0,NumGlu(3)
+                n3b = NumGlu(3)-n3a
+
+                rIn = n1a+1
+                rOut= NumGlu(1)+NumGlu(2)+n3a
+                Eps1 = cur_g_2f(Gluons(rIn:rOut),Quarks(3:4),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
+                PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(3)%Mom + Quarks(4)%Mom
+                PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+                if( abs(sc_(PMom1,PMom1)).lt.PropCut) cycle
+                Eps1 = Eps1*PropFac1
+
+                rIn = NumGlu(1)+NumGlu(2)+n3a+1
+                rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a
+                Eps2 = cur_g_2s(Gluons(rIn:rOut),Scalars(3:4),(/1+n3b+NumGlu(4)+n5a,n3b,NumGlu(4),n5a/))
+                PMom2(:) = SumMom(Gluons,rIn,rOut) + Scalars(3)%Mom + Scalars(4)%Mom
+                PropFac2 = (0d0,-1d0)/sc_(PMom2,PMom2)
+                if( abs(sc_(PMom2,PMom2)).lt.PropCut) cycle
+                Eps2 = Eps2*PropFac2
+
+                sca1 = cgsg(Eps1,Eps2) * sca1
+
+                  rIn = n1a+1
+                  rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
+                  PMom1 = SumMom(Gluons,rIn,rOut) + Scalars(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Scalars(3)%Mom + Scalars(4)%Mom
+                  if(n1a.ge.1 .or. n6b.ge.1) then
+                    PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Scalars(2)%Mass2)
+                    if( abs(sc_(PMom1,PMom1)-Scalars(2)%Mass2).lt.PropCut ) cycle
+                    sca1 = sca1*PropFac2
+                  endif
+
+                  TmpScalar(1)%Mom  => PMom1(:)
+                  TmpScalar(1)%Pol  => sca1
+                  TmpScalar(1)%Mass => Scalars(2)%Mass
+                  TmpScalar(1)%Mass2=> Scalars(2)%Mass2
+                  TmpExtRef = -1
+                  TmpScalar(1)%ExtRef => TmpExtRef
+                  TmpScalar(1)%PartType => Scalars(2)%PartType
+                  counter=1
+                  rIn =1
+                  rOut=n1a
+                  do i=rIn,rOut
+                    call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+                    counter=counter+1
+                  enddo
+                  rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a+1
+                  rOut=NumGlu(0)
+                  do i=rIn,rOut
+                    call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+                    counter=counter+1
+                  enddo
+                  tmp = cur_s_2s(TmpGluons(1:counter-1),TmpScalar(1:1),(/counter-1,n1a,n6b/) )
+
+                  Res = Res + tmp
+            enddo
+      enddo
+      enddo
+      enddo
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
+
+! this current only appears in AmpType 3
+FUNCTION cur_s_sffsss_FERMLOOPCONTRIB(Gluons,Scalars,Quarks,NumGlu) result(res)
 implicit none
 integer :: NumGlu(0:6)
 type(PtrToParticle) :: Gluons(1:),Quarks(3:4),Scalars(2:4)      ! off-shell scalar is not included
@@ -5699,7 +5904,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6b
-            sca1 = cur_s_4s(Gluons(rIn:rOut),Scalars(2:4),(/n3b+NumGlu(4)+NumGlu(5)+n6a, n3b,NumGlu(4),NumGlu(5),n6a/))
+            sca1 = cur_s_4s(Gluons(rIn:rOut),Scalars(2:4),(/n3b+NumGlu(4)+NumGlu(5)+n6a, n3b,NumGlu(4),NumGlu(5),n6a/),tag_f=-1)
             PMom1  = SumMom(Gluons,rIn,rOut)  + Scalars(2)%Mom + Scalars(3)%Mom + Scalars(4)%Mom
             PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1) - Scalars(4)%Mass2)
             if( abs(sc_(PMom1,PMom1) - Scalars(4)%Mass2).lt.PropCut ) cycle
@@ -5746,7 +5951,8 @@ integer :: rIn,rOut,i,counter
 
             rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a+1
             rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
-            sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(2:2),(/n1b+n2a,n1b,n2a/) )
+            sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(4:4),(/n5b+n6a,n5b,n6a/) )! here was a bug n5b,n6a, and another bug: Scalars(2-->4)
+
             PMom2(:) = Scalars(4)%Mom + SumMom(Gluons,rIn,rOut)
             if(n5b.ge.1 .or. n6a.ge.1) then
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Scalars(4)%Mass2)
@@ -5857,6 +6063,7 @@ integer :: rIn,rOut,i,counter
          rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
          Eps2 = cur_g_sffs(Gluons(rIn:rOut),Scalars(3:4),Quarks(4:5),(/1+n2b+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a,n2b,NumGlu(3),NumGlu(4),NumGlu(5),n6a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Scalars(3)%Mom + Scalars(4)%Mom + Quarks(4)%Mom + Quarks(5)%Mom
+
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
          if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
          Eps2 = Eps2*PropFac1
@@ -5871,14 +6078,11 @@ integer :: rIn,rOut,i,counter
                Sca1 = Sca1*PropFac2
             endif
 
-
-
             if( Scalars(2)%PartType.gt.0 ) then
                Sca0 = csg(Eps2,PMom1,PMom2) * Sca1
             else
                Sca0 = cbsg(Eps2,PMom1,PMom2) * Sca1
             endif
-
 
             PMom1 = Scalars(2)%Mom + Scalars(3)%Mom + Scalars(4)%Mom + Quarks(4)%Mom + Quarks(5)%Mom + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a)
             if(n1a.ge.1 .or. n6b.ge.1) then
@@ -5886,7 +6090,6 @@ integer :: rIn,rOut,i,counter
                if( abs(sc_(PMom1,PMom1)-Scalars(2)%Mass2).lt.PropCut ) cycle
                Sca0 = Sca0*PropFac1
             endif
-
 
             TmpScalar(1)%Mom  => PMom1(:)
             TmpScalar(1)%Pol  => Sca0
@@ -5926,11 +6129,12 @@ END FUNCTION
 
 
 
-FUNCTION cur_s_4s(Gluons,Scalars,NumGlu) result(res)!  checked gauge invariance for 2 gluons
+FUNCTION cur_s_4s(Gluons,Scalars,NumGlu,tag_f) result(res)!  checked gauge invariance for 2 gluons
 implicit none
 integer :: NumGlu(0:4)
 type(PtrToParticle) :: Gluons(1:),Scalars(2:4)      ! off-shell scalar is not included
 integer,target :: TmpExtRef
+integer,optional :: tag_f
 complex(8) :: res,tmp
 complex(8),target :: Sca0(1:1)
 complex(8) :: Sca1
@@ -5947,6 +6151,61 @@ integer :: rIn,rOut,i,counter
 !DEC$ IF (_DebugCheckMyImpl1==1)
     if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_s_4s"
 !DEC$ ENDIF
+
+
+if( present(tag_f) ) then
+if( tag_f.eq.-1 .and. NumGlu(0).eq.0 ) then! this calculates the inverted diagram with s1=s4 and s2=s3
+      Res=(0d0,0d0)
+         rIn =1
+         rOut=0
+         Eps2 = cur_g_2s(Gluons(rIn:rOut),Scalars(2:3),(/1,0,0,0/))
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Scalars(2)%Mom + Scalars(3)%Mom
+         PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+         if( abs(sc_(PMom1,PMom1)).lt.PropCut ) return
+         Eps2 = Eps2*PropFac1
+
+
+            rIn =1
+            rOut=0
+            Sca1 = cur_s_2s(Gluons(rIn:rOut),Scalars(4:4),(/0,0,0/))
+            PMom2(:) = Scalars(4)%Mom
+
+                  if( Scalars(4)%PartType.gt.0 ) then
+                      Sca0 = cgs(Eps2,PMom1,PMom2) * Sca1
+                  else
+                      Sca0 = cgbs(Eps2,PMom1,PMom2) * Sca1
+                  endif
+
+            PMom1 = Scalars(2)%Mom+Scalars(3)%Mom+Scalars(4)%Mom
+
+            TmpScalar(1)%Mom  => PMom1(:)
+            TmpScalar(1)%Pol  => Sca0
+            TmpScalar(1)%Mass => Scalars(4)%Mass
+            TmpScalar(1)%Mass2=> Scalars(4)%Mass2
+            TmpExtRef = -1
+            TmpScalar(1)%ExtRef => TmpExtRef
+            TmpScalar(1)%PartType => Scalars(4)%PartType
+            counter=1
+            rIn =1
+            rOut=0
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =1
+            rOut=0
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp = cur_s_2s(TmpGluons(1:0),TmpScalar(1:1),(/0,0,0/) )
+            Res = Res + tmp
+  
+return
+elseif( NumGlu(0).ne.0 ) then
+    print *, "Error in cur_s_4s with tag_f=-1 no gluons are implemented"
+endif
+endif
 
 
       Res=(0d0,0d0)

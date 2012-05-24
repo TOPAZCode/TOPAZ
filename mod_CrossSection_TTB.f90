@@ -606,6 +606,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
         PDFFac = PDFFac_b
         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
+! PDFFac=1d0; print *, "set pdfs to one"
     ISFac = MomCrossing(MomExt)
 
 IF( TOPDECAYS.GE.1 ) THEN
@@ -661,7 +662,6 @@ ENDIF
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,4
-!       do iPrimAmp=3,3; print *, "only evaluating pa3"
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -720,6 +720,7 @@ ENDIF
    enddo!helicity loop
   enddo! npdf loop
   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+! print *, "npdf swapping off"
 ENDIF
 
 
@@ -758,6 +759,9 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 !    print *, "res(0)+res(1): ", dble(NLO_Res_UnPol(0))+dble(NLO_Res_UnPol(1))+dble(NLO_Res_UnPol_Ferm(0))+dble(NLO_Res_UnPol_Ferm(1))
 !    print *, "res(0+1)_ferm: ", dble( NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))
 
+! print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+
 
    EvalCS_1L_ttbqqb = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
@@ -776,8 +780,11 @@ IF( PROCESS.EQ.6 ) THEN
       call EvalIntDipoles_QQBTTBG(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
    ELSEIF( TopDecays.EQ.0 ) THEN
       xE = yRnd(5)
+! xE=0.46d0; print *, "fixed xE"
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
       call EvalIntDipoles_QQBTTBG_noDK(MomP(1:4,1:4),xE,HOp(1:3))
+! print *, "IntDip",HOp(1)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! pause
    ELSE
       xE = yRnd(5)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
