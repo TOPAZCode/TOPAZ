@@ -2734,7 +2734,7 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 !       NumBornAmps = 2  ; print *, "for crossed check"
 
     ELSEIF( Correction.EQ.1 ) THEN
-      NumPrimAmps = 6
+      NumPrimAmps = 7
       NumBornAmps = 1
     ELSEIF( Correction.EQ.3 ) THEN
     ENDIF
@@ -3970,6 +3970,10 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
         PrimAmps(6)%ExtLine = (/1,2,3,4/)
         PrimAmps(6)%AmpType = 2
         PrimAmps(6)%FermLoopPart = Bot_
+
+        PrimAmps(7)%ExtLine = (/1,2,3,4/)
+        PrimAmps(7)%AmpType = 2
+        PrimAmps(7)%FermLoopPart = Stop_
 
         PrimAmp1_1234 = 1
         PrimAmp1_1243 = 2

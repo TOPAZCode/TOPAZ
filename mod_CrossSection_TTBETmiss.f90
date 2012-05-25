@@ -1104,7 +1104,6 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
 ! pause
-
       enddo
 
 
@@ -1127,7 +1126,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=5,6!; print *, "Evaluate fermion loop primamp",iPrimAmp
+      do iPrimAmp=5,7; print *, "Evaluate fermion loop primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -1140,9 +1139,9 @@ ELSEIF( Correction.EQ.1 ) THEN
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(1),rdiv)
 ! print *, "LO",BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
-! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
-! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
-! pause
+print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
+print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
+pause
       enddo
 
       FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) ) 
@@ -1187,10 +1186,9 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
 
 
-! print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-! print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-
-
+print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+pause
 
    EvalCS_1L_ststbqqb = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 

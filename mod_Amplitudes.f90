@@ -309,13 +309,26 @@ integer :: i,j,Order(1:6)
               Res(1) = cur_s_ssffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
               Res(2:Ds) = 0d0
           elseif( IsAScalar(Order(1)) .and. IsAQuark(Order(2)) .and. IsAQuark(Order(3))  ) then
-!               print *, "calling cur_s_sffsss"
-              Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
-              Res(2:Ds) = 0d0
+print *, "TODO: make sure that tag_f=2 when closed scalar loop "
+              if( tag_f.ne.2 ) then 
+                  Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+                  print *, "calling cur_s_sffsss"
+                  Res(2:Ds) = 0d0
+              else 
+                  Res(1) = cur_s_sffsss_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+                  print *, "calling cur_s_sffsss_CLOSEDLOOPCONTRIB"
+                  Res(2:Ds) = 0d0
+              endif 
           elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAScalar(Order(3))  ) then
-              Res(1) = cur_s_sssffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
-!               print *, "calling cur_s_sssffs"
-              Res(2:Ds) = 0d0
+              if( tag_f.ne.2 ) then
+                  Res(1) = cur_s_sssffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+                  print *, "calling cur_s_sssffs"
+                  Res(2:Ds) = 0d0
+              else
+                  Res(1) = cur_s_sssffs_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+                  print *, "calling cur_s_sssffs_CLOSEDLOOPCONTRIB"
+                  Res(2:Ds) = 0d0
+              endif
           else
              call Error("requested current is not available 2q+4s")
           endif
