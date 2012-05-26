@@ -428,6 +428,7 @@ use ModCrossSection_TTB
 use ModCrossSection_TTBJ
 use ModCrossSection_TTBP
 use ModCrossSection_TTBETmiss
+use ModCrossSection_ZprimeTTB
 use ModKinematics
 use ModParameters
 implicit none
@@ -1072,6 +1073,72 @@ IF( CORRECTION.LE.1 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.59) ) THEN
   endif
 ENDIF
 ENDIF
+
+
+
+!!! Zprime section !!!
+
+IF( MASTERPROCESS.EQ.62 ) THEN
+IF( (CORRECTION.LE.1) .AND. PROCESS.EQ.62 ) THEN
+   print *, 'LO / Virt Zprime'
+   call qlinit()
+   call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   if( warmup ) then
+      itmx = VegasIt1
+      ncall= VegasNc1
+      call InitHisto()
+      call vegas1(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   endif
+ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.62 ) THEN
+   print *, 'Virtual in decay, qqb->Zprime->ttb'
+   call vegas(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+IF( MASTERPROCESS.EQ.63 ) THEN
+IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.62 ) THEN
+   print *, 'Real correction, qqb->Zprime->ttb'
+  call vegas(EvalCS_Real_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Real_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF ( CORRECTION.EQ.3 .AND. PROCESS.EQ.66 ) THEN
+   print *, 'Zprime Int Dipoles'
+   call qlinit()
+   call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   if( warmup ) then
+      itmx = VegasIt1
+      ncall= VegasNc1
+      call InitHisto()
+      call vegas1(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   endif
+ENDIF
+ENDIF
+
+IF ( MASTERPROCESS.EQ.2) THEN
+IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
+   print *, "Gluon-Z' interference, virtual"
+  call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+!!! End Zprime section
 
 
 

@@ -12,9 +12,9 @@ complex(8),private :: p1w(1:4),k1ub(1:4),k2d(1:4),k3g(1:4),k4g(1:4)
 complex(8),private :: Spi2d(1:4),EpsS3g(1:4),Spi1ub(1:4)
 real(8),private,parameter ::  Nc =3.d0
 real(8),private,parameter ::  DenNc =1.d0/3.d0
-!real(8),private,parameter :: N_f=5.d0, GW=1d0,EL=1d0
+!real(8),private,parameter :: N_f=5.d0, GW=1d0,EEL=1d0
 real(8),parameter :: g2_weakh = 4d0*dsqrt(2d0)*m_W**2*GF
-real(8),private,parameter :: N_f=Nf_light,EL=dsqrt(alpha*4.d0*DblPi), swq = EL**2/g2_weakh, GW=1.d0/dsqrt(2.d0*swq)
+real(8),private,parameter :: N_f=Nf_light,EEL=dsqrt(alpha*4.d0*DblPi), swq = EEL**2/g2_weakh, GW=1.d0/dsqrt(2.d0*swq)
 real(8), private :: GS, alpha_S_scharf
 
 !! REAL VARS ONLY
@@ -685,7 +685,7 @@ elseif(color .eq. 2) then
   call CoeffsWmRealBA
 endif
 
-res(1:4) =  1.d0/4.d0* EL* GS**2* GW* ne*(&
+res(1:4) =  1.d0/4.d0* EEL* GS**2* GW* ne*(&
 + CoeffsR(1)*Dirac(1,1:4) + CoeffsR(2)*Dirac(2,1:4) + CoeffsR(3)*Dirac(3,1:4) + CoeffsR(4)*Dirac(4,1:4) + CoeffsR(5)*Dirac(5,1:4) &
 + CoeffsR(6)*Dirac(6,1:4) + CoeffsR(7)*Dirac(7,1:4) + CoeffsR(8)*Dirac(8,1:4) + CoeffsR(9)*Dirac(9,1:4) + CoeffsR(10)*Dirac(10,1:4) &
 + CoeffsR(11)*Dirac(11,1:4) + CoeffsR(12)*Dirac(12,1:4) + CoeffsR(13)*Dirac(13,1:4) + CoeffsR(14)*Dirac(14,1:4) + CoeffsR(15)*Dirac(15,1:4) &
@@ -694,7 +694,7 @@ res(1:4) =  1.d0/4.d0* EL* GS**2* GW* ne*(&
 + CoeffsR(26)*Dirac(26,1:4) + CoeffsR(27)*Dirac(27,1:4) + CoeffsR(28)*Dirac(28,1:4) + CoeffsR(29)*Dirac(29,1:4) + CoeffsR(30)*Dirac(30,1:4) &
 + CoeffsR(31)*Dirac(31,1:4) + CoeffsR(32)*Dirac(32,1:4) + CoeffsR(33)*Dirac(33,1:4) + CoeffsR(34)*Dirac(34,1:4) )/dsqrt(2.d0) ! identical particles
 
-!write(*,*) "GS,alphas, EL, GW, swq", GS, alpha_S,EL, GW, swq, dsqrt(2.d0)/8.d0*g2_weakh/m_W**2
+!write(*,*) "GS,alphas, EEL, GW, swq", GS, alpha_S,EEL, GW, swq, dsqrt(2.d0)/8.d0*g2_weakh/m_W**2
 !write(*,*) "", k1ub.dot.k1ub,k2d.dot.k2d,k3g.dot.k3g, p1w.dot.p1w, k4g.dot.k4g
 
 !write(*,*) "res", res(1:4)
@@ -824,7 +824,7 @@ call SPandPOLWmqqbR(pol3c,pol4cb)
 call CalcDiracWmqqb
 call CoeffsWmRealqqb
 
-res(1:4,1) =  1.d0/2.d0* EL* GS**2* GW* ne*(&
+res(1:4,1) =  1.d0/2.d0* EEL* GS**2* GW* ne*(&
 + CoeffsqqbR(1)*Diracqqb(1,1:4) + CoeffsqqbR(2)*Diracqqb(2,1:4) + CoeffsqqbR(3)*Diracqqb(3,1:4) + CoeffsqqbR(4)*Diracqqb(4,1:4) + CoeffsqqbR(5)*Diracqqb(5,1:4) &
 + CoeffsqqbR(6)*Diracqqb(6,1:4) + CoeffsqqbR(7)*Diracqqb(7,1:4) + CoeffsqqbR(8)*Diracqqb(8,1:4) )
 
@@ -955,7 +955,7 @@ call SPandPOLWmuub1R(pol1ub,pol3u,pol4ub)
 call CalcDiracWmuub1
 call CoeffsWmRealuub1
 
-res(1:4,1) =  1.d0/2.d0* EL* GS**2* GW* ne*(&
+res(1:4,1) =  1.d0/2.d0* EEL* GS**2* GW* ne*(&
 + Coeffsuub1R(1)*Diracuub1(1,1:4) + Coeffsuub1R(2)*Diracuub1(2,1:4) + Coeffsuub1R(3)*Diracuub1(3,1:4) + Coeffsuub1R(4)*Diracuub1(4,1:4) + Coeffsuub1R(5)*Diracuub1(5,1:4) &
 + Coeffsuub1R(6)*Diracuub1(6,1:4) + Coeffsuub1R(7)*Diracuub1(7,1:4) + Coeffsuub1R(8)*Diracuub1(8,1:4) )/dsqrt(2.d0)! identical particles
 
@@ -1092,7 +1092,7 @@ call SPandPOLWmuub2R(pol1ub,pol3u,pol4ub)
 call CalcDiracWmuub2
 call CoeffsWmRealuub2
 
-res(1:4,1) =  1.d0/2.d0* EL* GS**2* GW* ne*(&
+res(1:4,1) =  1.d0/2.d0* EEL* GS**2* GW* ne*(&
 + Coeffsuub2R(1)*Diracuub2(1,1:4) + Coeffsuub2R(2)*Diracuub2(2,1:4) + Coeffsuub2R(3)*Diracuub2(3,1:4) + Coeffsuub2R(4)*Diracuub2(4,1:4) + Coeffsuub2R(5)*Diracuub2(5,1:4) &
 + Coeffsuub2R(6)*Diracuub2(6,1:4) + Coeffsuub2R(7)*Diracuub2(7,1:4) + Coeffsuub2R(8)*Diracuub2(8,1:4) )/dsqrt(2.d0)! identical particles
 
@@ -1223,7 +1223,7 @@ call SPandPOLWmddb1R(pol2d,pol3d,pol4db)
 call CalcDiracWmddb1
 call CoeffsWmRealddb1
 
-res(1:4,1) =  1.d0/2.d0* EL* GS**2* GW* ne*(&
+res(1:4,1) =  1.d0/2.d0* EEL* GS**2* GW* ne*(&
 + Coeffsddb1R(1)*Diracddb1(1,1:4) + Coeffsddb1R(2)*Diracddb1(2,1:4) + Coeffsddb1R(3)*Diracddb1(3,1:4) + Coeffsddb1R(4)*Diracddb1(4,1:4) + Coeffsddb1R(5)*Diracddb1(5,1:4) &
 + Coeffsddb1R(6)*Diracddb1(6,1:4) + Coeffsddb1R(7)*Diracddb1(7,1:4) + Coeffsddb1R(8)*Diracddb1(8,1:4) )/dsqrt(2.d0)! identical particles
 
@@ -1360,7 +1360,7 @@ call SPandPOLWmddb2R(pol2d,pol3d,pol4db)
 call CalcDiracWmddb2
 call CoeffsWmRealddb2
 
-res(1:4,1) =  1.d0/2.d0* EL* GS**2* GW* ne*(&
+res(1:4,1) =  1.d0/2.d0* EEL* GS**2* GW* ne*(&
 + Coeffsddb2R(1)*Diracddb2(1,1:4) + Coeffsddb2R(2)*Diracddb2(2,1:4) + Coeffsddb2R(3)*Diracddb2(3,1:4) + Coeffsddb2R(4)*Diracddb2(4,1:4) + Coeffsddb2R(5)*Diracddb2(5,1:4) &
 + Coeffsddb2R(6)*Diracddb2(6,1:4) + Coeffsddb2R(7)*Diracddb2(7,1:4) + Coeffsddb2R(8)*Diracddb2(8,1:4) )/dsqrt(2.d0)! identical particles
 
@@ -2143,7 +2143,7 @@ end subroutine IopWm
       Mw = M_W
 
       t1 = GS**2
-      t3 = EL*t1*GS
+      t3 = EEL*t1*GS
       t4 = t3*GW
       t5 = Integrals(3)
       t6 = SP4(1)
@@ -2585,7 +2585,7 @@ end subroutine IopWm
       complex(8) :: t11,t12,t13,t14,t15,t16,t17,t18,t19
       real(8) :: Mw
       Mw = M_W
-            t1 = EL*GS
+            t1 = EEL*GS
       t2 = t1*GW
       t3 = SP4(1)
       t4 = SP4(2)
@@ -2616,7 +2616,7 @@ end subroutine IopWm
       complex(8) :: t11,t12,t13,t14,t15,t16,t17,t18,t19
       real(8) ::  Mw
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t3 = SP4(1)
       t4 = SP4(2)
@@ -2647,7 +2647,7 @@ end subroutine IopWm
       complex(8) :: t11,t12,t13,t14,t15,t16,t17,t18,t19
       real(8) ::  Mw
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t3 = SP4(1)
       t4 = SP4(2)

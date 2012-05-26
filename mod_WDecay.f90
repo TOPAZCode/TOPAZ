@@ -16,9 +16,7 @@ contains
     integer, optional :: LamW, LamP
     real(8) :: MomPol(:,:)
     real(8),parameter :: sq2 =  1.414213562373095D0
-    real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
-    real(8),parameter :: g_weak = dsqrt(g2_weak)
-    real(8) :: sw, EL, coup, Q_f1, Q_f2, check1, check2, check3, check4, check5
+    real(8) :: coup, Q_f1, Q_f2, check1, check2, check3, check4, check5
     complex(8) :: klep_dn(1:4), kneu_up(1:4), kpho(1:4), PropMom(1:4), EpsP(1:4)
     complex(8) :: SpiLep_dn(1:4), SpiNeu_up(1:4), SpiLep2(1:4),SpiLep1(1:4), coupl_sqrt
     integer :: Dv
@@ -27,8 +25,6 @@ contains
 
     QW=Wpm
 ! Resolving markus coupling structure, sin(Theta_w)
-    sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
-    EL = dsqrt(4.d0*DblPi*alpha)
     Dv =4
     If (order .ne. 0 ) then
        Write(*,*) "Only, LO is implemented <--> order =0"

@@ -1852,6 +1852,106 @@ ELSEIF( PROCESS.EQ.59 ) THEN !   test process
       call Error("Correction to this process is not available")
   ENDIF
 
+!!! Zprime section !!!
+
+ELSEIF( PROCESS.EQ.62 ) THEN !   3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSEIF (CORRECTION.EQ.1) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+ELSEIF( PROCESS.EQ.66 ) THEN !  3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top + 5_Glu
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=63
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSEIF ( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+ELSEIF( PROCESS.EQ.65 ) THEN ! Zprime-gluon interference
+  IF( CORRECTION.EQ.0 ) THEN
+      call Error("No tree-level interference with Z'")
+  ELSEIF (CORRECTION.EQ.1) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+ ELSEIF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=4
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+!!! End Zprime section !!!
 
 
 ELSE
@@ -2915,6 +3015,114 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
        call Error("Top decay not yet implemented for Masterprocess 16")
     ENDIF
 
+
+!!! Zprime section !!!
+
+ELSEIF( MASTERPROCESS.EQ.62 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
+    IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
+      NumPrimAmps = 1
+      NumBornAmps = 1
+    ELSEIF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 1 
+      NumBornAmps = 1
+    ELSEIF( Correction.EQ.3 ) THEN
+      NumPrimAmps = 1
+      NumBornAmps = 1
+    ELSEIF( Correction.EQ.4 ) THEN
+       NumPrimAmps = 1
+       NumBornAmps = 1
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( TOPDECAYS.GE.1 ) THEN
+              NumHelicities = 2
+              allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+              Helicities(1,1:4) = (/0,0,-1,+1/)
+              Helicities(2,1:4) = (/0,0,+1,-1/)
+    ELSE
+      NumHelicities = 8
+      allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+       sig_tb=+1; sig_t =+1;
+       Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+       Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+       sig_tb=+1; sig_t =-1;
+       Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+       Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+       sig_tb=-1; sig_t =+1;
+       Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+       Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+       sig_tb=-1; sig_t =-1;
+       Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+       Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    ENDIF
+
+ELSEIF( MASTERPROCESS.EQ.63 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
+    ExtParticle(5)%PartType = Glu_
+
+    IF( Correction.EQ.0 .OR.  Correction.EQ.2 .OR.  Correction.EQ.4 ) THEN
+      NumPrimAmps = 2
+      NumBornAmps = 2
+    ELSEIF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 0
+      NumBornAmps = 0
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( TOPDECAYS.GE.1 ) THEN
+        NumHelicities = 4
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+        Helicities(1,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(3,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(2,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(4,1:5) = (/0,0,+1,-1,-1/)
+    ELSE
+      NumHelicities = 16
+      allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+       sig_tb=+1; sig_t =+1;
+       Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+       Helicities(9,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+       Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+       Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+       sig_tb=+1; sig_t =-1;
+       Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+       Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+       Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+       Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+       sig_tb=-1; sig_t =+1;
+       Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+       Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+       Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+       Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+       sig_tb=-1; sig_t =-1;
+       Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+       Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+       Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+       Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+    ENDIF
+
+!!! End Zprime section !!!
 
 
 
@@ -4080,6 +4288,24 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
       PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
       PrimAmps(1)%AmpType = 1
    ENDIF
+
+
+!!! Zprime section !!!
+
+ELSEIF( MasterProcess.EQ.62) THEN
+   IF( Correction.EQ.0 .OR. Correction.EQ.3 .OR. Correction.GE.4 ) THEN
+   BornAmps(1)%ExtLine = (/1,2,3,4/)
+   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   ENDIF
+
+ELSEIF( MasterProcess.EQ.63) THEN
+   IF( Correction.EQ.2 ) THEN
+      BornAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
+      PrimAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
+      BornAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
+      PrimAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
+   ENDIF
+!!! End Zprime Section
 
 
 ELSE

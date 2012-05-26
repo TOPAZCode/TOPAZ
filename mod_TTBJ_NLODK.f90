@@ -11,7 +11,7 @@ complex(8),private :: SP4(1:7)
 real(8),private ::  Nc, DenNc
 real(8),private :: Mw
 real(8),private :: mt,GS
-real(8),private,parameter :: N_f=Nf_light, GW=1d0,EL=1d0
+real(8),private,parameter :: N_f=Nf_light, GW=1d0,EEL=1d0
 
 
 contains
@@ -56,7 +56,7 @@ elseif(LO_NLO .eq.  1 .and. gram_det .gt. 1.d-4) then
    call TopDecSMCoeff(SP4,mt,Mw,Nc,DenNc,ThetaEps,Integrals,CoeffsTopNLO)
    call CalcCTsTop(xe, mu, CT, CTmass)
    weyl(1:4) = (CoeffsTopNLO(1)*SME(1,1:4) + CoeffsTopNLO(2)*SME(2,1:4) + CoeffsTopNLO(3)*SME(3,1:4) + CoeffsTopNLO(4)*SME(4,1:4) &
-              + CoeffsTopNLO(5)*SME(5,1:4) + CoeffsTopNLO(6)*SME(6,1:4) + CoeffsTopNLO(7)*SME(7,1:4) + CoeffsTopNLO(8)*SME(8,1:4))/(4.d0*Pi)**2*ne*EL*GW*GS**3 &
+              + CoeffsTopNLO(5)*SME(5,1:4) + CoeffsTopNLO(6)*SME(6,1:4) + CoeffsTopNLO(7)*SME(7,1:4) + CoeffsTopNLO(8)*SME(8,1:4))/(4.d0*Pi)**2*ne*EEL*GW*GS**3 &
        + CTmass(1:4) + Ct(1:4)
 
    Spinor(1:4) = (spb2_(weyltodirac(weyl(1:4)),p1t(1:4))+m_top*weyltodirac(weyl(1:4)))*ne  *dsqrt(4.d0/3.d0)! COLOR-FACTOR
@@ -102,7 +102,7 @@ elseif(LO_NLO .eq.  1 .and. gram_det .gt. 1.d-4) then
    call AtopDecSMCoeff(SP4,mt,Mw,Nc,DenNc,ThetaEps,Integrals,CoeffsATopNLO)
    call CalcCTsAtop(xe, mu, CT, CTmass)
    weyl(1:4) = (CoeffsAtopNLO(1)*SMEA(1,1:4) + CoeffsAtopNLO(2)*SMEA(2,1:4) + CoeffsAtopNLO(3)*SMEA(3,1:4) + CoeffsAtopNLO(4)*SMEA(4,1:4) &
-              + CoeffsAtopNLO(5)*SMEA(5,1:4) + CoeffsAtopNLO(6)*SMEA(6,1:4) + CoeffsAtopNLO(7)*SMEA(7,1:4) + CoeffsAtopNLO(8)*SMEA(8,1:4))/(4.d0*Pi)**2*ne*EL*GW*GS**3 &
+              + CoeffsAtopNLO(5)*SMEA(5,1:4) + CoeffsAtopNLO(6)*SMEA(6,1:4) + CoeffsAtopNLO(7)*SMEA(7,1:4) + CoeffsAtopNLO(8)*SMEA(8,1:4))/(4.d0*Pi)**2*ne*EEL*GW*GS**3 &
        + CTmass(1:4) + Ct(1:4)
    Spinor(1:4) = (-spi2_(p1tb(1:4),weyltodirac(weyl(1:4)))+m_top*weyltodirac(weyl(1:4)))*ne  *dsqrt(4.d0/3.d0)! COLOR-FACTOR
 else
@@ -149,7 +149,7 @@ end subroutine calc_atopdecay
 !    call TopDecSMCoeff(SP4,mt,Mw,Nc,DenNc,ThetaEps,Integrals,CoeffsTopNLO)
 !    call CalcCTsTop(xe, mu, CT, CTmass)
 !    weyl(1:4) = (CoeffsTopNLO(1)*SME(1,1:4) + CoeffsTopNLO(2)*SME(2,1:4) + CoeffsTopNLO(3)*SME(3,1:4) + CoeffsTopNLO(4)*SME(4,1:4) &
-!               + CoeffsTopNLO(5)*SME(5,1:4) + CoeffsTopNLO(6)*SME(6,1:4) + CoeffsTopNLO(7)*SME(7,1:4) + CoeffsTopNLO(8)*SME(8,1:4))/(4.d0*Pi)**2*ne*EL*GW*GS**3 &
+!               + CoeffsTopNLO(5)*SME(5,1:4) + CoeffsTopNLO(6)*SME(6,1:4) + CoeffsTopNLO(7)*SME(7,1:4) + CoeffsTopNLO(8)*SME(8,1:4))/(4.d0*Pi)**2*ne*EEL*GW*GS**3 &
 !        + CTmass(1:4) + Ct(1:4)
 !
 !    Spinor(1:4) = (spb2_(weyltodirac(weyl(1:4)),p1t(1:4))+m_top*weyltodirac(weyl(1:4)))*ne  !*dsqrt(4.d0/3.d0)
@@ -193,7 +193,7 @@ end subroutine calc_atopdecay
 !    call AtopDecSMCoeff(SP4,mt,Mw,Nc,DenNc,ThetaEps,Integrals,CoeffsATopNLO)
 !    call CalcCTsAtop(xe, mu, CT, CTmass)
 !    weyl(1:4) = (CoeffsAtopNLO(1)*SMEA(1,1:4) + CoeffsAtopNLO(2)*SMEA(2,1:4) + CoeffsAtopNLO(3)*SMEA(3,1:4) + CoeffsAtopNLO(4)*SMEA(4,1:4) &
-!               + CoeffsAtopNLO(5)*SMEA(5,1:4) + CoeffsAtopNLO(6)*SMEA(6,1:4) + CoeffsAtopNLO(7)*SMEA(7,1:4) + CoeffsAtopNLO(8)*SMEA(8,1:4))/(4.d0*Pi)**2*ne*EL*GW*GS**3 &
+!               + CoeffsAtopNLO(5)*SMEA(5,1:4) + CoeffsAtopNLO(6)*SMEA(6,1:4) + CoeffsAtopNLO(7)*SMEA(7,1:4) + CoeffsAtopNLO(8)*SMEA(8,1:4))/(4.d0*Pi)**2*ne*EEL*GW*GS**3 &
 !        + CTmass(1:4) + Ct(1:4)
 !    Spinor(1:4) = (-spi2_(p1tb(1:4),weyltodirac(weyl(1:4)))+m_top*weyltodirac(weyl(1:4)))*ne  !*dsqrt(4.d0/3.d0)
 ! else
@@ -787,7 +787,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-            t2 = EL*GS*GW
+            t2 = EEL*GS*GW
       t3 = SP4(5)
       t5 = SP4(6)
       t6 = SP4(7)
@@ -820,7 +820,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t3 = SP4(3)
       t5 = mt**2
@@ -852,7 +852,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t2 = EL*GS*GW
+      t2 = EEL*GS*GW
       t3 = SP4(5)
       t5 = SP4(6)
       t6 = SP4(7)
@@ -885,7 +885,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t2 = EL*GS*GW
+      t2 = EEL*GS*GW
       t3 = SP4(5)
       t5 = SP4(6)
       t6 = SP4(7)
@@ -918,7 +918,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t2 = EL*GS*GW
+      t2 = EEL*GS*GW
       t3 = SP4(5)
       t5 = SP4(6)
       t6 = SP4(7)
@@ -952,7 +952,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t4 = SP4(3)
       t5 = SP4(6)
@@ -987,7 +987,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t2 = EL*GS*GW
+      t2 = EEL*GS*GW
       t3 = mt*ne
       t4 = SP4(5)
       t5 = mt**2
@@ -1017,7 +1017,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t4 = SP4(3)
       t5 = SP4(6)
@@ -1053,7 +1053,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t4 = SP4(3)
       t5 = SP4(6)
@@ -1088,7 +1088,7 @@ end subroutine CalcCTsTop
       real(8) :: mt, Mw
       mt = m_Top
       Mw = M_W
-      t1 = EL*GS
+      t1 = EEL*GS
       t2 = t1*GW
       t4 = SP4(3)
       t5 = SP4(6)

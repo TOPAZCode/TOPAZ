@@ -197,67 +197,20 @@ DipoleObjSTSTB = $(ObjectDir)/mod_Dipoles_GGSTSTBG.o \
                  $(ObjectDir)/mod_IntDipoles_QQBSTSTBG.o \
                  $(ObjectDir)/mod_IntDipoles_QGSTSTBQ.o
 
+# Zprime section
+
+DipoleDepZprime = $(Here)/dipoles/mod_Dipoles_ZprimeTTB.f90 \
+		  $(Here)/dipoles/mod_IntDipoles_ZprimeTTB.f90
+
+DipoleObjZprime = $(ObjectDir)/mod_Dipoles_ZprimeTTB.o \
+		 $(ObjectDir)/mod_IntDipoles_ZprimeTTB.o
+
+# End Zprime section
 
 
 MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
-				  $(Here)/MadGraph/gg_ttb.o \
-				  $(Here)/MadGraph/gg_ttba.o \
-				  $(Here)/MadGraph/gg_tbtga.o \
-				  $(Here)/MadGraph/ug_ttbua.o \
-				  $(Here)/MadGraph/ddb_ttba.o \
-				  $(Here)/MadGraph/uub_ttba.o \
-				  $(Here)/MadGraph/dbg_ttbdba.o \
-				  $(Here)/MadGraph/ddb_ttbga.o \
-				  $(Here)/MadGraph/wm_ubduub.o  \
-				  $(Here)/MadGraph/wm_ubdccb.o  \
-				  $(Here)/MadGraph/gg_ttbgg.o \
-				  $(Here)/MadGraph/tb_bbemveb.o \
-				  $(Here)/MadGraph/tb_tbepem.o \
-				  $(Here)/MadGraph/gg_bepvebbemve.o \
-				  $(Here)/MadGraph/gg_uub.o \
-				  $(Here)/MadGraph/gg_uubg.o \
-				  $(Here)/MadGraph/uub_ttb.o \
-				  $(Here)/MadGraph/uub_ttbg.o \
-				  $(Here)/MadGraph/uub_ttbgg.o \
-				  $(Here)/MadGraph/uub_ttbddb.o \
-				  $(Here)/MadGraph/uub_ttbuub.o \
-				  $(Here)/MadGraph/ubdb_ttbubdb.o \
-				  $(Here)/MadGraph/udb_ttbudb.o \
-				  $(Here)/MadGraph/ud_ttbud.o \
-				  $(Here)/MadGraph/uu_ttbuu.o \
-				  $(Here)/MadGraph/ubub_ttbubub.o \
-				  $(Here)/MadGraph/gg_ttbuub.o \
-				  $(Here)/MadGraph/uub_ddbg.o \
-				  $(Here)/MadGraph/ug_ttbu.o \
-				  $(Here)/MadGraph/ubg_ttbub.o \
-				  $(Here)/MadGraph/gub_ttbub.o \
-				  $(Here)/MadGraph/ug_ttbug.o \
-				  $(Here)/MadGraph/gu_ttbu.o \
-				  $(Here)/MadGraph/ubg_ttbubg.o \
-				  $(Here)/MadGraph/t_bepve.o \
-				  $(Here)/MadGraph/tb_emvebbb.o \
-				  $(Here)/MadGraph/tb_bbemveb.o \
-				  $(Here)/MadGraph/tb_bbemvebgg.o \
-				  $(Here)/MadGraph/t_bepvegg.o \
-				  $(Here)/MadGraph/t_epvebbbb.o \
-				  $(Here)/MadGraph/t_epvebuub.o \
-				  $(Here)/MadGraph/tb_emvebbbuub.o \
-				  $(Here)/MadGraph/tb_emvebbbbbb.o \
-				  $(Here)/MadGraph/t_bdbuccb.o \
-				  $(Here)/MadGraph/t_bdbuddb.o \
-				  $(Here)/MadGraph/t_bdbuuub.o \
-				  $(Here)/MadGraph/tb_bbubdccb.o \
-				  $(Here)/MadGraph/tb_bbubdddb.o \
-				  $(Here)/MadGraph/tb_bbubduub.o \
-				  $(Here)/MadGraph/tb_bbubdgg.o \
-				  $(Here)/MadGraph/t_bdbugg.o \
-				  $(Here)/MadGraph/tb_bbwm.o  \
-				  $(Here)/MadGraph/t_bwp.o \
-				  $(Here)/MadGraph/t_epveb.o \
-				  $(Here)/MadGraph/t_bwpuub.o \
-				  $(Here)/MadGraph/t_bwpbbb.o \
-				  $(Here)/MadGraph/wm_emveb.o \
-				  $(Here)/MadGraph/wp_epve.o \
+				  $(Here)/MadGraph/ddb_Zprime_ttb.o \
+				  $(Here)/MadGraph/uub_Zprime_ttb.o \
 				  $(Here)/MadGraph/switchmom.o \
 				  $(HOME)/lib/HELAS-3.0/coupsm.o \
 				  $(HOME)/lib/HELAS-3.0/oxxxxx.o \
@@ -271,6 +224,64 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(HOME)/lib/HELAS-3.0/fvoxxx.o \
 				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
 				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
+#				  $(Here)/MadGraph/gg_ttb.o \
+#				  $(Here)/MadGraph/gg_ttba.o \
+#				  $(Here)/MadGraph/gg_tbtga.o \
+#				  $(Here)/MadGraph/ug_ttbua.o \
+#				  $(Here)/MadGraph/ddb_ttba.o \
+#				  $(Here)/MadGraph/uub_ttba.o \
+#				  $(Here)/MadGraph/dbg_ttbdba.o \
+#				  $(Here)/MadGraph/ddb_ttbga.o \
+#				  $(Here)/MadGraph/wm_ubduub.o  \
+#				  $(Here)/MadGraph/wm_ubdccb.o  \
+#				  $(Here)/MadGraph/gg_ttbgg.o \
+#				  $(Here)/MadGraph/tb_bbemveb.o \
+#				  $(Here)/MadGraph/tb_tbepem.o \
+#				  $(Here)/MadGraph/gg_bepvebbemve.o \
+#				  $(Here)/MadGraph/gg_uub.o \
+#				  $(Here)/MadGraph/gg_uubg.o \
+#				  $(Here)/MadGraph/uub_ttb.o \
+#				  $(Here)/MadGraph/uub_ttbg.o \
+#				  $(Here)/MadGraph/uub_ttbgg.o \
+#				  $(Here)/MadGraph/uub_ttbddb.o \
+#				  $(Here)/MadGraph/uub_ttbuub.o \
+#				  $(Here)/MadGraph/ubdb_ttbubdb.o \
+#				  $(Here)/MadGraph/udb_ttbudb.o \
+#				  $(Here)/MadGraph/ud_ttbud.o \
+#				  $(Here)/MadGraph/uu_ttbuu.o \
+#				  $(Here)/MadGraph/ubub_ttbubub.o \
+#				  $(Here)/MadGraph/gg_ttbuub.o \
+#				  $(Here)/MadGraph/uub_ddbg.o \
+#				  $(Here)/MadGraph/ug_ttbu.o \
+#				  $(Here)/MadGraph/ubg_ttbub.o \
+#				  $(Here)/MadGraph/gub_ttbub.o \
+#				  $(Here)/MadGraph/ug_ttbug.o \
+#				  $(Here)/MadGraph/gu_ttbu.o \
+#				  $(Here)/MadGraph/ubg_ttbubg.o \
+#				  $(Here)/MadGraph/t_bepve.o \
+#				  $(Here)/MadGraph/tb_emvebbb.o \
+#				  $(Here)/MadGraph/tb_bbemveb.o \
+#				  $(Here)/MadGraph/tb_bbemvebgg.o \
+#				  $(Here)/MadGraph/t_bepvegg.o \
+#				  $(Here)/MadGraph/t_epvebbbb.o \
+#				  $(Here)/MadGraph/t_epvebuub.o \
+#				  $(Here)/MadGraph/tb_emvebbbuub.o \
+#				  $(Here)/MadGraph/tb_emvebbbbbb.o \
+#				  $(Here)/MadGraph/t_bdbuccb.o \
+#				  $(Here)/MadGraph/t_bdbuddb.o \
+#				  $(Here)/MadGraph/t_bdbuuub.o \
+#				  $(Here)/MadGraph/tb_bbubdccb.o \
+#				  $(Here)/MadGraph/tb_bbubdddb.o \
+#				  $(Here)/MadGraph/tb_bbubduub.o \
+#				  $(Here)/MadGraph/tb_bbubdgg.o \
+#				  $(Here)/MadGraph/t_bdbugg.o \
+#				  $(Here)/MadGraph/tb_bbwm.o  \
+#				  $(Here)/MadGraph/t_bwp.o \
+#				  $(Here)/MadGraph/t_epveb.o \
+#				  $(Here)/MadGraph/t_bwpuub.o \
+#				  $(Here)/MadGraph/t_bwpbbb.o \
+#				  $(Here)/MadGraph/wm_emveb.o \
+#				  $(Here)/MadGraph/wp_epve.o \
 
 
 # ------------------------------------------------------------
@@ -285,6 +296,7 @@ allObjects =   $(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_MyRecurrence.o \
 					$(ObjectDir)/mod_MyWeylRecurrence.o \
 					$(ObjectDir)/mod_Amplitudes.o \
+					$(ObjectDir)/mod_Amplitudes_Zprime.o \
 					$(OPPObj) \
 					$(ObjectDir)/mod_DKIntDipoles.o \
 					$(ObjectDir)/mod_HadrWDecay.o \
@@ -306,11 +318,13 @@ allObjects =   $(ObjectDir)/mod_Misc.o \
 					$(DipoleObjTTBJ) \
 					$(DipoleObjTTBP) \
 					$(DipoleObjSTSTB) \
+					$(DipoleObjZprime) \
 					$(ObjectDir)/mod_SixFermionProcs2.o \
 					$(ObjectDir)/mod_CrossSection_TTB.o \
 					$(ObjectDir)/mod_CrossSection_TTBJ.o \
 					$(ObjectDir)/mod_CrossSection_TTBP.o \
 					$(ObjectDir)/mod_CrossSection_TTBETmiss.o \
+					$(ObjectDir)/mod_CrossSection_ZprimeTTB.o \
 					$(ObjectDir)/main.o
 
 
@@ -328,7 +342,7 @@ all: $(allObjects)
 	@echo " linking"
 	@echo " executable file is " $(Exec)
 	@echo " "
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj)
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 
@@ -384,6 +398,9 @@ $(ObjectDir)/mod_Amplitudes.o: mod_Amplitudes.f90 $(makeDep)
 	@echo " compiling" $<
 	$(fcomp) -c $< -o $@
 
+$(ObjectDir)/mod_Amplitudes_Zprime.o: mod_Amplitudes_Zprime.f90 $(makeDep)
+	@echo " compiling" $<
+	$(fcomp) -c $< -o $@
 
 $(ObjectDir)/main.o: main.f90 $(makeDep)
 	@echo " compiling" $<
@@ -407,6 +424,10 @@ $(ObjectDir)/mod_CrossSection_TTBP.o: mod_CrossSection_TTBP.f90 $(makeDep)
 
 
 $(ObjectDir)/mod_CrossSection_TTBETmiss.o: mod_CrossSection_TTBETmiss.f90 $(makeDep)
+	@echo " compiling" $<
+	$(fcomp) -c $< -o $@
+
+$(ObjectDir)/mod_CrossSection_ZprimeTTB.o: mod_CrossSection_ZprimeTTB.f90 $(makeDep)
 	@echo " compiling" $<
 	$(fcomp) -c $< -o $@
 

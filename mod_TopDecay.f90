@@ -31,8 +31,8 @@ complex(8) :: WCurr_new(1:4),WCurr(1:4),F0,F1,IntDip,TopProp,PropMom(1:4),WCurr1
 complex(8) :: SME(1:8,1:4)
 real(8),parameter :: CF=4d0/3d0,CA=3d0,TR=1d0/2d0
 ! real(8),parameter :: g2_weak = 4d0*DblPi*alpha/sw2
-real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
-real(8),parameter :: g_weak = dsqrt(g2_weak)
+!real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
+!real(8),parameter :: g_weak = dsqrt(g2_weak)
 real(8),parameter :: Nc=3d0,Nflight=5d0,NFlav=2d0
 real(8), parameter :: eta = 0  !1=tHV scheme, 0=FDH
 complex(8) :: coupl_sqrt

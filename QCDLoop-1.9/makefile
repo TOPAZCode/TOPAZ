@@ -1,5 +1,5 @@
-FC = g77
-FFLAGS = -O 
+FC = ifort
+FFLAGS = -O2
 HERE   = $(PWD)
 QLDIR  = $(HERE)/ql
 FFDIR  = $(HERE)/ff
