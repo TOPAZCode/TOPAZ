@@ -28,9 +28,9 @@ contains
 
     lqcurrL = (-cI) * vbqq2(ub1,chir(.false.,v2))
     lqcurrR = (-cI) * vbqq2(ub1,chir(.true.,v2))
-    
+
     hqcurr = (-cI) * (vbqq2(ub3,chir(.false.,v4)) * gL_Zpr(top_) + vbqq2(ub3,chir(.true.,v4)) * gR_Zpr(top_))
-    
+
     propfact = -cI / (sc_(p1+p2,p1+p2)-m_Zpr**2 + cI * Ga_Zpr * M_Zpr)
     hqcurr = hqcurr * propfact
     
@@ -63,7 +63,7 @@ contains
 
     
     ! epsilon order
-    epv = -1
+    epv = 0
     
     ! Cf
     Cf = 4d0/3d0

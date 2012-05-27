@@ -426,7 +426,12 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (se
     eta_lep_cut = 2.5d0 
     pT_miss_cut = 25d0*GeV 
 
+ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
+   
 
+ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
+
+ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
 
 ENDIF
 
@@ -3012,6 +3017,33 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
           Histo(8)%BinSize= 20d0*GeV
           Histo(8)%LowVal = 0d0*GeV
           Histo(8)%SetScale= 100d0
+
+ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
+          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
+          NumHistograms = 0
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
+          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
+          NumHistograms = 0
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+ELSEIF( ObsSet.EQ.62 ) THEN! set of observables for Zprime, fully hadronic top decay
+          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.2  ) call Error("TopDecays needs to be 2!")
+          NumHistograms = 0
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
 
 
 ELSE

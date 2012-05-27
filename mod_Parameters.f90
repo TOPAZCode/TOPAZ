@@ -48,8 +48,8 @@ real(8), public, parameter :: m_A0    = 50d0*GeV
 real(8), public, parameter :: m_BH    = 50d0*GeV! remember: changes here require full re-compilation!
 real(8), public, parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8), public, parameter :: g_weak = dsqrt(g2_weak)
-real(8), public, parameter :: sw = sqrt(0.23d0)!dsqrt(4.d0*DblPi*alpha/g2_weak)
-real(8), public, parameter :: sw2 = sw**2 !=0.23095271d0!=MCFM value
+real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
+real(8), public, parameter :: sw2 = sw**2 
 real(8), public, parameter :: cw = dsqrt(1d0-sw2)
 real(8), public, parameter :: EL = dsqrt(4.d0*DblPi*alpha)
 real(8), public            :: Ga_HTop
@@ -62,8 +62,10 @@ real(8), public, parameter :: m_Chi   = 50d0*GeV
 
 !!! Zprime section !!!
 
-real(8), public, parameter :: m_Zpr = 91.19d0*GeV!1500d0*GeV
-real(8), public, parameter :: Ga_Zpr = 2.4950d0*GeV!15d0*GeV
+!real(8), public, parameter :: m_Zpr = 91.19d0*GeV ! Standard Z
+!real(8), public, parameter :: Ga_Zpr = 2.4950d0*GeV ! Standard Z
+real(8), public, parameter :: m_Zpr = 1500d0*GeV
+real(8), public, parameter :: Ga_Zpr = 15d0*GeV
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
 
 !!! End Zprime section !!!
@@ -448,16 +450,32 @@ ENDIF
 
 ! sequential -- mathced against Markus -- TO BE CHECKED
 
-gR_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
-gL_Zpr(top_) = eL*(sw/cw)*2d0/3d0
+!gR_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
+!gL_Zpr(top_) = eL*(sw/cw)*2d0/3d0
+
+!gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
+!gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
+
+!gL_Zpr(up_) = gR_Zpr(top_)
+!gR_Zpr(up_) = gL_Zpr(top_)
+!gL_Zpr(chm_) = gR_Zpr(top_)
+!gR_Zpr(chm_) = gL_Zpr(top_)
+
+!gL_Zpr(str_) = gL_Zpr(dn_)
+!gR_Zpr(str_) = gR_Zpr(dn_)
+!gL_Zpr(bot_) = gL_Zpr(dn_)
+!gR_Zpr(bot_) = gR_Zpr(dn_)
+
+gR_Zpr(top_) = eL*(sw/cw)*2d0/3d0
+gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
 
 gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
 gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
 
-gL_Zpr(up_) = gR_Zpr(top_)
-gR_Zpr(up_) = gL_Zpr(top_)
-gL_Zpr(chm_) = gR_Zpr(top_)
-gR_Zpr(chm_) = gL_Zpr(top_)
+gL_Zpr(up_) = gL_Zpr(top_)
+gR_Zpr(up_) = gR_Zpr(top_)
+gL_Zpr(chm_) = gL_Zpr(top_)
+gR_Zpr(chm_) = gR_Zpr(top_)
 
 gL_Zpr(str_) = gL_Zpr(dn_)
 gR_Zpr(str_) = gR_Zpr(dn_)

@@ -153,6 +153,10 @@ contains
           emi = 3
        endif
 
+       ! this is for check against virtual amplitude
+       !dipplus = 0d0
+       !dipfini = 0d0
+
        if(emi.eq.1) then
           IDip(1) = IDip(1) + (dipsoft-dipplus)
           IDip(2) = IDip(2) + (dipfini+dipplus)
@@ -167,8 +171,8 @@ contains
     enddo
 
     
-    ! print *, epinv
-    ! print *, "IntDip",IDip(2:3)
+     !print *, epinv
+     !print *, "IntDip",IDip(2:3)
 
     ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
     epcorr=epinv
@@ -177,13 +181,18 @@ contains
     APsoft= 3d0/2d0*CF     * epcorr
     APfini= (-1d0-z)*CF    * epcorr
     APplus= 2d0*CF/(1d0-z) * epcorr
+
+    ! this is for check against virtual amplitude
+    !APplus = 0d0
+    !APfini = 0d0
+
     IDip(1) = IDip(1) + (APsoft - APplus)*2d0
     IDip(2) = IDip(2) + (APfini + APplus)
     IDip(3) = IDip(3) + (APfini + APplus)
 
-    ! print *, "AP",(APsoft - APplus),(APfini + APplus)
-    ! print *, "sum",IDip(2:3)
-    ! pause
+     !print *, "AP",(APsoft - APplus),(APfini + APplus)
+     !print *, "sum",IDip(2:3)
+     !pause
 
   END SUBROUTINE IntDip_qqb_Zprime_ttb
 

@@ -46,34 +46,20 @@ include "vegas_common.f"
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
+
      call EvalPhasespace_TopDecay(MomExt(1:4,3),yRnd(5:8),.false.,MomDK(1:4,1:3),PSWgt2)
      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(9:12),.false.,MomDK(1:4,4:6),PSWgt3)
      PSWgt = PSWgt * PSWgt2*PSWgt3
      NRndHel=13
 
-     IF( TOPDECAYS.EQ.5 ) THEN
-        if(Correction.EQ.3 ) then
-           xFrag= yRnd(14)
-        else
-           xFrag= yRnd(13)
-        endif
-        PSWgt = PSWgt * FF(xFrag)
-     ELSEIF( TOPDECAYS.EQ.6 ) THEN
-        if(Correction.EQ.3 ) then
-           xFrag= yRnd(14)
-        else
-           xFrag= yRnd(13)
-        endif
-        PSWgt = PSWgt * FF(xFrag)
-     ENDIF
   ENDIF
 
 
   call Kinematics_TTBAR(.false.,MomExt,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
-  if( applyPSCut ) then
-     EvalCS_1L_Zprime_ttbqqb = 0d0
-     return
-  endif
+!  if( applyPSCut ) then
+!     EvalCS_1L_Zprime_ttbqqb = 0d0
+!     return
+!  endif
 
 
   call setPDFs(eta1,eta2,MuFac,pdf)
@@ -110,7 +96,6 @@ include "vegas_common.f"
      !Momext(1:4,2) = -(/-9.35696326631912d0, 0d0, 0d0, 9.35696326631912d0/)
      !EHat = dsqrt(2d0*(momext(1:4,1).dot.Momext(1:4,2)))
 
-
      ISFac = MomCrossing(MomExt)
 
      IF( TOPDECAYS.GE.1 ) THEN
@@ -130,22 +115,30 @@ include "vegas_common.f"
 !!!! M-F checked on May 26th
 
 !     call coupsm(0)
-!     call SUUB_ZPRIME_TTB((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4)/)*100d0,MadGraphRes)
+!     call SUUB_ZPRIME_TTB((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,4),MomExt(1:4,3)/)*100d0,MadGraphRes)
 !     print *, 'madgraph up', MadGraphRes
 !     print *, 'us         ', ISFac * (gL_Zpr(up_)**2 * LO_Res_Unpol_Left + gR_Zpr(up_)**2 * LO_Res_Unpol_Right)*9d0
 !     print *, ISFac*(gL_Zpr(up_)**2 * LO_Res_Unpol_Left + gR_Zpr(up_)**2 * LO_Res_Unpol_Right)*9d0/MadGraphRes
 !     print *, '' 
-!     call SDDB_ZPRIME_TTB((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4)/)*100d0,MadGraphRes)
+!     call SDDB_ZPRIME_TTB((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,4),MomExt(1:4,3)/)*100d0,MadGraphRes)
 !     print *, 'madgraph dn', MadGraphRes
 !     print *, 'us         ', ISFac * (gL_Zpr(dn_)**2 * LO_Res_Unpol_Left + gR_Zpr(dn_)**2 * LO_Res_Unpol_Right)*9d0
 !     print *, ISFac*(gL_Zpr(dn_)**2 * LO_Res_Unpol_Left + gR_Zpr(dn_)**2 * LO_Res_Unpol_Right)*9d0/MadGraphRes
 
-!!!     pause
+!     pause
+
 
      EvalCS_1L_Zprime_ttbqqb = ISFac*PreFac* (PDFFac_L * LO_Res_Unpol_Left + PDFFac_R * LO_Res_Unpol_Right)
      EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb * 9d0 ! Sum over initial / final colors
 
   ELSEIF(CORRECTION.EQ.1) THEN
+
+
+     !Momext(1:4,4) = (/2.73325721108289d0, -0.86989643239260d0, -0.55008440614255d0, 1.85822020357279d0/)
+     !Momext(1:4,3) = (/9.03205582647898d0, 0.86989643239260d0, 0.55008440614255d0, -8.80683369864915d0/)
+     !Momext(1:4,1) = -(/-2.40834977124275d0, 0d0, 0d0, -2.40834977124275d0/)
+     !Momext(1:4,2) = -(/-9.35696326631912d0, 0d0, 0d0, 9.35696326631912d0/)
+     !EHat = dsqrt(2d0*(momext(1:4,1).dot.Momext(1:4,2)))
 
      ISFac = MomCrossing(MomExt)
 
@@ -169,7 +162,6 @@ include "vegas_common.f"
 
      EvalCS_1L_Zprime_ttbqqb = ISFac*PreFac* (PDFFac_L * Virt_Res_Unpol_Left + PDFFac_R * Virt_Res_Unpol_Right)
      EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb * 9d0*(4d0*Pi*alpha_s*RunFactor) ! Color and alpha_s
-
 
   !!! Integrated dipoles !!!
 
@@ -197,7 +189,7 @@ include "vegas_common.f"
      enddo!helicity loop
 
 
-     IF(PROCESS.EQ.62) THEN
+     IF(PROCESS.EQ.66) THEN
         
         ! qqb initial state !
 
@@ -231,13 +223,13 @@ include "vegas_common.f"
         
         call IntDip_qqb_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
 
         IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
         
-        IDipAmp = IDipAmp * ISFac * 9d0
+        IDipAmp = IDipAmp * ISFac * 9d0 
 
         EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
 
@@ -260,7 +252,7 @@ include "vegas_common.f"
         
         call IntDip_gqb_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
         
         IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
@@ -289,7 +281,7 @@ include "vegas_common.f"
 
         call IntDip_qg_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
 
         IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
@@ -305,6 +297,8 @@ include "vegas_common.f"
 
   ENDIF
 
+  print *, 'full result', EvalCS_1L_Zprime_ttbqqb
+  pause
 
   do NHisto=1,NumHistograms
      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_Zprime_ttbqqb)

@@ -213,7 +213,6 @@ IF( Topol.eq.DK_LO ) THEN! leading order
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
         TopQuark%Pol(5:16)= (0d0,0d0)
 
-
     elseif( TopQuark%PartType.eq.ATop_ ) then  ! Anti-Top quark decay
         ATopDKProd(1)%Mom(1:4) =-TopQuark%Mom(1:4)!  Atop
         ATopDKProd(2)%Mom(1:4) = dcmplx(Mom(1:4,1))! Abot

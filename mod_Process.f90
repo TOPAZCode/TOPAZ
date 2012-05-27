@@ -1910,7 +1910,7 @@ ELSEIF( PROCESS.EQ.66 ) THEN !  3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top + 
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=62
+      MasterProcess=63
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -3025,17 +3025,17 @@ ELSEIF( MASTERPROCESS.EQ.62 ) THEN
     ExtParticle(3)%PartType = AStr_
     ExtParticle(4)%PartType = Str_
     IF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
-      NumPrimAmps = 1
-      NumBornAmps = 1
+      NumPrimAmps = 0
+      NumBornAmps = 0
     ELSEIF( Correction.EQ.1 ) THEN
-      NumPrimAmps = 1 
-      NumBornAmps = 1
+      NumPrimAmps = 0 
+      NumBornAmps = 0
     ELSEIF( Correction.EQ.3 ) THEN
-      NumPrimAmps = 1
-      NumBornAmps = 1
+      NumPrimAmps = 0
+      NumBornAmps = 0
     ELSEIF( Correction.EQ.4 ) THEN
-       NumPrimAmps = 1
-       NumBornAmps = 1
+       NumPrimAmps = 0
+       NumBornAmps = 0
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -4293,18 +4293,19 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 !!! Zprime section !!!
 
 ELSEIF( MasterProcess.EQ.62) THEN
-   IF( Correction.EQ.0 .OR. Correction.EQ.3 .OR. Correction.GE.4 ) THEN
-   BornAmps(1)%ExtLine = (/1,2,3,4/)
-   PrimAmps(1)%ExtLine = (/1,2,3,4/)
-   ENDIF
+!   IF( Correction.EQ.0 .OR. Correction.EQ.1 .OR. Correction.EQ.3 .OR. Correction.GE.4 ) THEN
+!   BornAmps(1)%ExtLine = (/1,2,3,4/)
+!   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+!   ENDIF
 
 ELSEIF( MasterProcess.EQ.63) THEN
-   IF( Correction.EQ.2 ) THEN
-      BornAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
-      PrimAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
-      BornAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
-      PrimAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
-   ENDIF
+!   IF( Correction.EQ.2 ) THEN
+!      BornAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
+!      PrimAmps(1)%ExtLine = (/1,2,3,5,4/) ! Emission from the light line
+!      BornAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
+!      PrimAmps(2)%ExtLine = (/1,5,2,3,4/) ! Emission from the heavy
+!   ENDIF
+
 !!! End Zprime Section
 
 
