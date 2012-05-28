@@ -285,3 +285,75 @@ int i;
    };
 };
 
+// Zprime section
+
+// generate phase space (using sequential splitting) in the process Z->g+ttbar such that the ttbar invariant mass is distributed around the Z mass peak
+// missing normalization (Byckling norm * linear mapping)= (2*Pi)^-(3n-4) * (4*Pi)^(n-1)
+void genpszttbg_(int *NOut, double *Energy, double *XRan, double *ZMass, double *ZWidth ,double *TopMass ,double *Mass, double Mom[][4], double *PSWgt ){
+double MInv[10];
+double EIntMom[10];
+double xJac,mu=0.0;
+double rmin,rmax,r;
+const int Nminus1=(*NOut)-1;
+const int Nminus2=(*NOut)-2;
+int Levl,NMom;
+double SingScale,eta;
+
+// set invariant masses: MInv
+// set Jacobian factors: xJac
+   MInv[0] = (*Energy);
+   MInv[Nminus1] = Mass[Nminus1];
+   (*PSWgt)=0.5/MInv[0];
+
+   rmin=1.0/((*ZWidth))/((*ZMass)) * atan(   (   4.0*((*TopMass))*((*TopMass))-((*ZMass))*((*ZMass))  )/((*ZWidth))/((*ZMass))     );
+   rmax=1.0/((*ZWidth))/((*ZMass)) * atan(   (   ((*Energy))*((*Energy))-((*ZMass))*((*ZMass))  )/((*ZWidth))/((*ZMass))     );
+
+   for(NMom=1; NMom<=Nminus1; NMom++ ) mu+=Mass[NMom];
+   for(Levl=1; Levl<=Nminus2; Levl++ ) {
+      r = XRan[Levl-1]*(rmax-rmin) + rmin;
+//    xJac = MInv[Levl-1]-Mass[Levl-1] - mu;
+//    MInv[Levl] = xJac*XRan[Levl-1] + mu;
+//    xJac =((*Energy)-2.0*(*TopMass));
+//    MInv[Levl] = ((*Energy)-2.0*(*TopMass))*XRan[Levl-1] + 2.0*(*TopMass);
+      MInv[Levl] = sqrt(    ((*ZMass))*((*ZWidth)) * tan( ((*ZMass))*((*ZWidth))*r )  +  ((*ZMass))*((*ZMass))      );
+      xJac = (rmax-rmin)*(  sq( sq(MInv[Levl])-sq((*ZMass)) )     +    sq((*ZMass)) * sq((*ZWidth))     ) / (2.0*MInv[Levl]);
+
+      mu-=Mass[Levl];
+      (*PSWgt)*= xJac;
+   }
+
+
+// split MInv[Levl] --> MInv[Levl+1],Mass[Levl]
+   for(Levl=0; Levl<=Nminus2; Levl++ ) {
+      (*PSWgt)*= split( &MInv[Levl], &XRan[Nminus2+2*Levl], &Mass[Levl], &MInv[Levl+1], Mom[Levl] );
+      EIntMom[Levl] = MInv[Levl]-Mom[Levl][0];
+   }
+
+
+// set last momentum vector
+   Mom[Nminus1][0] =  EIntMom[Nminus2];
+   Mom[Nminus1][1] = -Mom[Nminus2][1];
+   Mom[Nminus1][2] = -Mom[Nminus2][2];
+   Mom[Nminus1][3] = -Mom[Nminus2][3];
+
+// boost momenta to partonic CMS
+   for(Levl=Nminus2; Levl>=1; Levl-- ) {
+      if( MInv[Levl]<=1e-14 ){ (*PSWgt)*= 0.0; return; }    // NEW!
+      for(NMom=Levl; NMom<=Nminus1; NMom++ ) {
+
+          boostback( Mom[NMom],Mom[Levl-1],&MInv[Levl],&EIntMom[Levl-1] );
+      }
+   }
+
+
+#if CHECK_OSREL
+   checkOSrel(NOut,Energy,Mass,Mom,OSREL_PREC);
+#endif
+#if CHECK_EMCON
+   checkEMcon(NOut,Energy,Mass,Mom,EMCON_PREC);
+#endif
+
+};
+
+
+// End Zprime section

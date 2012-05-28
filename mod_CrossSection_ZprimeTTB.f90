@@ -34,7 +34,10 @@ include "vegas_common.f"
 
   EvalCS_1L_Zprime_ttbqqb = 0d0
 
-  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+!  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! Flat mapping
+
+  call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! BW mapping for Ehat
+
   if( EHat.le.2d0*m_Top) then
      EvalCS_1L_Zprime_ttbqqb = 0d0
      return
@@ -56,10 +59,10 @@ include "vegas_common.f"
 
 
   call Kinematics_TTBAR(.false.,MomExt,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
-!  if( applyPSCut ) then
-!     EvalCS_1L_Zprime_ttbqqb = 0d0
-!     return
-!  endif
+  if( applyPSCut ) then
+     EvalCS_1L_Zprime_ttbqqb = 0d0
+     return
+  endif
 
 
   call setPDFs(eta1,eta2,MuFac,pdf)
@@ -189,7 +192,65 @@ include "vegas_common.f"
      enddo!helicity loop
 
 
-     IF(PROCESS.EQ.66) THEN
+     IF(PROCESS.EQ.63) THEN
+
+        ! qg initial state !
+
+        PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2)+pdf_z(0,2)*pdf(up_,1))
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2)+pdf_z(0,2)*pdf(dn_,1))
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2)+pdf_z(0,2)*pdf(chm_,1))
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2)+pdf_z(0,2)*pdf(str_,1))
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2)+pdf_z(0,2)*pdf(bot_,1))
+
+        PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2)+pdf_z(0,2)*pdf(up_,1))
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2)+pdf_z(0,2)*pdf(dn_,1))
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2)+pdf_z(0,2)*pdf(chm_,1))
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2)+pdf_z(0,2)*pdf(str_,1))
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2)+pdf_z(0,2)*pdf(bot_,1))
+
+        call IntDip_qg_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
+
+        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+
+        IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
+        IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
+        IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
+        
+        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0)
+
+        EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
+
+
+     ELSEIF(PROCESS.EQ.64) THEN
+
+        ! gqb initial state !
+
+        PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(aup_,2)+pdf_z(0,2)*pdf(aup_,1))
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(adn_,2)+pdf_z(0,2)*pdf(adn_,1))
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(achm_,2)+pdf_z(0,2)*pdf(achm_,1))
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(astr_,2)+pdf_z(0,2)*pdf(astr_,1))
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(abot_,2)+pdf_z(0,2)*pdf(abot_,1))
+        
+        PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(aup_,2)+pdf_z(0,2)*pdf(aup_,1))
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(adn_,2)+pdf_z(0,2)*pdf(adn_,1))
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(achm_,2)+pdf_z(0,2)*pdf(achm_,1))
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(astr_,2)+pdf_z(0,2)*pdf(astr_,1))
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(abot_,2)+pdf_z(0,2)*pdf(abot_,1))
+        
+        call IntDip_gqb_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
+
+        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+
+        IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
+        IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
+        IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
+        
+        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0)
+        
+        EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
+
+
+     ELSEIF(PROCESS.EQ.66) THEN
         
         ! qqb initial state !
 
@@ -223,7 +284,7 @@ include "vegas_common.f"
         
         call IntDip_qqb_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
+        IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
 
         IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
@@ -232,65 +293,6 @@ include "vegas_common.f"
         IDipAmp = IDipAmp * ISFac * 9d0 
 
         EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
-
-
-     ELSEIF(PROCESS.EQ.63) THEN
-
-        ! gqb initial state !
-
-        PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(aup_,2)+pdf_z(0,2)*pdf(aup_,1))
-        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(adn_,2)+pdf_z(0,2)*pdf(adn_,1))
-        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(achm_,2)+pdf_z(0,2)*pdf(achm_,1))
-        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(astr_,2)+pdf_z(0,2)*pdf(astr_,1))
-        PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(abot_,2)+pdf_z(0,2)*pdf(abot_,1))
-        
-        PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(aup_,2)+pdf_z(0,2)*pdf(aup_,1))
-        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(adn_,2)+pdf_z(0,2)*pdf(adn_,1))
-        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(achm_,2)+pdf_z(0,2)*pdf(achm_,1))
-        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(astr_,2)+pdf_z(0,2)*pdf(astr_,1))
-        PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(abot_,2)+pdf_z(0,2)*pdf(abot_,1))
-        
-        call IntDip_gqb_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
-
-        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
-        
-        IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
-        IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
-        IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
-        
-        IDipAmp = IDipAmp * ISFac * 9d0 
-        
-        EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
-
-
-     ELSEIF(PROCESS.EQ.64) THEN
-
-        ! qg initial state !
-
-        PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2)+pdf_z(0,2)*pdf(up_,1))
-        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2)+pdf_z(0,2)*pdf(dn_,1))
-        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2)+pdf_z(0,2)*pdf(chm_,1))
-        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2)+pdf_z(0,2)*pdf(str_,1))
-        PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2)+pdf_z(0,2)*pdf(bot_,1))
-
-        PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2)+pdf_z(0,2)*pdf(up_,1))
-        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2)+pdf_z(0,2)*pdf(dn_,1))
-        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2)+pdf_z(0,2)*pdf(chm_,1))
-        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2)+pdf_z(0,2)*pdf(str_,1))
-        PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2)+pdf_z(0,2)*pdf(bot_,1))
-
-        call IntDip_qg_Zprime_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
-
-        IDip = IDip * (alpha_s*RunFactor)/(4d0*Pi) * PreFac
-
-        IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_Res_UnPol_Left + PDFFac_dip_R(1) * LO_Res_UnPol_Right)
-        IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
-        IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
-        
-        IDipAmp = IDipAmp * ISFac * 9d0 
-
-        EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
-
 
      ENDIF
      
@@ -353,14 +355,28 @@ include "vegas_common.f"
   EvalCS_Real_Zprime_ttbqqb = 0d0
   EvalCS_Dips_Zprime_ttbqqb = 0d0
 
-  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+
+!  if ((TOPDECAYS.EQ.0 .AND. yRnd(8).GT.0.5d0) .OR. (TOPDECAYS.NE.0 .AND. yRnd(16).GT.0.5d0)) then
+!     call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! BW mapping for Ehat
+!  else
+     call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! no mapping 
+!  endif
+
+
   if( EHat.le.2d0*m_Top * ThresholdCutOff ) then
       EvalCS_Real_Zprime_ttbqqb = 0d0
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
 
-  call EvalPhaseSpace_2to3(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
+
+!  if ((TOPDECAYS.EQ.0 .AND. yRnd(8).LE.0.5d0) .OR. (TOPDECAYS.NE.0 .AND. yRnd(16).LE.0.5d0)) then
+!     call EvalPhasespaceBWMapp(EHat,(/m_Top,m_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)!   BW mapping for M_ttbar
+!     call swapmom(MomExt(1:4,3),MomExt(1:4,5))
+!  else
+     call EvalPhaseSpace_2to3(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt) ! no mapping
+!  endif
+
   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
   call CheckSing(MomExt,applySingCut)
@@ -370,20 +386,44 @@ include "vegas_common.f"
   endif
   
   IF( TOPDECAYS.NE.0 ) THEN
-     call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomDK(1:4,1:3),PSWgt2)
+     call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomDK(1:4,1:3),PSWgt2) ! anti-top
      call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomDK(1:4,4:6),PSWgt3)
      PSWgt = PSWgt * PSWgt2*PSWgt3
-     
-     IF( TOPDECAYS.EQ.5 .OR. TOPDECAYS.EQ.6) THEN
-        xFrag= yRnd(16)
-        PSWgt = PSWgt * FF(xFrag)
-     ENDIF
   ENDIF
 
   call Kinematics_TTBAR(.true.,MomExt,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
 
   call setPDFs(eta1,eta2,MuFac,pdf)
-  IF( PROCESS.EQ.62 ) THEN
+
+
+  IF (PROCESS.EQ.63 ) THEN
+     ! gluon index is 0
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
+
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
+
+  ELSEIF (PROCESS.EQ.64 ) THEN
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
+
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
+
+  ELSEIF( PROCESS.EQ.66 ) THEN
      PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
@@ -397,28 +437,9 @@ include "vegas_common.f"
      PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
   ENDIF
 
-
-  !!! Markus check !!!
-
-  MomExt(:,1) = (/4.21461209967482d0, 0d0, 0d0, 4.21461209967482d0/)
-  MomExt(:,2) = (/16.37468571605846d0, 0d0, 0d0,-16.37468571605846d0/)
-  MomExt(:,3) = (/3.53018276105433d0, -2.83890678371522d0, -0.66820060629484d0, 1.98904664338675d0/)
-  MomExt(:,4) = (/1.87117889769921d0, 0.10131080859458d0, 0.25216925709584d0, 0.68487754601276d0/)
-  MomExt(:,5) = (/15.18793615697974d0, 2.73759597512065d0, 0.41603134919900d0, -14.83399780578316d0/)
-  PDFFac_L = 1d0
-  PDFFac_R = 1d0
-
-!  ExtParticle(1)%Mom(1:4) = (/1.87117889769921d0, 0.10131080859458d0, 0.25216925709584d0, 0.68487754601276d0/)
-!  ExtParticle(2)%Mom(1:4) = (/15.18793615697974d0, 2.73759597512065d0, 0.41603134919900d0, -14.83399780578316d0/)
-!  ExtParticle(3)%Mom(1:4) = (/-4.21461209967482d0, 0d0, 0d0, -4.21461209967482d0/)
-!  ExtParticle(4)%Mom(1:4) = (/-16.37468571605846d0, 0d0, 0d0,16.37468571605846d0/)
-!  ExtParticle(5)%Mom(1:4) = (/3.53018276105433d0, -2.83890678371522d0, -0.66820060629484d0, 1.98904664338675d0/)
-
-
   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
   RunFactor = RunAlphaS(NLOParam,MuRen)
   ISFac = MomCrossing(MomExt)
-
 
   IF( TOPDECAYS.GE.1 ) THEN
      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
@@ -451,37 +472,139 @@ include "vegas_common.f"
   endif!applyPSCut
 
 
-
   !!! Dipoles section
-
-  do nDip = 1, 4
-     call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
-
-     IF( TOPDECAYS.NE.0 ) THEN
-        call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
-        call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
-        PSWgt = PSWgt * PSWgt2*PSWgt3
+  IF ( PROCESS .EQ. 66 ) THEN ! qqb
+     dipoles = 0d0
+     do nDip = 1, 4
+        call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
         
-        IF( TOPDECAYS.EQ.5 .OR. TOPDECAYS.EQ.6) THEN
-           xFrag= yRnd(16)
-           PSWgt = PSWgt * FF(xFrag)
-        ENDIF
+        call Kinematics_TTBAR(.false.,MomExtTd,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
+        Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
+        ISFac = MomCrossing(MomExtTd)
+        Crossing(:) = (/4,5,-1,-2,3/) ! Original
+        
+        if( applyPSCut ) then
+           resdip = 0d0
+        else
+           
+           IF( TOPDECAYS.NE.0 ) THEN
+              call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
+              call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
+              PSWgt = PSWgt * PSWgt2*PSWgt3
 
-        call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
-        call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
-     ENDIF !TopDecays
+              call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+              call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+           ENDIF !TopDecays
 
+           
+           resLO_L = 0d0
+           resLO_R = 0d0
+           
+           do iHel=1,NumHelicities!/2
+              call HelCrossing(Helicities(iHel,1:NumExtParticles))
+              call SetPolarizations()
+              call Tree_Zprime_tbtqbq(ampLO_L, ampLO_R)
+              resLO_L = resLO_L +  dreal(ampLO_L * dconjg(ampLO_L))
+              resLO_R = resLO_R +  dreal(ampLO_R * dconjg(ampLO_R))
+           enddo!helicity loop
+
+           resLO_L = resLO_L/two
+           resLO_R = resLO_R/two
+           
+           ! Check against Markus
+           resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
+           resdip = resdip * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
+           
+           do NHisto=1,NumHistograms
+              call intoHisto(NHisto,NBin(NHisto),resdip)
+           enddo
+           
+           dipoles = dipoles + resdip
+           
+        endif !applyPSCut
+     
+     enddo !nDip
+  
+  ELSEIF ( PROCESS .EQ. 64) THEN
+     dipoles = 0d0
+   
+     call Dipoles_gqb_Zprime_ttbqb(1, MomExt(1:4,1:5), MomExtTd(1:4,1:4), resdip)
+     
      call Kinematics_TTBAR(.false.,MomExtTd,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
      Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
      ISFac = MomCrossing(MomExtTd)
-     Crossing(:) = (/4,5,-1,-2,3/) ! Original
+     Crossing(:) = (/4,5,3,-2,-1/) ! Original
+     
      if( applyPSCut ) then
         resdip = 0d0
      else
-
+      
+        IF( TOPDECAYS.NE.0 ) THEN
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
+           PSWgt = PSWgt * PSWgt2*PSWgt3
+           
+           call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+           call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+        ENDIF !TopDecays
+        
         resLO_L = 0d0
         resLO_R = 0d0
 
+        print *, NumHelicities
+
+        do iHel=1,NumHelicities!/2
+           call HelCrossing(Helicities(iHel,1:NumExtParticles))
+           call SetPolarizations()
+           call Tree_Zprime_tbtqbq(ampLO_L, ampLO_R)
+           resLO_L = resLO_L +  dreal(ampLO_L * dconjg(ampLO_L))
+           resLO_R = resLO_R +  dreal(ampLO_R * dconjg(ampLO_R))
+        enddo!helicity loop
+        
+        resLO_L = resLO_L/two
+        resLO_R = resLO_R/two
+
+        print *, resdip
+        print *, (gR_Zpr(dn_)**2 * resLO_R + gL_Zpr(dn_)**2 * resLO_L)
+
+        ! Check against Markus
+        resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
+        resdip = resdip * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
+        
+        do NHisto=1,NumHistograms
+           call intoHisto(NHisto,NBin(NHisto),resdip)
+        enddo
+        
+        dipoles = dipoles + resdip
+      
+     endif!applyPSCut
+   
+  ELSEIF ( PROCESS .EQ. 63) THEN
+     dipoles = 0d0
+   
+     call Dipoles_qg_Zprime_ttbq(1, MomExt(1:4,1:5), MomExtTd(1:4,1:4), resdip)
+     
+     call Kinematics_TTBAR(.false.,MomExtTd,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
+     Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
+     ISFac = MomCrossing(MomExtTd)
+     Crossing(:) = (/4,5,-1,3,-2/) ! Original
+     
+     if( applyPSCut ) then
+        resdip = 0d0
+     else
+        
+        IF( TOPDECAYS.NE.0 ) THEN
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
+           PSWgt = PSWgt * PSWgt2*PSWgt3
+           
+           call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+           call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+        ENDIF !TopDecays
+        
+        resLO_L = 0d0
+        resLO_R = 0d0
+        
         do iHel=1,NumHelicities/2
            call HelCrossing(Helicities(iHel,1:NumExtParticles))
            call SetPolarizations()
@@ -489,31 +612,77 @@ include "vegas_common.f"
            resLO_L = resLO_L +  dreal(ampLO_L * dconjg(ampLO_L))
            resLO_R = resLO_R +  dreal(ampLO_R * dconjg(ampLO_R))
         enddo!helicity loop
-
+        
         ! Check against Markus
         resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
         resdip = resdip * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
-  
+        
         do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),resdip)
         enddo
-
+        
         dipoles = dipoles + resdip
+        
+     endif!applyPSCut
+     
+  ENDIF
 
-     endif !applyPSCut
 
-  enddo !nDip
+!  do nDip = 1, 4
+!     call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
 
-  print *, 'qqb->Zprime->ttbar, real', EvalCS_Real_Zprime_ttbqqb/PreFac * (0.13/alpha_s)
-  print *, 'dipoles', dipoles/PreFac * (0.13/alpha_s)
-  print *, 'Markus result: 76.5573298093945'
-  print *, 'Markus result for dipoles: -79.2691620687762'
-  
+
+!     call Kinematics_TTBAR(.false.,MomExtTd,MomDK,applyPSCut,NBin,xJPsiFrag=xFrag)
+!     Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
+!     ISFac = MomCrossing(MomExtTd)
+!     Crossing(:) = (/4,5,-1,-2,3/) ! Original
+!     if( applyPSCut ) then
+!        resdip = 0d0
+!     else
+
+
+!     IF( TOPDECAYS.NE.0 ) THEN
+!        call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2) ! Anti-top
+!        call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
+!        !PSWgt = PSWgt * PSWgt2*PSWgt3
+!        call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+!        call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+!     ENDIF !TopDecays
+
+!        resLO_L = 0d0
+!        resLO_R = 0d0
+
+!        do iHel=1,NumHelicities/2
+!           call HelCrossing(Helicities(iHel,1:NumExtParticles))
+!           call SetPolarizations()
+!           call Tree_Zprime_tbtqbq(ampLO_L, ampLO_R)
+!           resLO_L = resLO_L +  dreal(ampLO_L * dconjg(ampLO_L))
+!           resLO_R = resLO_R +  dreal(ampLO_R * dconjg(ampLO_R))
+!        enddo!helicity loop
+
+!        ! Check against Markus
+!        resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
+!        resdip = resdip * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
+
+!        do NHisto=1,NumHistograms
+!           call intoHisto(NHisto,NBin(NHisto),resdip)
+!        enddo
+
+!        dipoles = dipoles + resdip
+
+!     endif !applyPSCut
+
+!  enddo !nDip
+
+
+  print *, 'real   ', EvalCS_Real_Zprime_ttbqqb
+  print *, 'dipoles', dipoles
+  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_ttbqqb + 1d0
+ 
   pause
-
-
+ 
   EvalCS_Real_Zprime_ttbqqb = (EvalCS_Real_Zprime_ttbqqb+dipoles)/VgsWgt
-    
+
   RETURN
 
 END FUNCTION EvalCS_Real_Zprime_ttbqqb

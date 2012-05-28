@@ -7,7 +7,8 @@
 
 
     double precision, private, parameter :: NCol=3d0
-    double precision, private, parameter :: TR=1d0
+!--F check TR
+    double precision, private, parameter :: TR=1d0/2d0
     double precision, private, parameter :: CA=2d0*TR*NCol
     double precision, private, parameter :: CF=TR*(NCol**2-1d0)/NCol
 
@@ -154,6 +155,83 @@
     END SUBROUTINE Dipoles_qqb_Zprime_ttb
 
 
+
+
+
+    SUBROUTINE Dipoles_gqb_Zprime_ttbqb(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+      use ModParameters
+      use ModKinematics
+      use ModMisc
+      implicit none
+      integer :: nDipole,a,i,b,j,k
+      real(8) :: MomExt(1:4,1:5),MomExtTd(1:4,1:4),Q(1:4),QTd(1:4),KSum(1:4)
+      real(8) :: sab,sai,sbi,sij,sik,skj,x,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+      real(8) :: Dipole
+      
+      a=1; i=3; b=2 ! initial-initial
+      
+      sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+      sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+      sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+      x = 1d0 - (sai+sbi)/sab
+      v = sai/sab
+      if( alpha_ii.lt.v ) then
+         Dipole = (0d0,0d0)
+         return
+      endif
+
+      MomExtTd(1:4,a) = x*MomExt(1:4,a)
+      MomExtTd(1:4,b) = MomExt(1:4,b)
+
+      Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+      QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+      KSum(1:4) = Q(1:4)+QTd(1:4)
+      MomExtTd(1:4,3) = MomExt(1:4,4) - 2d0*(MomExt(1:4,4).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) &
+           + 2d0*(MomExt(1:4,4).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+      MomExtTd(1:4,4) = MomExt(1:4,5) - 2d0*(MomExt(1:4,5).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) &
+           + 2d0*(MomExt(1:4,5).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+      Dipole = -1d0/sai/x * 2d0*TR * (1d0-2d0*x*(1d0-x))
+            
+    END SUBROUTINE Dipoles_gqb_Zprime_ttbqb
+
+
+
+    SUBROUTINE Dipoles_qg_Zprime_ttbq(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+      use ModParameters
+      use ModKinematics
+      use ModMisc
+      implicit none
+      integer :: nDipole,a,i,b,j,k
+      real(8) :: MomExt(1:4,1:5),MomExtTd(1:4,1:4),Q(1:4),QTd(1:4),KSum(1:4)
+      real(8) :: sab,sai,sbi,sij,sik,skj,x,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+      real(8) :: Dipole
+      
+      a=2; i=3; b=1!   initial-initial
+
+      sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+      sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+      sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+      x = 1d0 - (sai+sbi)/sab
+      v = sai/sab
+      if( alpha_ii.lt.v ) then
+         Dipole = (0d0,0d0)
+         return
+      endif
+
+      MomExtTd(1:4,a) = x*MomExt(1:4,a)
+      MomExtTd(1:4,b) = MomExt(1:4,b)
+      
+      Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+      QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+      KSum(1:4) = Q(1:4)+QTd(1:4)
+      MomExtTd(1:4,3) = MomExt(1:4,4) - 2d0*(MomExt(1:4,4).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) &
+           + 2d0*(MomExt(1:4,4).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+      MomExtTd(1:4,4) = MomExt(1:4,5) - 2d0*(MomExt(1:4,5).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) &
+           + 2d0*(MomExt(1:4,5).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+
+      Dipole = -1d0/sai/x * 2d0*TR * (1d0-2d0*x*(1d0-x))
+
+    END SUBROUTINE Dipoles_qg_Zprime_ttbq
 
 
 

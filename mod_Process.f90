@@ -1893,6 +1893,64 @@ ELSEIF( PROCESS.EQ.62 ) THEN !   3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top
       call Error("Correction to this process is not available")
   ENDIF
 
+ELSEIF( PROCESS.EQ.63 ) THEN !  3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top
+   IF (CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,3,-2/)
+      MasterProcess=63
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+!      NDim = NDim + 1    ! BW remapping initial or final
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSEIF (CORRECTION.EQ.3) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSE
+      call Error("Correction to this process is not available")
+   ENDIF
+
+ELSEIF( PROCESS.EQ.64 ) THEN ! 4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
+   IF (CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,3,-2,-1/)
+      MasterProcess=63
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+!      NDim = NDim + 1    ! BW remapping initial or final
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSEIF (CORRECTION.EQ.3) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSE
+      call Error("Correction to this process is not available")
+   ENDIF
+
 ELSEIF( PROCESS.EQ.66 ) THEN !  3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top + 5_Glu
   IF( CORRECTION.EQ.2 ) THEN
       NumExtParticles = 5
@@ -1903,6 +1961,7 @@ ELSEIF( PROCESS.EQ.66 ) THEN !  3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top + 
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 5    ! t tbar glu PS integration
       NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! BW remapping initial or final
       VegasNc0_default = 50000
       VegasNc1_default = 50000
   ELSEIF ( CORRECTION.EQ.3 ) THEN
@@ -1910,7 +1969,7 @@ ELSEIF( PROCESS.EQ.66 ) THEN !  3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top + 
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=63
+      MasterProcess=62
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -3076,8 +3135,8 @@ ELSEIF( MASTERPROCESS.EQ.63 ) THEN
     ExtParticle(5)%PartType = Glu_
 
     IF( Correction.EQ.0 .OR.  Correction.EQ.2 .OR.  Correction.EQ.4 ) THEN
-      NumPrimAmps = 2
-      NumBornAmps = 2
+      NumPrimAmps = 0
+      NumBornAmps = 0
     ELSEIF( Correction.EQ.1 ) THEN
       NumPrimAmps = 0
       NumBornAmps = 0
@@ -3091,36 +3150,97 @@ ELSEIF( MASTERPROCESS.EQ.63 ) THEN
     enddo
 
     IF( TOPDECAYS.GE.1 ) THEN
+!--F potential problem with crossing (see below)
         NumHelicities = 4
+!        NumHelicities = 8
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         Helicities(1,1:5) = (/0,0,-1,+1,+1/)
         Helicities(3,1:5) = (/0,0,-1,+1,-1/)
         Helicities(2,1:5) = (/0,0,+1,-1,+1/)
         Helicities(4,1:5) = (/0,0,+1,-1,-1/)
+
+!        ih = 1
+!        do h3 = -1,1,2
+!           do h4 = -1,1,2
+!              do h5 = -1,1,2
+!                 Helicities(ih,:) = (/0,0,h3,h3,h4,h5/)
+!                 ih = ih + 1
+!              enddo
+!           enddo
+!        enddo
     ELSE
-      NumHelicities = 16
-      allocate(Helicities(1:NumHelicities,1:NumExtParticles))
-       sig_tb=+1; sig_t =+1;
-       Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
-       Helicities(9,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
-       Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
-       Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
-       sig_tb=+1; sig_t =-1;
-       Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
-       Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
-       Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
-       Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
-       sig_tb=-1; sig_t =+1;
-       Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
-       Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
-       Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
-       Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
-       sig_tb=-1; sig_t =-1;
-       Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
-       Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
-       Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
-       Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!--F problem with crossing if only 16 hel are kept
+       NumHelicities = 32
+       allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+!       sig_tb=+1; sig_t =+1;
+!       Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(9,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=+1; sig_t =-1;
+!       Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=-1; sig_t =+1;
+!       Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=-1; sig_t =-1;
+!       Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+
+       ih = 1
+       do h1 = -1,1,2
+          do h2 = -1,1,2
+             do h3 = -1,1,2
+                do h4 = -1,1,2
+                   do h5 = -1,1,2
+                      Helicities(ih,:) = (/h1,h2,h3,h4,h5/)
+                      ih = ih + 1
+                   enddo
+                enddo
+             enddo
+          enddo
+       enddo
+
     ENDIF
+
+!!! End Zprime section !!!
+
+!        NumHelicities = 4
+!        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+!        Helicities(1,1:5) = (/0,0,-1,+1,+1/)
+!        Helicities(3,1:5) = (/0,0,-1,+1,-1/)
+!        Helicities(2,1:5) = (/0,0,+1,-1,+1/)
+!        Helicities(4,1:5) = (/0,0,+1,-1,-1/)
+!    ELSE
+!      NumHelicities = 16
+!      allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+!       sig_tb=+1; sig_t =+1;
+!       Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(9,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=+1; sig_t =-1;
+!       Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=-1; sig_t =+1;
+!       Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!       sig_tb=-1; sig_t =-1;
+!       Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,+1/)
+!       Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1,-1/)
+!       Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,+1/)
+!       Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1,-1/)
+!    ENDIF
 
 !!! End Zprime section !!!
 

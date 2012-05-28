@@ -235,8 +235,8 @@ contains
     endif
 
 
-    ! print *, epinv
-    ! print *, "IntDip",IDip(2:3)
+     !print *, epinv
+     !print *, "IntDip",IDip(2:3)
 
     ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
     epcorr=epinv
@@ -293,8 +293,8 @@ contains
     endif
     
 
-    ! print *, epinv
-    ! print *, "IntDip",IDip(2:3)
+     !print *, epinv
+     !print *, "IntDip",IDip(2:3)
     
     ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
     epcorr=epinv
@@ -306,9 +306,9 @@ contains
     IDip(1) = IDip(1) + (APsoft - APplus)
     IDip(3) = IDip(3) + (APfini + APplus)
     
-    ! print *, "AP",(APsoft - APplus),(APfini + APplus)
-    ! print *, "sum",IDip(2:3)
-    ! pause
+     !print *, "AP",(APsoft - APplus),(APfini + APplus)
+     !print *, "sum",IDip(2:3)
+     !pause
     
   END SUBROUTINE IntDip_qg_Zprime_ttb
 

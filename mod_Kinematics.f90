@@ -3815,8 +3815,8 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 !   Mom(1:4,5)  = TmpMom(1:4)
 
 !      Pcol1= 3 -1
-!      Pcol2= 3 -1
-!      SingDepth = 1e-10
+!      Pcol2= 1 -1
+!      SingDepth = 1e-5
 !      Steps = 15
 !      PSWgt = 1d0
 !      call gensing(3,EHat,(/0d0,m_Top,m_Top/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps)
@@ -3849,8 +3849,45 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 return
 END SUBROUTINE
 
+!!! Zprime section !!!
+
+SUBROUTINE EvalPhasespaceBWMapp(EHat,Masses,xRndPS,Mom,PSWgt)                                                                                                
+use ModParameters                                                                                                                                            
+use ModMisc                                                                                                                                                  
+implicit none                                                                                                                                                
+real(8) :: EHat,Masses(1:3),xRndPS(1:3*3-4)                                                                                                                  
+real(8) :: Mom(1:4,1:5),PSWgt                                                                                                                                
+real(8) :: PiWgt2,SingDepth                                                                                                                                  
+integer :: N,NVar,Pcol1,Pcol2,Steps                                                                                                                          
+                                                                                                                                                             
+   N=3                                                                                                                                                       
+   NVar=3*N-4                                                                                                                                                
+   PiWgt2 = (2d0*Pi)**(-NVar) * (4d0*Pi)**(N-1)                                                                                                              
+   call genpszttbg(N,Ehat,xRndPS(1:NVar),M_Zpr,Ga_Zpr,m_Top,(/0d0,m_top,m_top/),Mom(1:4,3:5),PSWgt)                                                          
+   PSWgt = PSWgt*PiWgt2                                                                                                                                      
+                                                                                                                                                             
+   Mom(1,1) =  EHat*0.5d0                                                                                                                                    
+   Mom(2,1) =  0d0                                                                                                                                           
+   Mom(3,1) =  0d0                                                                                                                                           
+   Mom(4,1) = +EHat*0.5d0                                                                                                                                    
+                                                                                                                                                             
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+   call swapmom(Mom(1:4,3),Mom(1:4,5))
+
+   if( N.eq.3 ) then
+      if( dmin1( (Mom(1:4,1).dot.Mom(1:4,5))/EHat**2,(Mom(1:4,2).dot.Mom(1:4,5))/EHat**2,(Mom(1,5)/EHat)**2 ).lt.1d-10 ) PSWgt = 0d0
+   endif
 
 
+return
+END SUBROUTINE
+
+
+!!! End Zprime section !!!
 
 
 
@@ -7513,7 +7550,7 @@ IF( NumExtParticles.EQ.5 .AND. CORRECTION.EQ.2 ) THEN
         applySingCut=.true.
         return
     endif
-    if( dabs(s23/s12).lt.1d-9 ) then
+    if( dabs(s13/s12).lt.1d-9 ) then
         applySingCut=.true.
         return
     endif
@@ -7751,7 +7788,19 @@ real(8) :: yRnd(1:2),eta1,eta2,EHat,sHatJacobi,tau,nPotMap,z,sbar,fmax
 !       eta1 = z + (1d0-z)*yRnd(2)
 !       eta2 = z/eta1
 !       sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (Collider_Energy**2*eta1*eta2 - m_Grav**2)**2 + m_Grav**2*Ga_Grav**2 )
+
+!!! Zprime section !!!
+  elseif ( MapType.eq.62) then ! BW for Zprime
+     fmax = 1d0/M_Zpr/Ga_Zpr * ( datan((Collider_Energy**2-M_Zpr**2)/M_Zpr/Ga_Zpr) - datan(-M_Zpr/Ga_Zpr) )
+     sbar = M_Zpr*Ga_Zpr * dtan(fmax*yRnd(1)*M_Zpr*Ga_Zpr - atan(M_Zpr/Ga_Zpr) ) + M_Zpr**2
+     z = sbar/Collider_Energy**2
+     eta1 = z + (1d0-z)*yRnd(2)
+     eta2 = z/eta1
+     sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (Collider_Energy**2*eta1*eta2 - M_Zpr**2)**2 + M_Zpr**2*Ga_Zpr**2 )
+!!! End Zprime section !!!
+
   else
+
       call Error("PDF mapping not available")
   endif
   EHat = Collider_Energy*dsqrt(eta1*eta2)

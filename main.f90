@@ -1089,6 +1089,16 @@ IF( (CORRECTION.LE.1) .AND. PROCESS.EQ.62 ) THEN
       call InitHisto()
       call vegas1(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
    endif
+ELSEIF ( CORRECTION.EQ.3 .AND. (PROCESS.EQ.63 .OR. PROCESS.EQ.64 .OR. PROCESS.EQ.66)) THEN
+   print *, 'Zprime Int Dipoles'
+   call qlinit()
+   call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   if( warmup ) then
+      itmx = VegasIt1
+      ncall= VegasNc1
+      call InitHisto()
+      call vegas1(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+   endif
 ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.62 ) THEN
    print *, 'Virtual in decay, qqb->Zprime->ttb'
    call vegas(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
@@ -1102,7 +1112,7 @@ ENDIF
 ENDIF
 
 IF( MASTERPROCESS.EQ.63 ) THEN
-IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.62 ) THEN
+IF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.63 .OR. PROCESS.EQ.64 .OR. PROCESS.EQ.66 )) THEN
    print *, 'Real correction, qqb->Zprime->ttb'
   call vegas(EvalCS_Real_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
@@ -1111,16 +1121,6 @@ IF( CORRECTION.EQ.2 .AND. PROCESS.EQ.62 ) THEN
     call InitHisto()
     call vegas1(EvalCS_Real_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
-ELSEIF ( CORRECTION.EQ.3 .AND. PROCESS.EQ.66 ) THEN
-   print *, 'Zprime Int Dipoles'
-   call qlinit()
-   call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
-   if( warmup ) then
-      itmx = VegasIt1
-      ncall= VegasNc1
-      call InitHisto()
-      call vegas1(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
-   endif
 ENDIF
 ENDIF
 
