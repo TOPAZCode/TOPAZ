@@ -426,9 +426,9 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (se
     eta_lep_cut = 2.5d0 
     pT_miss_cut = 25d0*GeV 
 
+
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
    
-
 ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
 
 ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
@@ -3021,11 +3021,61 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
 ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
-          NumHistograms = 0
+          NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
+
+
+          Histo(1)%Info   = "pT_ATop"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 100d0
+
+          Histo(2)%Info   = "pT_Top"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 50d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 100d0
+
+          Histo(3)%Info   = "y_ATop"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.2d0
+          Histo(3)%LowVal =-5.0d0
+          Histo(3)%SetScale= 1d0
+
+          Histo(4)%Info   = "y_Top"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.2d0
+          Histo(4)%LowVal =-5.0d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "M_TTbar"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 40d0*GeV
+          Histo(5)%LowVal = 350d0*GeV
+          Histo(5)%SetScale= 100d0
+
+          Histo(6)%Info   = "deltaPhi_TTbar"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.08d0
+          Histo(6)%LowVal = 0d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "CosTheta_scatter"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 0.04d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "CosTheta_star"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 0.04d0
+          Histo(8)%LowVal = -1d0
+          Histo(8)%SetScale= 1d0
+
 
 ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -7240,6 +7290,520 @@ endif
 
 return
 END SUBROUTINE
+
+
+
+
+
+
+SUBROUTINE Kinematics_TTBARZprime(NPlus1PS,MomExt,MomDK,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+integer :: NumHadr
+real(8) :: MomExt(:,:),MomDK(:,:),MomJet(1:4,1:8),MomAux1(1:4),MomAux2(1:4)
+real(8) :: MomTops(1:4,1:2),MomBoost(1:4)
+logical :: applyPSCut,NPlus1PS
+integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet_Tree,NObsJet
+real(8) :: y_Top,y_ATop,pT_Top,pT_ATop,M_TTbar,Dphi_TTbar
+real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star
+real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9)
+integer :: i,j,n,k
+
+!DEC$ IF(_CheckMomenta .EQ.1)
+   zeros(:) = 0d0
+   if( .not.NPlus1PS ) then
+        if(TopDecays.eq.0) then
+            zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomExt(1:4,3) - MomExt(1:4,4)
+        else
+            zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomDK(1:4,1)-MomDK(1:4,2)-MomDK(1:4,3)-MomDK(1:4,4)-MomDK(1:4,5)-MomDK(1:4,6)
+        endif
+   else
+        if(TopDecays.eq.0) then
+            zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomExt(1:4,3) - MomExt(1:4,4) - MomExt(1:4,5)
+        else
+            zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomExt(1:4,3) - MomDK(1:4,1)-MomDK(1:4,2)-MomDK(1:4,3)-MomDK(1:4,4)-MomDK(1:4,5)-MomDK(1:4,6)
+        endif
+   endif
+   if( any(abs(zeros(1:4)/MomExt(1,1)).gt.1d-6) ) then
+      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARJET(",NPlus1PS,"): ",zeros(1:4)
+      print *, "momenta dump:"
+      print *, MomExt(1:4,1:5+NPlus1PS)
+      print *, MomDK(1:4,1:6)
+   endif
+   if( .not. NPlus1PS ) then
+        zeros(1) = (MomExt(1:4,3).dot.MomExt(1:4,3)) - m_Top**2
+        zeros(2) = (MomExt(1:4,4).dot.MomExt(1:4,4)) - m_Top**2
+   else
+        zeros(1) = (MomExt(1:4,4).dot.MomExt(1:4,4)) - m_Top**2
+        zeros(2) = (MomExt(1:4,5).dot.MomExt(1:4,5)) - m_Top**2
+        zeros(3)=  MomExt(1:4,3).dot.MomExt(1:4,3)
+   endif
+   zeros(4) =  MomDK(1:4,1).dot.MomDK(1:4,1)
+   zeros(5) =  MomDK(1:4,2).dot.MomDK(1:4,2)
+   zeros(6) =  MomDK(1:4,3).dot.MomDK(1:4,3)
+   zeros(7) =  MomDK(1:4,4).dot.MomDK(1:4,4)
+   zeros(8) =  MomDK(1:4,5).dot.MomDK(1:4,5)
+   zeros(9) =  MomDK(1:4,6).dot.MomDK(1:4,6)
+   if( TopDecays.eq.0 .and. any(abs(zeros(1:9)/MomExt(1,1)**2).gt.1d-6) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZprime(",NPlus1PS,"): ",zeros(1:9)
+      print *, "momenta dump:"
+      print *, MomExt(1:4,1:4+NPlus1PS)
+      print *, MomDK(1:4,1:6)
+   endif
+   if( TopDecays.ne.0 .and. any(abs(zeros(1:9)/MomExt(1,1)**2).gt.1d-6) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZprime(",NPlus1PS,"): ",zeros(1:9)
+      print *, "momenta dump:"
+      print *, MomExt(1:4,1:4+NPlus1PS)
+      print *, MomDK(1:4,1:6)
+   endif
+!DEC$ ENDIF
+
+
+
+! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top
+!                          MomDK(:,1:7) : 1=ABot, 2=lep-/q, 3=ANeu/qbar, 4=Bot, 5=lep+/qbar, 6=Neu/q, 7=(Glu)
+! MomLept(:,1:4): 1=lep-, 2=ANeu, 3=lep+, 4=Neu
+
+
+applyPSCut = .false.
+NBin(1:NumHistograms) = 0
+
+
+MomHadr(1:4,1:7) = 0d0
+MomLept(1:4,1:4) = 0d0
+PartList(1:7)=(/1,2,3,4,5,6,7/)
+
+
+
+
+! separating momenta into hadron momenta and lepton momenta to which various procedures can be applied
+MomHadr(1:4,1) = MomDK(1:4,1)  ! ABot
+MomHadr(1:4,2) = MomDK(1:4,4)  ! Bot
+!-------------------------------------------------------
+if( TopDecays.eq.0 ) then  ! no top decays
+   NumHadr = 0
+   if( NPlus1PS ) then
+      MomTops(1:4,1) = MomExt(1:4,4)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,5)   ! Top
+   else
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+   endif
+!-------------------------------------------------------
+elseif( TopDecays.eq.1 ) then  ! full leptonic decay
+  MomLept(1:4,1) = MomDK(1:4,2)   ! lep-
+  MomLept(1:4,2) = MomDK(1:4,3)   ! ANeu
+  MomLept(1:4,3) = MomDK(1:4,5)   ! lep+
+  MomLept(1:4,4) = MomDK(1:4,6)   ! Neu
+
+  if( NPlus1PS .and. CORRECTION.eq.2 ) then
+      MomHadr(1:4,3) = MomExt(1:4,3)   ! q/qbar/glu
+      NumHadr = 3
+      MomTops(1:4,1) = MomExt(1:4,4)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,5)   ! Top
+  elseif( NPlus1PS .and. CORRECTION.eq.5 ) then
+      MomHadr(1:4,3) = MomDK(1:4,7)    ! q/qbar/glu
+      NumHadr = 3
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  else
+      NumHadr = 2
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  endif
+!-------------------------------------------------------
+elseif( TopDecays.eq.2 ) then  ! full hadronic decay
+  MomHadr(1:4,3) = MomDK(1:4,2)   ! qbar
+  MomHadr(1:4,4) = MomDK(1:4,3)   ! q
+  MomHadr(1:4,5) = MomDK(1:4,5)   ! qbar
+  MomHadr(1:4,6) = MomDK(1:4,6)   ! q
+  if( NPlus1PS .and. CORRECTION.eq.2 ) then
+      MomHadr(1:4,7) = MomExt(1:4,3)   ! q/qbar/glu
+      NumHadr = 7
+      MomTops(1:4,1) = MomExt(1:4,4)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,5)   ! Top
+  elseif( NPlus1PS .and. CORRECTION.eq.5 ) then
+      MomHadr(1:4,7) = MomDK(1:4,7)    ! q/qbar/glu
+      NumHadr = 7
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  else
+      NumHadr = 6
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  endif
+!-------------------------------------------------------
+elseif( TopDecays.eq.3 ) then  ! lept. Atop, hadr. top decay
+  MomLept(1:4,1) = MomDK(1:4,2)  ! lep-
+  MomLept(1:4,2) = MomDK(1:4,3)  ! ANeu
+  MomHadr(1:4,3) = MomDK(1:4,5)  ! qbar
+  MomHadr(1:4,4) = MomDK(1:4,6)  ! q
+  if( NPlus1PS .and. CORRECTION.eq.2 ) then
+      MomHadr(1:4,5) = MomExt(1:4,3)   ! q/qbar/glu
+      NumHadr = 5
+      MomTops(1:4,1) = MomExt(1:4,4)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,5)   ! Top
+  elseif( NPlus1PS .and. CORRECTION.eq.5 ) then
+      MomHadr(1:4,5) = MomDK(1:4,7)    ! q/qbar/glu
+      NumHadr = 5
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  else
+      NumHadr = 4
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  endif
+!-------------------------------------------------------
+elseif( TopDecays.eq.4 ) then  ! hadr. Atop, lept. top decay
+  MomHadr(1:4,3) = MomDK(1:4,2)  ! qbar
+  MomHadr(1:4,4) = MomDK(1:4,3)  ! q
+  MomLept(1:4,3) = MomDK(1:4,5)  ! lep+
+  MomLept(1:4,4) = MomDK(1:4,6)  ! Neu
+  if( NPlus1PS .and. CORRECTION.eq.2 ) then
+      MomHadr(1:4,5) = MomExt(1:4,3)   ! q/qbar/glu
+      NumHadr = 5
+      MomTops(1:4,1) = MomExt(1:4,4)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,5)   ! Top
+  elseif( NPlus1PS .and. CORRECTION.eq.5 ) then
+      MomHadr(1:4,5) = MomDK(1:4,7)    ! q/qbar/glu
+      NumHadr = 5
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  else
+      NumHadr = 4
+      MomTops(1:4,1) = MomExt(1:4,3)   ! ATop
+      MomTops(1:4,2) = MomExt(1:4,4)   ! Top
+  endif
+endif
+
+
+
+!---------------------- (anti) kT jet algorithm ---------------------------------
+    NJet=0
+    MomJet(1:4,1:7) = MomHadr(1:4,1:7)
+    call JetAlgo_kt(Rsep_jet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr))
+    call pT_order(2,MomJet(1:4,1:2))! pT-order b-jets first
+    call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))! pT-order non-b jets
+!--------------------------------------------------------------------------
+
+
+if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
+
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
+
+    y_ATop = get_ETA(MomTops(1:4,1))
+    y_Top  = get_ETA(MomTops(1:4,2))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+    Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
+    if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
+
+!   scattering angle of the top quark
+    CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
+
+!   see chinese paper, approximates scattering angle
+    MomAux1(1:4) = MomTops(1:4,2)
+    MomAux2(1:4) = MomExt(1:4,1)
+    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
+
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,pT_Top)
+    NBin(3) = WhichBin(3,y_ATop)
+    NBin(4) = WhichBin(4,y_Top)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,Dphi_TTbar)
+    NBin(7) = WhichBin(7,CosTheta_scatter)
+    NBin(8) = WhichBin(8,CosTheta_star)
+
+
+!-------------------------------------------------------
+elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept. decays
+! 
+! ! request at least two b-jets
+!     if( .not.(NJet.ge.2 .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+!    call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
+!    call pT_order(2,MomJet(1:4,1:2))
+! 
+! 
+! ! evaluate kinematic variables
+!     pT_bjet1 = get_PT(MomJet(1:4,1))
+!     pT_bjet2 = get_PT(MomJet(1:4,2))
+!     eta_bjet1 = get_ETA(MomJet(1:4,1))
+!     eta_bjet2 = get_ETA(MomJet(1:4,2))
+!     E_bjet1 = MomJet(1,1)
+!     E_bjet2 = MomJet(1,2)
+! 
+!     MinvLept = Get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
+!     pT_miss = get_PT(MomLept(1:4,2)+MomLept(1:4,4))
+!     pT_lept = get_PT(MomLept(1:4,1)+MomLept(1:4,3))
+!     pT_miss = get_PT(MomLept(1:4,2)+MomLept(1:4,4))
+!     ET_lept = dsqrt(pT_lept**2 + MinvLept**2)
+!     ET_miss = get_ET(MomLept(1:4,2)+MomLept(1:4,4))
+!     pT_x = MomLept(2,1)+MomLept(2,2)+MomLept(2,3)+MomLept(2,4)
+!     pT_y = MomLept(3,1)+MomLept(3,2)+MomLept(3,3)+MomLept(3,4)
+!     mT = dsqrt( (ET_lept+ET_miss)**2 - (pT_x**2+pT_y**2) )
+! 
+!     E_lept = MomLept(1,1)+MomLept(1,3)
+! 
+!     pT_lepM = get_PT(MomLept(1:4,1))
+!     pT_lepP = get_PT(MomLept(1:4,3))
+! 
+!     eta_lepM = get_ETA(MomLept(1:4,1))
+!     eta_lepP = get_ETA(MomLept(1:4,3))
+! 
+!     MInv_lepP_lepM = get_MInv( MomLept(1:4,1)+MomLept(1:4,3) )
+! 
+!     if( get_MInv(MomLept(1:4,3)+MomJet(1:4,1)).lt.get_MInv( MomLept(1:4,3)+MomJet(1:4,2)) ) then
+!         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,1) )
+!     else
+!         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,2) )
+!     endif
+! !MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomDK(1:4,4) )
+! 
+!     pT_ATop = get_PT(MomTops(1:4,1))
+!     pT_Top  = get_PT(MomTops(1:4,2))
+!     eta_ATop = get_ETA(MomTops(1:4,1))
+!     eta_Top  = get_ETA(MomTops(1:4,2))
+! 
+!     HT = pT_bjet1 + pT_bjet2 + pT_miss + pT_lepM + pT_lepP
+!     if( NJet.gt.2 ) HT = HT + get_PT(MomJet(1:4,3))
+! 
+!     MInv_Tops = get_MInv( MomTops(1:4,1)+MomTops(1:4,2) )
+! 
+! !     MomLepM(1:4)  = MomLept(1:4,1)
+! !     MomBoost(1)   =+MomTops(1,1)
+! !     MomBoost(2:4) =-MomTops(2:4,1)
+! !     call boost(MomLepM(1:4),MomBoost(1:4),m_top)
+! !     MomLepP(1:4)  = MomLept(1:4,3)
+! !     MomBoost(1)   =+MomTops(1,2)
+! !     MomBoost(2:4) =-MomTops(2:4,2)
+! !     call boost(MomLepP(1:4),MomBoost(1:4),m_top)
+! !     CosPhi_LepLep = (MomLepP(2)*MomLepM(2)+MomLepP(3)*MomLepM(3)+MomLepP(4)*MomLepM(4))/MomLepP(1)/MomLepM(1)
+! 
+! !     CosPsiT_LepLep = ( MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) )/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2)
+!     Psi_LepLep  = dacos( ( MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) + MomLept(4,1)*MomLept(4,3))/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2+MomLept(4,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2+MomLept(4,3)**2) )
+! 
+!    DeltaPhi = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
+!    if( DeltaPhi.gt.Pi ) DeltaPhi=2d0*Pi-DeltaPhi
+! 
+! 
+! !                     MomBoost(1)   =+MomTops(1,1)
+! !                     MomBoost(2:4) =-MomTops(2:4,1)
+! !                     call boost(MomLept(1:4,1),MomBoost(1:4),m_top)
+! !                     MomBoost(1)   =+MomTops(1,2)
+! !                     MomBoost(2:4) =-MomTops(2:4,2)
+! !                     call boost(MomLept(1:4,3),MomBoost(1:4),m_top)
+! !                     Psi_LepLep = dacos( VectorProd(MomTops(2:4,1),MomLept(2:4,1))/MomLept(1,1)/dsqrt((MomTops(1,1))**2-m_top**2) )
+! !                     DeltaPhi   = dacos( VectorProd(MomTops(2:4,2),MomLept(2:4,3))/MomLept(1,3)/dsqrt((MomTops(1,2))**2-m_top**2) )
+! 
+! !                       if( get_eta(MomTops(1:4,1)).lt.0.8d0 ) then
+! !                           applyPSCut = .true.
+! !                           RETURN
+! !                       endif
+! !                     Psi_LepLep = ( MomLept(4,1)/MomLept(1,1) )
+! !                     DeltaPhi   = ( MomLept(4,3)/MomLept(1,3) )
+! 
+! 
+!    DeltaPhi = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
+!    if( DeltaPhi.gt.Pi ) DeltaPhi=2d0*Pi-DeltaPhi
+!    Psi_LepLep  = dacos( ( MomLept(4,1)*MomLept(4,3) +MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) )/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2+MomLept(4,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2+MomLept(4,3)**2) )
+! 
+! 
+! 
+! 
+!    Ebjets = MomJet(1,1)+MomJet(1,2)
+! 
+! ! check cuts
+!     if( pT_bjet1.lt.pT_bjet_cut .OR. pT_bjet2.lt.pT_bjet_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+!     if( abs(eta_bjet1).gt.eta_bjet_cut .OR. abs(eta_bjet2).gt.eta_bjet_cut) then
+!        applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+! 
+!     if( pT_lepM.lt.pT_lep_cut .OR. pT_lepP.lt.pT_lep_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+!     if( abs(eta_lepM).gt.eta_lep_cut .OR. abs(eta_lepP).gt.eta_lep_cut) then
+!        applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+!     if( pT_miss.lt.pT_miss_cut ) then
+!        applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+! 
+! 
+! 
+! 
+! 
+! 
+! ! binning
+!     NBin(1) = WhichBin(1,pT_ATop)
+!     NBin(2) = WhichBin(2,eta_ATop)
+!     NBin(3) = WhichBin(3,pT_lepP)
+!     NBin(4) = WhichBin(4,eta_lepP)
+!     NBin(5) = WhichBin(5,HT)
+!     NBin(6) = WhichBin(6,MInv_lepP_bjet)
+!     NBin(7) = WhichBin(7,get_MInv(MomLept(1:4,3)+MomDK(1:4,4))) ! careful! MomDK(:,4) is not IR save
+! !    NBin(7) = WhichBin(7,Psi_LepLep)
+!     NBin(8) = WhichBin(8,DeltaPhi)
+!     NBin(9) = WhichBin(9,Ebjets)
+! 
+!     NBin(10) = WhichBin(10,ET_miss)
+!     NBin(11) = WhichBin(11,E_lept)
+!     NBin(12) = WhichBin(12,pT_bjet1)
+!     NBin(13) = WhichBin(13,pT_bjet2)
+!     NBin(14) = WhichBin(14,E_bjet1)
+!     NBin(15) = WhichBin(15,E_bjet2)
+!     NBin(16) = WhichBin(16,MInv_lepP_lepM)
+!     NBin(17) = WhichBin(17,ET_lept)
+!     NBin(18) = WhichBin(18,mT)
+! 
+!     NBin(19) = WhichBin(19,eta_lepM)
+!     NBin(20) = WhichBin(20,eta_lepP)
+
+
+
+!-------------------------------------------------------
+elseif( ObsSet.eq.62 ) then! set of observables for ttb production with hadr. Atop, lept. top decay
+
+
+! !   request at least two b-jets
+!     if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+!     call pT_order(2,MomJet(1:4,1:2))
+!     call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
+! 
+!     pT_bjet1 = get_PT(MomJet(1:4,1))
+!     pT_bjet2 = get_PT(MomJet(1:4,2))
+!     eta_bjet1 = get_ETA(MomJet(1:4,1))
+!     eta_bjet2 = get_ETA(MomJet(1:4,2))
+! 
+! !   check if b-jets pass cuts
+!     if(  pT_bjet1.lt.pT_bjet_cut .or. abs(eta_bjet1).gt.eta_bjet_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+!     if( pT_bjet2.lt.pT_bjet_cut .or. abs(eta_bjet2).gt.eta_bjet_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+!     HT = pT_bjet1 + pT_bjet2
+! 
+! !   determine observable light jets
+!     NObsJet = 2! these are the b-jets
+!     do k=3,NJet
+!         if( get_PT(MomJet(1:4,k)).gt.pT_jet_cut .and. abs(get_ETA(MomJet(1:4,k))).lt.eta_jet_cut ) then! count jets outside beam pipe
+!             NObsJet = NObsJet +1
+!             if( k.ne.NObsJet ) MomJet(1:4,NObsJet) = MomJet(1:4,k)
+!             HT = HT + get_PT(MomJet(1:4,k))
+!         endif
+!     enddo
+! 
+!     NObsJet_Tree = 4! request two b-jets and at least two light jets
+!     if( NObsJet.lt.NObsJet_Tree ) then
+! !     if( NObsJet.ne.NObsJet_Tree ) then!!!    CAREFUL: this cuts out the additional hard jet: only for combination with ttbjet
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+! 
+! 
+!     pT_lepP = get_PT(MomLept(1:4,3))
+!     eta_lepP = get_ETA(MomLept(1:4,3))
+! 
+!     ET_miss  = get_ET(MomLept(1:4,4))
+!     HT = HT + pT_lepP + ET_miss
+! 
+!     if( pT_bjet1.gt.pT_bjet2 ) then
+!         m_lb = get_Minv(MomLept(1:4,3)+MomJet(1:4,1))
+!     else
+!         m_lb = get_Minv(MomLept(1:4,3)+MomJet(1:4,2))
+!     endif
+! 
+!     pT_ATop = get_PT(MomTops(1:4,1))
+!     pT_Top  = get_PT(MomTops(1:4,2))
+! 
+!     eta_ATop = get_ETA(MomTops(1:4,1))
+!     eta_Top  = get_ETA(MomTops(1:4,2))
+! 
+! 
+! ! check cuts
+!     if( pT_lepP.lt.pT_lep_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+!     if( abs(eta_lepP).gt.eta_lep_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+!     if( ET_miss.lt.pT_miss_cut ) then
+!         applyPSCut = .true.
+!         RETURN
+!     endif
+! 
+! !     if( HT.lt.HT_cut ) then
+! !         applyPSCut = .true.
+! !         RETURN
+! !     endif
+! 
+! 
+! 
+! !   construct hadr. ttb pT
+!     MomTops(1:4,1) = MomJet(1:4,1)+MomJet(1:4,2)+MomLept(1:4,3)+MomLept(1:4,4) + MomJet(1:4,3)+MomJet(1:4,4)
+!     if( dabs( get_MInv(MomJet(1:4,3)+MomJet(1:4,4))-M_W ).lt.20d0*GeV ) then!   require a 20GeV window around M_W
+!         pT_Top = get_pT(MomTops(1:4,1))
+!     else
+!         pT_Top   = -1d0
+!     endif
+! 
+! 
+! 
+! ! binning
+!     NBin(1) = WhichBin(1,pT_ATop)
+!     NBin(2) = WhichBin(2,eta_ATop)
+!     NBin(3) = WhichBin(3,pT_Top)
+!     NBin(4) = WhichBin(4,eta_Top)
+!     NBin(5) = WhichBin(5,eta_ATop)
+!     NBin(6) = WhichBin(6,eta_Top)
+!     NBin(7) = WhichBin(7,pT_lepP)
+!     NBin(8) = WhichBin(8,eta_lepP)
+!     NBin(9) = WhichBin(9,ET_miss)
+!     NBin(10)= WhichBin(10,HT)
+!     NBin(11)= WhichBin(11,m_lb)
+!     NBin(12)= WhichBin(12,pT_Top)
+
+
+endif
+
+return
+END SUBROUTINE
+
+
 
 
 
