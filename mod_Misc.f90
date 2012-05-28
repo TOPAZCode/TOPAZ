@@ -958,6 +958,18 @@ RETURN
 END FUNCTION
 
 
+FUNCTION Get_CosTheta(Mom)
+implicit none
+real(8) ::Mom(1:4), Get_CosTheta
+
+    Get_CosTheta = dsqrt(Mom(2)**2+Mom(3)**2)/Mom(4)
+
+RETURN
+END FUNCTION
+
+
+
+
 FUNCTION Get_CosAlpha(Mom1,Mom2)
 implicit none
 real(8) ::Mom1(1:4),Mom2(1:4),Get_CosAlpha

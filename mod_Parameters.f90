@@ -448,24 +448,6 @@ ENDIF
 
 !!! Zprime section !!!
 
-! sequential -- mathced against Markus -- TO BE CHECKED
-
-!gR_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
-!gL_Zpr(top_) = eL*(sw/cw)*2d0/3d0
-
-!gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
-!gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
-
-!gL_Zpr(up_) = gR_Zpr(top_)
-!gR_Zpr(up_) = gL_Zpr(top_)
-!gL_Zpr(chm_) = gR_Zpr(top_)
-!gR_Zpr(chm_) = gL_Zpr(top_)
-
-!gL_Zpr(str_) = gL_Zpr(dn_)
-!gR_Zpr(str_) = gR_Zpr(dn_)
-!gL_Zpr(bot_) = gL_Zpr(dn_)
-!gR_Zpr(bot_) = gR_Zpr(dn_)
-
 gR_Zpr(top_) = eL*(sw/cw)*2d0/3d0
 gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
 
@@ -481,7 +463,6 @@ gL_Zpr(str_) = gL_Zpr(dn_)
 gR_Zpr(str_) = gR_Zpr(dn_)
 gL_Zpr(bot_) = gL_Zpr(dn_)
 gR_Zpr(bot_) = gR_Zpr(dn_)
-
 
 !!! End Zprime section !!!
 
