@@ -2,7 +2,7 @@ MODULE ModCrossSection_TTB
 use ModTopDecay
 implicit none
 
-integer,private,parameter :: NumMaxHisto=20
+integer,private,parameter :: NumMaxHisto=45
 
 contains
 

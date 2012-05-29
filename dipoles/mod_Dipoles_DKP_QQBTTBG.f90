@@ -5,7 +5,7 @@
       use ModTopdecay
       implicit none
 
-      integer,private,parameter :: NumMaxHisto=20
+      integer,private,parameter :: NumMaxHisto=45
 
       double precision, private, parameter :: NCol=3d0
       double precision, private, parameter :: TR=1d0

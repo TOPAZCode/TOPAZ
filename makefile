@@ -14,7 +14,7 @@ QCDLoop = $(Here)/QCDLoop-1.9
 
 # compiler options
 F95compiler = ifort
-Opt = Yes
+Opt = No
 
 
 ifeq ($(Opt),Yes)

@@ -2,7 +2,7 @@ MODULE ModCrossSection_ZprimeTTB
 use ModTopDecay
 implicit none
 
-integer,private,parameter :: NumMaxHisto=20
+integer,private,parameter :: NumMaxHisto=45
 
 contains
 
@@ -49,12 +49,10 @@ include "vegas_common.f"
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
-
      call EvalPhasespace_TopDecay(MomExt(1:4,3),yRnd(5:8),.false.,MomDK(1:4,1:3),PSWgt2)
      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(9:12),.false.,MomDK(1:4,4:6),PSWgt3)
      PSWgt = PSWgt * PSWgt2*PSWgt3
      NRndHel=13
-
   ENDIF
 
 

@@ -2,7 +2,7 @@ MODULE ModCrossSection_TTBETmiss
 use ModExoticDecay
 implicit none
 
-integer,private,parameter :: NumMaxHisto=20
+integer,private,parameter :: NumMaxHisto=45
 
 
 
@@ -1064,7 +1064,7 @@ IF( Correction.EQ.0 ) THEN
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
-    do iHel=nHel(1),nHel(2)
+    do iHel=nHel(1),nHel(2)  !; print *, "eval hel2 only"
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -1083,7 +1083,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ bosonic loops --------------
-      do iPrimAmp=1,4
+      do iPrimAmp=1,4; !print *, "Evaluate bosonic loop primamp",iPrimAmp
 ! print *, "hel",ihel,"primamp no",iPrimAmp
 ! print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
@@ -1143,9 +1143,9 @@ print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
 pause
       enddo
-
-      FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) ) 
-      FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) )
+                                                                                         ! minus to remove minus from closed fermion loop
+      FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+      FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,2
@@ -1170,7 +1170,7 @@ IF( Correction.EQ.0 ) THEN
 ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 !  CT contributions                           ! beta           !top WFRC
-   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 + 4d0)*LO_Res_Unpol  ! THE LAST PIECE +4d0  is not understoood yet!!
+   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 + 25d0/6d0)*LO_Res_Unpol  ! THE LAST PIECE +4d0  is not understoood yet!!
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from  top WFRC
 
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol

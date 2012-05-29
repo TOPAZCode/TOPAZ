@@ -2,7 +2,7 @@ MODULE ModDipolesDKJTTB
 use ModTopdecay
 implicit none
 public :: DipolesDKJ
-integer,private,parameter :: NumMaxHisto=20
+integer,private,parameter :: NumMaxHisto=45
 
 contains
 

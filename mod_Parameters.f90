@@ -56,6 +56,7 @@ real(8), public            :: Ga_HTop
 real(8), public            :: Ga_Htop_A0Top
 real(8), public            :: Ga_Htop_BHTop
 real(8), public, parameter :: m_STop  = 172d0*GeV
+real(8), public            :: m_SBot
 real(8), public            :: Ga_STop
 real(8), public            :: Ga_Stop_ChiTop
 real(8), public, parameter :: m_Chi   = 50d0*GeV
@@ -295,7 +296,8 @@ implicit none
 real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice
 
 
-m_Bot   = m_Top ! this is NOT the bottom mass! it is the mass for massive particles in closed fermion loops
+m_Bot  = m_Top  ! this is NOT the bottom mass! it is the mass for massive fermion in closed loops
+m_SBot = m_STop ! this is NOT the sbottom mass! it is the mass for massive scalar in closed loops
 
 
 IF( COLLIDER.EQ.1 ) THEN
@@ -500,6 +502,8 @@ integer PartType
       GetMass = m_HTop
    elseif( abs( PartType) .eq. STop_) then
       GetMass = m_Stop
+   elseif( abs( PartType) .eq. SBot_) then
+      GetMass = m_SBot
    elseif( PartType .eq. 0 ) then
       GetMass = 0d0
    else

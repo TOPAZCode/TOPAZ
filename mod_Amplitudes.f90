@@ -272,7 +272,11 @@ integer :: i,j,Order(1:6)
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.0  .and. TreeProc%NumSca.eq.4) then!  0 quarks, 4 scalars
           if( IsAScalar(TreeProc%PartType(1)) ) then
-              Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
+              if( tag_f.ne.2 ) then
+                  Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
+              else
+                  Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4),tag_f=-1 )
+              endif
               Res(2:Ds) = 0d0
 !                       print *, "calling cur_s_4s"
           else

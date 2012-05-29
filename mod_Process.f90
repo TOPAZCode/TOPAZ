@@ -4916,6 +4916,8 @@ include 'misc/global_import'
          Lab_ex(Vertex)='top'
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
          Lab_ex(Vertex)='top'
+      elseif(ExtPartType.eq.SBot_ .or. ExtPartType.eq.ASBot_ ) then! fix for STop(closed loop)
+         Lab_ex(Vertex)='bot'
       else
          print *, "error in kirills conv, ExtPartType=", ExtPartType
       endif
@@ -4934,6 +4936,8 @@ include 'misc/global_import'
          Lab_in(Propa)='top'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.STop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASTop_ ) then
          Lab_in(Propa)='top'
+      elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.SBot_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASBot_ ) then
+         Lab_in(Propa)='bot'
       else
          Lab_in(Propa)='notset'
       endif

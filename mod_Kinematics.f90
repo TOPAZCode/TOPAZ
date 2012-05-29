@@ -1292,7 +1292,7 @@ ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without de
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
           if(Collider.ne.2)  call Error("Collider needs to be Tevatron!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
-          NumHistograms = 40
+          NumHistograms = 42
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
