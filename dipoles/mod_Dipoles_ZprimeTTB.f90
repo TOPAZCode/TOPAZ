@@ -63,7 +63,7 @@
          MomExtTd(1:4,4) = MomExt(1:4,5) - 2d0*(MomExt(1:4,5).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,5).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
          
          Dipole = -1d0/sai/x * (2d0/(1d0-x)-1d0-x)
-         
+
       elseif(nDipole.eq.2) then
          a=2; i=3; b=1!   initial-initial
          

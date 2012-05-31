@@ -7326,7 +7326,7 @@ integer :: i,j,n,k
         endif
    endif
    if( any(abs(zeros(1:4)/MomExt(1,1)).gt.1d-6) ) then
-      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARJET(",NPlus1PS,"): ",zeros(1:4)
+      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARZprime(",NPlus1PS,"): ",zeros(1:4)
       print *, "momenta dump:"
       print *, MomExt(1:4,1:5+NPlus1PS)
       print *, MomDK(1:4,1:6)
@@ -7359,7 +7359,7 @@ integer :: i,j,n,k
       print *, MomDK(1:4,1:6)
    endif
 !DEC$ ENDIF
-
+ 
 
 
 ! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top
