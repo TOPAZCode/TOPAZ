@@ -286,7 +286,7 @@ contains
     complex(8) :: LO_L, LO_R
     real(8) :: catani
 
-    epv = -1
+    epv = 0
 
     mt = m_Top
     mZp = m_Zpr

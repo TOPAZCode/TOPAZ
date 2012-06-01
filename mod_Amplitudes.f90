@@ -674,8 +674,9 @@ integer :: FermionLoop
           q = NumExtParticles-2
           beta0 = -q/2d0*4d0/3d0/2d0   !minus??
       else
-          FermionLoop = 2
-          beta0 = 0d0
+          FermionLoop = 1
+          q = NumExtParticles-2
+          beta0 = -q/2d0*4d0/3d0/2d0   !minus??
       endif
       do NPart=1,NumExtParticles
             call Gamma_sing(ExtParticle(ThePrimAmp%ExtLine(NPart))%PartType,FermionLoop,rdiv1)

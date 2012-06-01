@@ -986,8 +986,6 @@ END FUNCTION EvalCS_Real_Zprime_ttbqqb
 
 
 
-
-
 FUNCTION EvalCS_Virt_Zprime_Interf(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -1006,9 +1004,9 @@ real(8) ::  EvalCS_Virt_Zprime_Interf,yRnd(1:VegasMxDim),VgsWgt
 integer :: iPrimAmp
 complex(8) :: LO_Res_Pol_Left, LO_Res_Pol_Right, LO_Res_Pol_glue
 complex(8) :: Virt_Res_Pol_Left, Virt_Res_Pol_Right
-complex(8) :: BosonicPartAmp(4,-2:1), FermionPartAmp(2,-2:1), NLO_Res_Pol(2,-2:1)
+complex(8) :: BosonicPartAmp(4,-2:1), FermionPartAmp(2,-2:1), NLO_Res_Pol(2)
 real(8) :: accPoles
-real(8) :: Virt_Res_Unpol_Left, Virt_Res_Unpol_Right, NLO_Res_Unpol_Left(-2:1), NLO_Res_Unpol_Right(-2:1)
+real(8) :: Virt_Res_Unpol_Left, Virt_Res_Unpol_Right, NLO_Res_Unpol_Left, NLO_Res_Unpol_Right
 integer :: iHel, sig_t, sig_tb
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,xFrag
 real(8) :: MomExt(1:4,1:NumExtParticles),MomDK(1:4,1:6)
@@ -1020,6 +1018,7 @@ integer :: NHisto,NBin(1:NumMaxHisto),npdf,nHel(1:2),NRndHel
 include 'misc/global_import'
 include "vegas_common.f"
 
+complex(8) :: rdiv(1:2)
 
   EvalCS_Virt_Zprime_Interf = 0d0
 
@@ -1030,10 +1029,8 @@ include "vegas_common.f"
   endif
   FluxFac = 1d0/(2d0*EHat**2)
 
-
   call EvalPhaseSpace_2to2(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)
   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
@@ -1041,22 +1038,6 @@ include "vegas_common.f"
      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(9:12),.false.,MomDK(1:4,4:6),PSWgt3)
      PSWgt = PSWgt * PSWgt2*PSWgt3
      NRndHel=13
-
-     IF( TOPDECAYS.EQ.5 ) THEN
-        if(Correction.EQ.3 ) then
-           xFrag= yRnd(14)
-        else
-           xFrag= yRnd(13)
-        endif
-        PSWgt = PSWgt * FF(xFrag)
-     ELSEIF( TOPDECAYS.EQ.6 ) THEN
-        if(Correction.EQ.3 ) then
-           xFrag= yRnd(14)
-        else
-           xFrag= yRnd(13)
-        endif
-        PSWgt = PSWgt * FF(xFrag)
-     ENDIF
   ENDIF
 
 
@@ -1100,7 +1081,7 @@ include "vegas_common.f"
   PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
   PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
   PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
-
+  
   PDFFac_R = gR_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
   PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
   PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
@@ -1112,7 +1093,7 @@ include "vegas_common.f"
   RunFactor = RunAlphaS(NLOParam,MuRen)
   nHel(1:2) = getHelicity(yrnd(NRndHel))
   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
-
+  
 
   Virt_Res_Unpol_Left = 0d0
   Virt_Res_Unpol_Right = 0d0
@@ -1126,15 +1107,6 @@ include "vegas_common.f"
 
      ISFac = MomCrossing(MomExt)
 
-!!! Markus check process: 0-> tb t qb q
-!     ExtParticle(1)%Mom(1:4) = (/2.73325721108289d0, -0.86989643239260d0, -0.55008440614255d0, 1.85822020357279d0/)
-!     ExtParticle(2)%Mom(1:4) = (/9.03205582647898d0, 0.86989643239260d0, 0.55008440614255d0, -8.80683369864915d0/)
-!     ExtParticle(3)%Mom(1:4) = (/-2.40834977124275d0, 0d0, 0d0, -2.40834977124275d0/)
-!     ExtParticle(4)%Mom(1:4) = (/-9.35696326631912d0, 0d0, 0d0, 9.35696326631912d0/)
-
-!!! End markus check
-
-
      IF( TOPDECAYS.GE.1 ) THEN
         !     top decays with spin correlations
         call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
@@ -1144,6 +1116,7 @@ include "vegas_common.f"
      call InitCurrCache()
      call SetPropagators()
 
+
      do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
@@ -1151,14 +1124,15 @@ include "vegas_common.f"
         ! Compute first the Zprime part
         call Tree_Zprime_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
         call Virt_Zprime_box(Virt_Res_Pol_Left, Virt_Res_Pol_Right)
-
+        
         ! Now compute the gluon part
         do iPrimAmp=1,NumBornAmps
            call EvalTree(BornAmps(iPrimAmp)) ! Vertex: gs/sqrt(2)
         enddo
         
+
         ! ------------ bosonic loops --------------
-        do iPrimAmp=1,4
+        do iPrimAmp=1,2
            call SetKirill(PrimAmps(iPrimAmp))
            call PentCut(PrimAmps(iPrimAmp))
            call QuadCut(PrimAmps(iPrimAmp))
@@ -1166,107 +1140,47 @@ include "vegas_common.f"
            call DoubCut(PrimAmps(iPrimAmp))
            call SingCut(PrimAmps(iPrimAmp))
            call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
+!           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
            PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-           !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-           !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+           !            call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+           !            call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+
+
         enddo
+
+
         BosonicPartAmp(1,-2:1) =  & ! Coefficient of d_tqbar d_qtbar
              + Nc * PrimAmps(PrimAmp1_1234)%Result(-2:1) &
-             - 2d0/Nc*( PrimAmps(PrimAmp1_1234)%Result(-2:1) + PrimAmps(PrimAmp1_1243)%Result(-2:1) ) &
-             - 1d0/Nc * ( PrimAmps(PrimAmp3_1432)%Result(-2:1) + PrimAmps(PrimAmp4_1234)%Result(-2:1) )
-        
+             - 2d0/Nc*( PrimAmps(PrimAmp1_1234)%Result(-2:1) + PrimAmps(PrimAmp1_1243)%Result(-2:1) )
+           
         BosonicPartAmp(2,-2:1) = PrimAmps(PrimAmp1_1243)%Result(-2:1)  & ! Coefficient of d_ttbar d_qqbar
-             + 1d0/Nc**2 * ( PrimAmps(PrimAmp1_1234)%Result(-2:1) + PrimAmps(PrimAmp1_1243)%Result(-2:1) )  &
-             + 1d0/Nc**2 * ( PrimAmps(PrimAmp3_1432)%Result(-2:1) + PrimAmps(PrimAmp4_1234)%Result(-2:1) )
-        
-        
-!        NLO_Res_Pol(-2:1) = (0d0,0d0)
-!           do iPrimAmp=1,NumBornAmps
-!              NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ParityFlip*Col1L_ttbqqb(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result * dconjg(BosonicPartAmp(jPrimAmp,-2:1)) )
-!           enddo
-!        enddo
-!        NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)*PDFFac*SpinDecorr
+             + 1d0/Nc**2 * ( PrimAmps(PrimAmp1_1234)%Result(-2:1) + PrimAmps(PrimAmp1_1243)%Result(-2:1) ) 
+                   
 
-        ! ------------ fermionic loops --------------
-        do iPrimAmp=5,6
-           call SetKirill(PrimAmps(iPrimAmp))
-           call PentCut(PrimAmps(iPrimAmp))
-           call QuadCut(PrimAmps(iPrimAmp))
-           call TripCut(PrimAmps(iPrimAmp))
-           call DoubCut(PrimAmps(iPrimAmp))
-           call SingCut(PrimAmps(iPrimAmp))
-           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus if from closed fermion loop
-           !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-           !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-        enddo
+        NLO_Res_Pol(1) = (BosonicPartAmp(1,0) + BosonicPartAmp(1,1)) ! cc + rational
+        NLO_Res_Pol(2) = (BosonicPartAmp(2,0) + BosonicPartAmp(2,1)) ! cc + rational
 
-        ! Minus sign from fermion loop already taken into account
-        FermionPartAmp(1,-2:1) = ( Nf_light*PrimAmps(PrimAmp2_1234)%Result(-2:1) +  PrimAmps(PrimAmp2m_1234)%Result(-2:1) )
-        FermionPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(PrimAmp2_1234)%Result(-2:1) + PrimAmps(PrimAmp2_1234)%Result(-2:1) )
-
-        NLO_Res_Pol(1,:) = BosonicPartAmp(1,:) + FermionPartAmp(1,:)
-        NLO_Res_Pol(2,:) = BosonicPartAmp(2,:) + FermionPartAmp(2,:)
-!        do jPrimAmp=1,2
-!           do iPrimAmp=1,NumBornAmps
-!              NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ParityFlip*Col1L_ttbqqb(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result * dconjg(FermionPartAmp(jPrimAmp,-2:1)) )
-!           enddo
-!        enddo
-!        NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)*PDFFac*SpinDecorr
+        ! eps-cancellation check
+!        NLO_Res_Pol(1) = (BosonicPartAmp(1,-1))
+!        NLO_Res_Pol(2) = (BosonicPartAmp(2,-1))
 
         ! Z' virt, glue tree
         LO_res_pol_glue = BornAmps(1)%Result
-        NLO_Res_Unpol_Left = NLO_Res_UnPol_Left + 2d0 * (nc**2-1d0) * dreal(LO_res_pol_glue*dconjg(Virt_Res_Pol_Left))
-        NLO_Res_Unpol_Right = NLO_Res_UnPol_Right + 2d0 * (nc**2-1d0) * dreal(LO_res_pol_glue*dconjg(Virt_Res_Pol_Right))
+        NLO_Res_Unpol_Left = NLO_Res_UnPol_Left + (nc**2-1d0) * dreal(LO_res_pol_glue*dconjg(Virt_Res_Pol_Left)) ! factor two taken care of by alpha_sOver2Pi
+        NLO_Res_Unpol_Right = NLO_Res_UnPol_Right + (nc**2-1d0) * dreal(LO_res_pol_glue*dconjg(Virt_Res_Pol_Right))
 
         ! Z' tree, glue loop
-        NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + 2d0 * dreal( (nc * NLO_Res_Pol(1,:) + nc**2 * NLO_Res_Pol(2,:)) * dconjg(LO_Res_Pol_Left))
-        NLO_Res_UnPol_Right = NLO_Res_UnPol_Left + 2d0 * dreal( (nc * NLO_Res_Pol(1,:) + nc**2 * NLO_Res_Pol(2,:)) * dconjg(LO_Res_Pol_Right))
+        NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + dreal( (nc * NLO_Res_Pol(1) + nc**2 * NLO_Res_Pol(2)) * dconjg(LO_Res_Pol_Left))
+        NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + dreal( (nc * NLO_Res_Pol(1) + nc**2 * NLO_Res_Pol(2)) * dconjg(LO_Res_Pol_Right))
 
-        LO_for_dip_Left = LO_for_dip_Left + 2d0 * dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
-        LO_for_dip_Right = LO_for_dip_Right + 2d0 * dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
+        LO_for_dip_Left = LO_for_dip_Left +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
+        LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
 
      enddo!helicity loop
 
+     EvalCS_Virt_Zprime_Interf = ISFac*PreFac* (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
+     EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * (alpha_sOver2Pi*RunFactor) 
 
-     !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
-     !  CT contributions                           ! beta           !top WFRC
-!     NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0)*LO_Res_Unpol
-!     NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from  top WFRC
-     
-!     NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol
-!     NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-     
-!     NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
-!     NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
-     
-     !  factor out (Mu2/mTop**2)^eps
-     !    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + NLO_Res_UnPol(-1)*2d0*dlog(m_top/MuRen) + NLO_Res_UnPol(-2)*dlog(m_top/MuRen)**2
-     !    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + NLO_Res_UnPol(-2)*2d0*dlog(m_top/MuRen)
-     !    NLO_Res_UnPol_Ferm(0) = NLO_Res_UnPol_Ferm(0) + NLO_Res_UnPol_Ferm(-1)*2d0*dlog(m_top/MuRen)
-     
-     !  normalization
-!     LO_Res_Unpol = LO_Res_Unpol                         * ISFac * (alpha_s4Pi*RunFactor)**2
-!     NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1)           * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
-!     NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
-
-     !    MCFM comparison
-     !    print *, "res(-2): ",dble(NLO_Res_UnPol(-2))
-     !    print *, "res(-1): ",dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))
-     !    print *, "res(0)+res(1): ", dble(NLO_Res_UnPol(0))+dble(NLO_Res_UnPol(1))+dble(NLO_Res_UnPol_Ferm(0))+dble(NLO_Res_UnPol_Ferm(1))
-     !    print *, "res(0+1)_ferm: ", dble( NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))
-     
-
-!     EvalCS_1L_ttbqqb = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
-
-
-     ! CHECK!!!
-
-     EvalCS_Virt_Zprime_Interf = ISFac*PreFac* (PDFFac_L * NLO_Res_Unpol_Left(-1) + PDFFac_R * NLO_Res_Unpol_Right(-1))
-     EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * 9d0*(4d0*Pi*alpha_s*RunFactor) ! Color and alpha_s
-
-     print *, 'amp', EvalCS_Virt_Zprime_Interf
 
      !!! Integrated Dipoles !!!
 
@@ -1278,31 +1192,31 @@ include "vegas_common.f"
 
      PDFFac_dip_L(1) = PDFFac_L
 
-     PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
 
-     PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
 
      PDFFac_dip_R(1) = PDFFac_R
 
-     PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
 
-     PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
 
      call IntDip_qqb_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
@@ -1310,16 +1224,14 @@ include "vegas_common.f"
 
      IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
 
-
      IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_for_dip_Left + PDFFac_dip_R(1) * LO_for_dip_Right)
      IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_for_dip_Left + PDFFac_dip_R(2) * LO_for_dip_Right)
      IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_for_dip_Left + PDFFac_dip_R(3) * LO_for_dip_Right)
 
-     IDipAmp = IDipAmp * ISFac * 9d0 
+     IDipAmp = IDipAmp * ISFac 
 
-     print *, 'dip', IDipAmp
-     
-     print *, PDFFac_dip_L(1),PDFFac_dip_L(2),PDFFac_dip_L(3)
+!     print *, 'virt', EvalCS_Virt_Zprime_Interf
+!     print *, 'idip', IDipAmp
 
      EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf + IDipAmp
 
@@ -1340,6 +1252,7 @@ include "vegas_common.f"
 return
 
 END FUNCTION EvalCS_Virt_Zprime_Interf
+
 
 
 

@@ -20,62 +20,62 @@ contains
     real(8) :: CF 
     integer :: n,emi
 
-
-    CF = 4d0/3d0
-
 !    epinv2=0d0
 !    epinv =0d0
 
     ! all-outgoing
-    
-    pflip(:,1) = -p(:,2)
-    pflip(:,2) = -p(:,1)
+    pflip(:,1) = -p(:,1)
+    pflip(:,2) = -p(:,2)
     pflip(:,3) = p(:,3)
     pflip(:,4) = p(:,4)
 
     IDip(1:3) = 0d0
     do n=1,8
        if(n.eq.1) then
-          dipsoft =if_qq(0d0,m_Top,pflip,1,3,z,1) 
-          dipfini =if_qq(0d0,m_Top,pflip,1,3,z,2) 
-          dipplus =if_qq(0d0,m_Top,pflip,1,3,z,3) 
+          dipsoft =-if_qq(0d0,m_Top,pflip,1,3,z,1)
+          dipfini =-if_qq(0d0,m_Top,pflip,1,3,z,2) 
+          dipplus =-if_qq(0d0,m_Top,pflip,1,3,z,3) 
           emi = 1
        elseif(n.eq.2) then
-          dipsoft =-if_qq(0d0,m_Top,pflip,2,3,z,1)
-          dipfini =-if_qq(0d0,m_Top,pflip,2,3,z,2)
-          dipplus =-if_qq(0d0,m_Top,pflip,2,3,z,3)
+          dipsoft =if_qq(0d0,m_Top,pflip,2,3,z,1)
+          dipfini =if_qq(0d0,m_Top,pflip,2,3,z,2)
+          dipplus =if_qq(0d0,m_Top,pflip,2,3,z,3)
           emi = 2
        elseif(n.eq.3) then
-          dipsoft =-if_qq(0d0,m_Top,pflip,1,4,z,1) 
-          dipfini =-if_qq(0d0,m_Top,pflip,1,4,z,2) 
-          dipplus =-if_qq(0d0,m_Top,pflip,1,4,z,3) 
+          dipsoft =if_qq(0d0,m_Top,pflip,1,4,z,1)
+          dipfini =if_qq(0d0,m_Top,pflip,1,4,z,2) 
+          dipplus =if_qq(0d0,m_Top,pflip,1,4,z,3) 
           emi = 1
        elseif(n.eq.4) then
-          dipsoft =if_qq(0d0,m_Top,pflip,2,4,z,1)
-          dipfini =if_qq(0d0,m_Top,pflip,2,4,z,2)
-          dipplus =if_qq(0d0,m_Top,pflip,2,4,z,3)
+          dipsoft =-if_qq(0d0,m_Top,pflip,2,4,z,1)
+          dipfini =-if_qq(0d0,m_Top,pflip,2,4,z,2)
+          dipplus =-if_qq(0d0,m_Top,pflip,2,4,z,3)
           emi = 2
        elseif(n.eq.5) then
-          dipsoft =fi_qq(m_Top,0d0,pflip,3,1,z,1)
-          dipfini =fi_qq(m_Top,0d0,pflip,3,1,z,2)
-          dipplus =fi_qq(m_Top,0d0,pflip,3,1,z,3)
+          dipsoft =-fi_qq(m_Top,0d0,pflip,3,1,z,1)
+          dipfini =-fi_qq(m_Top,0d0,pflip,3,1,z,2)
+          dipplus =-fi_qq(m_Top,0d0,pflip,3,1,z,3)
           emi = 3
        elseif(n.eq.6) then
-          dipsoft =-fi_qq(m_Top,0d0,pflip,3,2,z,1)
-          dipfini =-fi_qq(m_Top,0d0,pflip,3,2,z,2)
-          dipplus =-fi_qq(m_Top,0d0,pflip,3,2,z,3)
+          dipsoft =fi_qq(m_Top,0d0,pflip,3,2,z,1)
+          dipfini =fi_qq(m_Top,0d0,pflip,3,2,z,2)
+          dipplus =fi_qq(m_Top,0d0,pflip,3,2,z,3)
           emi = 3
        elseif(n.eq.7) then
-          dipsoft =-fi_qq(m_Top,0d0,pflip,4,1,z,1)
-          dipfini =-fi_qq(m_Top,0d0,pflip,4,1,z,2)
-          dipplus =-fi_qq(m_Top,0d0,pflip,4,1,z,3)
+          dipsoft =fi_qq(m_Top,0d0,pflip,4,1,z,1)
+          dipfini =fi_qq(m_Top,0d0,pflip,4,1,z,2)
+          dipplus =fi_qq(m_Top,0d0,pflip,4,1,z,3)
           emi = 3
        elseif(n.eq.8) then
-          dipsoft =fi_qq(m_Top,0d0,pflip,4,2,z,1)
-          dipfini =fi_qq(m_Top,0d0,pflip,4,2,z,2)
-          dipplus =fi_qq(m_Top,0d0,pflip,4,2,z,3)
+          dipsoft =-fi_qq(m_Top,0d0,pflip,4,2,z,1)
+          dipfini =-fi_qq(m_Top,0d0,pflip,4,2,z,2)
+          dipplus =-fi_qq(m_Top,0d0,pflip,4,2,z,3)
           emi = 3
        endif
+
+!       print *, 'dipoles set to zero for 1/ep'
+!       dipplus = 0d0
+!       dipfini = 0d0
 
        if(emi.eq.1) then
           IDip(1) = IDip(1) + (dipsoft-dipplus)
@@ -94,15 +94,14 @@ contains
     ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
  !   epcorr=epinv
 
-   epcorr=1
+!    AP not needed for interference
+!    APsoft= 3d0/2d0*CF     * epcorr
+!    APfini= (-1d0-z)*CF    * epcorr
+!    APplus= 2d0*CF/(1d0-z) * epcorr
 
-    !      this is for qqb-->Zpr-->ttb+g process
-    APsoft= 3d0/2d0*CF     * epcorr
-    APfini= (-1d0-z)*CF    * epcorr
-    APplus= 2d0*CF/(1d0-z) * epcorr
-    IDip(1) = IDip(1) + (APsoft - APplus)*2d0
-    IDip(2) = IDip(2) + (APfini + APplus)
-    IDip(3) = IDip(3) + (APfini + APplus)
+    IDip(1) = IDip(1) !+ (APsoft - APplus)*2d0
+    IDip(2) = IDip(2) !+ (APfini + APplus)
+    IDip(3) = IDip(3) !+ (APfini + APplus)
 
 !     print *, "AP",(APsoft - APplus),(APfini + APplus)
 !     print *, "sum",IDip(2:3)
