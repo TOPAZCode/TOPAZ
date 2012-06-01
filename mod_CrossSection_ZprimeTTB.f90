@@ -473,6 +473,7 @@ integer :: nDip
 real(8) :: resdip, dipoles
 real(8) :: resLO_L, resLO_R
 complex(8) :: ampLO_L, ampLO_R
+real(8) :: xpdf
 include "vegas_common.f"
 
 
@@ -524,43 +525,140 @@ integer :: i1,i2,i3,i4,i5
 
   IF (PROCESS.EQ.63 ) THEN
      ! gluon index is 0
-     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
 
-     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
+     call random_number(xpdf)
+
+     if( xpdf.le.0.5d0 ) then
+        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
+        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
+     else
+        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,2)*pdf(dn_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,2)*pdf(chm_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,2)*pdf(str_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,2)*pdf(bot_,1))
+        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,2)*pdf(dn_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,2)*pdf(chm_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,2)*pdf(str_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,2)*pdf(bot_,1))
+        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+     endif
+
+     PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+     PDFFac_L = PDFFac_L * 2d0
+
+!     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
+
+!     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2) + pdf(0,2)*pdf(up_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2) + pdf(0,2)*pdf(dn_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2) + pdf(0,2)*pdf(chm_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2) + pdf(0,2)*pdf(str_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2) + pdf(0,2)*pdf(bot_,1))
 
   ELSEIF (PROCESS.EQ.64 ) THEN
-     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
 
-     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
+     call random_number(xpdf)
+ 
+    if( xpdf.le.0.5d0 ) then
+        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2))
+        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2))
+     else
+        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,2)*pdf(aup_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,2)*pdf(adn_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,2)*pdf(achm_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,2)*pdf(astr_,1))
+        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,2)*pdf(abot_,1))
+        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,2)*pdf(aup_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,2)*pdf(adn_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,2)*pdf(achm_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,2)*pdf(astr_,1))
+        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,2)*pdf(abot_,1))
+        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+     endif
+     
+     PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+     PDFFac_L = PDFFac_L * 2d0
+
+!     PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
+
+!     PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2) + pdf(0,2)*pdf(aup_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2) + pdf(0,2)*pdf(adn_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(achm_,2) + pdf(0,2)*pdf(achm_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(astr_,2) + pdf(0,2)*pdf(astr_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
 
   ELSEIF( PROCESS.EQ.66 ) THEN
-     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
 
-     PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+
+  call random_number(xpdf)
+
+  if( xpdf.le.0.5d0 ) then
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+     
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+  else
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+     
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+     call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+  endif
+  
+  PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+  PDFFac_L = PDFFac_L * 2d0
+
+
+!     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+
+!     PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
   ENDIF
 
   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
@@ -1180,31 +1278,31 @@ include "vegas_common.f"
 
      PDFFac_dip_L(1) = PDFFac_L
 
-     PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
+     PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
 
-     PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
 
      PDFFac_dip_R(1) = PDFFac_R
 
-     PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
+     PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
 
-     PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
+     PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf_z(aup_,2)+pdf_z(up_,2)*pdf_z(aup_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf_z(adn_,2)+pdf_z(dn_,2)*pdf_z(adn_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf_z(achm_,2)+pdf_z(chm_,2)*pdf_z(achm_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf_z(astr_,2)+pdf_z(str_,2)*pdf_z(astr_,1))
+     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf_z(abot_,2)+pdf_z(bot_,2)*pdf_z(abot_,1))
 
      call IntDip_qqb_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
