@@ -8,6 +8,37 @@ double precision, private :: MomDK(0:3,1:6)
 
 contains
 
+  Subroutine IntDip_qg_ZprimeInt_ttb(p,z,IDip)
+    use ModParameters
+    use ModMisc
+    implicit none
+    real(8) :: p(4,4),pflip(4,4)
+    real(8) :: IDip(1:3),APsoft,APfini,APplus,z,sHat
+    real(8) :: dipsoft,dipfini,dipplus,epcorr!, epinv, epinv2
+    real(8) :: CF 
+    integer :: n,emi
+
+    print *, 'IntDip_qg_ZprimeInt_ttb not yet implemented'
+
+    stop
+
+  END Subroutine IntDip_qg_ZprimeInt_ttb
+
+  Subroutine IntDip_qbg_ZprimeInt_ttb(p,z,IDip)
+    use ModParameters
+    use ModMisc
+    implicit none
+    real(8) :: p(4,4),pflip(4,4)
+    real(8) :: IDip(1:3),APsoft,APfini,APplus,z,sHat
+    real(8) :: dipsoft,dipfini,dipplus,epcorr!, epinv, epinv2
+    real(8) :: CF 
+    integer :: n,emi
+
+    print *, 'IntDip_qbg_ZprimeInt_ttb not yet implemented'
+
+    stop
+
+  END Subroutine IntDip_qbg_ZprimeInt_ttb
 
 
   SUBROUTINE IntDip_qqb_ZprimeInt_ttb(p,z,IDip)

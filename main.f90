@@ -1126,6 +1126,7 @@ ENDIF
 
 IF ( MASTERPROCESS.EQ.2) THEN
 IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
+   call qlinit()
    print *, "Gluon-Z' interference, virtual"
   call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then

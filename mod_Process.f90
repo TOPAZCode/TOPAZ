@@ -1992,26 +1992,96 @@ ELSEIF( PROCESS.EQ.65 ) THEN ! Zprime-gluon interference
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
-      NDIM = NDim + 1    ! x integration
       VegasNc0_default = 50000
       VegasNc1_default = 50000
- ELSEIF( CORRECTION.EQ.2 ) THEN
+   ENDIF
+
+
+ELSEIF( PROCESS.EQ.67 ) THEN !  3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top
+   IF (CORRECTION.EQ.2 ) THEN
       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
-      Crossing(:) = (/4,5,-1,-2,3/)
+      Crossing(:) = (/4,5,-1,3,-2/)
       MasterProcess=4
-      AvgFactor = SpinAvg * QuarkColAvg**2
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
       NDim = NDim + 5    ! t tbar glu PS integration
       NDim = NDim + 2    ! shat integration
       VegasNc0_default = 50000
       VegasNc1_default = 50000
-  ELSE
+  ELSEIF (CORRECTION.EQ.3) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSE
       call Error("Correction to this process is not available")
-  ENDIF
+   ENDIF
+
+ELSEIF( PROCESS.EQ.68 ) THEN ! 4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
+   IF (CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,3,-2,-1/)
+      MasterProcess=4
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+  ELSEIF (CORRECTION.EQ.3) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSE
+      call Error("Correction to this process is not available")
+   ENDIF
+
+ ELSEIF( PROCESS.EQ. 69 ) THEN
+    IF (CORRECTION.EQ.2 ) THEN
+       NumExtParticles = 5
+       allocate(Crossing(1:NumExtParticles))
+       allocate(ExtParticle(1:NumExtParticles))
+       Crossing(:) = (/4,5,-1,-2,3/)
+       MasterProcess=4
+       AvgFactor = SpinAvg * QuarkColAvg**2
+       NDim = NDim + 5    ! t tbar glu PS integration
+       NDim = NDim + 2    ! shat integration
+       VegasNc0_default = 50000
+       VegasNc1_default = 50000
+    ELSEIF (CORRECTION.EQ.3) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDIM = NDim + 1    ! x integration
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
+   ELSE
+      call Error("Correction to this process is not available")
+   ENDIF
 
 !!! End Zprime section !!!
-
 
 ELSE
     call Error("Process not available")

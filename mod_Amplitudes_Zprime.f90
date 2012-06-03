@@ -42,6 +42,49 @@ contains
   end subroutine Tree_Zprime_tbtqbq
 
 
+  subroutine Tree_Zprime_tbtqbq_gluefordip(LO_Res_Pol)
+    use ModProcess
+    use ModParameters
+    use ModMisc
+    complex(8), intent(out) :: LO_Res_Pol
+
+    complex(8) :: ub1(4), v2(4), ub3(4), v4(4)
+    complex(8) :: p1(4), p2(4), p3(4), p4(4)
+    complex(8) :: lqcurrL(4), lqcurrR(4) ! Light quark currents
+    complex(8) :: hqcurr(4) ! Heavy quark current
+    complex(8) :: propfact
+    
+    
+    ub1(1:4) = ExtParticle(4)%Pol(1:4)
+    v2(1:4) = ExtParticle(3)%Pol(1:4)
+    ub3(1:4) = ExtParticle(2)%Pol(1:4)
+    v4(1:4) = ExtParticle(1)%Pol(1:4)
+    
+    p1(1:4) = ExtParticle(4)%Mom(1:4)
+    p2(1:4) = ExtParticle(3)%Mom(1:4)
+    p3(1:4) = ExtParticle(2)%Mom(1:4)
+    p4(1:4) = ExtParticle(1)%Mom(1:4)
+
+    lqcurrL = (-cI) * vbqq2(ub1,chir(.false.,v2))
+    lqcurrR = (-cI) * vbqq2(ub1,chir(.true.,v2))
+    
+    hqcurr = (-cI) * (vbqq2(ub3,chir(.false.,v4)) + vbqq2(ub3,chir(.true.,v4)))
+    
+    propfact = -cI / (sc_(p1+p2,p1+p2))
+    hqcurr = hqcurr * propfact
+    
+    LO_Res_Pol = sc_(lqcurrL+lqcurrR,hqcurr) 
+
+    LO_Res_Pol = LO_Res_Pol/2d0 ! use 1/sqrt2 vertex for consistency with gluon amplitudes
+
+    return
+
+  end subroutine Tree_Zprime_tbtqbq_gluefordip
+
+
+
+
+
   subroutine Virt_Zprime_tbtqbq(Virt_Res_Pol_Left, Virt_Res_Pol_Right) ! Vertex correction and Z factor
     use ModParameters
     use ModProcess
@@ -704,10 +747,10 @@ contains
      &     )
 
 
-    resLL = resLL * (cI)/(4d0 * Pi)**2 ! QCDLoop normalization
+    resLL = resLL * (cI)!/(4d0 * Pi)**2 ! QCDLoop normalization, (4Pi)**2 taken care of by alpha_sOver2Pi
     resLL = resLL * (2d0) ! Overall normalization
 
-    resLR = resLR * (cI)/(4d0 * Pi)**2 ! QCDLoop normalization
+    resLR = resLR * (cI)!/(4d0 * Pi)**2 ! QCDLoop normalization, (4Pi)**2 taken care of by alpha_sOver2Pi
     resLR = resLR * (2d0) ! Overall normalization
 
     boxL = resLL(-1) * gL_Zpr(top_) + resLR(-1) * gR_Zpr(top_)
@@ -722,7 +765,8 @@ contains
 !   Singularity checks, Catani
 
     if ( epv .ne. 0) then
-       catani = -2d0/(4d0*Pi)**2 * dlog(s13/s23)
+!       catani = -2d0/(4d0*Pi)**2 * dlog(s13/s23)
+       catani = -2d0 * dlog(s13/s23)
        call Tree_Zprime_tbtqbq(LO_L,LO_R)
        print *,'tree, up quark ',(LO_L*gL_Zpr(up_)+LO_R*gR_Zpr(up_))
        print *,'res, up quark  ',boxL*gL_Zpr(up_)+boxR*gR_Zpr(up_)

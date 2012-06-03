@@ -1015,6 +1015,7 @@ real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_L, PDFFac_R, PDFFac_dip_L(
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2), z
 real(8) :: IDip(3), IDipAmp, LO_for_dip_Left, LO_for_dip_Right
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,nHel(1:2),NRndHel
+real(8) :: xpdf
 include 'misc/global_import'
 include "vegas_common.f"
 
@@ -1022,7 +1023,8 @@ complex(8) :: rdiv(1:2)
 
   EvalCS_Virt_Zprime_Interf = 0d0
 
-  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! Flat mapping
+
   if( EHat.le.2d0*m_Top) then
      EvalCS_Virt_Zprime_Interf = 0d0
      return
@@ -1076,17 +1078,49 @@ complex(8) :: rdiv(1:2)
 
 
   call setPDFs(eta1,eta2,MuFac,pdf)
-  PDFFac_L = gL_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+
+  call random_number(xpdf)
+
+  if( xpdf.le.0.5d0 ) then
+     PDFFac_L = gL_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2))
+     
+     PDFFac_R = gR_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2))
+  else
+     PDFFac_L = gL_Zpr(up_) * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,2)*pdf(abot_,1))
+     
+     PDFFac_R = gR_Zpr(up_) * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,2)*pdf(abot_,1))
+     call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+  endif
+  PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+  PDFFac_L = PDFFac_L * 2d0
+
+!  PDFFac_L = gL_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
+!  PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!  PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!  PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!  PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
   
-  PDFFac_R = gR_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+!  PDFFac_R = gR_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
+!  PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!  PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!  PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!  PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
 
   
   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
@@ -1103,15 +1137,15 @@ complex(8) :: rdiv(1:2)
   LO_for_dip_left = 0d0
   LO_for_dip_right = 0d0
   
+  ISFac = MomCrossing(MomExt)
+
+  IF( TOPDECAYS.GE.1 ) THEN
+     !     top decays with spin correlations
+     call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+     call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
+  ENDIF
+  
   IF(CORRECTION.EQ.1) THEN
-
-     ISFac = MomCrossing(MomExt)
-
-     IF( TOPDECAYS.GE.1 ) THEN
-        !     top decays with spin correlations
-        call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
-        call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
-     ENDIF
 
      call InitCurrCache()
      call SetPropagators()
@@ -1120,7 +1154,7 @@ complex(8) :: rdiv(1:2)
      do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
-
+        
         ! Compute first the Zprime part
         call Tree_Zprime_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
         call Virt_Zprime_box(Virt_Res_Pol_Left, Virt_Res_Pol_Right)
@@ -1130,7 +1164,6 @@ complex(8) :: rdiv(1:2)
            call EvalTree(BornAmps(iPrimAmp)) ! Vertex: gs/sqrt(2)
         enddo
         
-
         ! ------------ bosonic loops --------------
         do iPrimAmp=1,2
            call SetKirill(PrimAmps(iPrimAmp))
@@ -1173,76 +1206,197 @@ complex(8) :: rdiv(1:2)
         NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + dreal( (nc * NLO_Res_Pol(1) + nc**2 * NLO_Res_Pol(2)) * dconjg(LO_Res_Pol_Left))
         NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + dreal( (nc * NLO_Res_Pol(1) + nc**2 * NLO_Res_Pol(2)) * dconjg(LO_Res_Pol_Right))
 
-        LO_for_dip_Left = LO_for_dip_Left +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
-        LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
-
      enddo!helicity loop
 
      EvalCS_Virt_Zprime_Interf = ISFac*PreFac* (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
      EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * (alpha_sOver2Pi*RunFactor) 
 
 
+  ELSEIF ( CORRECTION.EQ.3 ) THEN
+
      !!! Integrated Dipoles !!!
+
+
+     do iHel=nHel(1),nHel(2)
+        call HelCrossing(Helicities(iHel,1:NumExtParticles))
+        call SetPolarizations()
+        
+        ! Compute first the Zprime part
+        call Tree_Zprime_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
+        
+        ! Now compute the gluon part
+        do iPrimAmp=1,NumBornAmps
+           call EvalTree(BornAmps(iPrimAmp)) ! Vertex: gs/sqrt(2)
+        enddo
+
+        LO_res_pol_glue = BornAmps(1)%Result
+
+        LO_for_dip_Left = LO_for_dip_Left +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
+        LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
+
+     enddo!helicity loop
 
      z = yRnd(5)
 
      call setPDFs(eta1/z,eta2/z,MuFac,pdf_z)
 
-     ! qqb initial state !
+     IF ( PROCESS.EQ.67 ) THEN
 
-     PDFFac_dip_L(1) = PDFFac_L
+        ! qg initial state !
+        
+        PDFFac_dip_L(1) = 0d0
+        PDFFac_dip_L(2) = 0d0
 
-     PDFFac_dip_L(2) = gL_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
-     PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
+        if( xpdf.le.0.5d0 ) then
+            PDFFac_dip_L(3) = gL_Zpr(up_) * (pdf_z(0,1)*pdf(up_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_) * (pdf_z(0,1)*pdf(dn_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_) * (pdf_z(0,1)*pdf(chm_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_) * (pdf_z(0,1)*pdf(str_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_) * (pdf_z(0,1)*pdf(bot_,2))
+            PDFFac_dip_R(3) = gR_Zpr(up_) * (pdf_z(0,1)*pdf(up_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_) * (pdf_z(0,1)*pdf(dn_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_) * (pdf_z(0,1)*pdf(chm_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_) * (pdf_z(0,1)*pdf(str_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_) * (pdf_z(0,1)*pdf(bot_,2))
+        else
+            PDFFac_dip_L(3) = gL_Zpr(up_) * (pdf_z(0,2)*pdf(up_,1))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_) * (pdf_z(0,2)*pdf(dn_,1))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_) * (pdf_z(0,2)*pdf(chm_,1))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_) * (pdf_z(0,2)*pdf(str_,1))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_) * (pdf_z(0,2)*pdf(bot_,1))
+            PDFFac_dip_R(3) = gR_Zpr(up_) * (pdf_z(0,2)*pdf(up_,1))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_) * (pdf_z(0,2)*pdf(dn_,1))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_) * (pdf_z(0,2)*pdf(chm_,1))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_) * (pdf_z(0,2)*pdf(str_,1))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_) * (pdf_z(0,2)*pdf(bot_,1))
+        endif
 
-     PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) * 2d0!  factor two for sampling over pdfs
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) * 2d0
 
-     PDFFac_dip_R(1) = PDFFac_R
+        call IntDip_qg_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-     PDFFac_dip_R(2) = gR_Zpr(up_)**2 * (pdf_z(up_,1)*pdf(aup_,2)+pdf_z(up_,2)*pdf(aup_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_)**2 * (pdf_z(dn_,1)*pdf(adn_,2)+pdf_z(dn_,2)*pdf(adn_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_)**2 * (pdf_z(chm_,1)*pdf(achm_,2)+pdf_z(chm_,2)*pdf(achm_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_)**2 * (pdf_z(str_,1)*pdf(astr_,2)+pdf_z(str_,2)*pdf(astr_,1))
-     PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_)**2 * (pdf_z(bot_,1)*pdf(abot_,2)+pdf_z(bot_,2)*pdf(abot_,1))
 
-     PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf_z(aup_,2)+pdf(up_,2)*pdf_z(aup_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf_z(adn_,2)+pdf(dn_,2)*pdf_z(adn_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf_z(achm_,2)+pdf(chm_,2)*pdf_z(achm_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf_z(astr_,2)+pdf(str_,2)*pdf_z(astr_,1))
-     PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf_z(abot_,2)+pdf(bot_,2)*pdf_z(abot_,1))
+     ELSEIF (PROCESS.EQ.68) THEN
+        
+        ! qbg initial state !
 
-     call IntDip_qqb_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
+        PDFFac_dip_L(1) = 0d0
+        PDFFac_dip_L(3) = 0d0
 
-     IDip = IDip * (nc**2-1d0)
+        if( xpdf.le.0.5d0 ) then
+           PDFFac_dip_L(2) = gL_Zpr(up_) * (pdf_z(0,1)*pdf(aup_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_) * (pdf_z(0,1)*pdf(adn_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_) * (pdf_z(0,1)*pdf(achm_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_) * (pdf_z(0,1)*pdf(astr_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_) * (pdf_z(0,1)*pdf(abot_,2))
+           PDFFac_dip_R(2) = gR_Zpr(up_) * (pdf_z(0,1)*pdf(aup_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_) * (pdf_z(0,1)*pdf(adn_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_) * (pdf_z(0,1)*pdf(achm_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_) * (pdf_z(0,1)*pdf(astr_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_) * (pdf_z(0,1)*pdf(abot_,2))
+        else
+           PDFFac_dip_L(2) = gL_Zpr(up_) * (pdf_z(0,2)*pdf(aup_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_) * (pdf_z(0,2)*pdf(adn_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_) * (pdf_z(0,2)*pdf(achm_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_) * (pdf_z(0,2)*pdf(astr_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_) * (pdf_z(0,2)*pdf(abot_,1))
+           PDFFac_dip_R(2) = gR_Zpr(up_) * (pdf_z(0,2)*pdf(aup_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_) * (pdf_z(0,2)*pdf(adn_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_) * (pdf_z(0,2)*pdf(achm_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_) * (pdf_z(0,2)*pdf(astr_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_) * (pdf_z(0,2)*pdf(abot_,1))
+        endif
 
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) * 2d0!  factor two for sampling over pdfs
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) * 2d0
+
+        call IntDip_qbg_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
+
+     ELSEIF ( PROCESS.EQ.69) THEN
+     
+        ! qqb initial state !
+
+        PDFFac_dip_L(1) = PDFFac_L
+        PDFFac_dip_R(1) = PDFFac_R
+
+        if( xpdf.le.0.5d0 ) then
+           PDFFac_dip_L(2) = gL_Zpr(up_) * (pdf_z(up_,1)*pdf(aup_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_) * (pdf_z(dn_,1)*pdf(adn_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_) * (pdf_z(chm_,1)*pdf(achm_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_) * (pdf_z(str_,1)*pdf(astr_,2))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_) * (pdf_z(bot_,1)*pdf(abot_,2))
+           PDFFac_dip_L(3) = gL_Zpr(up_) * (pdf(up_,1)*pdf_z(aup_,2))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_) * (pdf(dn_,1)*pdf_z(adn_,2))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_) * (pdf(chm_,1)*pdf_z(achm_,2))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_) * (pdf(str_,1)*pdf_z(astr_,2))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_) * (pdf(bot_,1)*pdf_z(abot_,2))
+           PDFFac_dip_R(2) = gR_Zpr(up_) * (pdf_z(up_,1)*pdf(aup_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_) * (pdf_z(dn_,1)*pdf(adn_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_) * (pdf_z(chm_,1)*pdf(achm_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_) * (pdf_z(str_,1)*pdf(astr_,2))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_) * (pdf_z(bot_,1)*pdf(abot_,2))
+           PDFFac_dip_R(3) = gR_Zpr(up_) * (pdf(up_,1)*pdf_z(aup_,2))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_) * (pdf(dn_,1)*pdf_z(adn_,2))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_) * (pdf(chm_,1)*pdf_z(achm_,2))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_) * (pdf(str_,1)*pdf_z(astr_,2))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_) * (pdf(bot_,1)*pdf_z(abot_,2))
+        else
+           PDFFac_dip_L(2) = gL_Zpr(up_) * (pdf_z(up_,2)*pdf(aup_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(dn_) * (pdf_z(dn_,2)*pdf(adn_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(chm_) * (pdf_z(chm_,2)*pdf(achm_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(str_) * (pdf_z(str_,2)*pdf(astr_,1))
+           PDFFac_dip_L(2) = PDFFac_dip_L(2) + gL_Zpr(bot_) * (pdf_z(bot_,2)*pdf(abot_,1))
+           PDFFac_dip_L(3) = gL_Zpr(up_) * (pdf(up_,2)*pdf_z(aup_,1))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_) * (pdf(dn_,2)*pdf_z(adn_,1))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_) * (pdf(chm_,2)*pdf_z(achm_,1))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_) * (pdf(str_,2)*pdf_z(astr_,1))
+           PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_) * (pdf(bot_,2)*pdf_z(abot_,1))
+           PDFFac_dip_R(2) = gR_Zpr(up_) * (pdf_z(up_,2)*pdf(aup_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(dn_) * (pdf_z(dn_,2)*pdf(adn_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(chm_) * (pdf_z(chm_,2)*pdf(achm_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(str_) * (pdf_z(str_,2)*pdf(astr_,1))
+           PDFFac_dip_R(2) = PDFFac_dip_R(2) + gR_Zpr(bot_) * (pdf_z(bot_,2)*pdf(abot_,1))
+           PDFFac_dip_R(3) = gR_Zpr(up_) * (pdf(up_,2)*pdf_z(aup_,1))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_) * (pdf(dn_,2)*pdf_z(adn_,1))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_) * (pdf(chm_,2)*pdf_z(achm_,1))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_) * (pdf(str_,2)*pdf_z(astr_,1))
+           PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_) * (pdf(bot_,2)*pdf_z(abot_,1))
+        endif
+
+        PDFFac_dip_R(2) = PDFFac_dip_R(2) * 2d0!  factor two for sampling over pdfs
+        PDFFac_dip_L(2) = PDFFac_dip_L(2) * 2d0
+
+        PDFFac_dip_R(3) = PDFFac_dip_R(3) * 2d0
+        PDFFac_dip_L(3) = PDFFac_dip_L(3) * 2d0
+        
+        call IntDip_qqb_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
+
+        IDip = IDip * (nc**2-1d0)
+
+     ENDIF ! Integrated Dipoles process
+        
      IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
-
+        
      IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_for_dip_Left + PDFFac_dip_R(1) * LO_for_dip_Right)
      IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_for_dip_Left + PDFFac_dip_R(2) * LO_for_dip_Right)
      IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_for_dip_Left + PDFFac_dip_R(3) * LO_for_dip_Right)
-
+     
      IDipAmp = IDipAmp * ISFac 
-
-!     print *, 'virt', EvalCS_Virt_Zprime_Interf
-!     print *, 'idip', IDipAmp
-
-     EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf + IDipAmp
-
-     pause
-
-  ENDIF
+     
+     EvalCS_Virt_Zprime_Interf = IDipAmp
+     
+  ENDIF ! Correction
 
 
   do NHisto=1,NumHistograms
      call intoHisto(NHisto,NBin(NHisto),EvalCS_Virt_Zprime_Interf)
   enddo
+
+!     print *, 'virt', EvalCS_Virt_Zprime_Interf
+!     print *, 'idip', IDipAmp
+!     pause
+
 
   EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf/VgsWgt
 

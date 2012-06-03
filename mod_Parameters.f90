@@ -66,7 +66,7 @@ real(8), public, parameter :: m_Chi   = 50d0*GeV
 !real(8), public, parameter :: m_Zpr = 91.19d0*GeV ! Standard Z
 !real(8), public, parameter :: Ga_Zpr = 2.4950d0*GeV ! Standard Z
 real(8), public, parameter :: m_Zpr = 1500d0*GeV
-real(8), public, parameter :: Ga_Zpr = 15d0*GeV
+real(8), public, parameter :: Ga_Zpr = 0d0!15d0*GeV
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
 
 !!! End Zprime section !!!
