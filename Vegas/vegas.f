@@ -186,8 +186,9 @@ c         main integration loop
 c        here the main loop starts around label 11 and 12
  11      fb=0d0
          f2b=fb
-         k=0
- 12      k=k+1
+!          k=0! removed by MARKUS
+!  12      k=k+1! removed by MARKUS
+         do k=1,npg! introduced by MARKUS instead of the two lines above
          wgt=xjac
          do 15 j=1,ndim
          xn=(dble(kg(j))-ran1(idum))*dxg+one
@@ -210,7 +211,8 @@ c         write(6,FMT='(a20,2F20.16)') 'xo,xnd in dvegas: ',xo,xnd
          do 16 j=1,ndim
          di(ia(j),j)=di(ia(j),j)+f
  16      if(mds.ge.0)d(ia(j),J)=d(ia(j),J)+f2
-         if(k.lt.npg) go to 12
+!          if(k.lt.npg) go to 12! removed by MARKUS
+         enddo! introduced by MARKUS instead of the line above
 888    FORMAT(1X,'F',G14.6,'F2',G14.6,'FB',G14.6,'F2B',G14.6)
          f2b= sqrt(f2b*      NPG)
          f2b=(f2b-fb)*(f2b+fb)

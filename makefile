@@ -7,6 +7,7 @@ DipoleDir = $(Here)/dipoles
 OD = $(ObjectDir)
 PDFDir = $(Here)/PDFS
 VegasDir = $(Here)/Vegas
+CubaDir = $(Here)/Cuba
 OptReport = $(Here)/OptRep.txt
 PSDir = $(Here)/PhaseSpace
 QCDLoop = $(Here)/QCDLoop-1.9
@@ -51,6 +52,8 @@ RockyObj = $(PSDir)/genps.o \
            $(PSDir)/boost.o
 YetiObj  = $(PSDir)/yeti.o
 VegasObj = $(VegasDir)/vegas.o
+
+CubaLib = $(CubaDir)/libcuba.a
 
 
 
@@ -342,6 +345,7 @@ all: $(allObjects)
 	@echo " linking"
 	@echo " executable file is " $(Exec)
 	@echo " "
+# 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) 
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 

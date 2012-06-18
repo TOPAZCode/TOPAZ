@@ -75,7 +75,6 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       enddo
       ResultSum = ResultSum + TheDipoles(2)%DipoleValue
 
-
       TheDipoles(3)%alphaCut = alpha_if
       call evalDipole3_154(Mom,Mass2,TheDipoles(3))
       RunFactor = RunAlphaS(2,MuRen)
@@ -104,7 +103,6 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
          call intoHisto(NHisto,NBin(NHisto),TheDipoles(5)%DipoleValue)
       enddo
       ResultSum = ResultSum + TheDipoles(5)%DipoleValue
-
 
       TheDipoles(6)%alphaCut = alpha_if
       call evalDipole6_254(Mom,Mass2,TheDipoles(6))
@@ -165,7 +163,6 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       enddo
       ResultSum = ResultSum + TheDipoles(11)%DipoleValue
 
-
       TheDipoles(12)%alphaCut = alpha_ff
       call evalDipole12_453(Mom,Mass2,TheDipoles(12))
       RunFactor = RunAlphaS(2,MuRen)
@@ -174,6 +171,7 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
          call intoHisto(NHisto,NBin(NHisto),TheDipoles(12)%DipoleValue)
       enddo
       ResultSum = ResultSum + TheDipoles(12)%DipoleValue
+
       return
       END SUBROUTINE
 
@@ -978,6 +976,7 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
                 return
             endif
       endif
+
 
 
 !      momentum crossing

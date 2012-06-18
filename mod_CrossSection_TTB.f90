@@ -7,6 +7,22 @@ integer,private,parameter :: NumMaxHisto=45
 contains
 
 
+INTEGER FUNCTION EvalCS_1L_ttbgg_CUBA(ndims,var,ncomp,integral)
+implicit none
+integer :: ndims,ncomp,iter
+real(8) :: var(1:ndims),integral(ncomp),weight
+integer, parameter :: mxdim=25! this has to match ./Vegas/vegas_common.f
+real(8) ::  yRnd(1:mxdim)
+
+  yRnd(1:ndims) = var(1:ndims)
+
+  integral(1) = EvalCS_1L_ttbgg(yRnd,weight)
+  EvalCS_1L_ttbgg_CUBA = 0
+
+RETURN
+END FUNCTION
+
+
 
 FUNCTION EvalCS_1L_ttbgg(yRnd,VgsWgt)
 use ModProcess

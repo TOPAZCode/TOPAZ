@@ -7,7 +7,7 @@ integer,private,parameter :: NumMaxHisto=45
 
 
 
-contains
+ contains
 
 
 
@@ -776,10 +776,10 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-print *, "gauge inv. fails for XTopDK=3", PrimAmps(iPrimAmp)%Result(-2:-1)
-pause
+! print *, "gauge inv. fails for XTopDK=3", PrimAmps(iPrimAmp)%Result(-2:-1)
+! pause
 ! print *, "------"
 ! print *, "LO", BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
@@ -788,10 +788,9 @@ pause
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
 ! pause
-
-! !DEC$ IF (_QuadPrecImpr==1)
-!           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-!           if( AccPoles.gt.1d-4 ) then
+!DEC$ IF (_QuadPrecImpr==1)
+          AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+          if( AccPoles.gt.1d-4 ) then
 !               call PentCut_128(PrimAmps(iPrimAmp))
 !               call QuadCut_128(PrimAmps(iPrimAmp))
 !               call TripCut_128(PrimAmps(iPrimAmp))
@@ -804,12 +803,12 @@ pause
 !               if( AccPoles.gt.5d-2 ) then
 !                   print *, "SKIP",AccPoles
 !                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
-!                   EvalCS_1L_ttbgg = 0d0
-!                   SkipCounter = SkipCounter + 1
-!                   return
+                  EvalCS_1L_ststbgg = 0d0
+                  SkipCounter = SkipCounter + 1
+                  return
 !               endif
-!           endif
-! !DEC$ ENDIF
+          endif
+!DEC$ ENDIF
       enddo
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
@@ -933,6 +932,7 @@ ENDIF
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbgg)
+      EvalCounter = EvalCounter + 1
    enddo
 
    EvalCS_1L_ststbgg = EvalCS_1L_ststbgg/VgsWgt
@@ -1096,14 +1096,36 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !         call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-
 ! print *, "LO",BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(iPrimAmp)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(iPrimAmp)%Result
 ! pause
+
+!DEC$ IF (_QuadPrecImpr==1)
+          AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+          if( AccPoles.gt.1d-4 ) then
+!               call PentCut_128(PrimAmps(iPrimAmp))
+!               call QuadCut_128(PrimAmps(iPrimAmp))
+!               call TripCut_128(PrimAmps(iPrimAmp))
+!               call DoubCut_128(PrimAmps(iPrimAmp))
+!               call SingCut_128(PrimAmps(iPrimAmp))
+!               call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+!               call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
+!               PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+!               AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+!               if( AccPoles.gt.5d-2 ) then
+!                   print *, "SKIP",AccPoles
+!                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+                  EvalCS_1L_ststbqqb = 0d0
+                  SkipCounter = SkipCounter + 1
+                  return
+!               endif
+          endif
+!DEC$ ENDIF
+
       enddo
 
 
@@ -1135,10 +1157,10 @@ ELSEIF( Correction.EQ.1 ) THEN
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(1),rdiv)
-! print *, "LO",BornAmps(iPrimAmp)%Result
-! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(1),rdiv)
+print *, "LO",BornAmps(iPrimAmp)%Result
+print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
 pause
@@ -1186,9 +1208,9 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
 
 
-print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-pause
+! print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! pause
 
    EvalCS_1L_ststbqqb = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
@@ -1262,6 +1284,7 @@ ENDIF
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbqqb)
+      EvalCounter = EvalCounter + 1
    enddo
 
    EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb/VgsWgt
@@ -1620,6 +1643,7 @@ include 'vegas_common.f'
    call EvalPhaseSpace_2to3Stops(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu AStop, Stop
    if( PSWgt.eq.0d0 )  then
       EvalCS_Real_ststbggg = 0d0
+      SkipCounter = SkipCounter + 1
       return
    endif
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
@@ -1679,6 +1703,7 @@ else
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbggg)
+      EvalCounter = EvalCounter + 1
    enddo
 
 ! !     gg->ttbg
@@ -1776,6 +1801,11 @@ include 'vegas_common.f'
    FluxFac = 1d0/(2d0*EHat**2)
 
    call EvalPhaseSpace_2to3Stops(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu AStop, Stop
+   if( PSWgt.eq.0d0 )  then
+      EvalCS_Real_ststbqqbg = 0d0
+      SkipCounter = SkipCounter + 1
+      return
+   endif
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    IF(XTOPDECAYS.EQ.3) THEN
@@ -1838,9 +1868,9 @@ else
       
        do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
-          print *, "amp",BornAmps(iPrimAmp)%ExtLine
-          print *, "res",BornAmps(iPrimAmp)%Result
-          pause
+!           print *, "amp",BornAmps(iPrimAmp)%ExtLine
+!           print *, "res",BornAmps(iPrimAmp)%Result
+!           pause
       enddo
 
       LO_Res_Pol = (0d0,0d0)
@@ -1858,6 +1888,7 @@ else
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbqqbg)
+      EvalCounter = EvalCounter + 1
    enddo
 endif! applyPSCut
 

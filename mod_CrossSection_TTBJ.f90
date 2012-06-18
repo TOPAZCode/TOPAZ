@@ -1687,6 +1687,19 @@ END FUNCTION
 
 
 
+INTEGER FUNCTION EvalCS_Real_ttbgggg_CUBA(ndims,var,ncomp,integral)
+implicit none
+integer :: ndims,ncomp,iter
+real(8) :: var(ndims),integral(ncomp),weight
+integer, parameter :: mxdim=25! this has to match ./Vegas/vegas_common.f
+real(8) ::  yRnd(1:mxdim)
+
+  yRnd(1:ndims) = var(1:ndims)
+  integral(1) = EvalCS_Real_ttbgggg(yRnd,weight)
+
+EvalCS_Real_ttbgggg_CUBA = 0
+END FUNCTION
+
 
 FUNCTION EvalCS_Real_ttbgggg(yRnd,VgsWgt)
 use ModProcess
@@ -1780,6 +1793,7 @@ ENDIF
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
        EvalCS_Real_ttbgggg = 0d0
+       SkipCounter = SkipCounter + 1
        return
    endif
 !    call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
@@ -1815,6 +1829,8 @@ ENDIF
         do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ttbgggg)
         enddo
+        EvalCounter = EvalCounter + 1
+
 endif!applyPSCut
 
     PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**4 / PSWgt2/PSWgt3
@@ -2145,6 +2161,7 @@ if( .not. applyPSCut ) then
     do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
     enddo
+    EvalCounter = EvalCounter + 1
     EvalCS_Real_ttbqqbgg = EvalCS_Real_ttbqqbgg + LO_Res_Unpol
 endif!applyPSCut
 
@@ -4101,7 +4118,7 @@ integer :: nJetRad2,nJetRad4
 include "vegas_common.f"
 
 
-! dummy(:)=0d0
+dummy(:)=0d0
 ! print *, "yrnd fixed"
 !  yrnd(1)=  0.440979372449676d0
 !  yrnd(2)= 0.322643898112068d0
@@ -4123,8 +4140,6 @@ include "vegas_common.f"
 !  yrnd(18)=     0.772143932186135d0
 
 
-
-
   EvalCS_DKJ_Real_ttbggg = 0d0
   EvalCS_DKJ_Real_ttbggg_1 = 0d0
   EvalCS_DKJ_Real_ttbggg_2 = 0d0
@@ -4144,6 +4159,7 @@ include "vegas_common.f"
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
        EvalCS_DKJ_Real_ttbggg = 0d0
+       SkipCounter = SkipCounter + 1
        return
    endif
 
@@ -4179,6 +4195,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off top line,nJetRad=
    call Kinematics_TTBARJET(1,(/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,9),MomExt(1:4,4),MomExt(1:4,5)/),(/MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,10),MomExt(1:4,11),MomExt(1:4,12)/),applyPSCut,NBin)
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ttbggg = 0d0
+       PSCutCounter = PSCutCounter + 1
       goto 50
    endif
 
@@ -4206,18 +4223,19 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off top line,nJetRad=
           LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
       enddo!helicity loop
       enddo!helicity loop
-      EvalCS_DKJ_Real_ttbggg = LO_Res_UnPol * PreFac * (alpha_s4Pi*RunFactor)**3 * ISFac; !dummy(1)=EvalCS_DKJ_Real_ttbggg
+      EvalCS_DKJ_Real_ttbggg = LO_Res_UnPol * PreFac * (alpha_s4Pi*RunFactor)**3 * ISFac; dummy(1)=dummy(1)+EvalCS_DKJ_Real_ttbggg
 
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ttbggg)
       enddo
+      EvalCounter = EvalCounter + 1
       EvalCS_DKJ_Real_ttbggg_1 = EvalCS_DKJ_Real_ttbggg_1 + EvalCS_DKJ_Real_ttbggg
 
 
 50 continue!!   Dipoles for gluon  emission off anti-top
 
       call EvalDipoles_DKJ_GGTTBG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_Top**2,m_Top**2,0d0/),yRnd(8:18),PreFac,ATop_,nJetRad,DipoleResult)
-      EvalCS_DKJ_Real_ttbggg_1 = EvalCS_DKJ_Real_ttbggg_1 + DipoleResult; ! dummy(2)=DipoleResult
+      EvalCS_DKJ_Real_ttbggg_1 = EvalCS_DKJ_Real_ttbggg_1 + DipoleResult;  dummy(2)=dummy(2)+DipoleResult
 
    if( nJetRad.eq.1 ) then
         call WTransform(MomExt(1:4,6:9),MomExtTd(1:4,6:8),pbDpg,ptDpg,ptDpb)
@@ -4299,16 +4317,50 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off top line,nJetRad=
 
 enddo! nJetRad loop
 
+! print *, ""
 ! print *, "Real",dummy(1)
 ! print *, "DipolesPR",dummy(2)
 ! print *, "DipolesDK1",dummy(3)
 ! print *, "DipolesDK2",dummy(4)+dummy(5)
-!
+! 
 ! print *, "ratio", dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)), dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)) +1d0
-! print *, " Sing",(MomExt(1:4,2).dot.MomExt(1:4,3))/EHat**2
+! print *, " Sing",(MomExt(1:4,1).dot.MomExt(1:4,3))/EHat**2
 ! print *, " Sing",(MomExt(1:4,5).dot.MomExt(1:4,9))/EHat**2
 ! print *, " Sing",(MomExt(1:4,8).dot.MomExt(1:4,9))/EHat**2
-! pause
+
+! if( (MomExt(1:4,1).dot.MomExt(1:4,3))/EHat**2.lt.1d-5  .and. abs(dummy(1)+dummy(2)).gt.1d0 ) then
+!     print *, ""
+!     print *, yrnd(1:18)
+!     print *, "Real",dummy(1)
+!     print *, "DipolesPR",dummy(2)
+!     print *, "ratio", dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)), dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)) +1d0
+!     print *, " Sing",(MomExt(1:4,1).dot.MomExt(1:4,3))/EHat**2
+!     pause
+! endif
+! 
+! 
+! if( (MomExt(1:4,2).dot.MomExt(1:4,3))/EHat**2.lt.1d-5  .and. abs(dummy(1)+dummy(2)).gt.1d0 ) then
+!     print *, ""
+!     print *, yrnd(1:18)
+!     print *, "Real",dummy(1)
+!     print *, "DipolesPR",dummy(2)
+!     print *, "ratio", dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)), dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)) +1d0
+!     print *, " Sing",(MomExt(1:4,1).dot.MomExt(1:4,3))/EHat**2
+!     pause
+! endif
+! 
+! 
+! if( (MomExt(1,3))/EHat.lt.1d-4 .and. abs(dummy(1)+dummy(2)).gt.1d0 ) then
+!     print *, ""
+!     print *, yrnd(1:18)
+!     print *, "Real",dummy(1)
+!     print *, "DipolesPR",dummy(2)
+!     print *, "ratio", dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)), dummy(1)/(dummy(2)+dummy(3)+dummy(4)+dummy(5)) +1d0
+!     print *, " Sing",(MomExt(1:4,1).dot.MomExt(1:4,3))/EHat**2
+!     pause
+! endif
+
+
 
 
 
@@ -4328,10 +4380,10 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off top line,nJetRad=
    endif
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt*PSWgt2*PSWgt3 * VgsWgt * PDFFac
    if( PreFac.eq.0d0 ) cycle
-
    call Kinematics_TTBARJET(1,(/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,12),MomExt(1:4,4),MomExt(1:4,5)/),(/MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10),MomExt(1:4,11)/),applyPSCut,NBin)
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ttbggg = 0d0
+      PSCutCounter = PSCutCounter + 1
       goto 51
    endif
 
@@ -4365,6 +4417,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off top line,nJetRad=
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ttbggg)
       enddo
+      EvalCounter = EvalCounter + 1
       EvalCS_DKJ_Real_ttbggg_2 = EvalCS_DKJ_Real_ttbggg_2 + EvalCS_DKJ_Real_ttbggg
 
 51 continue
@@ -4381,12 +4434,10 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off top line,nJetRad=
 
         TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
-
         call Kinematics_TTBARJET(0,(/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),(/MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExtTd(1:4,9),MomExtTd(1:4,10),MomExtTd(1:4,11)/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
             cycle
         endif
-
         LO_Res_Unpol = (0d0,0d0)
         do iHel=1,NumHelicities! helicity summation
             call HelCrossing(Helicities(iHel,1:NumExtParticles))
@@ -4406,12 +4457,10 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off top line,nJetRad=
             LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
         enddo!helicity loop
         DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**3 * ISFac
-
         do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),DipoleResult)
         enddo
         EvalCS_DKJ_Real_ttbggg_2 = EvalCS_DKJ_Real_ttbggg_2 + DipoleResult;    !dummy(3)=DipoleResult
-
 
    elseif( nJetRad.eq.2 ) then
 
@@ -4462,6 +4511,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off top line,nJetRad=
 
 enddo! nJetRad loop
 
+
 ! print *, "check",EvalCS_DKJ_Real_ttbggg_1+EvalCS_DKJ_Real_ttbggg_2
 ! print *, "Real",dummy(1)
 ! print *, "DipolesPR",dummy(2)
@@ -4485,7 +4535,6 @@ if( isNaN(EvalCS_DKJ_Real_ttbggg) ) then
     print *, ""
     EvalCS_DKJ_Real_ttbggg = 0d0
 endif
-
 
 
 RETURN
@@ -4540,6 +4589,7 @@ include "vegas_common.f"
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
       EvalCS_DKJ_Real_ttbqqbg = 0d0
+      SkipCounter = SkipCounter + 1
       return
    endif
 
@@ -4607,6 +4657,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: photon radiation off top/bot/W, nJetR
         call Kinematics_TTBARJET(1,(/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,9),MomExt(1:4,4),MomExt(1:4,5)/),(/MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,10),MomExt(1:4,11),MomExt(1:4,12)/),applyPSCut,NBin)
         if( applyPSCut ) then
             EvalCS_DKJ_Real_ttbqqbg = 0d0
+              PSCutCounter = PSCutCounter + 1
             goto 60
         endif
 
@@ -4640,6 +4691,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: photon radiation off top/bot/W, nJetR
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ttbqqbg)
       enddo
+      EvalCounter = EvalCounter + 1
       EvalCS_DKJ_Real_ttbqqbg_1 = EvalCS_DKJ_Real_ttbqqbg_1 + EvalCS_DKJ_Real_ttbqqbg
 ! dummy(1) = EvalCS_DKJ_Real_ttbqqbg + dummy(1)
 
@@ -4786,11 +4838,15 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: photon radiation off top/bot/W, nJetR
         endif
         ISFac = MomCrossing(MomExt)
         PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt*PSWgt2*PSWgt3 * VgsWgt * PDFFac
-        if( PreFac.eq.0d0 ) cycle
+        if( PreFac.eq.0d0 ) then
+            SkipCounter = SkipCounter + 1
+            cycle
+        endif
 
         call Kinematics_TTBARJET(1,(/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,12),MomExt(1:4,4),MomExt(1:4,5)/),(/MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10),MomExt(1:4,11)/),applyPSCut,NBin)
         if( applyPSCut ) then
             EvalCS_DKJ_Real_ttbqqbg = 0d0
+            PSCutCounter = PSCutCounter + 1
             goto 61
         endif
 
@@ -4824,6 +4880,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: photon radiation off top/bot/W, nJetR
           call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ttbqqbg)
       enddo
       EvalCS_DKJ_Real_ttbqqbg_2 = EvalCS_DKJ_Real_ttbqqbg_2 + EvalCS_DKJ_Real_ttbqqbg
+      EvalCounter = EvalCounter + 1
 ! dummy(1) = EvalCS_DKJ_Real_ttbqqbg + dummy(1)
 
 61 continue

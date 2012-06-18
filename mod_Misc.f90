@@ -958,11 +958,11 @@ RETURN
 END FUNCTION
 
 
-FUNCTION Get_CosTheta(Mom)
+FUNCTION Get_CosTheta(Mom)! = Mom.nz/abs(Mom)
 implicit none
 real(8) ::Mom(1:4), Get_CosTheta
 
-    Get_CosTheta = dsqrt(Mom(2)**2+Mom(3)**2)/Mom(4)
+    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 )
 
 RETURN
 END FUNCTION

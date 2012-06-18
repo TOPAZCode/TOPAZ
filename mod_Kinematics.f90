@@ -14,13 +14,25 @@ type :: Histogram
     character :: Info*(50)
 end type
 
+!type :: Histogram2D
+!    integer :: NBins(1:2)
+!    real(8) :: BinSize(1:2)
+!    real(8) :: LowVal(1:2)
+!    real(8) :: SetScale(1:2)
+!    real(8),allocatable :: Value(:,:)
+!    real(8),allocatable :: Value2(:,:)
+!    integer,allocatable :: Hits(:,:)
+!    character :: Info*(50)
+!end type
+
 
 integer,public :: it_sav
 
-type(Histogram),allocatable :: Histo(:)
+type(Histogram),allocatable   :: Histo(:)
+!type(Histogram2D),allocatable :: Histo2D(:)
+
 real(8) :: pT_jet_cut, pT_bjet_cut, pT_lep_cut, Rsep_jet, Rsep_LepJet, pT_miss_cut, eta_sepa_cut, MInv_jets_cut, eta_lep_cut, eta_jet_cut, eta_bjet_cut, HT_cut, pT_hardestjet_cut
 real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut
-
 
 real(8),public ::MInv_LB
 
@@ -147,7 +159,7 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
     eta_jet_cut = 2d0
     eta_bjet_cut= eta_jet_cut
     pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2d0
+    eta_lep_cut = 1d0
     pT_miss_cut = 20d0*GeV
     HT_cut      = 220d0*GeV
     Rsep_jet    = 0.5d0
@@ -1292,11 +1304,15 @@ ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without de
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
           if(Collider.ne.2)  call Error("Collider needs to be Tevatron!")
           if(TopDecays.ne.4) call Error("TopDecays needs to be 4!")
-          NumHistograms = 42
+          NumHistograms = 44
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
+!          if( .not.allocated(Histo2D) ) then
+!                allocate( Histo2D(1:3), stat=AllocStatus  )
+!                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo2D")
+!          endif
 
 
           Histo(1)%Info   = "pT_lepPlus"
@@ -1372,45 +1388,45 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
           Histo(12)%SetScale= 1d0
 
           Histo(13)%Info   = "pT(ttbar)"
-          Histo(13)%NBins  = 40
-          Histo(13)%BinSize= 15d0*GeV
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 10d0*GeV
           Histo(13)%LowVal = 0d0
           Histo(13)%SetScale= 100d0
 
 ! new stuff for A_FB analysis, this is for ideally reconstructed tops
           Histo(14)%Info   = "pT(ttbar) FWD"
           Histo(14)%NBins  = 50
-          Histo(14)%BinSize= 20d0*GeV
+          Histo(14)%BinSize= 10d0*GeV
           Histo(14)%LowVal =  0d0*GeV
           Histo(14)%SetScale= 100d0
 
           Histo(15)%Info   = "pT(ttbar) BWD"
           Histo(15)%NBins  = 50
-          Histo(15)%BinSize= 20d0*GeV
+          Histo(15)%BinSize= 10d0*GeV
           Histo(15)%LowVal =  0d0*GeV
           Histo(15)%SetScale= 100d0
 
           Histo(16)%Info   = "m(ttbar) FWD"
           Histo(16)%NBins  = 50
-          Histo(16)%BinSize= 20d0*GeV
+          Histo(16)%BinSize= 50d0*GeV
           Histo(16)%LowVal =  300d0*GeV
           Histo(16)%SetScale= 100d0
 
           Histo(17)%Info   = "m(ttbar) BWD"
           Histo(17)%NBins  = 50
-          Histo(17)%BinSize= 20d0*GeV
+          Histo(17)%BinSize= 50d0*GeV
           Histo(17)%LowVal =  300d0*GeV
           Histo(17)%SetScale= 100d0
 
           Histo(18)%Info   = "y(ttbar) FWD"
           Histo(18)%NBins  = 40
-          Histo(18)%BinSize= 0.25d0
+          Histo(18)%BinSize= 0.5d0
           Histo(18)%LowVal =-5.0d0
           Histo(18)%SetScale= 1d0
 
           Histo(19)%Info   = "y(ttbar) BWD"
           Histo(19)%NBins  = 40
-          Histo(19)%BinSize= 0.25d0
+          Histo(19)%BinSize= 0.5d0
           Histo(19)%LowVal =-5.0d0
           Histo(19)%SetScale= 1d0
 
@@ -1426,17 +1442,17 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
           Histo(21)%LowVal = 0.0d0
           Histo(21)%SetScale= 1d0
 
-          Histo(22)%Info   = "y(top)"
-          Histo(22)%NBins  = 40
-          Histo(22)%BinSize= 0.25d0
-          Histo(22)%LowVal =-5.0d0
-          Histo(22)%SetScale= 1d0
+          Histo(22)%Info   = "pT(ttbar) FWD lept"
+          Histo(22)%NBins  = 50
+          Histo(22)%BinSize= 10d0*GeV
+          Histo(22)%LowVal =  0d0*GeV
+          Histo(22)%SetScale= 100d0
 
-          Histo(23)%Info   = "y(Atop)"
-          Histo(23)%NBins  = 40
-          Histo(23)%BinSize= 0.25d0
-          Histo(23)%LowVal =-5.0d0
-          Histo(23)%SetScale= 1d0
+          Histo(23)%Info   = "pT(ttbar) BWD lept"
+          Histo(23)%NBins  = 50
+          Histo(23)%BinSize= 10d0*GeV
+          Histo(23)%LowVal =  0d0*GeV
+          Histo(23)%SetScale= 100d0
 
           Histo(24)%Info   = "y_FB(top)"
           Histo(24)%NBins  = 2
@@ -1465,14 +1481,14 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
 
 ! new stuff for A_FB analysis, this is for realistically reconstructed tops
           Histo(28)%Info   = "pT(ttbar)"
-          Histo(28)%NBins  = 40
-          Histo(28)%BinSize= 15d0*GeV
+          Histo(28)%NBins  = 50
+          Histo(28)%BinSize= 10d0*GeV
           Histo(28)%LowVal = 0d0
           Histo(28)%SetScale= 100d0
 
           Histo(29)%Info   = "pT(ttbar) FWD"
           Histo(29)%NBins  = 50
-          Histo(29)%BinSize= 20d0*GeV
+          Histo(29)%BinSize= 10d0*GeV
           Histo(29)%LowVal =  0d0*GeV
           Histo(29)%SetScale= 100d0
 
@@ -1484,25 +1500,25 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
 
           Histo(31)%Info   = "m(ttbar) FWD"
           Histo(31)%NBins  = 50
-          Histo(31)%BinSize= 20d0*GeV
-          Histo(31)%LowVal =  0d0*GeV
+          Histo(31)%BinSize= 50d0*GeV
+          Histo(31)%LowVal =  300d0*GeV
           Histo(31)%SetScale= 100d0
 
           Histo(32)%Info   = "m(ttbar) BWD"
           Histo(32)%NBins  = 50
-          Histo(32)%BinSize= 20d0*GeV
-          Histo(32)%LowVal =  0d0*GeV
+          Histo(32)%BinSize= 50d0*GeV
+          Histo(32)%LowVal =  300d0*GeV
           Histo(32)%SetScale= 100d0
 
           Histo(33)%Info   = "y(ttbar) FWD"
           Histo(33)%NBins  = 40
-          Histo(33)%BinSize= 0.25d0
+          Histo(33)%BinSize= 0.5d0
           Histo(33)%LowVal =-5.0d0
           Histo(33)%SetScale= 1d0
 
           Histo(34)%Info   = "y(ttbar) BWD"
           Histo(34)%NBins  = 40
-          Histo(34)%BinSize= 0.25d0
+          Histo(34)%BinSize= 0.5d0
           Histo(34)%LowVal =-5.0d0
           Histo(34)%SetScale= 1d0
 
@@ -1518,17 +1534,17 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
           Histo(36)%LowVal = 0.0d0
           Histo(36)%SetScale= 1d0
 
-          Histo(37)%Info   = "y(top)"
-          Histo(37)%NBins  = 40
-          Histo(37)%BinSize= 0.25d0
-          Histo(37)%LowVal =-5.0d0
-          Histo(37)%SetScale= 1d0
+          Histo(37)%Info   = "pT(ttbar) FWD lept"
+          Histo(37)%NBins  = 50
+          Histo(37)%BinSize= 10d0*GeV
+          Histo(37)%LowVal =  0d0*GeV
+          Histo(37)%SetScale= 100d0
 
-          Histo(38)%Info   = "y(Atop)"
-          Histo(38)%NBins  = 40
-          Histo(38)%BinSize= 0.25d0
-          Histo(38)%LowVal =-5.0d0
-          Histo(38)%SetScale= 1d0
+          Histo(38)%Info   = "pT(ttbar) BWD lept"
+          Histo(38)%NBins  = 50
+          Histo(38)%BinSize= 10d0*GeV
+          Histo(38)%LowVal =  0d0*GeV
+          Histo(38)%SetScale= 100d0
 
           Histo(39)%Info   = "y_FB(top)"
           Histo(39)%NBins  = 2
@@ -1553,6 +1569,53 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
           Histo(42)%BinSize= 0.25d0
           Histo(42)%LowVal = 0d0
           Histo(42)%SetScale= 1d0
+
+          Histo(43)%Info   = "cos(theta_top*)" 
+          Histo(43)%NBins  = 20
+          Histo(43)%BinSize= 0.1d0
+          Histo(43)%LowVal = -1d0
+          Histo(43)%SetScale= 1d0
+
+          Histo(44)%Info   = "beta_top*cos(theta_top*)" 
+          Histo(44)%NBins  = 20
+          Histo(44)%BinSize= 0.1d0
+          Histo(44)%LowVal = -1d0
+          Histo(44)%SetScale= 1d0
+
+! 2D histograms for realistically reconstructed tops      
+!
+!          Histo2D(1)%Info   = "m_ttbar over pT_jet"  
+!          Histo2D(1)%NBins(1)  = 50
+!          Histo2D(1)%BinSize(1)= 50d0
+!          Histo2D(1)%LowVal(1) = 300d0
+!          Histo2D(1)%SetScale(1)= 100d0
+!          Histo2D(1)%NBins(2)  = 50
+!          Histo2D(1)%BinSize(2)= 10d0
+!          Histo2D(1)%LowVal(2) = 0d0
+!          Histo2D(1)%SetScale(2)= 100d0
+!
+!          Histo2D(2)%Info   = "m_ttbar over pT_ttbar FWD"  
+!          Histo2D(2)%NBins(1)  = 50
+!          Histo2D(2)%BinSize(1)= 50d0
+!          Histo2D(2)%LowVal(1) = 300d0
+!          Histo2D(2)%SetScale(1)= 100d0
+!          Histo2D(2)%NBins(2)  = 50
+!          Histo2D(2)%BinSize(2)= 20d0
+!          Histo2D(2)%LowVal(2) = 0d0
+!          Histo2D(2)%SetScale(2)= 100d0
+!
+!          Histo2D(3)%Info   = "m_ttbar over pT_ttbar BWD"  
+!          Histo2D(3)%NBins(1)  = 50
+!          Histo2D(3)%BinSize(1)= 50d0
+!          Histo2D(3)%LowVal(1) = 300d0
+!          Histo2D(3)%SetScale(1)= 100d0
+!          Histo2D(3)%NBins(2)  = 50
+!          Histo2D(3)%BinSize(2)= 20d0
+!          Histo2D(3)%LowVal(2) = 0d0
+!          Histo2D(3)%SetScale(2)= 100d0
+
+
+
 
 
 ELSEIF( ObsSet.EQ.13 ) THEN! set of observables for ttbjet production as signal process at LHC (di-lept. decay)
@@ -2914,7 +2977,7 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar (stable stops)
           Histo(1)%Info   = "pT"
           Histo(1)%NBins  = 40
           Histo(1)%BinSize= 20d0*GeV
-          Histo(1)%LowVal = 20d0*GeV
+          Histo(1)%LowVal =  0d0*GeV
           Histo(1)%SetScale= 100d0
 
 
@@ -3955,9 +4018,9 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 !      Pcol1= 3 -1
 !      Pcol2= 1 -1
 !      SingDepth = 1e-10
-!      Steps = 15
+!      Steps = 10
 !      PSWgt = 1d0
-!      call gensing(3,EHat,(/0d0,m_Top,m_Top/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps)
+!      call gensing(3,EHat,(/0d0,m_Top,m_Top/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -4259,7 +4322,7 @@ real(8) :: MomBoost(1:4),MomW(1:4),MomTops(1:4,1:2)
 logical :: applyPSCut
 integer :: NBin(:),PartList(1:8),JetList(1:8),NJet,NObsJet,n,NObsJet_Tree,nWJets
 real(8) :: pT_lepM,pT_lepP,pT_miss,pT_ATop,pT_Top,HT,m_lb,R_lb,m_bb,m_bj
-real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,eta_miss
+real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,eta_miss,beta,costheta
 real(8) :: pT_jet(1:8),eta_jet(1:8),eta_sepa,eta_Zeppi,s34,s35,s36,s45,s46,s56,mTopHadr,mTopLept
 real(8) :: R_bb,MinvJets,MinvLept,phi_Lept,pT_lept,ET_lept,ET_miss,mT,pT_x,pT_y,MTW
 real(8) :: MomTTbar(1:4),pT_ttbar,m_ttbar,y_top,y_Atop,y_ttbar,dy_tops,dphi_ttbar
@@ -4583,6 +4646,9 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
 
 
 ! binning
+
+    NBin(:) = 0
+
     NBin(1) = WhichBin(1,pT_lepP)
     NBin(2) = WhichBin(2,eta_lepP)
     NBin(3) = WhichBin(3,pT_jet(3))
@@ -4615,6 +4681,8 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     pT_top = get_PT(MomTops(1:4,2))
     dphi_ttbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2)) )
     if( dphi_ttbar.gt.Pi ) dphi_ttbar=2d0*Pi-dphi_ttbar
+    beta = dsqrt( abs(1d0-m_top**2/MomTops(1,2)**2) )
+    costheta = Get_CosTheta(MomTops(1:4,2))
 
 
     NBin(13)= WhichBin(13,pT_ttbar)
@@ -4626,17 +4694,15 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
     if(dy_tops.lt.0d0) NBin(19)= WhichBin(19,y_ttbar)
     if(dy_tops.ge.0d0) NBin(20)= WhichBin(20,abs(dy_tops))
     if(dy_tops.lt.0d0) NBin(21)= WhichBin(21,abs(dy_tops))
-    NBin(22)= WhichBin(22,y_top)
-    NBin(23)= WhichBin(23,y_Atop)
+    if(eta_lepP.ge.0d0) NBin(22)= WhichBin(22,pT_ttbar)
+    if(eta_lepP.lt.0d0) NBin(23)= WhichBin(23,pT_ttbar)
     NBin(24)= WhichBin(24,y_top)
     NBin(25)= WhichBin(25,pT_top)
     if(dy_tops.ge.0d0) NBin(26)= WhichBin(26,dphi_ttbar)
     if(dy_tops.lt.0d0) NBin(27)= WhichBin(27,dphi_ttbar)
 
-
-
-
-
+    NBin(43) = WhichBin(43,costheta)
+    NBin(44) = WhichBin(44,beta*costheta)
 
 
 
@@ -4720,12 +4786,13 @@ elseif( ObsSet.eq.12 ) then! set of observables for ttbjet production as signal 
         if(dy_tops.lt.0d0) NBin(34)= WhichBin(34,y_ttbar)
         if(dy_tops.ge.0d0) NBin(35)= WhichBin(35,abs(dy_tops))
         if(dy_tops.lt.0d0) NBin(36)= WhichBin(36,abs(dy_tops))
-        NBin(37)= WhichBin(37,y_top)
-        NBin(38)= WhichBin(38,y_Atop)
+        if(eta_lepP.ge.0d0) NBin(37)= WhichBin(37,pT_ttbar)
+        if(eta_lepP.lt.0d0) NBin(38)= WhichBin(38,pT_ttbar)
         NBin(39)= WhichBin(39,y_top)
         NBin(40)= WhichBin(40,pT_top)
         if(dy_tops.ge.0d0) NBin(41)= WhichBin(41,dphi_ttbar)
         if(dy_tops.lt.0d0) NBin(42)= WhichBin(42,dphi_ttbar)
+
 
     endif
 
@@ -7212,6 +7279,11 @@ ENDIF
 if( ObsSet.eq.31 .or. ObsSet.eq.41) then! no decays
 
 
+    pT_jet(1) = get_PT(Mom(1:4,HTbar))
+
+
+! binning
+    NBin(1)= WhichBin(1,pT_jet(1))
 
 
 !-------------------------------------------------------
@@ -8006,7 +8078,7 @@ IF( NumExtParticles.EQ.5 .AND. CORRECTION.EQ.2 ) THEN
         applySingCut=.true.
         return
     endif
-    if( dabs(s13/s12).lt.1d-9 ) then
+    if( dabs(s23/s12).lt.1d-9 ) then
         applySingCut=.true.
         return
     endif
@@ -8139,7 +8211,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

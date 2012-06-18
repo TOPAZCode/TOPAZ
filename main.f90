@@ -179,10 +179,15 @@ logical :: dirresult
    enddo
    write(MuStr,"(F4.2)") MuRen
 
+   if( DipAlpha2.eq.0d0 ) then
+       print *, "DipAlpha2 cannot ne zero"
+       !stop
+   endif
    if (alpha_ii.ne.1d0) alpha_ii = DipAlpha2 * alpha_ii
    if (alpha_if.ne.1d0) alpha_if = DipAlpha2 * alpha_if
    if (alpha_fi.ne.1d0) alpha_fi = DipAlpha2 * alpha_fi
    if (alpha_ff.ne.1d0) alpha_ff = DipAlpha2 * alpha_ff
+
 
    alpha_DKTfi = alpha_DK; alpha_DKTff = alpha_DK; alpha_DKWff = alpha_DK;
    if(iDKAlpha(1).ne.0) then
@@ -421,7 +426,7 @@ END SUBROUTINE
 
 
 
-
+!DEC$ IF(_UseCuba .EQ.0)
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModMisc
 use ModCrossSection_TTB
@@ -1138,14 +1143,85 @@ IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
 ENDIF
 ENDIF
 
-
 !!! End Zprime section
-
-
 
 
 return
 END SUBROUTINE
+!DEC$ ENDIF
+
+
+
+
+
+
+
+
+!DEC$ IF(_UseCuba .EQ.1)
+SUBROUTINE StartVegas(VG_Result,VG_Error)
+use ModMisc
+use ModCrossSection_TTB
+use ModCrossSection_TTBJ
+use ModCrossSection_TTBP
+use ModCrossSection_TTBETmiss
+use ModCrossSection_ZprimeTTB
+use ModKinematics
+use ModParameters
+implicit none
+include "vegas_common.f"
+real(8) :: VG_Result,VG_Error,VG_Chi2
+integer :: verbose,mineval,maxeval,nstart,nincrease,neval,fail,ncomp,nbatch,userdata,seed,gridno
+real(8) :: epsrel,epsabs
+character :: CubaStateFile*(20)
+
+
+  ncomp = 1
+  mineval   = 100000
+  maxeval   = VegasNc1
+  nstart    = 100000
+  nincrease = 100000
+  epsrel = 1d-10
+  epsabs = 1d-10
+  verbose = 2
+  userdata = 0
+  seed = 0
+  nbatch = 10000
+  gridno = 1
+  cubastatefile = ""
+
+
+!   export CUBACORES=8
+
+
+IF( MASTERPROCESS.EQ.1 ) THEN
+IF( CORRECTION   .EQ.0 ) THEN
+
+  call vegas(ndim,ncomp,EvalCS_1L_ttbgg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
+
+ENDIF
+ENDIF
+
+
+
+IF( MASTERPROCESS.EQ.5 ) THEN
+IF( CORRECTION   .EQ.2 ) THEN
+
+  call vegas(ndim,ncomp,EvalCS_Real_ttbgggg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
+
+ENDIF
+ENDIF
+
+
+
+
+
+
+
+RETURN
+END SUBROUTINE
+!DEC$ ENDIF
+
+
 
 
 
