@@ -1175,6 +1175,8 @@ real(8) :: epsrel,epsabs
 character :: CubaStateFile*(20)
 
 
+  VegasMxDim=mxdim
+
   ncomp = 1
   mineval   = 100000
   maxeval   = VegasNc1
@@ -1190,7 +1192,7 @@ character :: CubaStateFile*(20)
   cubastatefile = ""
 
 
-!   export CUBACORES=8
+! in bash shell: export CUBACORES=8
 
 
 IF( MASTERPROCESS.EQ.1 ) THEN
