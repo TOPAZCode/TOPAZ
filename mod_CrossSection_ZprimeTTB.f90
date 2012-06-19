@@ -1005,7 +1005,7 @@ integer :: iPrimAmp
 complex(8) :: LO_Res_Pol_Left, LO_Res_Pol_Right, LO_Res_Pol_glue
 complex(8) :: Virt_Res_Pol_Left, Virt_Res_Pol_Right
 complex(8) :: BosonicPartAmp(4,-2:1), FermionPartAmp(2,-2:1), NLO_Res_Pol(2)
-real(8) :: accPoles
+real(8) :: AccPoles
 real(8) :: Virt_Res_Unpol_Left, Virt_Res_Unpol_Right, NLO_Res_Unpol_Left, NLO_Res_Unpol_Right
 integer :: iHel, sig_t, sig_tb
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,xFrag

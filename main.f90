@@ -1175,13 +1175,12 @@ real(8) :: epsrel,epsabs
 character :: CubaStateFile*(20)
 
 
-  VegasMxDim=mxdim
 
   ncomp = 1
-  mineval   = 100000
+  mineval   = 1000
   maxeval   = VegasNc1
-  nstart    = 100000
-  nincrease = 100000
+  nstart    = 1000
+  nincrease = 1000
   epsrel = 1d-10
   epsabs = 1d-10
   verbose = 2
@@ -1190,9 +1189,11 @@ character :: CubaStateFile*(20)
   nbatch = 10000
   gridno = 1
   cubastatefile = ""
-
-
 ! in bash shell: export CUBACORES=8
+
+
+  VegasMxDim=mxdim
+  call InitHisto()
 
 
 IF( MASTERPROCESS.EQ.1 ) THEN
@@ -1215,8 +1216,16 @@ ENDIF
 
 
 
+IF( MASTERPROCESS.EQ.6 ) THEN
+IF( CORRECTION   .EQ.2 ) THEN
+
+  call vegas(ndim,ncomp,EvalCS_Real_ttbqqbgg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
+
+ENDIF
+ENDIF
 
 
+it=4
 
 
 RETURN
@@ -1346,7 +1355,6 @@ character :: filename*(100)
   write(TheUnit,"(A,2X,1F20.10)") "# EvalCounter  =",dble(EvalCounter)
   write(TheUnit,"(A,2X,1F20.10)") "# PSCutCounter =",dble(PSCutCounter)
   write(TheUnit,"(A,2X,1F20.10)") "# SkipCounter  =",dble(SkipCounter)
-
 
   write(TheUnit,"(A,2X,1PE20.10,2X,1PE20.5)") "#TotCS[fb]=",VG_Result,VG_Error
   do NHisto=1,NumHistograms

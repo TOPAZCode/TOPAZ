@@ -4438,7 +4438,7 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 !       BornAmps(2)%ExtLine = (/2,3,4,5,6,1/)! this requires call to cur_s_sffsss_FERMLOOPCONTRIB
 !  (3.553617730648898E-005,-4.248905967780229E-004)
 !  (3.553617730648904E-005,-4.248905967780231E-004)
-
+print *, "check this here"
       BornAmps(1)%ExtLine = (/6,1,2,3,4,5/)
       BornAmps(2)%ExtLine = (/2,3,4,5,6,1/)! this requires call to cur_s_sffsss
 !  (2.484313163916796E-004,-5.444781253106519E-004)

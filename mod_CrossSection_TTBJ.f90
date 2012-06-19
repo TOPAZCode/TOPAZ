@@ -1690,9 +1690,15 @@ use ModParameters
 implicit none
 integer :: ndims,ncomp,iter,userdata
 real(8) :: var(ndims),integral(ncomp),weight
+real(8) :: yRnd(1:VegasMxDim)
 
+  if( weight.eq.0d0 ) then!   wtf ??
+    integral(1) = 0d0
+    return
+  endif
 
-  integral(1) = EvalCS_Real_ttbgggg(var(1:ndims),weight)
+  yRnd(1:NDims) = var(1:NDims)
+  integral(1) = EvalCS_Real_ttbgggg(yRnd(1:VegasMxDim),weight)
   EvalCS_Real_ttbgggg_CUBA = 0
 
 RETURN
@@ -1723,7 +1729,6 @@ real(8) :: weight,pjetout(1:4,1:6)
 real(8),parameter :: ThresholdCutOff = 1.0d0
 integer :: Njet
 include "vegas_common.f"
-
 
 IF( TopDecays.ge.1 ) THEN
   ParityFlip=1
@@ -1905,9 +1910,15 @@ use ModParameters
 implicit none
 integer :: ndims,ncomp,iter,userdata
 real(8) :: var(ndims),integral(ncomp),weight
+real(8) :: yRnd(1:VegasMxDim)
 
+  if( weight.eq.0d0 ) then!   wtf ??
+    integral(1) = 0d0
+    return
+  endif
 
-  integral(1) = EvalCS_Real_ttbqqbgg(var(1:ndims),weight)
+  yRnd(1:NDims) = var(1:NDims)
+  integral(1) = EvalCS_Real_ttbqqbgg(yRnd(1:VegasMxDim),weight)
   EvalCS_Real_ttbqqbgg_CUBA = 0
 
 RETURN
@@ -1942,25 +1953,8 @@ real(8),parameter :: ThresholdCutOff=1d0
 include "vegas_common.f"
 
   ParityFlip=1
-!   print *, "yRnd fixed"
-!   yrnd(1)=0.2d0
-!   yrnd(2)=0.3d0
-!   yrnd(3)=0.7d0
-!   yrnd(4)=0.4d0
-!   yrnd(5)=0.9d0
-!   yrnd(6)=0.1d0
-!   yrnd(7)=0.7d0
-!   yrnd(8)=0.8d0
-!   yrnd(9)=0.2d0
-!   yrnd(10)=0.6d0
-!   yrnd(11)=0.5d0
-!   yrnd(12)=0.04d0
-!   yrnd(13)=0.3d0
-!   yrnd(14)=0.1d0
-!   yrnd(15)=0.1d0
-!   yrnd(16)=0.3d0
-!   yrnd(17)=0.2d0
-!   yrnd(18)=0.2d0
+! print *, "yRnd fixed"
+
 
   EvalCS_Real_ttbqqbgg = 0d0
   EvalCS_Dips_ttbqqbgg = 0d0
