@@ -4015,8 +4015,8 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 !   Mom(1:4,3)  = Mom(1:4,5)
 !   Mom(1:4,5)  = TmpMom(1:4)
 
-!      Pcol1= 3 -1
-!      Pcol2= 1 -1
+!      Pcol1= 1 -1
+!      Pcol2= 3 -1
 !      SingDepth = 1e-10
 !      Steps = 10
 !      PSWgt = 1d0
@@ -8023,7 +8023,6 @@ do NPart=1,NumExtParticles
 enddo
 MomCrossing = AvgFactor
 
-
 return
 END FUNCTION
 
@@ -8211,7 +8210,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

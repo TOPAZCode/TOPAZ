@@ -2,7 +2,7 @@ MODULE ModCrossSection_ZprimeTTB
 use ModTopDecay
 implicit none
 
-integer,private,parameter :: NumMaxHisto=20
+integer,private,parameter :: NumMaxHisto=45
 
 contains
 
@@ -452,9 +452,7 @@ use ModProcess
 use ModKinematics
 use ModAmplitudes_Zprime
 use ModParameters
-use ModJPsiFrag
 use ModDipoles_Zprime
-
 implicit none
 real(8) ::  EvalCS_Real_Zprime_ttbqqb,yRnd(1:VegasMxDim),VgsWgt,DipoleResult,EvalCS_Dips_Zprime_ttbqqb
 complex(8) :: Res_Pol_L, Res_Pol_R, prim1_L, prim1_R, prim2_L, prim2_R
@@ -475,21 +473,20 @@ real(8) :: resLO_L, resLO_R
 complex(8) :: ampLO_L, ampLO_R
 real(8) :: xpdf
 include "vegas_common.f"
-
-
 integer :: i1,i2,i3,i4,i5
+
 
   EvalCS_Real_Zprime_ttbqqb = 0d0
   EvalCS_Dips_Zprime_ttbqqb = 0d0
 
 
+!   yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
 
   if ((TOPDECAYS.EQ.0 .AND. yRnd(8).GT.0.5d0) .OR. (TOPDECAYS.NE.0 .AND. yRnd(16).GT.0.5d0)) then
      call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! BW mapping for Ehat
   else
      call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! no mapping 
   endif
-
 
   if( EHat.le.2d0*m_Top * ThresholdCutOff ) then
       EvalCS_Real_Zprime_ttbqqb = 0d0
@@ -615,38 +612,37 @@ integer :: i1,i2,i3,i4,i5
   ELSEIF( PROCESS.EQ.66 ) THEN
 
 
-  call random_number(xpdf)
+    call random_number(xpdf)
 
-  if( xpdf.le.0.5d0 ) then
-     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
-     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
-     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
-     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
-     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
-     
-     PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
-     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
-     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
-     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
-     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
-  else
-     PDFFac_L = gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
-     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
-     
-     PDFFac_R = gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
-     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
-     call swapMom(MomExt(1:4,1),MomExt(1:4,2))
-  endif
+    if( xpdf.le.0.5d0 ) then
+       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+       
+       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+    else
+       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       
+       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
   
   PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
   PDFFac_L = PDFFac_L * 2d0
-
 
 !     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(up_,2)*pdf(aup_,1))
 !     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
@@ -669,7 +665,6 @@ integer :: i1,i2,i3,i4,i5
   IF( TOPDECAYS.GE.1 ) THEN
      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
-
   ENDIF
 
   if( applyPSCut ) then
@@ -677,17 +672,17 @@ integer :: i1,i2,i3,i4,i5
   else
 
      colf = 2d0 * 9d0 * Cf
-
      Res_UnPol_L = 0d0
      Res_UnPol_R = 0d0
      do iHel=1,NumHelicities
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
+
         call Tree_Zprime_tbtqbqg_i(prim1_L, prim1_R)
         call Tree_Zprime_tbtqbqg_f(prim2_L, prim2_R)
 
-        Res_UnPol_L = Res_UnPol_L +  dreal(prim1_L * dconjg(prim1_L)+prim2_L * dconjg(prim2_L))
-        Res_UnPol_R = Res_UnPol_R +  dreal(prim1_R * dconjg(prim1_R)+prim2_R * dconjg(prim2_R))
+        Res_UnPol_L = Res_UnPol_L +  dreal(prim1_L*dconjg(prim1_L) + prim2_L*dconjg(prim2_L))
+        Res_UnPol_R = Res_UnPol_R +  dreal(prim1_R*dconjg(prim1_R) + prim2_R*dconjg(prim2_R))
      enddo!helicity loop
 
      EvalCS_Real_Zprime_ttbqqb = (PDFFac_R * Res_UnPol_R + PDFFac_L * Res_UnPol_L)
@@ -696,12 +691,17 @@ integer :: i1,i2,i3,i4,i5
      do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_ttbqqb)
      enddo
+
   endif!applyPSCut
+
+
+
+
 
   !!! Dipoles section
   IF ( PROCESS .EQ. 66 ) THEN ! qqb
      dipoles = 0d0
-     do nDip = 1, 4
+     do nDip = 1,4
 
         call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
  
@@ -710,14 +710,14 @@ integer :: i1,i2,i3,i4,i5
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
         NumExtParticles = 4
         ISFac = MomCrossing(MomExtTd)
-        Crossing(:) = (/4,5,3,-2,-1/) ! Original
+        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
         NumExtParticles = 5
         
         IF( TOPDECAYS.NE.0 ) THEN
            call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
            call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
-           PSWgt = PSWgt * PSWgt2*PSWgt3
-          
+           PSWgt = PSWgt * PSWgt2*PSWgt3! this is better never be used anywhere below
+           
            call Kinematics_TTBARZprime(.false.,MomExtTd,MomDKTd,applyPSCut,NBin)
 
            if ( applyPSCut ) then
@@ -732,7 +732,6 @@ integer :: i1,i2,i3,i4,i5
               
               i1 = 0
               i2 = 0
-              
               do i3 = -1,1,2
                  ExtParticle(1)%Helicity = i1
                  ExtParticle(2)%Helicity = i2
@@ -802,7 +801,7 @@ integer :: i1,i2,i3,i4,i5
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
         NumExtParticles = 4
         ISFac = MomCrossing(MomExtTd)
-        Crossing(:) = (/4,5,3,-2,-1/) ! Original
+        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
         NumExtParticles = 5
         
         IF( TOPDECAYS.NE.0 ) THEN
@@ -892,7 +891,7 @@ integer :: i1,i2,i3,i4,i5
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
         NumExtParticles=4
         ISFac = MomCrossing(MomExtTd)
-        Crossing(:) = (/4,5,3,-2,-1/) ! Original
+        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
         NumExtParticles=5
         
         IF( TOPDECAYS.NE.0 ) THEN
@@ -972,11 +971,11 @@ integer :: i1,i2,i3,i4,i5
     
   ENDIF
 
+!  print *, 'inv    ', (MomExt(1:4,1).dot.MomExt(1:4,3))/Ehat**2,(MomExt(1:4,2).dot.MomExt(1:4,3))/Ehat**2
 !  print *, 'real   ', EvalCS_Real_Zprime_ttbqqb
 !  print *, 'dipoles', dipoles
 !  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_ttbqqb + 1d0
- 
-!  stop
+!  pause 
  
   EvalCS_Real_Zprime_ttbqqb = (EvalCS_Real_Zprime_ttbqqb+dipoles)/VgsWgt
 
