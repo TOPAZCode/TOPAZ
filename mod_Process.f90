@@ -1997,7 +1997,7 @@ ELSEIF( PROCESS.EQ.65 ) THEN ! Zprime-gluon interference
    ENDIF
 
 
-ELSEIF( PROCESS.EQ.67 ) THEN !  3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.67 ) THEN !  3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top, Zprime-gluon interference
    IF (CORRECTION.EQ.2 ) THEN
       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))

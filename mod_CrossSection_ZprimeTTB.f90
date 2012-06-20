@@ -1159,7 +1159,7 @@ complex(8) :: rdiv(1:2)
         call Virt_Zprime_box(Virt_Res_Pol_Left, Virt_Res_Pol_Right)
         
         ! Now compute the gluon part
-        do iPrimAmp=1,NumBornAmps
+        do iPrimAmp=1,2
            call EvalTree(BornAmps(iPrimAmp)) ! Vertex: gs/sqrt(2)
         enddo
         
@@ -1405,6 +1405,274 @@ complex(8) :: rdiv(1:2)
 return
 
 END FUNCTION EvalCS_Virt_Zprime_Interf
+
+
+
+FUNCTION EvalCS_Real_Zprime_Interf(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModAmplitudes
+use ModAmplitudes_Zprime
+use ModParameters
+use ModDipoles_Zprime
+implicit none
+real(8) ::  EvalCS_Real_Zprime_Interf,yRnd(1:VegasMxDim),VgsWgt,DipoleResult,EvalCS_Dips_Zprime_ttbqqb
+complex(8) :: Res_Pol_L, Res_Pol_R, prim1_L, prim1_R, prim2_L, prim2_R
+real(8) :: Res_UnPol_L, Res_UnPol_R
+integer :: iHel
+real(8) :: EHat,RunFactor,PSWgt,PS,PSWgt2,PSWgt3,xFrag, sHatJacobi
+real(8) :: FluxFac, PreFac, ISFac
+real(8) :: pdf(-6:6,1:2),eta1,eta2, PDFFac_L, PDFFac_R
+real(8) :: MomExt(1:4,1:5),MomDK(1:4,1:6), MomExtTd(1:4,1:4), MomDKTd(1:4,1:6)
+integer :: NBin(1:NumMaxHisto),NHisto
+logical :: applyPSCut,applySingCut
+real(8) :: colf
+real(8),parameter :: ThresholdCutOff = 1.00d0
+real(8),parameter :: Cf = 4d0/3d0
+integer :: nDip
+real(8) :: resdip, dipoles
+real(8) :: resLO_L, resLO_R
+complex(8) :: ampLO_L, ampLO_R, ampLO_QCD
+real(8) :: xpdf
+include "vegas_common.f"
+integer :: i1,i2,i3,i4,i5, iPrimAmp
+
+  EvalCS_Real_Zprime_interf = 0d0
+
+
+   yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
+  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! no mapping 
+
+  if( EHat.le.2d0*m_Top * ThresholdCutOff ) then
+      EvalCS_Real_Zprime_interf = 0d0
+      return
+  endif
+  FluxFac = 1d0/(2d0*EHat**2)
+
+  call EvalPhaseSpace_2to3(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt) ! no mapping
+  
+  call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+
+  call CheckSing(MomExt,applySingCut)
+  if( applySingCut ) then
+     EvalCS_Real_Zprime_interf = 0d0
+     print *, 'no cuts'
+!     return
+  endif
+  
+  IF( TOPDECAYS.NE.0 ) THEN
+     call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomDK(1:4,1:3),PSWgt2) ! anti-top
+     call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomDK(1:4,4:6),PSWgt3)
+     PSWgt = PSWgt * PSWgt2*PSWgt3
+  ENDIF
+
+  call Kinematics_TTBARZprime(.true.,MomExt,MomDK,applyPSCut,NBin)
+
+  call setPDFs(eta1,eta2,MuFac,pdf)
+
+
+  IF (PROCESS.EQ.67 ) THEN
+
+    call random_number(xpdf)
+
+    if( xpdf.le.0.5d0 ) then
+       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+       
+       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+    else
+       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       
+       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
+  
+  PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+  PDFFac_L = PDFFac_L * 2d0
+
+  ENDIF
+
+  PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+
+  RunFactor = RunAlphaS(NLOParam,MuRen)
+  ISFac = MomCrossing(MomExt)
+
+  IF( TOPDECAYS.GE.1 ) THEN
+     call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+     call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
+  ENDIF
+
+  if( applyPSCut ) then
+     EvalCS_Real_Zprime_interf = 0d0
+  else
+
+     PrimAmp1_12345 = 1
+     PrimAmp1_15234 = 2
+     PrimAmp1_12534 = 3
+     PrimAmp1_12354 = 4
+
+     colf = 8d0 ! NC^2 - 1
+     Res_UnPol_L = 0d0
+     Res_UnPol_R = 0d0
+     do iHel=1,NumHelicities
+        call HelCrossing(Helicities(iHel,1:NumExtParticles))
+        call SetPolarizations()
+        
+        ! Z' amplitudes
+        call Tree_Zprime_tbtqbqg_i(prim1_L, prim1_R)
+        call Tree_Zprime_tbtqbqg_f(prim2_L, prim2_R)
+
+        ! QCD amplitudes
+        do iPrimAmp=1,NumPrimAmps
+           call EvalTree(BornAmps(iPrimAmp))
+        enddo
+
+        Res_UnPol_L = Res_UnPol_L + 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_L)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim2_L)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_15234)%Result * dconjg(prim2_L)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim1_L)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim2_L)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_L)) 
+
+        Res_UnPol_R = Res_UnPol_R + 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_R)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim2_R)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_15234)%Result * dconjg(prim2_R)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim1_R)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim2_R)) + &
+             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_R)) 
+
+     enddo!helicity loop
+
+     EvalCS_Real_Zprime_interf = (PDFFac_R * Res_UnPol_R + PDFFac_L * Res_UnPol_L)
+     EvalCS_Real_Zprime_interf = EvalCS_Real_Zprime_interf * (4d0*Pi*alpha_s*RunFactor)**2 * PreFac * ISFac * colf
+
+     do NHisto=1,NumHistograms
+        call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_interf)
+     enddo
+
+  endif!applyPSCut
+
+
+  !!! Dipoles section
+  IF ( PROCESS .EQ. 67 ) THEN ! qqb
+     dipoles = 0d0
+     do nDip = 1,8
+
+        call Dipoles_qqb_Zprime_interf(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
+ 
+        if (resdip .EQ. 0d0) cycle
+
+        Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
+        NumExtParticles = 4
+        ISFac = MomCrossing(MomExtTd)
+        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
+        NumExtParticles = 5
+        
+        IF( TOPDECAYS.NE.0 ) THEN
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
+           call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
+           PSWgt = PSWgt * PSWgt2*PSWgt3! this is better never be used anywhere below
+           
+           call Kinematics_TTBARZprime(.false.,MomExtTd,MomDKTd,applyPSCut,NBin)
+
+           if ( applyPSCut ) then
+              resdip = 0d0
+           else
+              
+              call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+              call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+              
+              resLO_L = 0d0
+              resLO_R = 0d0
+              
+              i1 = 0
+              i2 = 0
+              do i3 = -1,1,2
+                 ExtParticle(1)%Helicity = i1
+                 ExtParticle(2)%Helicity = i2
+                 ExtParticle(3)%Helicity = i3
+                 ExtParticle(4)%Helicity = -i3
+                 call SetPolarizations()
+                 call Tree_Zprime_tbtqbq_gluefordip(ampLO_QCD)
+                 call Tree_Zprime_tbtqbq(ampLO_L, ampLO_R)
+                 resLO_L = resLO_L +  2d0 * dreal(ampLO_L * dconjg(ampLO_QCD))
+                 resLO_R = resLO_R +  2d0 * dreal(ampLO_R * dconjg(ampLO_QCD))
+              enddo
+              
+           endif
+           
+        ELSE
+           
+           call Kinematics_TTBARZprime(.false.,MomExtTd,MomDK,applyPSCut,NBin)
+           
+           if ( applyPSCut ) then
+              resdip = 0d0
+           else
+              
+              resLO_L = 0d0
+              resLO_R = 0d0
+              
+              do i1 = -1,1,2
+                 do i2 = -1,1,2
+                    do i3 = -1,1,2
+                       ExtParticle(1)%Helicity = i1
+                       ExtParticle(2)%Helicity = i2
+                       ExtParticle(3)%Helicity = i3
+                       ExtParticle(4)%Helicity = -i3
+                       call SetPolarizations()
+                       call Tree_Zprime_tbtqbq_gluefordip(ampLO_QCD)
+                       call Tree_Zprime_tbtqbq(ampLO_L, ampLO_R)
+                       resLO_L = resLO_L +  2d0 * dreal(ampLO_L * dconjg(ampLO_QCD))
+                       resLO_R = resLO_R +  2d0 * dreal(ampLO_R * dconjg(ampLO_QCD))
+                    enddo
+                 enddo
+              enddo
+              
+           endif
+           
+        ENDIF !TopDecays
+        
+        ! Check against Markus
+
+        resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
+        resdip = resdip * (4d0*Pi*alpha_s*RunFactor)**2 * PreFac * ISFac * colf
+        
+        do NHisto=1,NumHistograms
+           call intoHisto(NHisto,NBin(NHisto),resdip)
+        enddo
+     
+        dipoles = dipoles + resdip
+     
+     enddo
+
+  ENDIF
+
+  print *, 'inv    ', MomExt(1,3)/Ehat !(MomExt(1:4,1).dot.MomExt(1:4,3))/Ehat**2,(MomExt(1:4,2).dot.MomExt(1:4,3))/Ehat**2
+  print *, 'real   ', EvalCS_Real_Zprime_interf
+  print *, 'dipoles', dipoles
+  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_interf + 1d0
+  pause 
+ 
+  EvalCS_Real_Zprime_interf = (EvalCS_Real_Zprime_interf+dipoles)/VgsWgt
+
+  RETURN
+
+END FUNCTION EvalCS_Real_Zprime_Interf
 
 
 

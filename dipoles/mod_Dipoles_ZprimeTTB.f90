@@ -233,6 +233,224 @@
 
     END SUBROUTINE Dipoles_qg_Zprime_ttbq
 
+    SUBROUTINE Dipoles_qqb_Zprime_interf(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+      use ModParameters
+      use ModKinematics
+      use ModMisc
+      implicit none
+      integer :: nDipole,a,i,b,j,k
+      real(8) :: MomExt(1:4,1:5),MomExtTd(1:4,1:4),Q(1:4),QTd(1:4),KSum(1:4)
+      real(8) :: sab,sai,saj,sbj,sij,x,u,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+      real(8) :: Dipole
+      
+      Dipole = 0d0
+      
+      if (nDipole.eq.1) then
+
+         a=1; i=3; j=4; !initial-final, q tb
+         
+         sai = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,i)) 
+         saj = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,j)) 
+         sij = 2d0*(MomExt(1:4,i)).dot.(MomExt(1:4,j)) 
+         
+         x = 1d0-sij/(sai+saj)
+         u = sai/(sai+saj)
+         if( alpha_if.lt.u ) then
+            Dipole = 0d0
+            return
+         endif
+
+         Dipole = -1d0/sai/x
+         
+         MomExtTd(1:4,1) = x*MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,1) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) ! t
+
+         !     splitting 1: A/Quark_I --> A/Quark_I + Gluon_F
+         Dipole = Dipole * (2d0/(1d0-x+u)-1d0-x)
+
+      elseif (nDipole.eq.2) then
+
+         a=2; i=3; j=4; !initial-final, qb tb
+         
+         sai = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,i)) 
+         saj = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,j)) 
+         sij = 2d0*(MomExt(1:4,i)).dot.(MomExt(1:4,j)) 
+         
+         x = 1d0-sij/(sai+saj)
+         u = sai/(sai+saj)
+         if( alpha_if.lt.u ) then
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sai/x
+         
+         MomExtTd(1:4,1) = MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = x*MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,2) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) ! t
+
+         !     splitting 1: A/Quark_I --> A/Quark_I + Gluon_F
+         Dipole = Dipole * (2d0/(1d0-x+u)-1d0-x)
+
+         Dipole = - Dipole ! from color matrix
+
+      elseif (nDipole.eq.3) then
+
+         a=1; i=3; j=5; !initial-final, q t
+         
+         sai = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,i)) 
+         saj = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,j)) 
+         sij = 2d0*(MomExt(1:4,i)).dot.(MomExt(1:4,j)) 
+         
+         x = 1d0-sij/(sai+saj)
+         u = sai/(sai+saj)
+         if( alpha_if.lt.u ) then
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sai/x
+         
+         MomExtTd(1:4,1) = x*MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,1) ! t
+
+         !     splitting 1: A/Quark_I --> A/Quark_I + Gluon_F
+         Dipole = Dipole * (2d0/(1d0-x+u)-1d0-x)
+
+         Dipole = - Dipole ! from color matrix
+
+      elseif (nDipole.eq.4) then
+
+         a=2; i=3; j=5; !initial-final, qb t
+         
+         sai = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,i)) 
+         saj = 2d0*(MomExt(1:4,a)).dot.(MomExt(1:4,j)) 
+         sij = 2d0*(MomExt(1:4,i)).dot.(MomExt(1:4,j)) 
+         
+         x = 1d0-sij/(sai+saj)
+         u = sai/(sai+saj)
+         if( alpha_if.lt.u ) then
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sai/x
+         
+         MomExtTd(1:4,1) = MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = x*MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,2) ! t
+
+         !     splitting 1: A/Quark_I --> A/Quark_I + Gluon_F
+         Dipole = Dipole * (2d0/(1d0-x+u)-1d0-x)
+
+      elseif (nDipole.eq.5) then
+
+         j=4; i=3; a=1 !final-initial, tb q
+
+         sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+         saj = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,j))
+         sij = 2d0*(MomExt(1:4,i).dot.MomExt(1:4,j))
+
+         x = 1d0-sij/(sai+saj)
+         z = saj/(sai+saj)
+         if( alpha_fi.lt.1d0-x ) then  ! NEW
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sij/x
+
+         MomExtTd(1:4,1) = x*MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,1) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) ! out t
+
+         !     splitting 5: A/Quark_F --> A/Quark_F + Gluon_F
+         Dipole = Dipole * (2d0/(2d0-z-x)-1d0-z-2d0*m_Top**2/sij)
+
+      elseif (nDipole.eq.6) then
+
+         j=4; i=3; a=2 !final-initial, tb qb
+
+         sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+         saj = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,j))
+         sij = 2d0*(MomExt(1:4,i).dot.MomExt(1:4,j))
+
+         x = 1d0-sij/(sai+saj)
+         z = saj/(sai+saj)
+         if( alpha_fi.lt.1d0-x ) then  ! NEW
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sij/x
+
+         MomExtTd(1:4,1) = MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = x*MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,2) ! tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) ! out t
+
+         !     splitting 5: A/Quark_F --> A/Quark_F + Gluon_F
+         Dipole = Dipole * (2d0/(2d0-z-x)-1d0-z-2d0*m_Top**2/sij)
+
+         Dipole = - Dipole ! from color matrix
+
+      elseif (nDipole.eq.7) then
+
+         j=5; i=3; a=1 !final-initial, t q
+
+         sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+         saj = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,j))
+         sij = 2d0*(MomExt(1:4,i).dot.MomExt(1:4,j))
+
+         x = 1d0-sij/(sai+saj)
+         z = saj/(sai+saj)
+         if( alpha_fi.lt.1d0-x ) then  ! NEW
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sij/x
+
+         MomExtTd(1:4,1) = x*MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) ! out tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,1) ! t
+
+         !     splitting 5: A/Quark_F --> A/Quark_F + Gluon_F
+         Dipole = Dipole * (2d0/(2d0-z-x)-1d0-z-2d0*m_Top**2/sij)
+
+         Dipole = - Dipole ! from color matrix
+
+      elseif (nDipole.eq.8) then
+
+         j=5; i=3; a=2 !final-initial, t qb
+
+         sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+         saj = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,j))
+         sij = 2d0*(MomExt(1:4,i).dot.MomExt(1:4,j))
+
+         x = 1d0-sij/(sai+saj)
+         z = saj/(sai+saj)
+         if( alpha_fi.lt.1d0-x ) then  ! NEW
+            Dipole = 0d0
+            return
+         endif
+         Dipole = -1d0/sij/x
+
+         MomExtTd(1:4,1) = MomExt(1:4,1) ! out q
+         MomExtTd(1:4,2) = x*MomExt(1:4,2) ! out qb
+         MomExtTd(1:4,3) = MomExt(1:4,4) ! out tb
+         MomExtTd(1:4,4) = MomExt(1:4,5) + MomExt(1:4,3) - (1d0-x)*MomExt(1:4,2) ! t
+
+         !     splitting 5: A/Quark_F --> A/Quark_F + Gluon_F
+         Dipole = Dipole * (2d0/(2d0-z-x)-1d0-z-2d0*m_Top**2/sij)
+
+      endif
+      
+      return
+
+    END SUBROUTINE Dipoles_qqb_Zprime_interf
 
 
   END MODULE ModDipoles_Zprime

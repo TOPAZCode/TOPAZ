@@ -4015,9 +4015,9 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 !   Mom(1:4,3)  = Mom(1:4,5)
 !   Mom(1:4,5)  = TmpMom(1:4)
 
-!      Pcol1= 1 -1
+!      Pcol1= 3 -1
 !      Pcol2= 3 -1
-!      SingDepth = 1e-10
+!      SingDepth = 1e-5
 !      Steps = 10
 !      PSWgt = 1d0
 !      call gensing(3,EHat,(/0d0,m_Top,m_Top/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"

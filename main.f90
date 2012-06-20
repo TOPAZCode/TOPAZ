@@ -1143,6 +1143,21 @@ IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
 ENDIF
 ENDIF
 
+IF ( MASTERPROCESS.EQ.4) THEN
+IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.67 ) THEN
+   call qlinit()
+   print *, "Gluon-Z' interference, real"
+  call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
 !!! End Zprime section
 
 
