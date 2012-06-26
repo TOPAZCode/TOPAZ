@@ -268,7 +268,7 @@ include "vegas_common.f"
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
         
-        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0)
+        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0) * 2d0!  9* CF/TR
 
         EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
 
@@ -327,7 +327,7 @@ include "vegas_common.f"
         IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_Res_UnPol_Left + PDFFac_dip_R(2) * LO_Res_UnPol_Right)
         IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_Res_UnPol_Left + PDFFac_dip_R(3) * LO_Res_UnPol_Right)
         
-        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0)
+        IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0) * 2d0!  9* CF/TR
         
         EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
 
@@ -804,7 +804,7 @@ integer :: i1,i2,i3,i4,i5
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
         NumExtParticles = 4
         ISFac = MomCrossing(MomExtTd)
-        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
+        Crossing(:) = (/4,5,3,-2,-1/) ! Original: this was wrong, corrected
         NumExtParticles = 5
         
         IF( TOPDECAYS.NE.0 ) THEN
@@ -894,7 +894,7 @@ integer :: i1,i2,i3,i4,i5
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
         NumExtParticles=4
         ISFac = MomCrossing(MomExtTd)
-        Crossing(:) = (/4,5,-1,-2,3/) ! Original: this was wrong, corrected
+        Crossing(:) = (/4,5,-1,3,-2/) ! Original: this was wrong, corrected
         NumExtParticles=5
         
         IF( TOPDECAYS.NE.0 ) THEN
