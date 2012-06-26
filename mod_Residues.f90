@@ -1203,6 +1203,7 @@ END SUBROUTINE
           else                                             !  if yes (i.e. tag_pol=1) then use full gluon polarization sum
               tag_pol=0                                    !  note: tag_pol does not affect fermion loops!
           endif
+
           if( any(Lab_in(l2c(1:2)).eq.'glu') ) then
             tag_f = 0
           elseif( all(Lab_in(l2c(1:2)).eq.'top') .or. all(Lab_in(l2c(1:2)).eq.'str') ) then

@@ -987,7 +987,8 @@ include 'vegas_common.f'
    FluxFac = 1d0/(2d0*EHat**2)
 
    call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
-   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+!    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+print *, "switch off boost for comparison with Radja"
 
    IF(XTOPDECAYS.EQ.3) THEN
       call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
@@ -1028,14 +1029,14 @@ include 'vegas_common.f'
   NLO_Res_Unpol(-2:1)      = (0d0,0d0)
   NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 
- do npdf=1,2!; print *, "no npdf loop"
+ do npdf=1,1; print *, "no npdf loop"
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
         PDFFac = PDFFac_b
         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
-! PDFFac=1d0; print *, "pdfs set to one"
+PDFFac=1d0; print *, "pdfs set to one"
     ISFac = MomCrossing(MomExt)
     call InitCurrCache()
     call SetPropagators()
@@ -1084,7 +1085,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,4; !print *, "Evaluate bosonic loop primamp",iPrimAmp
-! print *, "hel",ihel,"primamp no",iPrimAmp
+! print *, "hel",ihel
 ! print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
@@ -1158,16 +1159,23 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus from closed fermion loop
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(1),rdiv)
-print *, "LO",BornAmps(iPrimAmp)%Result
-print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(1),rdiv)
+! print *, "LO",BornAmps(1)%Result
+! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
 print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
-pause
+print *, "ratio",PrimAmps(iPrimAmp)%Result(0)/BornAmps(1)%Result
+print *, "ratio",PrimAmps(iPrimAmp)%Result(1)/BornAmps(1)%Result
       enddo
-                                                                                         ! minus to remove minus from closed fermion loop
+pause                                                                
+                         ! minus to remove minus from closed fermion loop
       FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
       FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+
+ print *, "For comparison with RADJA set mt=0 in closed loops"
+ FermionLoopPartAmp(1,-2:1) =           ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+ FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,2
@@ -1180,8 +1188,8 @@ pause
    enddo!helicity loop
 ENDIF! Correction loop
   enddo! npdf loop
-  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
-! print *, "npdf swap off"
+!   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+print *, "npdf swap off"
 
 
 IF( Correction.EQ.0 ) THEN
@@ -1190,23 +1198,54 @@ IF( Correction.EQ.0 ) THEN
    EvalCS_1L_ststbqqb = LO_Res_Unpol * PreFac
 
 ELSEIF( Correction.EQ.1 ) THEN
+print *, ""
+print *, "LO",LO_Res_Unpol* ISFac/5.3333333333333333d-2
+print *, "LO",LO_Res_Unpol* ISFac/2.700617283950616d-002
+print *, "LO",LO_Res_Unpol* ISFac/8.163265306122448d-002
+print *, ""
+print *, "bare NLO(-2)",2d0*NLO_Res_UnPol(-2)/LO_Res_Unpol
+print *, "bare NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-44.2491195362494d0
+print *, "bare NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-47.0012561334728d0
+print *, "bare NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-51.5866549563775d0
+print *, ""
+print *, "bare NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+56.3557171738789d0
+print *, "bare NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+67.6225159647733d0
+print *, "bare NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+84.9030724385563d0
+
+
+! print *, "bare NLO(0)",(2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+56.3557171738789d0)/(dblpi**2*2d0*NLO_Res_UnPol(-2)/LO_Res_Unpol)
+! print *, "bare NLO(0)",(2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+67.6225159647733d0)/(dblpi**2*2d0*NLO_Res_UnPol(-2)/LO_Res_Unpol)
+! print *, "bare NLO(0)",(2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+84.9030724385563d0)/(dblpi**2*2d0*NLO_Res_UnPol(-2)/LO_Res_Unpol)
+
+pause
+
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 !  CT contributions                           ! beta           !top WFRC
-   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 + 25d0/6d0)*LO_Res_Unpol  ! THE LAST PIECE +4d0  is not understoood yet!!
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from  top WFRC
+   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 + 4d0 )*LO_Res_Unpol  ! THE LAST PIECE +4d0  is not understood yet!!
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from  top WFRC
+                                                                                          ! the last term is from the scalar loop
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  0* 2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol; print *, "remove Nf_heavy for comparison"
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + 0*(2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +            (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
 
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
+
+! print *, "ren. NLO(-2)",2d0*NLO_Res_UnPol(-2)/LO_Res_Unpol
+! print *, "ren. NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-29.2491195362494d0
+! print *, "ren. NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-32.0012561334728d0
+! print *, "ren. NLO(-1)",2d0*(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol-36.5866549563775d0
+! print *, "ren. NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+56.3557171738789d0
+! print *, "ren. NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+67.6225159647733d0
+! print *, "ren. NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+84.9030724385563d0
+! pause
 
 
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol                         * ISFac * (alpha_s4Pi*RunFactor)**2
    NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1)           * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
-
 
 ! print *, "virt 1/eps2",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
 ! print *, "virt 1/eps",(dble(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1)))/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
@@ -1229,8 +1268,9 @@ ELSEIF( Correction.EQ.3 ) THEN
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
    IF( PROCESS.eq.56 ) THEN
       call EvalIntDipoles_QQBSTSTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
-! print *, "IntDip",HOp(1)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! print *, "IntDip",HOp(1)*RunFactor**3/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
 ! pause
+! IF(PROCESS.eq.99999999999999 ) THEN
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ststbqqb = HOp(1) * (pdf(Up_,1)*pdf(AUp_,2)+pdf(Dn_,1)*pdf(ADn_,2)+pdf(Chm_,1)*pdf(AChm_,2)+pdf(Str_,1)*pdf(AStr_,2)+pdf(Bot_,1)*pdf(ABot_,2) ) &
                          + HOp(2)/xE * (pdf_z(Up_,1)*pdf(AUp_,2)+pdf_z(Dn_,1)*pdf(ADn_,2)+pdf_z(Chm_,1)*pdf(AChm_,2)+pdf_z(Str_,1)*pdf(AStr_,2)+pdf_z(Bot_,1)*pdf(ABot_,2) ) &

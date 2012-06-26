@@ -66,7 +66,8 @@ logical :: dirresult
    TopDecays=-100
    XTopDecays=-100
    HelSampling=.false.
-   m_Top=172d0 / 100d0
+   m_Top=172d0*GeV
+   m_STop=100d0*GeV
    Q_top = Q_up
    MuRen=m_Top
    MuFac=m_Top
@@ -109,6 +110,11 @@ logical :: dirresult
         MuRen=m_Top
         MuFac=m_Top
         MuFrag=m_Top
+    elseif( arg(1:6).eq."MStop=" ) then
+        read(arg(7:11),*) m_STop
+        MuRen=m_STop
+        MuFac=m_STop
+        MuFrag=m_STop
    elseif( arg(1:8).eq."nGluRad=" ) then
         read(arg(9:10),*) nGluRadContr
     elseif( arg(1:5).eq."XQTop" ) then
@@ -154,6 +160,7 @@ logical :: dirresult
         read(arg(11:41),*) HistoFile
     elseif( arg(1:8).eq."FileTag=" ) then
         read(arg(9:59),*)  FileTag
+        if( FileTag.eq."." ) FileTag=""
     elseif( arg(1:9).eq."DipAlpha=" ) then
         read(arg(10:10),*) iDipAlpha(1)
         read(arg(11:11),*) iDipAlpha(2)
@@ -211,9 +218,11 @@ logical :: dirresult
           print *, "ObsSet:      see mod_Kinematics.f90"
           stop
     endif
-    if( Process.ge.41 .and. Process.le.59 .and. XTopDecays.eq.-100) then
-          print *, "not enough input parameter"
-          print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
+    if( Process.ge.41 .and. Process.le.59 ) then
+          if( XTopDecays.eq.-100 ) then 
+              print *, "not enough input parameter"
+              print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
+          endif
     endif
 
     if((Correction.eq.3 .or. TopDecays.eq.5 .or. TopDecays.eq.6) .and. HelSampling) then

@@ -506,6 +506,7 @@ integer :: i1,i2,i3,i4,i5
   call CheckSing(MomExt,applySingCut)
   if( applySingCut ) then
      EvalCS_Real_Zprime_ttbqqb = 0d0
+     SkipCounter = SkipCounter + 1
      return
   endif
   
@@ -516,6 +517,8 @@ integer :: i1,i2,i3,i4,i5
   ENDIF
 
   call Kinematics_TTBARZprime(.true.,MomExt,MomDK,applyPSCut,NBin)
+
+! applyPSCut=.true.! this is for inverted alpha check
 
   call setPDFs(eta1,eta2,MuFac,pdf)
 
@@ -658,6 +661,7 @@ integer :: i1,i2,i3,i4,i5
   ENDIF
 
   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+  colf = 2d0 * 9d0 * Cf
 
   RunFactor = RunAlphaS(NLOParam,MuRen)
   ISFac = MomCrossing(MomExt)
@@ -671,7 +675,6 @@ integer :: i1,i2,i3,i4,i5
      EvalCS_Real_Zprime_ttbqqb = 0d0
   else
 
-     colf = 2d0 * 9d0 * Cf
      Res_UnPol_L = 0d0
      Res_UnPol_R = 0d0
      do iHel=1,NumHelicities
@@ -691,6 +694,7 @@ integer :: i1,i2,i3,i4,i5
      do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_ttbqqb)
      enddo
+     EvalCounter = EvalCounter + 1
 
   endif!applyPSCut
 
@@ -776,7 +780,6 @@ integer :: i1,i2,i3,i4,i5
         ENDIF !TopDecays
         
         ! Check against Markus
-
         resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
         resdip = resdip * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
         

@@ -55,7 +55,7 @@ real(8), public, parameter :: EL = dsqrt(4.d0*DblPi*alpha)
 real(8), public            :: Ga_HTop
 real(8), public            :: Ga_Htop_A0Top
 real(8), public            :: Ga_Htop_BHTop
-real(8), public, parameter :: m_STop  = 172d0*GeV
+real(8), public            :: m_STop
 real(8), public            :: m_SBot
 real(8), public            :: Ga_STop
 real(8), public            :: Ga_Stop_ChiTop

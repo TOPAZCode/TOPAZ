@@ -24,6 +24,8 @@
     double precision, private :: yRndDK(1:8),xFrac,r_sc
     integer, private :: NBin(1:20)
     
+    logical, parameter :: invert_alphaCut = .false.
+
   contains
 
 
@@ -48,9 +50,16 @@
          sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
          x = 1d0 - (sai+sbi)/sab
          v = sai/sab
-         if( alpha_ii.lt.v ) then
-            Dipole = (0d0,0d0)
-            return
+         if( .not. invert_alphacut ) then
+            if( alpha_ii.lt.v ) then
+                Dipole = (0d0,0d0)
+                return
+            endif
+         else
+            if( alpha_ii.gt.v ) then
+                Dipole = (0d0,0d0)
+                return
+            endif
          endif
          
          MomExtTd(1:4,a) = x*MomExt(1:4,a)
@@ -72,9 +81,16 @@
          sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
          x = 1d0 - (sai+sbi)/sab
          v = sai/sab
-         if( alpha_ii.lt.v ) then
-            Dipole = (0d0,0d0)
-            return
+         if( .not. invert_alphacut ) then
+              if( alpha_ii.lt.v ) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
+         else
+              if( alpha_ii.gt.v ) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
          endif
 
          MomExtTd(1:4,a) = x*MomExt(1:4,a)
@@ -104,9 +120,16 @@
          z = sik/(skj+sik)
          v = (1d0-y)*dsqrt((1d0-4d0*mu2)/( (2d0*mu2+(1d0-2d0*mu2)*(1d0-y))**2-4d0*mu2))
          yp = 1d0-2d0*mu*(1d0-mu)/(1d0-2d0*mu2)
-         if( y.gt.alpha_ff*yp) then
-            Dipole = (0d0,0d0)
-            return
+         if( .not. invert_alphacut ) then
+              if( y.gt.alpha_ff*yp) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
+         else
+              if( y.lt.alpha_ff*yp) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
          endif
 
          MomFac1 = dsqrt(((sij+sik+skj)**2-4d0*m_Top**4)/((sik+skj)**2-4d0*m_Top**2*(m_Top**2+sij)))
@@ -134,9 +157,16 @@
          z = sik/(skj+sik)
          v = (1d0-y)*dsqrt((1d0-4d0*mu2)/( (2d0*mu2+(1d0-2d0*mu2)*(1d0-y))**2-4d0*mu2))
          yp = 1d0-2d0*mu*(1d0-mu)/(1d0-2d0*mu2)
-         if( y.gt.alpha_ff*yp) then
-            Dipole = (0d0,0d0)
-            return
+         if( .not. invert_alphacut ) then
+              if( y.gt.alpha_ff*yp) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
+         else
+              if( y.lt.alpha_ff*yp) then
+                  Dipole = (0d0,0d0)
+                  return
+              endif
          endif
          MomFac1 = dsqrt(((sij+sik+skj)**2-4d0*m_Top**4)/((sik+skj)**2-4d0*m_Top**2*(m_Top**2+sij)))
          MomFac2 = (0.5d0*(sik+skj)+m_Top**2)/Q2
@@ -175,9 +205,17 @@
       sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
       x = 1d0 - (sai+sbi)/sab
       v = sai/sab
-      if( alpha_ii.lt.v ) then
-         Dipole = (0d0,0d0)
-         return
+      
+      if( .not. invert_alphacut ) then
+            if( alpha_ii.lt.v ) then
+              Dipole = (0d0,0d0)
+              return
+            endif
+      else
+            if( alpha_ii.gt.v ) then
+              Dipole = (0d0,0d0)
+              return
+            endif
       endif
 
       MomExtTd(1:4,a) = x*MomExt(1:4,a)
@@ -213,9 +251,16 @@
       sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
       x = 1d0 - (sai+sbi)/sab
       v = sai/sab
-      if( alpha_ii.lt.v ) then
-         Dipole = (0d0,0d0)
-         return
+      if( .not. invert_alphacut ) then
+            if( alpha_ii.lt.v ) then
+              Dipole = (0d0,0d0)
+              return
+            endif
+      else
+            if( alpha_ii.gt.v ) then
+              Dipole = (0d0,0d0)
+              return
+            endif
       endif
 
       MomExtTd(1:4,a) = x*MomExt(1:4,a)

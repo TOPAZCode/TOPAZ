@@ -44,8 +44,8 @@ contains
    TreeMom(1:4,3) = dcmplx( p(1:4,2) )
    TreeMom(1:4,4) = dcmplx( p(1:4,1) )
 
-   Tree_12 = Tree_GG_TTb_00(0,TreeMom,(/0d0,0d0,m_Top**2,m_Top**2/))
-   Tree_21 = Tree_UUb_TTb_00(0,TreeMom,(/0d0,0d0,m_Top**2,m_Top**2/))
+   Tree_12 = Tree_GG_TTb_00(0,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
+   Tree_21 = Tree_UUb_TTb_00(0,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
 
    do n=5,6   ! implementation for ii-contributions only
       if(n.eq.5) then

@@ -156,12 +156,12 @@ ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without de
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
     pT_jet_cut  = 20d0*GeV
     pT_bjet_cut = pT_jet_cut
-    eta_jet_cut = 2d0
-    eta_bjet_cut= eta_jet_cut
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 1d0
-    pT_miss_cut = 20d0*GeV
-    HT_cut      = 220d0*GeV
+    eta_jet_cut = 2d0            *100d0
+    eta_bjet_cut= eta_jet_cut    *100d0
+    pT_lep_cut  = 20d0*GeV       *0d0
+    eta_lep_cut = 1d0            *100d0
+    pT_miss_cut = 20d0*GeV       *0d0
+    HT_cut      = 220d0*GeV      *0d0
     Rsep_jet    = 0.5d0
 
 ELSEIF( ObsSet.EQ.13 ) THEN! set of observables for ttbjet production as signal process at LHC (di-lept. decay)
@@ -3084,7 +3084,7 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
 ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
-          NumHistograms = 8
+          NumHistograms = 9
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3139,6 +3139,11 @@ ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
           Histo(8)%LowVal = -1d0
           Histo(8)%SetScale= 1d0
 
+          Histo(9)%Info   = "M_TTbar+jet"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 40d0*GeV
+          Histo(9)%LowVal = 350d0*GeV
+          Histo(9)%SetScale= 100d0
 
 ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -3914,11 +3919,53 @@ real(8) :: EHat
 real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
 real(8) :: Mom(1:4,1:4),MomW(1:4),xRndPS(1:2)
 real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
-
+integer,save :: it=1
+real(8) :: beta,t,u,cos13,phi
 
 !  generate PS: massless + massless --> massive(anti-top) + massive(top)
    call genps(2,Ehat,xRndPS(1:2),(/m_Stop,m_Stop/),Mom(1:4,3:4),PSWgt)
    PSWgt = PSWgt*PiWgt2
+
+
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+print *, "INPUT MOMENTA FOR COMPARISON WITH RADJA"
+phi = 0.231231d0
+if(it.eq.1) then
+ EHat=dsqrt(1000000.0000000d0) *GeV
+ t = -836410.161513775d0 *GeV**2
+ u = -143589.838486225d0*GeV**2
+elseif(it.eq.2) then
+ EHat=dsqrt(1440000.00000000d0) *GeV
+ t = -1324817.04595758d0*GeV**2
+ u = -95182.9540424241d0*GeV**2
+elseif(it.eq.3) then
+ EHat=dsqrt(1960000.00000000d0) *GeV
+ t = -1454974.22611929d0*GeV**2
+ u = -485025.773880714d0*GeV**2
+endif
+
+ PSWgt=1d0
+ m_Stop = dsqrt(0.5d0*(EHat**2+t+u))
+
+ beta=dsqrt(1d0-m_stop**2/(EHat*0.5d0)**2)
+ cos13=1d0/beta*(1d0+(t-m_stop**2)/(EHat**2*0.5d0))
+
+
+ Mom(1,4) = EHat*0.5d0
+ Mom(2,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dsin(phi)
+ Mom(3,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
+ Mom(4,4) = EHat*0.5d0*beta*cos13
+
+ Mom(1,3) = EHat*0.5d0
+ Mom(2,3) =-EHat*beta*0.5d0*dsqrt(1d0-cos13**2)*dsin(phi)
+ Mom(3,3) =-EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
+ Mom(4,3) =-EHat*beta*0.5d0*cos13
+ it=it+1
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+
+
+
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -3930,6 +3977,18 @@ real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
    Mom(2,2) =  0d0
    Mom(3,2) =  0d0
    Mom(4,2) = -EHat*0.5d0
+
+
+print *, "check",((Mom(1:4,3)).dot.(Mom(1:4,3)))-m_stop**2
+print *, "check",((Mom(1:4,4)).dot.(Mom(1:4,4)))-m_stop**2
+print *, "check",Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)
+print *, "check",Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)
+print *, "check",Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)
+print *, "check",Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)
+print *, "check",ehat**2+t+u-2d0*m_stop**2
+print *, "t",(Mom(1:4,1)-Mom(1:4,3)).dot.(Mom(1:4,1)-Mom(1:4,3))
+print *, "u",(Mom(1:4,1)-Mom(1:4,4)).dot.(Mom(1:4,1)-Mom(1:4,4))
+! pause
 
 
 return
@@ -7692,6 +7751,7 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
     NBin(7) = WhichBin(7,CosTheta_scatter)
     NBin(8) = WhichBin(8,CosTheta_star)
 
+    NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
 
 !-------------------------------------------------------
 elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept. decays
@@ -7781,7 +7841,7 @@ END SUBROUTINE
 
 
 
-RECURSIVE SUBROUTINE JetAlgo_kt(Rsep_jet,PartonList,MomParton,NJet,JetList,MomJet)  ! initial call must have NJet=0
+RECURSIVE SUBROUTINE JetAlgo_kt(Rsep_jet,PartonList,MomParton,NJet,JetList,MomJet)  ! initial call must have NJet=0 and MomJet(1:4,:) = MomPartons(1:4,:)
 use ModMisc
 use ModParameters
 implicit none

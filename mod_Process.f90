@@ -4348,7 +4348,7 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
 
         PrimAmps(7)%ExtLine = (/1,2,3,4/)
         PrimAmps(7)%AmpType = 2
-        PrimAmps(7)%FermLoopPart = Stop_
+        PrimAmps(7)%FermLoopPart = SBot_
 
         PrimAmp1_1234 = 1
         PrimAmp1_1243 = 2
@@ -4986,8 +4986,8 @@ include 'misc/global_import'
          Lab_ex(Vertex)='top'
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
          Lab_ex(Vertex)='top'
-      elseif(ExtPartType.eq.SBot_ .or. ExtPartType.eq.ASBot_ ) then! fix for STop(closed loop)
-         Lab_ex(Vertex)='bot'
+!       elseif(ExtPartType.eq.SBot_ .or. ExtPartType.eq.ASBot_ ) then! fix for STop(closed loop)
+!          Lab_ex(Vertex)='bot'
       else
          print *, "error in kirills conv, ExtPartType=", ExtPartType
       endif
