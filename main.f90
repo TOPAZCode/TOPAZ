@@ -52,7 +52,7 @@ use ModKinematics
 use ifport
 implicit none
 character :: arg*(100)
-character :: env*(31),ColliderStr*(10),ProcessStr*(2),CorrectionStr*(10),FileTag*(50),SeedStr*(6),MuStr*(7),ObsStr*(6)
+character :: env*(31),ColliderStr*(10),ColliderDirStr*(10),ProcessStr*(2),CorrectionStr*(10),FileTag*(50),SeedStr*(6),MuStr*(7),ObsStr*(6)
 integer :: NumArgs,NArg,IDipAlpha(1:5),iDKAlpha(1:3),DipAlpha2
 logical :: dirresult
 
@@ -218,7 +218,7 @@ logical :: dirresult
     if(Collider.eq.-1 .or. Process.eq.-1 .or. Correction.eq.-1 .or. TopDecays.eq.-100 .or. ObsSet.eq.-1) then
           print *, "not enough input parameter"
           print *, "required: Collider,Process,Correction,TopDK,ObsSet"
-          print *, "Collider:    1=LHC, 2=Tevatron"
+          print *, "Collider:    1=LHC(14TeV), 11=LHC(7TeV), 12=LHC(8TeV), 13=LHC(13TeV), 2=Tevatron"
           print *, "Process:     see ProcessInfo.txt"
           print *, "Correction:  0=LO, 1=VI, 2=RE, 3=ID, 4=VI in top decay, 5=RE in top decay"
           print *, "TopDK:       0=stable tops, 1=dilept, 2=full hadr, 3=l-&jets, 4=l+&jets"
@@ -295,14 +295,19 @@ logical :: dirresult
    endif
 
     if( Collider.eq.1 ) then
-        ColliderStr="LHC14"
+        ColliderDirStr="LHC14"
+        ColliderStr="LHC"
     elseif( Collider.eq.11 ) then
-        ColliderStr="LHC7"
+        ColliderDirStr="LHC7"
+        ColliderStr="LHC"
     elseif( Collider.eq.12 ) then
-        ColliderStr="LHC8"
+        ColliderDirStr="LHC8"
+        ColliderStr="LHC"
     elseif( Collider.eq.13 ) then
-        ColliderStr="LHC13"
+        ColliderDirStr="LHC13"
+        ColliderStr="LHC"
     elseif( Collider.eq.2 ) then
+        ColliderDirStr="TEV"
         ColliderStr="TEV"
     endif
 
@@ -311,10 +316,9 @@ logical :: dirresult
         MuStr=trim(MuStr)//"_XQ"
     endif
 
-    dirresult = makedirqq("./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr))
-    dirresult = makedirqq("./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr))
-    if(dirresult) print *, "created directory "//"./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)
-pause
+    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr))
+    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr))
+    if(dirresult) print *, "created directory "//"./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)
 
 
     if( ObsSet.eq.8 ) then!   spin correlations with R
@@ -325,10 +329,10 @@ pause
 
 
     if(HistoFile.eq."") then
-        HistoFile = "./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
+        HistoFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
     endif
 
-   GridFile = "./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
+   GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
 
 return
 END SUBROUTINE
