@@ -3929,39 +3929,39 @@ real(8) :: beta,t,u,cos13,phi
 
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
-print *, "INPUT MOMENTA FOR COMPARISON WITH RADJA"
-phi = 0.231231d0
-if(it.eq.1) then
- EHat=dsqrt(1000000.0000000d0) *GeV
- t = -836410.161513775d0 *GeV**2
- u = -143589.838486225d0*GeV**2
-elseif(it.eq.2) then
- EHat=dsqrt(1440000.00000000d0) *GeV
- t = -1324817.04595758d0*GeV**2
- u = -95182.9540424241d0*GeV**2
-elseif(it.eq.3) then
- EHat=dsqrt(1960000.00000000d0) *GeV
- t = -1454974.22611929d0*GeV**2
- u = -485025.773880714d0*GeV**2
-endif
-
- PSWgt=1d0
- m_Stop = dsqrt(0.5d0*(EHat**2+t+u))
-
- beta=dsqrt(1d0-m_stop**2/(EHat*0.5d0)**2)
- cos13=1d0/beta*(1d0+(t-m_stop**2)/(EHat**2*0.5d0))
-
-
- Mom(1,4) = EHat*0.5d0
- Mom(2,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dsin(phi)
- Mom(3,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
- Mom(4,4) = EHat*0.5d0*beta*cos13
-
- Mom(1,3) = EHat*0.5d0
- Mom(2,3) =-EHat*beta*0.5d0*dsqrt(1d0-cos13**2)*dsin(phi)
- Mom(3,3) =-EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
- Mom(4,3) =-EHat*beta*0.5d0*cos13
- it=it+1
+! print *, "INPUT MOMENTA FOR COMPARISON WITH RADJA"
+! phi = 0.231231d0
+! if(it.eq.1) then
+!  EHat=dsqrt(1000000.0000000d0) *GeV
+!  t = -836410.161513775d0 *GeV**2
+!  u = -143589.838486225d0*GeV**2
+! elseif(it.eq.2) then
+!  EHat=dsqrt(1440000.00000000d0) *GeV
+!  t = -1324817.04595758d0*GeV**2
+!  u = -95182.9540424241d0*GeV**2
+! elseif(it.eq.3) then
+!  EHat=dsqrt(1960000.00000000d0) *GeV
+!  t = -1454974.22611929d0*GeV**2
+!  u = -485025.773880714d0*GeV**2
+! endif
+! 
+!  PSWgt=1d0
+!  m_Stop = dsqrt(0.5d0*(EHat**2+t+u))
+! 
+!  beta=dsqrt(1d0-m_stop**2/(EHat*0.5d0)**2)
+!  cos13=1d0/beta*(1d0+(t-m_stop**2)/(EHat**2*0.5d0))
+! 
+! 
+!  Mom(1,4) = EHat*0.5d0
+!  Mom(2,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dsin(phi)
+!  Mom(3,4) = EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
+!  Mom(4,4) = EHat*0.5d0*beta*cos13
+! 
+!  Mom(1,3) = EHat*0.5d0
+!  Mom(2,3) =-EHat*beta*0.5d0*dsqrt(1d0-cos13**2)*dsin(phi)
+!  Mom(3,3) =-EHat*0.5d0*beta*dsqrt(1d0-cos13**2)*dcos(phi)
+!  Mom(4,3) =-EHat*beta*0.5d0*cos13
+!  it=it+1
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
 
 
@@ -3979,15 +3979,15 @@ endif
    Mom(4,2) = -EHat*0.5d0
 
 
-print *, "check",((Mom(1:4,3)).dot.(Mom(1:4,3)))-m_stop**2
-print *, "check",((Mom(1:4,4)).dot.(Mom(1:4,4)))-m_stop**2
-print *, "check",Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)
-print *, "check",Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)
-print *, "check",Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)
-print *, "check",Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)
-print *, "check",ehat**2+t+u-2d0*m_stop**2
-print *, "t",(Mom(1:4,1)-Mom(1:4,3)).dot.(Mom(1:4,1)-Mom(1:4,3))
-print *, "u",(Mom(1:4,1)-Mom(1:4,4)).dot.(Mom(1:4,1)-Mom(1:4,4))
+! print *, "check",((Mom(1:4,3)).dot.(Mom(1:4,3)))-m_stop**2
+! print *, "check",((Mom(1:4,4)).dot.(Mom(1:4,4)))-m_stop**2
+! print *, "check",Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)
+! print *, "check",Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)
+! print *, "check",Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)
+! print *, "check",Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)
+! print *, "check",ehat**2+t+u-2d0*m_stop**2
+! print *, "t",(Mom(1:4,1)-Mom(1:4,3)).dot.(Mom(1:4,1)-Mom(1:4,3))
+! print *, "u",(Mom(1:4,1)-Mom(1:4,4)).dot.(Mom(1:4,1)-Mom(1:4,4))
 ! pause
 
 
@@ -8270,7 +8270,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

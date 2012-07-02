@@ -250,7 +250,6 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! ------------ fermionic loops --------------
       do iPrimAmp=7,10
           call SetKirill(PrimAmps(iPrimAmp))
-
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
           call TripCut(PrimAmps(iPrimAmp))
@@ -259,8 +258,9 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!         call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
+          pause
       enddo
       FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
       FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)

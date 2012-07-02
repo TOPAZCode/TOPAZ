@@ -771,10 +771,10 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x3 = 1d0
          SqrtPreF = cdsqrt(dcmplx( IntPart(DoubCuts%CutProp(CutNum,1))%Mass2*(1d0+x1) - x1*IntPart(DoubCuts%CutProp(CutNum,2))%Mass2 ))
          x4 = cdsqrt(SqrtPreF**2 - x3**2)
+
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
          call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
-
 
 ! -------- #2
          x3 = -x3
@@ -907,6 +907,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
 
          tagdcut(CutNum,1)=999    ! needed for integrals
+
+
 
          coeff2(CutNum,1) = DoubCuts%Coeff(CutNum,0)
          coeff2(CutNum,2) = DoubCuts%Coeff(CutNum,1)

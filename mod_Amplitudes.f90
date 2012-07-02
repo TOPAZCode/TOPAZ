@@ -234,8 +234,8 @@ integer :: i,j,Order(1:6)
           elseif( IsAScalar(TreeProc%PartType(1))  ) then
 !                 if( TreeProc%Quarks(1)%ExtRef.lt.TreeProc%Scalars(2)%ExtRef .or. TreeProc%Scalars(2)%ExtRef.eq.-1 ) then 
                 if( IsAQuark(Order(2)) ) then 
-                    Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
 !                     print *, "calling cur_s_sffs"
+                    Res(1) = cur_s_sffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
                     Res(2:Ds) = 0d0
                 else
                     Res(1) = cur_s_ssff( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:4))
@@ -273,13 +273,9 @@ integer :: i,j,Order(1:6)
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.0  .and. TreeProc%NumSca.eq.4) then!  0 quarks, 4 scalars
           if( IsAScalar(TreeProc%PartType(1)) ) then
-              if( tag_f.ne.2 ) then
-                  Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4) )
-              else
-                  Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4),tag_f=-1 )
-              endif
+!               print *, "calling cur_s_4s",tag_f
+              Res(1) = cur_s_4s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%NumGlu(0:4),tag_f )
               Res(2:Ds) = 0d0
-!                       print *, "calling cur_s_4s"
           else
              call Error("requested current is not available 4s")
           endif
@@ -314,24 +310,23 @@ integer :: i,j,Order(1:6)
               Res(1) = cur_s_ssffss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
               Res(2:Ds) = 0d0
           elseif( IsAScalar(Order(1)) .and. IsAQuark(Order(2)) .and. IsAQuark(Order(3))  ) then
-! print *, "TODO: make sure that tag_f=2 when closed scalar loop "
-              if( tag_f.ne.2 ) then 
-                  Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
+              if( tag_f.ne.3 ) then 
 !                   print *, "calling cur_s_sffsss"
+                  Res(1) = cur_s_sffsss( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
                   Res(2:Ds) = 0d0
               else 
-                  Res(1) = cur_s_sffsss_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
 !                   print *, "calling cur_s_sffsss_CLOSEDLOOPCONTRIB"
+                  Res(1) = cur_s_sffsss_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
                   Res(2:Ds) = 0d0
               endif 
           elseif( IsAScalar(Order(1)) .and. IsAScalar(Order(2)) .and. IsAScalar(Order(3))  ) then
-              if( tag_f.ne.2 ) then
+              if( tag_f.ne.3 ) then
                   Res(1) = cur_s_sssffs( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
 !                   print *, "calling cur_s_sssffs"
                   Res(2:Ds) = 0d0
               else
-                  Res(1) = cur_s_sssffs_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
 !                   print *, "calling cur_s_sssffs_CLOSEDLOOPCONTRIB"
+                  Res(1) = cur_s_sssffs_CLOSEDLOOPCONTRIB( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:4),TreeProc%Quarks(1:2),TreeProc%NumGlu(0:6) )
                   Res(2:Ds) = 0d0
               endif
           else
@@ -765,7 +760,7 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = -q/2d0*11d0/3d0   +3d0/3d0!- 4d0/3d0*TR*Nf_light
       endif
-      dZ2_top= 3d0/2d0 - 5d0/2d0 + 1d0 ! needs to be checked, +1d0 comes from new contribution in gamma_sing
+      dZ2_top= 0d0
 !      beta0 = 0d0
 !      dZ2_top=0d0
 
@@ -803,7 +798,7 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = q/2d0*11d0/3d0 - 10d0/3d0
       endif
-      dZ2_top= +3d0/4d0 -3d0/4d0
+      dZ2_top= 0d0
 
 
 !--------------------------------needs modification-------------------------------------------
@@ -858,7 +853,7 @@ integer :: FermionLoop
       elseif( Ng.eq.3 ) then
          beta0 = q/2d0*11d0/3d0 - q*10d0/3d0
       endif
-      dZ2_top= 3d0/2d0 -3d0/2d0
+      dZ2_top= 0d0
    endif
 
 
@@ -930,6 +925,9 @@ integer :: NfTerms
     endif
 return
 END SUBROUTINE
+
+
+
 
 
 

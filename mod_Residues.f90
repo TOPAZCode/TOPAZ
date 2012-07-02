@@ -126,10 +126,12 @@
 !DEC$ IF (_DebugUseMyAmps==0)
           if( any(Lab_in(l5c(1:5)).eq.'glu') ) then
             tag_f = 0
-          elseif( all(Lab_in(l5c(1:5)).eq.'top') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then
+          elseif( all(Lab_in(l5c(1:5)).eq.'top') .or .all(Lab_in(l5c(1:5)).eq.'sto') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then
             tag_f = 1
           elseif( all(Lab_in(l5c(1:5)).eq.'bot') .or. all(Lab_in(l5c(1:5)).eq.'chm') ) then
             tag_f = 2
+          elseif( all(Lab_in(l5c(1:5)).eq.'sbo')  ) then
+            tag_f = 3
           else
             tag_f = 99
           endif
@@ -175,10 +177,12 @@
 
           if( any(Lab_in(l5c(1:5)).eq.'glu') ) then
             tag_f = 0
-          elseif( all(Lab_in(l5c(1:5)).eq.'top') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then
+          elseif( all(Lab_in(l5c(1:5)).eq.'top') .or. all(Lab_in(l5c(1:5)).eq.'sto') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then
             tag_f = 1
           elseif( all(Lab_in(l5c(1:5)).eq.'bot') .or. all(Lab_in(l5c(1:5)).eq.'chm') ) then
             tag_f = 2
+          elseif( all(Lab_in(l5c(1:5)).eq.'sbo') ) then
+            tag_f = 3
           else
             tag_f = 99
           endif
@@ -206,7 +210,8 @@
 
 !         to multiply by proper power of I:
           do j=1,5
-              if (Lab_in(l5c(j)).eq.'top'.or.Lab_in(l5c(j)).eq.'bot'.or.Lab_in(l5c(j)).eq.'str'.or.Lab_in(l5c(j)).eq.'chm') then
+              if (Lab_in(l5c(j)).eq.'top' .or. Lab_in(l5c(j)).eq.'bot' .or. Lab_in(l5c(j)).eq.'sto' .or. Lab_in(l5c(j)).eq.'sbo' & 
+             .or. Lab_in(l5c(j)).eq.'str' .or. Lab_in(l5c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -287,7 +292,8 @@
 
 !           to multiply by proper power of I:
            do j=1,5
-              if (Lab_in(l5c(j)).eq.'top'.or.Lab_in(l5c(j)).eq.'bot'.or.Lab_in(l5c(j)).eq.'str'.or.Lab_in(l5c(j)).eq.'chm') then
+              if (Lab_in(l5c(j)).eq.'top' .or. Lab_in(l5c(j)).eq.'bot' .or. Lab_in(l5c(j)).eq.'sto' .or. Lab_in(l5c(j)).eq.'sbo' .or. & 
+                  Lab_in(l5c(j)).eq.'str' .or. Lab_in(l5c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -296,12 +302,13 @@
 
 !          intermediate 8-dim result
            res8 = res
-
 !           final result                          ! res=1/(D2-D1)*{ (D2-4)*(2/Nh6)*res6 - (D1-4)*(2/Nh8)*res8 }     with D1=6, D2=8
             if( tag_f.eq.0 ) then                 ! at least one gluon in loop,   Nh6=4, Nh8=2
                res = res6 -res8
             elseif (tag_f.eq.2) then              ! closed fermion loop,          Nh6=4, Nh8=8
                res = res6 - res8/4d0
+            elseif (tag_f.eq.3) then              ! closed scalar loop,           Nh6=2, Nh8=2
+               res = 2d0*res6 - res8
             else                                  ! no gluon in the loop,         Nh6=2, Nh8=2
                res = 2d0*res6 - res8
             endif
@@ -381,13 +388,16 @@ END SUBROUTINE
 
           if( any(Lab_in(l4c(1:4)).eq.'glu') ) then
             tag_f = 0
-          elseif( all(Lab_in(l4c(1:4)).eq.'top') .or. all(Lab_in(l4c(1:4)).eq.'str') ) then
+          elseif( all(Lab_in(l4c(1:4)).eq.'top') .or. all(Lab_in(l4c(1:4)).eq.'sto') .or. all(Lab_in(l4c(1:4)).eq.'str') ) then
             tag_f = 1
           elseif( all(Lab_in(l4c(1:4)).eq.'bot') .or. all(Lab_in(l4c(1:4)).eq.'chm')) then
             tag_f = 2
+          elseif( all(Lab_in(l4c(1:4)).eq.'sbo') .or. all(Lab_in(l4c(1:4)).eq.'sch')) then
+            tag_f = 3
           else
             tag_f = 99
           endif
+
 
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
@@ -481,7 +491,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,4
-              if (Lab_in(l4c(j)).eq.'top'.or.Lab_in(l4c(j)).eq.'bot'.or.Lab_in(l4c(j)).eq.'str'.or.Lab_in(l4c(j)).eq.'chm') then
+              if (Lab_in(l4c(j)).eq.'top' .or. Lab_in(l4c(j)).eq.'bot' .or. Lab_in(l4c(j)).eq.'sto' .or. Lab_in(l4c(j)).eq.'sbo' .or. Lab_in(l4c(j)).eq.'str' .or. Lab_in(l4c(j)).eq.'chm') then
                  res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -555,7 +565,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,4
-              if (Lab_in(l4c(j)).eq.'top'.or.Lab_in(l4c(j)).eq.'bot'.or.Lab_in(l4c(j)).eq.'str'.or.Lab_in(l4c(j)).eq.'chm') then
+              if (Lab_in(l4c(j)).eq.'top' .or. Lab_in(l4c(j)).eq.'bot' .or. Lab_in(l4c(j)).eq.'sto' .or. Lab_in(l4c(j)).eq.'sbo' .or. Lab_in(l4c(j)).eq.'str' .or. Lab_in(l4c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -621,7 +631,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,4
-              if (Lab_in(l4c(j)).eq.'top'.or.Lab_in(l4c(j)).eq.'bot'.or.Lab_in(l4c(j)).eq.'str'.or.Lab_in(l4c(j)).eq.'chm') then
+              if (Lab_in(l4c(j)).eq.'top' .or. Lab_in(l4c(j)).eq.'bot' .or. Lab_in(l4c(j)).eq.'sto' .or. Lab_in(l4c(j)).eq.'sbo' .or. Lab_in(l4c(j)).eq.'str' .or. Lab_in(l4c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -634,6 +644,8 @@ END SUBROUTINE
                res = res6 -res8
             elseif (tag_f.eq.2) then
                res = res6 - res8/4d0
+            elseif (tag_f.eq.3) then
+               res = 2d0*res6 - res8
             else
                res = 2d0*res6 - res8
             endif
@@ -765,10 +777,12 @@ END SUBROUTINE
 
           if( any(Lab_in(l3c(1:3)).eq.'glu') ) then
             tag_f = 0
-          elseif( all(Lab_in(l3c(1:3)).eq.'top') .or. all(Lab_in(l3c(1:3)).eq.'str') ) then
+          elseif( all(Lab_in(l3c(1:3)).eq.'top') .or. all(Lab_in(l3c(1:3)).eq.'sto') .or. all(Lab_in(l3c(1:3)).eq.'str') ) then
             tag_f = 1
           elseif( all(Lab_in(l3c(1:3)).eq.'bot') .or. all(Lab_in(l3c(1:3)).eq.'chm') ) then
             tag_f = 2
+          elseif( all(Lab_in(l3c(1:3)).eq.'sbo')  ) then
+            tag_f = 3
           else
             tag_f = 99
           endif
@@ -839,7 +853,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,3
-              if (Lab_in(l3c(j)).eq.'top'.or.Lab_in(l3c(j)).eq.'bot'.or.Lab_in(l3c(j)).eq.'str'.or.Lab_in(l3c(j)).eq.'chm') then
+              if (Lab_in(l3c(j)).eq.'top' .or. Lab_in(l3c(j)).eq.'bot' .or. Lab_in(l3c(j)).eq.'sto' .or. Lab_in(l3c(j)).eq.'sbo' .or. Lab_in(l3c(j)).eq.'str' .or. Lab_in(l3c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -901,7 +915,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,3
-              if (Lab_in(l3c(j)).eq.'top'.or.Lab_in(l3c(j)).eq.'bot'.or.Lab_in(l3c(j)).eq.'str'.or.Lab_in(l3c(j)).eq.'chm') then
+              if (Lab_in(l3c(j)).eq.'top' .or. Lab_in(l3c(j)).eq.'bot' .or. Lab_in(l3c(j)).eq.'sto' .or. Lab_in(l3c(j)).eq.'sbo' .or. Lab_in(l3c(j)).eq.'str' .or. Lab_in(l3c(j)).eq.'chm') then
                  res = dcmplx(0d0,1d0)*res
                 else
                  res = dcmplx(0d0,-1d0)*res
@@ -963,7 +977,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,3
-              if (Lab_in(l3c(j)).eq.'top'.or.Lab_in(l3c(j)).eq.'bot'.or.Lab_in(l3c(j)).eq.'str'.or.Lab_in(l3c(j)).eq.'chm') then
+              if (Lab_in(l3c(j)).eq.'top' .or. Lab_in(l3c(j)).eq.'bot' .or. Lab_in(l3c(j)).eq.'sto' .or. Lab_in(l3c(j)).eq.'sbo' .or. Lab_in(l3c(j)).eq.'str' .or. Lab_in(l3c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                 res = dcmplx(0d0,-1d0)*res
@@ -976,6 +990,8 @@ END SUBROUTINE
                res = res6 - res8
             elseif (tag_f.eq.2) then
                res = res6 - res8/4d0
+            elseif (tag_f.eq.3) then
+               res = 2d0*res6 - res8
             else
                res = 2d0*res6 - res8
             endif
@@ -1206,10 +1222,12 @@ END SUBROUTINE
 
           if( any(Lab_in(l2c(1:2)).eq.'glu') ) then
             tag_f = 0
-          elseif( all(Lab_in(l2c(1:2)).eq.'top') .or. all(Lab_in(l2c(1:2)).eq.'str') ) then
+          elseif( all(Lab_in(l2c(1:2)).eq.'top') .or.  all(Lab_in(l2c(1:2)).eq.'sto') .or. all(Lab_in(l2c(1:2)).eq.'str') ) then
             tag_f = 1
           elseif( all(Lab_in(l2c(1:2)).eq.'bot') .or. all(Lab_in(l2c(1:2)).eq.'chm') ) then
             tag_f = 2
+          elseif( all(Lab_in(l2c(1:2)).eq.'sbo') ) then
+            tag_f = 3
           else
             tag_f = 99
           endif
@@ -1270,7 +1288,7 @@ END SUBROUTINE
 
 !--------- to multiply by proper power of I:
            do j=1,2
-              if (Lab_in(l2c(j)).eq.'top'.or.Lab_in(l2c(j)).eq.'bot'.or.Lab_in(l2c(j)).eq.'str'.or.Lab_in(l2c(j)).eq.'chm') then
+              if (Lab_in(l2c(j)).eq.'top' .or. Lab_in(l2c(j)).eq.'bot' .or. Lab_in(l2c(j)).eq.'sto' .or. Lab_in(l2c(j)).eq.'sbo' .or. Lab_in(l2c(j)).eq.'str' .or. Lab_in(l2c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                 res = dcmplx(0d0,-1d0)*res
@@ -1324,7 +1342,7 @@ END SUBROUTINE
 
 !           to multiply by proper power of I:
            do j=1,2
-              if (Lab_in(l2c(j)).eq.'top'.or.Lab_in(l2c(j)).eq.'bot'.or.Lab_in(l2c(j)).eq.'str'.or.Lab_in(l2c(j)).eq.'chm') then
+              if (Lab_in(l2c(j)).eq.'top' .or. Lab_in(l2c(j)).eq.'bot' .or. Lab_in(l2c(j)).eq.'sto' .or. Lab_in(l2c(j)).eq.'sbo' .or. Lab_in(l2c(j)).eq.'str' .or. Lab_in(l2c(j)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -1373,7 +1391,7 @@ END SUBROUTINE
 
 !---------- multiply by proper power of I:
            do j=1,2
-              if (Lab_in(l2c(j)).eq.'top'.or.Lab_in(l2c(j)).eq.'bot'.or.Lab_in(l2c(j)).eq.'str'.or.Lab_in(l2c(j)).eq.'chm') then
+              if (Lab_in(l2c(j)).eq.'top' .or. Lab_in(l2c(j)).eq.'bot' .or. Lab_in(l2c(j)).eq.'sto' .or. Lab_in(l2c(j)).eq.'sbo' .or. Lab_in(l2c(j)).eq.'str' .or. Lab_in(l2c(j)).eq.'chm') then
                  res = dcmplx(0d0,1d0)*res
               else
                  res = dcmplx(0d0,-1d0)*res
@@ -1387,9 +1405,13 @@ END SUBROUTINE
                res = res6 -res8
             elseif (tag_f.eq.2) then
                res = res6 - res8/4d0
+            elseif (tag_f.eq.3) then
+               res = 2d0*res6 -res8
             else
                res = 2d0*res6 - res8
             endif
+
+
 
 !cccccccccccccccccccc endif for Ds = 5
          endif
@@ -1651,10 +1673,12 @@ END SUBROUTINE
 
           if( Lab_in(l1c(1)).eq.'glu' ) then
             tag_f = 0
-          elseif( Lab_in(l1c(1)).eq.'top' .or. Lab_in(l1c(1)).eq.'str') then
+          elseif( Lab_in(l1c(1)).eq.'top' .or. Lab_in(l1c(1)).eq.'sto' .or. Lab_in(l1c(1)).eq.'str') then
             tag_f = 1
           elseif( Lab_in(l1c(1)).eq.'bot' .or. Lab_in(l1c(1)).eq.'chm' ) then
             tag_f = 2
+          elseif( Lab_in(l1c(1)).eq.'sbo'  ) then
+            tag_f = 3
           else
             tag_f = 99
           endif
@@ -1708,7 +1732,7 @@ END SUBROUTINE
             enddo
 
 
-              if (Lab_in(l1c(1)).eq.'top'.or.Lab_in(l1c(1)).eq.'bot'.or.Lab_in(l1c(1)).eq.'str'.or.Lab_in(l1c(1)).eq.'chm') then
+              if (Lab_in(l1c(1)).eq.'top' .or. Lab_in(l1c(1)).eq.'bot' .or. Lab_in(l1c(1)).eq.'sto' .or. Lab_in(l1c(1)).eq.'sbo' .or. Lab_in(l1c(1)).eq.'str' .or. Lab_in(l1c(1)).eq.'chm') then
                 res = dcmplx(0d0,1d0)*res
               else
                 res = dcmplx(0d0,-1d0)*res

@@ -2910,7 +2910,7 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
 !       NumBornAmps = 4  ; print *, "for crossed check"
 
     ELSEIF( Correction.EQ.1 ) THEN
-      NumPrimAmps = 10
+      NumPrimAmps = 12
       NumBornAmps = 2
     ELSEIF( Correction.EQ.3 ) THEN
     ENDIF
@@ -4304,6 +4304,15 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
       PrimAmps(10)%ExtLine = (/1,2,4,3/)
       PrimAmps(10)%AmpType = 2
       PrimAmps(10)%FermLoopPart = Bot_
+
+      PrimAmps(11)%ExtLine = (/1,2,3,4/)
+      PrimAmps(11)%AmpType = 2
+      PrimAmps(11)%FermLoopPart = SBot_
+
+      PrimAmps(12)%ExtLine = (/1,2,4,3/)
+      PrimAmps(12)%AmpType = 2
+      PrimAmps(12)%FermLoopPart = SBot_
+
    ENDIF
 
 
@@ -4985,9 +4994,7 @@ include 'misc/global_import'
       elseif(ExtPartType.eq.HTop_ .or. ExtPartType.eq.AHTop_ ) then! fix for HTop
          Lab_ex(Vertex)='top'
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
-         Lab_ex(Vertex)='top'
-!       elseif(ExtPartType.eq.SBot_ .or. ExtPartType.eq.ASBot_ ) then! fix for STop(closed loop)
-!          Lab_ex(Vertex)='bot'
+         Lab_ex(Vertex)='sto'
       else
          print *, "error in kirills conv, ExtPartType=", ExtPartType
       endif
@@ -5005,9 +5012,9 @@ include 'misc/global_import'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.HTop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.AHTop_ ) then
          Lab_in(Propa)='top'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.STop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASTop_ ) then
-         Lab_in(Propa)='top'
+         Lab_in(Propa)='sto'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.SBot_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASBot_ ) then
-         Lab_in(Propa)='bot'
+         Lab_in(Propa)='sbo'
       else
          Lab_in(Propa)='notset'
       endif

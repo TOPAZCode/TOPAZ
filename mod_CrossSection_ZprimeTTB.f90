@@ -12,7 +12,6 @@ use ModProcess
 use ModKinematics
 use ModAmplitudes_Zprime
 use ModParameters
-use ModJPsiFrag
 use ModIntDipoles_ZprimeTTB
 implicit none
 real(8) ::  EvalCS_1L_Zprime_ttbqqb,yRnd(1:VegasMxDim),VgsWgt
@@ -187,8 +186,8 @@ include "vegas_common.f"
      EvalCS_1L_Zprime_ttbqqb = ISFac*PreFac* (PDFFac_L * Virt_Res_Unpol_Left + PDFFac_R * Virt_Res_Unpol_Right)
      EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb * 9d0*(4d0*Pi*alpha_s*RunFactor) ! Color and alpha_s
 
-  !!! Integrated dipoles !!!
 
+  !!! Integrated dipoles !!!
   ELSEIF(CORRECTION.EQ.3) THEN
 
      z = yRnd(5)
@@ -221,27 +220,27 @@ include "vegas_common.f"
         PDFFac_dip_L(2) = 0d0
 
         if( xpdf.le.0.5d0 ) then
-            PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2))
-            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2))
-            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2))
-            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2))
-            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2))
-            PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2))
-            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2))
-            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2))
-            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2))
-            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2))
-        else
-            PDFFac_dip_L(3) = gL_Zpr(up_)**2 * (pdf_z(0,2)*pdf(up_,1))
+            PDFFac_dip_L(3) =                   gL_Zpr(up_)**2 * (pdf_z(0,2)*pdf(up_,1))! here was a bug: 1<-->2; correct now
             PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(0,2)*pdf(dn_,1))
             PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(0,2)*pdf(chm_,1))
             PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(0,2)*pdf(str_,1))
             PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(0,2)*pdf(bot_,1))
-            PDFFac_dip_R(3) = gR_Zpr(up_)**2 * (pdf_z(0,2)*pdf(up_,1))
+            PDFFac_dip_R(3) =                   gR_Zpr(up_)**2 * (pdf_z(0,2)*pdf(up_,1))
             PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(0,2)*pdf(dn_,1))
             PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(0,2)*pdf(chm_,1))
             PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(0,2)*pdf(str_,1))
             PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(0,2)*pdf(bot_,1))
+        else
+            PDFFac_dip_L(3) =                   gL_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2))
+            PDFFac_dip_L(3) = PDFFac_dip_L(3) + gL_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2))
+            PDFFac_dip_R(3) =                   gR_Zpr(up_)**2 * (pdf_z(0,1)*pdf(up_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(dn_)**2 * (pdf_z(0,1)*pdf(dn_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(chm_)**2 * (pdf_z(0,1)*pdf(chm_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(str_)**2 * (pdf_z(0,1)*pdf(str_,2))
+            PDFFac_dip_R(3) = PDFFac_dip_R(3) + gR_Zpr(bot_)**2 * (pdf_z(0,1)*pdf(bot_,2))
         endif
 
         PDFFac_dip_R(3) = PDFFac_dip_R(3) * 2d0!  factor two for sampling over pdfs
@@ -528,28 +527,28 @@ integer :: i1,i2,i3,i4,i5
 
      call random_number(xpdf)
 
-     if( xpdf.le.0.5d0 ) then
-        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
-        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
-        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
-        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
-        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
-        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
-        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
-        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
-        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
-        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
-     else
-        PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
+     if( xpdf.le.0.5d0 ) then !   here was a bug: 1<-->2; corrected now
+        PDFFac_L =            gL_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
         PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,2)*pdf(dn_,1))
         PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,2)*pdf(chm_,1))
         PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,2)*pdf(str_,1))
         PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,2)*pdf(bot_,1))
-        PDFFac_R = gR_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
+        PDFFac_R =            gR_Zpr(up_)**2 * (pdf(0,2)*pdf(up_,1))
         PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,2)*pdf(dn_,1))
         PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,2)*pdf(chm_,1))
         PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,2)*pdf(str_,1))
         PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,2)*pdf(bot_,1))
+     else
+        PDFFac_L =            gL_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
+        PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
+        PDFFac_R =            gR_Zpr(up_)**2 * (pdf(0,1)*pdf(up_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(0,1)*pdf(dn_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(0,1)*pdf(chm_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(0,1)*pdf(str_,2))
+        PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(bot_,2))
         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
      endif
 
@@ -707,7 +706,7 @@ integer :: i1,i2,i3,i4,i5
      dipoles = 0d0
      do nDip = 1,4
 
-        call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
+        call Dipoles_qqb_Zprime_ttb(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:4), resdip)! here was a bug: MomExtTd was running from 1:5; correct now
  
         if (resdip .EQ. 0d0) cycle
 
@@ -967,9 +966,9 @@ integer :: i1,i2,i3,i4,i5
         do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),resdip)
         enddo
-     
+        
         dipoles = dipoles + resdip
-
+        
      enddo
     
   ENDIF

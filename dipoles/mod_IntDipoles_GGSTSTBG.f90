@@ -3,7 +3,7 @@ use ModTopDecay
 implicit none
 private
 
-public:: EvalIntDipoles_GGSTSTBG
+public:: EvalIntDipoles_GGSTSTBG,Tree_GG_TTb_ij
 
 integer, parameter,private  :: dp = selected_real_kind(15)
 real(dp),parameter,private :: zero = 0.0_dp
@@ -49,7 +49,6 @@ contains
     Tree_23  =  Tree_ij(4) * 0.5d0
     Tree_24  =  Tree_ij(5) * 0.5d0
     Tree_34  =  Tree_ij(6) * 0.5d0
-
 
    do n=1,12
       if(n.eq.1) then
@@ -153,6 +152,8 @@ contains
         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
       endif
 
+!res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
+
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 
@@ -167,6 +168,8 @@ contains
        res(1) = res(1) + 2d0*(AP(1)-AP(3))
        res(2) = res(2) + (AP(2) + AP(3))
        res(3) = res(3) + (AP(2) + AP(3))
+
+!res(1) = res(1)+2*ap(1); print *, "eps check"
 
 ! 
 ! print *, "LO ID", Tree_ij(0)
@@ -241,13 +244,13 @@ contains
       Gluons(2)%Mass  => MassTd(2)
 
       Quarks(1)%Mom => MomTd(:,3)
-      Quarks(1)%PartType => Top_
+      Quarks(1)%PartType => STop_
       Quarks(1)%ExtRef => ExtRef
       Quarks(1)%Mass2 => Mass2Td(3)
       Quarks(1)%Mass  => MassTd(3)
 
       Quarks(2)%Mom => MomTd(:,4)
-      Quarks(2)%PartType => ATop_
+      Quarks(2)%PartType => ASTop_
       Quarks(2)%ExtRef => ExtRef
       Quarks(2)%Mass2 => Mass2Td(4)
       Quarks(2)%Mass  => MassTd(4)

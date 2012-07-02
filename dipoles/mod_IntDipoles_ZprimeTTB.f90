@@ -255,10 +255,10 @@ contains
     if(emi.eq.1) then
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        IDip(2) = IDip(2) + (dipfini+dipplus)
-    elseif(emi.eq.2) then
+    elseif(emi.eq.2) then! never called
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        IDip(3) = IDip(3) + (dipfini+dipplus)
-    elseif(emi.eq.3) then
+    elseif(emi.eq.3) then! never called
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        IDip(2) = IDip(2) + (dipfini+dipplus)*0.5d0
        IDip(3) = IDip(3) + (dipfini+dipplus)*0.5d0
@@ -279,7 +279,7 @@ contains
     IDip(2) = IDip(2) + (APfini + APplus)
     
     ! print *, "AP",(APsoft - APplus),(APfini + APplus)
-    ! print *, "sum",IDip(2:3)
+    ! print *, "sum",IDip(1:3)
     ! pause
     
   END SUBROUTINE IntDip_gqb_Zprime_ttb
@@ -310,13 +310,13 @@ contains
     emi = 2
 
 
-    if(emi.eq.1) then
+    if(emi.eq.1) then! never called
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        IDip(2) = IDip(2) + (dipfini+dipplus)
     elseif(emi.eq.2) then
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        IDip(3) = IDip(3) + (dipfini+dipplus)
-    elseif(emi.eq.3) then
+    elseif(emi.eq.3) then! never called
        IDip(1) = IDip(1) + (dipsoft-dipplus)
        !         IDip(2) = IDip(2) + (dipfini+dipplus)*0.5d0
        !         IDip(3) = IDip(3) + (dipfini+dipplus)*0.5d0
@@ -337,9 +337,11 @@ contains
     IDip(3) = IDip(3) + (APfini + APplus)
     
      !print *, "AP",(APsoft - APplus),(APfini + APplus)
-     !print *, "sum",IDip(2:3)
+     !print *, "sum",IDip(1:3)
      !pause
     
+
+
   END SUBROUTINE IntDip_qg_Zprime_ttb
 
 

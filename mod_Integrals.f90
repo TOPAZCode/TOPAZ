@@ -375,11 +375,28 @@ contains
          endif
 
 !--------contribution to the rational part
+
          res(1) = res(1) +b10*dcmplx(-0.5d0*(m12+m22-s11/3d0),0d0)
 
          enddo
 
 
+! print *, "checker",qlI2(m_stop**2,0d0,m_stop**2,m_stop**2,-1)
+! print *, "checker",qlI2(m_stop**2,0d0,m_stop**2,m_stop**2,0)
+
+! print *, "checker",qlI2(m_stop**2,1d8*m_stop**2,m_top**2,m_stop**2,-1)
+! print *, "checker",qlI2(m_stop**2,1d8*m_stop**2,m_top**2,m_stop**2,0)
+! call ffxdb0(res(0),res(1),m_stop**2,1d8*m_stop**2,m_top**2,xe)! m*dB
+! print *, "checker",2d0*res(0)*( m_stop**2-1d8*m_stop**2-m_top**2 )
+
+! call ffxdb0(res(0),res(1),m_stop**2,1d-10,m_stop**2,xe)! m*dB
+! print *, "checker",res(1)
+
+
+! print *, "checker",qlI3(m_stop**2,m_stop**2,(1000d0*GeV)**2,m_top**2,1d12*m_stop**2,m_top**2,MuRen**2,-2)
+! print *, "checker",qlI3(m_stop**2,m_stop**2,(1000d0*GeV)**2,m_top**2,1d12*m_stop**2,m_top**2,MuRen**2,-1)
+! print *, "checker",qlI3(m_stop**2,m_stop**2,(1000d0*GeV)**2,m_top**2,1d12*m_stop**2,m_top**2,MuRen**2,0)
+! pause
 
 
 !     1 cut
