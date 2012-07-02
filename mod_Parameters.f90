@@ -65,8 +65,8 @@ real(8), public, parameter :: m_Chi   = 50d0*GeV
 
 !real(8), public, parameter :: m_Zpr = 91.19d0*GeV ! Standard Z
 !real(8), public, parameter :: Ga_Zpr = 2.4950d0*GeV ! Standard Z
-real(8), public, parameter :: m_Zpr = 1500d0*GeV
-real(8), public, parameter :: Ga_Zpr = 15d0*GeV
+real(8), public :: m_Zpr
+real(8), public :: Ga_Zpr
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
 
 !!! End Zprime section !!!
@@ -302,33 +302,54 @@ m_SBot = m_STop ! this is NOT the sbottom mass! it is the mass for massive scala
 
 IF( COLLIDER.EQ.1 ) THEN
    Collider_Energy  = 14000d0*GeV
-   if( ObsSet.eq.1 ) then
-        Collider_Energy  = 14000d0*GeV
-   endif
-   if( ObsSet.eq.3 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.5 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.6 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.8 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.11 ) then
-        Collider_Energy  = 14000d0*GeV
-   endif
-   if( ObsSet.eq.13 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.15 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
-   if( ObsSet.eq.25 ) then
-        Collider_Energy  = 7000d0*GeV
-   endif
+
+ELSEIF( COLLIDER.EQ.11 ) THEN
+   Collider_Energy  = 7000d0*GeV
+   COLLIDER = 1
+
+ELSEIF( COLLIDER.EQ.12 ) THEN
+   Collider_Energy  = 8000d0*GeV
+   COLLIDER = 1
+
+ELSEIF( COLLIDER.EQ.13 ) THEN
+   Collider_Energy  = 13000d0*GeV
+   COLLIDER = 1
+
+!    Collider_Energy  = 14000d0*GeV
+!    if( ObsSet.eq.1 ) then
+!         Collider_Energy  = 14000d0*GeV
+!    endif
+!    if( ObsSet.eq.3 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.5 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.6 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.8 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.11 ) then
+!         Collider_Energy  = 14000d0*GeV
+!    endif
+!    if( ObsSet.eq.13 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.15 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.25 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.60 ) then
+!         Collider_Energy  = 7000d0*GeV
+!    endif
+!    if( ObsSet.eq.61 ) then
+!         Collider_Energy  = 14000d0*GeV
+!    endif
+
 ELSEIF( COLLIDER.EQ.2 ) THEN
   Collider_Energy  = 1960d0*GeV
 ENDIF
@@ -336,8 +357,11 @@ ENDIF
 
 IF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.1 .OR. NLOPARAM.EQ.0) ) THEN
   Lambda_QCD = 0.165d0*GeV
-  alpha_s = 0.13d0  ! CTEQ6L1
-!   alpha_s = 0.118d0   ! CTEQ6L
+!   alpha_s = 0.13d0  ! CTEQ6L1
+  alpha_s = 0.118d0   ! CTEQ6L
+
+print *, "SWITCHED TO WRONG ALPHA_S FOR CHINESE CHECK"
+
 ELSEIF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.2) ) THEN
   Lambda_QCD = 0.226235d0*GeV
   alpha_s = 0.118d0

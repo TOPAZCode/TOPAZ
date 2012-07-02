@@ -3081,7 +3081,9 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
           Histo(8)%LowVal = 0d0*GeV
           Histo(8)%SetScale= 100d0
 
-ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
+
+
+ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
           NumHistograms = 9
@@ -3105,37 +3107,37 @@ ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
 
           Histo(3)%Info   = "y_ATop"
           Histo(3)%NBins  = 50
-          Histo(3)%BinSize= 0.2d0
+          Histo(3)%BinSize= 0.5d0
           Histo(3)%LowVal =-5.0d0
           Histo(3)%SetScale= 1d0
 
           Histo(4)%Info   = "y_Top"
           Histo(4)%NBins  = 50
-          Histo(4)%BinSize= 0.2d0
+          Histo(4)%BinSize= 0.5d0
           Histo(4)%LowVal =-5.0d0
           Histo(4)%SetScale= 1d0
 
           Histo(5)%Info   = "M_TTbar"
           Histo(5)%NBins  = 50
-          Histo(5)%BinSize= 40d0*GeV
+          Histo(5)%BinSize= 50d0*GeV
           Histo(5)%LowVal = 350d0*GeV
           Histo(5)%SetScale= 100d0
 
           Histo(6)%Info   = "deltaPhi_TTbar"
           Histo(6)%NBins  = 50
-          Histo(6)%BinSize= 0.08d0
+          Histo(6)%BinSize= 0.1d0
           Histo(6)%LowVal = 0d0
           Histo(6)%SetScale= 1d0
 
           Histo(7)%Info   = "CosTheta_scatter"
           Histo(7)%NBins  = 50
-          Histo(7)%BinSize= 0.04d0
+          Histo(7)%BinSize= 0.1d0
           Histo(7)%LowVal = -1d0
           Histo(7)%SetScale= 1d0
 
           Histo(8)%Info   = "CosTheta_star"
           Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 0.04d0
+          Histo(8)%BinSize= 0.1d0
           Histo(8)%LowVal = -1d0
           Histo(8)%SetScale= 1d0
 
@@ -3144,6 +3146,8 @@ ELSEIF( ObsSet.EQ.60 ) THEN! set of observables for Zprime, stable tops
           Histo(9)%BinSize= 40d0*GeV
           Histo(9)%LowVal = 350d0*GeV
           Histo(9)%SetScale= 100d0
+
+
 
 ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -3169,19 +3173,19 @@ ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dile
 
           Histo(3)%Info   = "y_Top"
           Histo(3)%NBins  = 50
-          Histo(3)%BinSize= 0.2d0
+          Histo(3)%BinSize= 0.5d0
           Histo(3)%LowVal =-5.0d0
           Histo(3)%SetScale= 1d0
 
           Histo(4)%Info   = "y_leptP"
           Histo(4)%NBins  = 50
-          Histo(4)%BinSize= 0.2d0
+          Histo(4)%BinSize= 0.5d0
           Histo(4)%LowVal =-5.0d0
           Histo(4)%SetScale= 1d0
 
           Histo(5)%Info   = "M_LL"
           Histo(5)%NBins  = 50
-          Histo(5)%BinSize= 40d0*GeV
+          Histo(5)%BinSize= 50d0*GeV
           Histo(5)%LowVal = 350d0*GeV
           Histo(5)%SetScale= 100d0
 
@@ -7729,10 +7733,10 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
     Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
     if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
 
-!   scattering angle of the top quark
+!   scattering angle of the top quark in lab frame
     CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
 
-!   see chinese paper, approximates scattering angle
+!   see chinese paper, approximates scattering angle in ttb rest frame
     MomAux1(1:4) = MomTops(1:4,2)
     MomAux2(1:4) = MomExt(1:4,1)
     call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
@@ -7751,7 +7755,8 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
     NBin(7) = WhichBin(7,CosTheta_scatter)
     NBin(8) = WhichBin(8,CosTheta_star)
 
-    NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
+    if( NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
+    if( .not. NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)))
 
 !-------------------------------------------------------
 elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept. decays

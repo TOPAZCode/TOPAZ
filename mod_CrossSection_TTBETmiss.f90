@@ -821,7 +821,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=7,10; !12; print *, "only primamp",iPrimAmp
+      do iPrimAmp=7,12; !12; print *, "only primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
 
           call PentCut(PrimAmps(iPrimAmp))
@@ -870,27 +870,27 @@ IF( Correction.EQ.0 ) THEN
 
 
 ELSEIF( Correction.EQ.1 ) THEN
-
-
-
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 !  CT contributions                           ! beta        !stop WFRC
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0   +  0d0  )*LO_Res_Unpol
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (+2d0/3d0*Nf_light+2d0/3d0)*LO_Res_Unpol! coupling renorm.
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (  -1d0/6d0          -2d0/3d0)*LO_Res_Unpol! gluon self energy (scalar,light fermion loops)
+
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_stop)*LO_Res_Unpol  ! finite log(mu) contrib. from  stop WFRC
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) - (-2d0/3d0*Nf_light)*LO_Res_Unpol
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-7d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from stop WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
 
-call Catani_1L_ststbgg(MomExt(1:4,1:4),CataniRes(-2:-1))
-print *, "LO",LO_Res_Unpol
+! call Catani_1L_ststbgg(MomExt(1:4,1:4),CataniRes(-2:-1))!  alpha_s renormalization needs to be switched off
+! print *, "LO",LO_Res_Unpol
 ! print *, "bare NLO(-2)",(NLO_Res_UnPol(-2)/LO_Res_Unpol)
-print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
-! print *, "bare NLO(01)",(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))!/LO_Res_Unpol
+! print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
+! print *, "bare NLO( 0)",(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0))/LO_Res_Unpol
+! print *, "bare NLO( 1)",(NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol
 ! print *, "Catani(-2)",dreal(CataniRes(-2))/LO_Res_Unpol
-print *, "Catani(-1)",real(CataniRes(-1))/LO_Res_Unpol
-print *, "ratio",real(CataniRes(-1)/LO_Res_Unpol)/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-print *, "diff ",real(CataniRes(-1)/LO_Res_Unpol)-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-pause
+! print *, "Catani(-1)",real(CataniRes(-1))/LO_Res_Unpol
+! print *, "ratio",real(CataniRes(-1)/LO_Res_Unpol)/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+! print *, "diff ",real(CataniRes(-1)/LO_Res_Unpol)-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+! pause
 
 
 !  normalization
@@ -1013,21 +1013,21 @@ complex(8) :: TreeMom(1:4,1:4)
 
 
 
- rdiv1=-11d0/6d0*3d0 + 2d0/3d0/2d0*6d0
+ rdiv1=-11d0/6d0*3d0 + 2d0/3d0/2d0*5d0
  res(-1) = res(-1) + rdiv1*Tree
 
- rdiv1=-11d0/6d0*3d0 + 2d0/3d0/2d0*6d0
- res(-1) = res(-1) + rdiv1*Tree
-
- rdiv1=-4d0/3d0 
+ rdiv1=-11d0/6d0*3d0 + 2d0/3d0/2d0*5d0
  res(-1) = res(-1) + rdiv1*Tree
 
  rdiv1=-4d0/3d0 
  res(-1) = res(-1) + rdiv1*Tree
 
+ rdiv1=-4d0/3d0 
+ res(-1) = res(-1) + rdiv1*Tree
 
- beta0 = 11d0/3d0*3d0 -2d0/3d0*5d0 !- 1d0/6d0
- res(-1) = res(-1) + beta0*Tree
+
+ beta0 = 11d0/3d0*3d0 -2d0/3d0*6d0 - 1d0/6d0
+  res(-1) = res(-1) + beta0*Tree
 
 
 RETURN
@@ -1246,7 +1246,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=5,7; print *, "Evaluate fermion loop primamp",iPrimAmp
+      do iPrimAmp=5,7; !print *, "Evaluate fermion loop primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -1260,18 +1260,18 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! print *, "LO",BornAmps(1)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
-print *, "ratio",PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
-print *, "ratio",PrimAmps(iPrimAmp)%Result(0)/BornAmps(1)%Result
-print *, "ratio",PrimAmps(iPrimAmp)%Result(1)/BornAmps(1)%Result
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1),BornAmps(1)%Result
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(0),BornAmps(1)%Result
+! print *, "ratio",PrimAmps(iPrimAmp)%Result(1),BornAmps(1)%Result
       enddo
 ! pause
                          ! minus to remove minus from closed fermion loop
       FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
       FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
 
-print *, "For comparison with RADJA set mt=0 in closed loops"
-FermionLoopPartAmp(1,-2:1) =           ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
-FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+! print *, "For comparison with RADJA set mt=0 in closed loops"
+! FermionLoopPartAmp(1,-2:1) =           ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
+! FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( (Nf_light)*PrimAmps(5)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
 
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
@@ -1327,24 +1327,18 @@ NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  NLO_Res_UnPol(-2)*dblPi**2/12d0!  convert
 ! print *, "bare NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+67.6225159647733d0
 ! print *, "bare NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+84.9030724385563d0
 ! print *, ""
- call Catani_1L_ststbqqb(MomExt(1:4,1:4),CataniRes(-2:-1))
-print *, "bare NLO(-2)",(NLO_Res_UnPol(-2)/LO_Res_Unpol)
-print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
-print *, "Catani(-2)",dreal(CataniRes(-2))
-print *, "Catani(-1)",real(CataniRes(-1))
-print *, "ratio",real(CataniRes(-1))/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-print *, "diff ",real(CataniRes(-1))-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-pause
+
+
 
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 
    call deltaZ_Stop(dZStop(-1:0))
 
 !  CT contributions
-   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0  +  2d0*dZStop(-1) )*LO_Res_Unpol
+   NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0   +  2d0*dZStop(-1) )*LO_Res_Unpol
                                                                                           ! the last term is from the scalar loop
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  0* 2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol; print *, "remove Nf_heavy for comparison"
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + 0*(2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol; ! print *, "remove Nf_heavy for comparison"
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +            (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + dZStop(0)*LO_Res_Unpol ! finite contribution from dZStop
 
@@ -1358,6 +1352,17 @@ pause
 !  print *, "ren. NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+67.6225159647733d0
 !  print *, "ren. NLO(0)",2d0*(NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_Unpol+84.9030724385563d0
 !  pause
+
+
+call Catani_1L_ststbqqb(MomExt(1:4,1:4),CataniRes(-2:-1))!  alpha_s renormalization needs to be switched off
+print *, "LO",LO_Res_Unpol
+print *, "bare NLO(-2)",(NLO_Res_UnPol(-2)/LO_Res_Unpol)
+print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
+print *, "Catani(-2)",dreal(CataniRes(-2))
+print *, "Catani(-1)",real(CataniRes(-1))
+print *, "ratio",real(CataniRes(-1))/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+print *, "diff ",real(CataniRes(-1))-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+pause
 
 
 !  normalization
@@ -1505,8 +1510,8 @@ complex(8) :: res(-2:-1),s12,s13,s14,s34,rdiv2,rdiv1
  rdiv1=-4d0/3d0 
  res(-1) = res(-1) + rdiv1
 
-
- beta0 = 11d0/3d0*3d0 -2d0/3d0*5d0 - 1d0/6d0
+                        ! Nf+NF=6
+ beta0 = 11d0/3d0*3d0 -2d0/3d0*6d0 - 1d0/6d0
  res(-1) = res(-1) + beta0
 
 

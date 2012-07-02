@@ -68,6 +68,8 @@ logical :: dirresult
    HelSampling=.false.
    m_Top=172d0*GeV
    m_STop=100d0*GeV
+   m_Zpr=1500d0*GeV
+   Ga_Zpr=m_Zpr*0.01d0
    Q_top = Q_up
    MuRen=m_Top
    MuFac=m_Top
@@ -97,7 +99,7 @@ logical :: dirresult
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
     if( arg(1:9).eq."Collider=" ) then
-        read(arg(10:10),*) Collider
+        read(arg(10:11),*) Collider
     elseif( arg(1:8).eq."Process=" ) then
         read(arg(9:10),*) Process
     elseif( arg(1:11).eq."Correction=" ) then
@@ -114,7 +116,12 @@ logical :: dirresult
         read(arg(7:11),*) m_STop
         MuRen=m_STop
         MuFac=m_STop
-        MuFrag=m_STop
+    elseif( arg(1:5).eq."MZpr=" ) then
+        read(arg(6:10),*) m_Zpr
+        MuRen=m_Zpr
+        MuFac=m_Zpr
+    elseif( arg(1:6).eq."GaZpr=" ) then
+        read(arg(7:11),*) Ga_Zpr
    elseif( arg(1:8).eq."nGluRad=" ) then
         read(arg(9:10),*) nGluRadContr
     elseif( arg(1:5).eq."XQTop" ) then
@@ -184,7 +191,7 @@ logical :: dirresult
         read(arg(6:7),*) DKRE_switch
     endif
    enddo
-   write(MuStr,"(F4.2)") MuRen
+   write(MuStr,"(F5.2)") MuRen
 
    if( DipAlpha2.eq.0d0 ) then
        print *, "DipAlpha2 cannot ne zero"
@@ -288,10 +295,17 @@ logical :: dirresult
    endif
 
     if( Collider.eq.1 ) then
-        ColliderStr="LHC"
+        ColliderStr="LHC14"
+    elseif( Collider.eq.11 ) then
+        ColliderStr="LHC7"
+    elseif( Collider.eq.12 ) then
+        ColliderStr="LHC8"
+    elseif( Collider.eq.13 ) then
+        ColliderStr="LHC13"
     elseif( Collider.eq.2 ) then
         ColliderStr="TEV"
     endif
+
 
     if( Q_top.ne.Q_up ) then
         MuStr=trim(MuStr)//"_XQ"
@@ -299,7 +313,8 @@ logical :: dirresult
 
     dirresult = makedirqq("./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr))
     dirresult = makedirqq("./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr))
-    if(dirresult) print *, "created directory "//"./"//trim(ColliderStr)//"/"//trim(ProcessStr)
+    if(dirresult) print *, "created directory "//"./"//trim(ColliderStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)
+pause
 
 
     if( ObsSet.eq.8 ) then!   spin correlations with R
@@ -369,6 +384,10 @@ integer TheUnit
        write(TheUnit,"(A)") "# two loop running"
     else
        write(TheUnit,*) "# no alpha_s running"
+    endif
+    if( ObsSet.ge.60 .and. ObsSet.le.69 ) then
+        write(TheUnit,'(A,F10.5)') "# m(Zpr)=",m_Zpr*100d0
+        write(TheUnit,'(A,F10.5)') "# Gamma(Zpr)=",Ga_Zpr*100d0
     endif
     write(TheUnit,'(A,F8.3)') "# m(top)=",m_Top *100d0
     write(TheUnit,"(A,F10.6)") "# Width expansion factor=",WidthExpansion
@@ -1307,9 +1326,12 @@ IF( PDFSET.EQ.1 ) THEN! MRST/MSTW
 
 ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
   IF( NLOPARAM.EQ.2) THEN
-!       call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
+      call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
 !       call SetCtq6(200) !  updated CTEQ6.1M Standard MSbar scheme   0.118     326   226    cteq6m.tbl
-     call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
+!      call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
+
+print *, "SWITCHED TO CTEQ6M FOR CHINESE CHECK"
+
      PDFSetString = " CTEQ6.6M NLO (ctq66.00.pds)"
 !      call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
 !      PDFSetString = "CTEQ10 NLO (ct10.00.pds)"
