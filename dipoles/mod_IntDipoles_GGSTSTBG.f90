@@ -36,10 +36,10 @@ contains
        MomDK(1:4,5:14) = pDK(1:4,1:10)
 
 !  tree momenta for g g -> t tb
-   TreeMom(1:4,1) =-dcmplx( p(1:4,3) )
-   TreeMom(1:4,2) =-dcmplx( p(1:4,4) )
-   TreeMom(1:4,3) = dcmplx( p(1:4,2) )
-   TreeMom(1:4,4) = dcmplx( p(1:4,1) )
+    TreeMom(1:4,1) =-dcmplx( p(1:4,3) )
+    TreeMom(1:4,2) =-dcmplx( p(1:4,4) )
+    TreeMom(1:4,3) = dcmplx( p(1:4,2) )
+    TreeMom(1:4,4) = dcmplx( p(1:4,1) )
 
 
     Tree_ij= Tree_GG_TTb_ij(TreeMom,(/0d0,0d0,m_STop**2,m_STop**2/))
@@ -155,7 +155,7 @@ contains
 !res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
 
    enddo
-   res(1:3) = -alpha_sOver2Pi * res(1:3)
+   res(1:3) = alpha_sOver2Pi * res(1:3)!   remove a minus sign here
 
        mtrsq = Tree_ij(0)
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)

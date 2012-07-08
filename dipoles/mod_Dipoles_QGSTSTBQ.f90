@@ -25,6 +25,8 @@
       double precision, private :: yRndDK(8:19)
       integer, private :: NBin(1:NumMaxHisto)
 
+      logical, parameter :: invert_alphaCut = .false.
+
 
       contains
 
@@ -60,6 +62,7 @@
       call evalDipole1_15x(Mom,Mass2,TheDipoles(1))
       RunFactor = RunAlphaS(2,MuRen)
       TheDipoles(1)%DipoleValue = DipMinus * Wgt * TheDipoles(1)%DipoleValue * RunFactor**3
+
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),TheDipoles(1)%DipoleValue)
       enddo
@@ -132,9 +135,17 @@
       s25 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,2))
       x = 1d0 - (s15+s25)/s12
       v = s15/s12
-      if( TheDipole%AlphaCut.lt.v ) then
-         TheDipole%DipoleValue = 0d0
-         return
+
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.gt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s15/x
 
@@ -168,7 +179,6 @@
 !     color and spin correlated tree process
       SqAmp = Tree_GG_TTb(0,dcmplx(TheDipole%MomTd),TheDipole%Mass2Td,Split_A,Split_B,Split_V) *(-4d0/3d0)
 
-
       TheDipole%DipoleValue = LeadSing * SqAmp
       return
       END SUBROUTINE
@@ -194,9 +204,16 @@
       s15 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,1))
       x = 1d0 - (s25+s15)/s12
       v = s25/s12
-      if( TheDipole%AlphaCut.lt.v ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.gt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s25/x
 

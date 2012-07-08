@@ -385,7 +385,9 @@ contains
 ! print *, "checker",qlI2(m_stop**2,0d0,m_stop**2,m_stop**2,0)
 
 ! print *, "checker",qlI2(m_stop**2,1d8*m_stop**2,m_top**2,m_stop**2,-1)
-! print *, "checker",qlI2(m_stop**2,1d8*m_stop**2,m_top**2,m_stop**2,0)
+! print *, "checker",qlI2(m_stop**2,(1d4*m_stop)**2,m_top**2,m_stop**2,0)
+! print *,  1d0 - dlog((1d4*m_stop)**2/m_stop**2) 
+
 ! call ffxdb0(res(0),res(1),m_stop**2,1d8*m_stop**2,m_top**2,xe)! m*dB
 ! print *, "checker",2d0*res(0)*( m_stop**2-1d8*m_stop**2-m_top**2 )
 

@@ -1080,8 +1080,8 @@ include 'vegas_common.f'
    FluxFac = 1d0/(2d0*EHat**2)
 
    call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
-!    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-print *, "switch off boost for comparison with Radja"
+   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+! print *, "switch off boost for comparison with Radja"
 
    IF(XTOPDECAYS.EQ.3) THEN
       call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
@@ -1122,14 +1122,14 @@ print *, "switch off boost for comparison with Radja"
   NLO_Res_Unpol(-2:1)      = (0d0,0d0)
   NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 
- do npdf=1,1; print *, "no npdf loop"
+ do npdf=1,2;! print *, "no npdf loop"
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
         PDFFac = PDFFac_b
         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
-PDFFac=1d0; print *, "pdfs set to one"
+! PDFFac=1d0; print *, "pdfs set to one"
     ISFac = MomCrossing(MomExt)
     call InitCurrCache()
     call SetPropagators()
@@ -1150,7 +1150,6 @@ IF( Correction.EQ.0 ) THEN
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-! print *, "removed for cross check"
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
@@ -1179,9 +1178,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ bosonic loops --------------
-      do iPrimAmp=1,4; print *, "Evaluate bosonic loop primamp",iPrimAmp
-! print *, "hel",ihel
-! print *, "ordering ",PrimAmps(iPrimAmp)%ExtLine(1:4)
+      do iPrimAmp=1,4; !print *, "Evaluate bosonic loop primamp",iPrimAmp
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -1285,8 +1282,8 @@ ELSEIF( Correction.EQ.1 ) THEN
    enddo!helicity loop
 ENDIF! Correction loop
   enddo! npdf loop
-!   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
-print *, "npdf swap off"
+  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+! print *, "npdf swap off"
 
 ! Radja's results with nf=5:
 ! E1 = -56.3557171738789
@@ -1309,9 +1306,9 @@ IF( Correction.EQ.0 ) THEN
 
 ELSEIF( Correction.EQ.1 ) THEN
 
-NLO_Res_UnPol(0) = NLO_Res_UnPol(0) +  1d0*LO_Res_Unpol! shift alpha_s from FDH to CDR
-NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  4d0/3d0*LO_Res_Unpol! shift anom.dim. from FDH to CDR
-NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  NLO_Res_UnPol(-2)*dblPi**2/12d0!  convert from my normalization to radja's 
+! NLO_Res_UnPol(0) = NLO_Res_UnPol(0) +  1d0*LO_Res_Unpol! shift alpha_s from FDH to CDR
+! NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  4d0/3d0*LO_Res_Unpol! shift anom.dim. from FDH to CDR
+! NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  NLO_Res_UnPol(-2)*dblPi**2/12d0!  convert from my normalization to radja's 
 
 ! print *, ""
 ! print *, "LO",LO_Res_Unpol* ISFac/5.3333333333333333d-2
@@ -1354,15 +1351,15 @@ NLO_Res_UnPol(0) = NLO_Res_UnPol(0) -  NLO_Res_UnPol(-2)*dblPi**2/12d0!  convert
 !  pause
 
 
-call Catani_1L_ststbqqb(MomExt(1:4,1:4),CataniRes(-2:-1))!  alpha_s renormalization needs to be switched off
-print *, "LO",LO_Res_Unpol
-print *, "bare NLO(-2)",(NLO_Res_UnPol(-2)/LO_Res_Unpol)
-print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
-print *, "Catani(-2)",dreal(CataniRes(-2))
-print *, "Catani(-1)",real(CataniRes(-1))
-print *, "ratio",real(CataniRes(-1))/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-print *, "diff ",real(CataniRes(-1))-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
-pause
+! call Catani_1L_ststbqqb(MomExt(1:4,1:4),CataniRes(-2:-1))!  alpha_s renormalization needs to be switched off
+! print *, "LO",LO_Res_Unpol
+! print *, "bare NLO(-2)",(NLO_Res_UnPol(-2)/LO_Res_Unpol)
+! print *, "bare NLO(-1)",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol
+! print *, "Catani(-2)",dreal(CataniRes(-2))
+! print *, "Catani(-1)",real(CataniRes(-1))
+! print *, "ratio",real(CataniRes(-1))/((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+! print *, "diff ",real(CataniRes(-1))-((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_Unpol)
+! pause
 
 
 !  normalization
@@ -1406,11 +1403,10 @@ ELSEIF( Correction.EQ.3 ) THEN
                          + HOp(2)/xE * (pdf_z(Up_,2)*pdf(AUp_,1)+pdf_z(Dn_,2)*pdf(ADn_,1)+pdf_z(Chm_,2)*pdf(AChm_,1)+pdf_z(Str_,2)*pdf(AStr_,1)+pdf_z(Bot_,2)*pdf(ABot_,1) ) &
                          + HOp(3)/xE * (pdf(Up_,2)*pdf_z(AUp_,1)+pdf(Dn_,2)*pdf_z(ADn_,1)+pdf(Chm_,2)*pdf_z(AChm_,1)+pdf(Str_,2)*pdf_z(AStr_,1)+pdf(Bot_,2)*pdf_z(ABot_,1) )
 
+
    ELSEIF( PROCESS.eq.53 ) THEN
-! print *, "added if"
       call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
-! print *, "LO_Res_Unpol",dreal(LO_Res_Unpol)
-! pause
+
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ststbqqb = HOp(1) * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
                          + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
@@ -1418,10 +1414,13 @@ ELSEIF( Correction.EQ.3 ) THEN
 
       call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-      EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb &
-                         + HOp(1) * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
-                         + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
-                         + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
+
+      EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb  &
+                         + HOp(1)    * (pdf(Up_,2)*pdf(0,1)+pdf(Dn_,2)*pdf(0,1)+pdf(Chm_,2)*pdf(0,1)+pdf(Str_,2)*pdf(0,1)+pdf(Bot_,2)*pdf(0,1) ) &
+                         + HOp(2)/xE * (pdf_z(Up_,2)*pdf(0,1)+pdf_z(Dn_,2)*pdf(0,1)+pdf_z(Chm_,2)*pdf(0,1)+pdf_z(Str_,2)*pdf(0,1)+pdf_z(Bot_,2)*pdf(0,1) ) &
+                         + HOp(3)/xE * (pdf(Up_,2)*pdf_z(0,1)+pdf(Dn_,2)*pdf_z(0,1)+pdf(Chm_,2)*pdf_z(0,1)+pdf(Str_,2)*pdf_z(0,1)+pdf(Bot_,2)*pdf_z(0,1) )
+
+
 
    ELSEIF( PROCESS.eq.54 ) THEN
       call EvalIntDipoles_QGSTSTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
@@ -1916,6 +1915,12 @@ include 'vegas_common.f'
    RunFactor = RunAlphaS(2,MuRen)
 
    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+
+
+! applyPScut = .true.! this is for inverted check
+
+
+
 if(  applyPSCut ) then
    EvalCS_Real_ststbggg = 0d0
 else
@@ -2061,13 +2066,7 @@ include 'vegas_common.f'
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    ENDIF
 
-
-DO NPDF=1,2
-    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
-if(  applyPSCut ) then
-    EvalCS_Real_ststbqqbg = 0d0
-else
-    call SetPDFs(eta1,eta2,MuFac,pdf)
+   call SetPDFs(eta1,eta2,MuFac,pdf)
    IF( PROCESS.EQ.56 ) THEN
           PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
                    + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
@@ -2090,8 +2089,11 @@ else
                    + pdf(AChm_,1)*pdf(0,2) + pdf(AStr_,1)*pdf(0,2)  &
                    + pdf(ABot_,1)*pdf(0,2)
     ENDIF
-    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-    RunFactor = RunAlphaS(2,MuRen)
+
+DO NPDF=1,2
+    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+
+! applyPScut = .true.! this is for inverted check
 
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
@@ -2099,9 +2101,17 @@ else
         PDFFac = PDFFac_b
         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
+    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+    RunFactor = RunAlphaS(2,MuRen)
     ISFac = MomCrossing(MomExt)
     call InitCurrCache()
     call SetPropagators()
+
+
+if(  applyPSCut ) then
+    EvalCS_Real_ststbqqbg = 0d0
+else
+
 
 !------------ LO ----------------
    LO_Res_Unpol = (0d0,0d0)
@@ -2136,6 +2146,7 @@ else
       EvalCounter = EvalCounter + 1
    enddo
 endif! applyPSCut
+
 
 
   PreFacDip = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac

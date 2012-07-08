@@ -20,7 +20,7 @@ real(8) :: LO_Res_Unpol_Left, LO_Res_Unpol_Right
 complex(8) :: Virt_Res_Pol_Left, Virt_Res_Pol_Right
 real(8) :: Virt_Res_Unpol_Left, Virt_Res_Unpol_Right
 integer :: iHel
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,xFrag
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac
 real(8) :: MomExt(1:4,1:NumExtParticles),MomDK(1:4,1:6)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_L, PDFFac_R, PDFFac_dip_L(3), PDFFac_dip_R(3)

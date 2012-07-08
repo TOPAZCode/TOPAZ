@@ -1494,7 +1494,7 @@ ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal 
 
           Histo(30)%Info   = "pT(ttbar) BWD"
           Histo(30)%NBins  = 50
-          Histo(30)%BinSize= 20d0*GeV
+          Histo(30)%BinSize= 10d0*GeV
           Histo(30)%LowVal =  0d0*GeV
           Histo(30)%SetScale= 100d0
 

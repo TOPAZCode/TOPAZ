@@ -218,11 +218,11 @@ logical :: dirresult
     if(Collider.eq.-1 .or. Process.eq.-1 .or. Correction.eq.-1 .or. TopDecays.eq.-100 .or. ObsSet.eq.-1) then
           print *, "not enough input parameter"
           print *, "required: Collider,Process,Correction,TopDK,ObsSet"
-          print *, "Collider:    1=LHC(14TeV), 11=LHC(7TeV), 12=LHC(8TeV), 13=LHC(13TeV), 2=Tevatron"
-          print *, "Process:     see ProcessInfo.txt"
-          print *, "Correction:  0=LO, 1=VI, 2=RE, 3=ID, 4=VI in top decay, 5=RE in top decay"
-          print *, "TopDK:       0=stable tops, 1=dilept, 2=full hadr, 3=l-&jets, 4=l+&jets"
-          print *, "ObsSet:      see mod_Kinematics.f90"
+          print *, "Collider:   1=LHC(14TeV), 11=LHC(7TeV), 12=LHC(8TeV), 13=LHC(13TeV), 2=Tevatron"
+          print *, "Process:    see ProcessInfo.txt"
+          print *, "Correction: 0=LO, 1=VI, 2=RE, 3=ID, 4=VI in top decay, 5=RE in top decay"
+          print *, "TopDK:      0=stable tops, 1=dilept, 2=full hadr, 3=l-&jets, 4=l+&jets"
+          print *, "ObsSet:     see mod_Kinematics.f90"
           stop
     endif
     if( Process.ge.41 .and. Process.le.59 ) then
@@ -243,7 +243,7 @@ logical :: dirresult
       write(ProcessStr,"(I2)") Process
     endif
 
-    if( Collider.eq.1 ) then
+    if( Collider.eq.1 .or. (Collider.ge.11 .and. Collider.le.19) ) then
          AlgoType = -1       ! anti-kT
     elseif( Collider.eq.2 ) then
          AlgoType = +1       ! kT
@@ -316,9 +316,10 @@ logical :: dirresult
         MuStr=trim(MuStr)//"_XQ"
     endif
 
-    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr))
-    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr))
-    if(dirresult) print *, "created directory "//"./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)
+
+    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr)))! need adjustl to cut off leading spaces for Mu<10.00 (=1TeV)
+    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr))
+    if(dirresult) print *, "created directory "//"./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)
 
 
     if( ObsSet.eq.8 ) then!   spin correlations with R
@@ -329,10 +330,10 @@ logical :: dirresult
 
 
     if(HistoFile.eq."") then
-        HistoFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
+        HistoFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
     endif
 
-   GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(MuStr)//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
+   GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
 
 return
 END SUBROUTINE
@@ -390,10 +391,10 @@ integer TheUnit
        write(TheUnit,*) "# no alpha_s running"
     endif
     if( ObsSet.ge.60 .and. ObsSet.le.69 ) then
-        write(TheUnit,'(A,F10.5)') "# m(Zpr)=",m_Zpr*100d0
-        write(TheUnit,'(A,F10.5)') "# Gamma(Zpr)=",Ga_Zpr*100d0
+        write(TheUnit,'(A,F10.5,A)') "# m(Zpr)=",m_Zpr*100d0, " GeV"
+        write(TheUnit,'(A,F10.5,A)') "# Gamma(Zpr)=",Ga_Zpr*100d0, " GeV"
     endif
-    write(TheUnit,'(A,F8.3)') "# m(top)=",m_Top *100d0
+    write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_Top *100d0, " GeV"
     write(TheUnit,"(A,F10.6)") "# Width expansion factor=",WidthExpansion
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(LO) =",Ga_Top(0)*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(NLO)=",(Ga_Top(0)+Ga_Top(1))*100d0," GeV"

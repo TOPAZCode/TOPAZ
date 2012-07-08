@@ -26,7 +26,7 @@ contains
       real(dp), intent(out) :: res(1:3)
       real(dp) :: dipsoft,dipfini,dipplus,mtrsq,AP(1:3),epcorr
       real(dp) :: Tree_21,Tree_13,Tree_14,Tree_23,Tree_24,Tree_12,z
-      real(dp) :: CA,CF,TR,L,Q2
+      real(dp) :: CA,CF,TR,L,Q2,tmp
       integer  :: n,emi,in1,in2
       complex(dp) :: TreeMom(1:4,1:4)
 
@@ -60,7 +60,7 @@ contains
         dipfini =ii_gq(zero,zero,p,4,3,z,2)
         dipplus =ii_gq(zero,zero,p,4,3,z,3)
         emi = 2 ! mom #4 is emitting
-        mtrsq = Tree_21*(-1d0)  ! TR is included in splitting functions
+        mtrsq = Tree_21   !*(-1d0)  ! removed this minus sign!  ! TR is included in splitting functions
       endif
 
       if(emi.eq.1) then
@@ -73,7 +73,7 @@ contains
       endif
 
    enddo
-   res(1:3) = -alpha_sOver2Pi * res(1:3)
+   res(1:3) = alpha_sOver2Pi * res(1:3)!    removed a minus sign here
 
 
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)

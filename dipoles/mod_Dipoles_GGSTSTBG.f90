@@ -25,6 +25,7 @@
       double precision, private :: yRndDK(8:19)
       integer, private :: NBin(1:NumMaxHisto)
 
+      logical, parameter :: invert_alphaCut = .false.
 
 
       contains
@@ -229,9 +230,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s25 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,2))
       x = 1d0 - (s15+s25)/s12
       v = s15/s12
-      if( TheDipole%AlphaCut.lt.v ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s15/x
 
@@ -292,9 +300,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
       x = 1d0-s35/(s13+s15)
       u = s15/(s15+s13)
-      if( TheDipole%AlphaCut.lt.u ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s15/x
 
@@ -348,9 +363,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
       x = 1d0-s45/(s14+s15)
       u = s15/(s15+s14)
-      if( TheDipole%AlphaCut.lt.u ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s15/x
 
@@ -404,9 +426,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s15 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,1))
       x = 1d0 - (s25+s15)/s12
       v = s25/s12
-      if( TheDipole%AlphaCut.lt.v ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.v ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s25/x
 
@@ -467,9 +496,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
       x = 1d0-s35/(s23+s25)
       u = s25/(s25+s23)
-      if( TheDipole%AlphaCut.lt.u ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s25/x
 
@@ -523,9 +559,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
       x = 1d0-s45/(s24+s25)
       u = s25/(s25+s24)
-      if( TheDipole%AlphaCut.lt.u ) then
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.u ) then
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s25/x
 
@@ -578,9 +621,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s15 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,1))
       x = 1d0-s35/(s13+s15)
       z = s13/(s15+s13)
-      if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s35/x
 
@@ -631,9 +681,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s25 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,2))
       x = 1d0-s35/(s23+s25)
       z = s23/(s25+s23)
-      if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.1d0-x   ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.1d0-x   ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s35/x
 
@@ -743,9 +800,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s15 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,1))
       x = 1d0-s45/(s14+s15)
       z = s14/(s15+s14)
-      if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s45/x
 
@@ -795,9 +859,16 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       s25 = 2d0*(Mom(0:3,5)).dot.(Mom(0:3,2))
       x = 1d0-s45/(s24+s25)
       z = s24/(s25+s24)
-      if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
-         TheDipole%DipoleValue = 0d0
-         return
+      if( .not. invert_alphacut ) then
+          if( TheDipole%AlphaCut.lt.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
+      else
+          if( TheDipole%AlphaCut.ge.1d0-x ) then  ! NEW
+            TheDipole%DipoleValue = 0d0
+            return
+          endif
       endif
       LeadSing = -1d0/s45/x
 
