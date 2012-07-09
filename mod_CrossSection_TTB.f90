@@ -218,15 +218,24 @@ ELSEIF( Correction.EQ.1 ) THEN
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
           if( AccPoles.gt.1d-4 ) then
-              coeff4_128(:,:) = qcmplx( coeff4(:,:) )
+!              coeff4_128(:,:) = qcmplx( coeff4(:,:) )
               coeff5_128(:,:) = qcmplx( coeff5(:,:) )
+!print *, "before QUAD PREC",AccPoles
+              call QuadCut_128(PrimAmps(iPrimAmp))
               call TripCut_128(PrimAmps(iPrimAmp))
               call DoubCut_128(PrimAmps(iPrimAmp))
               call SingCut_128(PrimAmps(iPrimAmp))
+!PrimAmps(iPrimAmp)%UCuts(5)%Coeff(:,:)= dcmplx(PrimAmps(iPrimAmp)%UCuts(5)%Coeff_128(:,:) ) 
+!PrimAmps(iPrimAmp)%UCuts(4)%Coeff(:,:)= dcmplx(PrimAmps(iPrimAmp)%UCuts(4)%Coeff_128(:,:) ) 
+!PrimAmps(iPrimAmp)%UCuts(3)%Coeff(:,:)= dcmplx(PrimAmps(iPrimAmp)%UCuts(3)%Coeff_128(:,:) ) 
+!PrimAmps(iPrimAmp)%UCuts(2)%Coeff(:,:)= dcmplx(PrimAmps(iPrimAmp)%UCuts(2)%Coeff_128(:,:) ) 
+!PrimAmps(iPrimAmp)%UCuts(1)%Coeff(:,:)= dcmplx(PrimAmps(iPrimAmp)%UCuts(1)%Coeff_128(:,:) ) 
               call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
               call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
               PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
               AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+!print *, "after QUAD PREC",AccPoles
+!pause
               if( AccPoles.gt.5d-2 ) then
                   print *, "SKIP",AccPoles
                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
@@ -258,9 +267,9 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
-          pause
+          !call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          !call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
+          !pause
       enddo
       FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
       FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)

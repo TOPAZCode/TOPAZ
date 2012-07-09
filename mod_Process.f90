@@ -55,8 +55,9 @@ end type
 type :: UnitarityCut
    integer              :: CutType              ! 5,...,1: pent.,...,sing. cut
    integer              :: NumCuts              ! number of cuts
-   integer, allocatable :: CutProp(:,:)         ! CutProp(cut number, 1..CutType): cutted prop. in highest-level diagr.
-   complex(8), allocatable :: Coeff(:,:)        ! coefficients of these cuts
+   integer, allocatable :: CutProp(:,:)         ! CutProp(cut number, 1..CutType): cut prop. in highest-level diagr.
+   complex(8),  allocatable :: Coeff(:,:)        ! coefficients of these cuts
+   complex(16), allocatable :: Coeff_128(:,:)        ! coefficients of these cuts
    type(TreeProcess), allocatable :: TreeProcess(:,:)  ! process for a cut at a vertex, first and last number are the prop.ID, the rest corresp. to the ExtParticle ID
    real(8), allocatable :: KMom(:,:,:)
    complex(8), allocatable :: NMom(:,:,:)
@@ -5113,12 +5114,16 @@ type(TreeProcess),pointer :: TheTree
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(5)")
    allocate( ThePrimAmp%UCuts(5)%Coeff(1:ThePrimAmp%UCuts(5)%NumCuts,0:0),     stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(5)")
+   allocate( ThePrimAmp%UCuts(5)%Coeff_128(1:ThePrimAmp%UCuts(5)%NumCuts,0:0),     stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(5)")
    allocate( ThePrimAmp%UCuts(5)%KMom(1:ThePrimAmp%UCuts(5)%NumCuts,1:4,1:4) )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in KMom 5")
 
    allocate( ThePrimAmp%UCuts(4)%CutProp(1:ThePrimAmp%UCuts(4)%NumCuts,1:4), stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(4)")
    allocate( ThePrimAmp%UCuts(4)%Coeff(1:ThePrimAmp%UCuts(4)%NumCuts,0:4),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(4)")
+   allocate( ThePrimAmp%UCuts(4)%Coeff_128(1:ThePrimAmp%UCuts(4)%NumCuts,0:4),   stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(4)")
    allocate( ThePrimAmp%UCuts(4)%KMom(1:ThePrimAmp%UCuts(4)%NumCuts,1:3,1:4) )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in KMom 4")
@@ -5129,6 +5134,8 @@ type(TreeProcess),pointer :: TheTree
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(3)")
    allocate( ThePrimAmp%UCuts(3)%Coeff(1:ThePrimAmp%UCuts(3)%NumCuts,0:9),   stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(3)")
+   allocate( ThePrimAmp%UCuts(3)%Coeff_128(1:ThePrimAmp%UCuts(3)%NumCuts,0:9),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(3)")
    allocate( ThePrimAmp%UCuts(3)%KMom(1:ThePrimAmp%UCuts(3)%NumCuts,1:2,1:4) )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in KMom 3")
    allocate( ThePrimAmp%UCuts(3)%NMom(1:ThePrimAmp%UCuts(3)%NumCuts,1:2,1:4) )
@@ -5138,7 +5145,8 @@ type(TreeProcess),pointer :: TheTree
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(2)")
    allocate( ThePrimAmp%UCuts(2)%Coeff(1:ThePrimAmp%UCuts(2)%NumCuts,0:9),   stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(2)")
-   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(3)")
+   allocate( ThePrimAmp%UCuts(2)%Coeff_128(1:ThePrimAmp%UCuts(2)%NumCuts,0:9),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(2)")
    allocate( ThePrimAmp%UCuts(2)%KMom(1:ThePrimAmp%UCuts(2)%NumCuts,1:1,1:4) )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in KMom 2")
    allocate( ThePrimAmp%UCuts(2)%NMom(1:ThePrimAmp%UCuts(2)%NumCuts,1:3,1:4) )
@@ -5147,6 +5155,8 @@ type(TreeProcess),pointer :: TheTree
    allocate( ThePrimAmp%UCuts(1)%CutProp(1:ThePrimAmp%UCuts(1)%NumCuts,1:1), stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
    allocate( ThePrimAmp%UCuts(1)%Coeff(1:ThePrimAmp%UCuts(1)%NumCuts,0:0),     stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
+   allocate( ThePrimAmp%UCuts(1)%Coeff_128(1:ThePrimAmp%UCuts(1)%NumCuts,0:0),     stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
 
 

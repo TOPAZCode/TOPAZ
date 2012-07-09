@@ -1006,14 +1006,13 @@ integer :: iPrimAmp
 complex(8) :: LO_Res_Pol_Left, LO_Res_Pol_Right, LO_Res_Pol_glue
 complex(8) :: Virt_Res_Pol_Left, Virt_Res_Pol_Right
 complex(8) :: BosonicPartAmp(4,-2:1), FermionPartAmp(2,-2:1), NLO_Res_Pol(2)
-real(8) :: AccPoles
 real(8) :: Virt_Res_Unpol_Left, Virt_Res_Unpol_Right, NLO_Res_Unpol_Left, NLO_Res_Unpol_Right
 integer :: iHel, sig_t, sig_tb
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,xFrag
 real(8) :: MomExt(1:4,1:NumExtParticles),MomDK(1:4,1:6)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_L, PDFFac_R, PDFFac_dip_L(3), PDFFac_dip_R(3)
-real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2), z
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2), z,AccPoles
 real(8) :: IDip(3), IDipAmp, LO_for_dip_Left, LO_for_dip_Right
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,nHel(1:2),NRndHel
 real(8) :: xpdf
@@ -1176,10 +1175,38 @@ complex(8) :: rdiv(1:2)
            call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 !           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
            PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-           !            call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-           !            call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+           !call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+           if( AccPoles.gt.1d-4 ) then
+!                 print *, "PrimAmp",iPrimAmp
+!                 print *, "AccPoles",AccPoles
+!                 call PrintYrnd(Yrnd(1:12))
+!                 SkipCounter = SkipCounter + 1
+!                 EvalCS_Virt_Zprime_Interf = 0d0
+!                 return
 
+!                 print *, "PrimAmp",iPrimAmp
+!                 print *, "AccPoles",AccPoles
+                 call PentCut_128(PrimAmps(iPrimAmp))
+                 call QuadCut_128(PrimAmps(iPrimAmp))
+                 call TripCut_128(PrimAmps(iPrimAmp))
+                 call DoubCut_128(PrimAmps(iPrimAmp))
+                 call SingCut_128(PrimAmps(iPrimAmp))
+                 call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+                 PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+                 call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+                 AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+                if( AccPoles.gt.1d-3 ) then
+                   print *, "SKIP PrimAmp",iPrimAmp
+                   print *, "AccPoles",AccPoles
+                   call PrintYrnd(Yrnd(1:12))
+                   SkipCounter = SkipCounter + 1
+                   EvalCS_Virt_Zprime_Interf = 0d0
+                   return
+                endif 
 
+           endif
         enddo
 
 
