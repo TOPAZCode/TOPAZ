@@ -300,7 +300,8 @@
          
          x = 1d0-sij/(sai+saj)
          u = sai/(sai+saj)
-         if( alpha_if.lt.u ) then
+!         if( alpha_if.lt.u ) then
+         if( alpha_if.gt.u ) then
             Dipole = 0d0
             return
          endif
@@ -325,7 +326,8 @@
          
          x = 1d0-sij/(sai+saj)
          u = sai/(sai+saj)
-         if( alpha_if.lt.u ) then
+!         if( alpha_if.lt.u ) then
+         if( alpha_if.gt.u ) then
             Dipole = 0d0
             return
          endif
@@ -351,7 +353,8 @@
          
          x = 1d0-sij/(sai+saj)
          u = sai/(sai+saj)
-         if( alpha_if.lt.u ) then
+!         if( alpha_if.lt.u ) then
+         if( alpha_if.gt.u ) then
             Dipole = 0d0
             return
          endif
@@ -377,7 +380,8 @@
          
          x = 1d0-sij/(sai+saj)
          u = sai/(sai+saj)
-         if( alpha_if.lt.u ) then
+!         if( alpha_if.lt.u ) then
+         if( alpha_if.gt.u ) then
             Dipole = 0d0
             return
          endif
@@ -401,7 +405,8 @@
 
          x = 1d0-sij/(sai+saj)
          z = saj/(sai+saj)
-         if( alpha_fi.lt.1d0-x ) then  ! NEW
+!         if( alpha_fi.lt.1d0-x ) then  ! NEW
+         if( alpha_fi.gt.1d0-x ) then  ! NEW
             Dipole = 0d0
             return
          endif
@@ -425,7 +430,8 @@
 
          x = 1d0-sij/(sai+saj)
          z = saj/(sai+saj)
-         if( alpha_fi.lt.1d0-x ) then  ! NEW
+!         if( alpha_fi.lt.1d0-x ) then  ! NEW
+         if( alpha_fi.gt.1d0-x ) then  ! NEW
             Dipole = 0d0
             return
          endif
@@ -451,7 +457,8 @@
 
          x = 1d0-sij/(sai+saj)
          z = saj/(sai+saj)
-         if( alpha_fi.lt.1d0-x ) then  ! NEW
+!         if( alpha_fi.lt.1d0-x ) then  ! NEW
+         if( alpha_fi.gt.1d0-x ) then  ! NEW
             Dipole = 0d0
             return
          endif
@@ -477,7 +484,8 @@
 
          x = 1d0-sij/(sai+saj)
          z = saj/(sai+saj)
-         if( alpha_fi.lt.1d0-x ) then  ! NEW
+!         if( alpha_fi.lt.1d0-x ) then  ! NEW
+         if( alpha_fi.gt.1d0-x ) then  ! NEW
             Dipole = 0d0
             return
          endif

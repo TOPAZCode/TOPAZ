@@ -1237,27 +1237,22 @@ complex(8) :: rdiv(1:2)
      enddo!helicity loop
 
      EvalCS_Virt_Zprime_Interf = ISFac*PreFac* (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
-     EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * (alpha_sOver2Pi*RunFactor) 
+     EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * (alpha_sOver2Pi*RunFactor) * (4d0*Pi*alpha_s*RunFactor)
 
 
   ELSEIF ( CORRECTION.EQ.3 ) THEN
 
      !!! Integrated Dipoles !!!
 
-
      do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
-        
+    
         ! Compute first the Zprime part
         call Tree_Zprime_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
         
         ! Now compute the gluon part
-        do iPrimAmp=1,NumBornAmps
-           call EvalTree(BornAmps(iPrimAmp)) ! Vertex: gs/sqrt(2)
-        enddo
-
-        LO_res_pol_glue = BornAmps(1)%Result
+        call Tree_Zprime_tbtqbq_gluefordip(LO_Res_Pol_glue)
 
         LO_for_dip_Left = LO_for_dip_Left +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
         LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
@@ -1404,7 +1399,7 @@ complex(8) :: rdiv(1:2)
 
      ENDIF ! Integrated Dipoles process
         
-     IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac
+     IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac * (4d0*Pi*alpha_s*RunFactor)
         
      IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_for_dip_Left + PDFFac_dip_R(1) * LO_for_dip_Right)
      IDipAmp = IDipAmp + IDip(2)/z * (PDFFac_dip_L(2) * LO_for_dip_Left + PDFFac_dip_R(2) * LO_for_dip_Right)
@@ -1468,8 +1463,7 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
 
   EvalCS_Real_Zprime_interf = 0d0
 
-
-   yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
+!   yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! no mapping 
 
   if( EHat.le.2d0*m_Top * ThresholdCutOff ) then
@@ -1485,8 +1479,8 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
   call CheckSing(MomExt,applySingCut)
   if( applySingCut ) then
      EvalCS_Real_Zprime_interf = 0d0
-     print *, 'no cuts'
-!     return
+     SkipCounter = SkipCounter + 1
+     return
   endif
   
   IF( TOPDECAYS.NE.0 ) THEN
@@ -1500,7 +1494,7 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
   call setPDFs(eta1,eta2,MuFac,pdf)
 
 
-  IF (PROCESS.EQ.67 ) THEN
+  IF (PROCESS.EQ.69 ) THEN
 
     call random_number(xpdf)
 
@@ -1546,7 +1540,9 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
   ENDIF
 
-  if( applyPSCut ) then
+!!! INVERTED DIPOLES CHECK !!!
+if (1.eq.1) then
+!  if( applyPSCut ) then
      EvalCS_Real_Zprime_interf = 0d0
   else
 
@@ -1598,7 +1594,8 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
 
 
   !!! Dipoles section
-  IF ( PROCESS .EQ. 67 ) THEN ! qqb
+  colf = 8d0 ! NC^2 - 1
+  IF ( PROCESS .EQ. 69 ) THEN ! qqb
      dipoles = 0d0
      do nDip = 1,8
 
@@ -1686,17 +1683,17 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
         enddo
      
         dipoles = dipoles + resdip
-     
+
      enddo
 
   ENDIF
 
-  print *, 'inv    ', MomExt(1,3)/Ehat !(MomExt(1:4,1).dot.MomExt(1:4,3))/Ehat**2,(MomExt(1:4,2).dot.MomExt(1:4,3))/Ehat**2
-  print *, 'real   ', EvalCS_Real_Zprime_interf
-  print *, 'dipoles', dipoles
-  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_interf + 1d0
-  pause 
- 
+!  print *, 'inv    ', MomExt(1,3)/Ehat !(MomExt(1:4,1).dot.MomExt(1:4,3))/Ehat**2,(MomExt(1:4,2).dot.MomExt(1:4,3))/Ehat**2
+!  print *, 'real   ', EvalCS_Real_Zprime_interf
+!  print *, 'dipoles', dipoles
+!  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_interf + 1d0
+!  pause 
+
   EvalCS_Real_Zprime_interf = (EvalCS_Real_Zprime_interf+dipoles)/VgsWgt
 
   RETURN

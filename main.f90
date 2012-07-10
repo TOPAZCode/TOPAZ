@@ -1166,6 +1166,18 @@ IF ( MASTERPROCESS.EQ.2) THEN
 IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
    call qlinit()
    print *, "Gluon-Z' interference, virtual"
+   call qlinit()
+  call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+IF ( CORRECTION.EQ.3 .AND. PROCESS.EQ.69 ) THEN
+   call qlinit()
+   print *, "Gluon-Z' interference, integrated dipoles"
   call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
@@ -1177,7 +1189,7 @@ ENDIF
 ENDIF
 
 IF ( MASTERPROCESS.EQ.4) THEN
-IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.67 ) THEN
+IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.69 ) THEN
    call qlinit()
    print *, "Gluon-Z' interference, real"
   call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
