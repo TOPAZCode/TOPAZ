@@ -86,22 +86,22 @@ contains
           dipsoft =-fi_qq(m_Top,0d0,pflip,3,1,z,1)
           dipfini =-fi_qq(m_Top,0d0,pflip,3,1,z,2)
           dipplus =-fi_qq(m_Top,0d0,pflip,3,1,z,3)
-          emi = 3
+          emi = 1
        elseif(n.eq.6) then
           dipsoft =fi_qq(m_Top,0d0,pflip,3,2,z,1)
           dipfini =fi_qq(m_Top,0d0,pflip,3,2,z,2)
           dipplus =fi_qq(m_Top,0d0,pflip,3,2,z,3)
-          emi = 3
+          emi = 2
        elseif(n.eq.7) then
           dipsoft =fi_qq(m_Top,0d0,pflip,4,1,z,1)
           dipfini =fi_qq(m_Top,0d0,pflip,4,1,z,2)
           dipplus =fi_qq(m_Top,0d0,pflip,4,1,z,3)
-          emi = 3
+          emi = 1
        elseif(n.eq.8) then
           dipsoft =-fi_qq(m_Top,0d0,pflip,4,2,z,1)
           dipfini =-fi_qq(m_Top,0d0,pflip,4,2,z,2)
           dipplus =-fi_qq(m_Top,0d0,pflip,4,2,z,3)
-          emi = 3
+          emi = 2
        endif
 
 !       print *, 'dipoles set to zero for 1/ep'

@@ -278,6 +278,10 @@
 
     END SUBROUTINE Dipoles_qg_Zprime_ttbq
 
+
+
+
+
     SUBROUTINE Dipoles_qqb_Zprime_interf(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
       use ModParameters
       use ModKinematics

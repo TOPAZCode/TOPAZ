@@ -1664,6 +1664,50 @@ END SUBROUTINE
 
 
 
+
+! Lorentz transformation for the dipole matrix element in stop decays (taken from John and Keith, arXiv:1204.1513 hep-ph)
+SUBROUTINE WTransform3(MomDK,MomDKTd,pbDpg,ptDpg,ptDpb)! MomDK: 1=stop, 2=Chi, 3=glu
+implicit none
+real(8) :: MomDK(1:4,1:3),MomDKTd(1:4,1:2),pw(4),pt(4),lDt(3:4),lDw(3:4)
+real(8) :: root,hsin,hcos,a,b
+real(8) :: ptDpt,pwDpw,ptDpw,ptDpg,pbDpg,ptDpb,pWDpl,ptDpl,pWDpn,ptDpn,pbDpb
+
+
+    pw(1:4) = MomDK(1:4,2)
+    pt(1:4) = pw(1:4) + MomDK(1:4,1) + MomDK(1:4,3)
+
+    pbDpg = MomDK(1:4,1).dot.MomDK(1:4,3)
+    ptDpg = pt(1:4).dot.MomDK(1:4,3)
+    ptDpb = pt(1:4).dot.MomDK(1:4,1)
+    ptDpw = pt(1:4).dot.pw(1:4)
+    ptDpt = pt(1:4).dot.pt(1:4)
+    pbDpb = MomDK(1:4,1).dot.MomDK(1:4,1)
+    pwDpw = pw(1:4).dot.pw(1:4)
+    pWDpl = pw(1:4).dot.MomDK(1:4,2)
+    ptDpl = pt(1:4).dot.MomDK(1:4,2)
+
+
+!   SqrtLambda(x,y,z)
+    root=dsqrt(ptDpw**2-ptDpt*pwDpw)
+
+    hsin=0.5d0/(ptDpt*pwDpw)*( -SqrtLambda(ptDpt,pwDpw,pbDpb)*ptDpw + (ptDpt+pwDpw-pbDpb)*root)
+    hcos=0.5d0/(ptDpt*pwDpw)*(+(ptDpt+pwDpw-pbDpb)*ptDpw-SqrtLambda(ptDpt,pwDpw,pbDpb)*root)
+    a=hsin/root
+    b=(hcos-1d0)/root**2
+
+    MomDKTd(1:4,2) = MomDK(1:4,2) + a*( pt(1:4)*pwDpl-pw(1:4)*ptDpl )  &
+                                  + b*( ptDpw*(pt(1:4)*pwDpl+pw(1:4)*ptDpl) - pt(1:4)*pwDpw*ptDpl - pw(1:4)*ptDpt*pwDpl )
+
+    MomDKTd(1:4,1) = pt(1:4) - MomDKTd(1:4,2)
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
 ! Lorentz transformation for the dipole matrix element in top decays with additional photon in w decay
 SUBROUTINE DipoleTrafo(MomT,MomK,MomIn,MomOut)
 implicit none

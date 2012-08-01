@@ -1015,7 +1015,7 @@ real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_L, PDFFac_R, PDFFac_dip_L(
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2), z,AccPoles
 real(8) :: IDip(3), IDipAmp, LO_for_dip_Left, LO_for_dip_Right
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,nHel(1:2),NRndHel
-real(8) :: xpdf
+real(8) :: xpdf,beta,AndreasResult
 include 'misc/global_import'
 include "vegas_common.f"
 
@@ -1032,7 +1032,8 @@ complex(8) :: rdiv(1:2)
   FluxFac = 1d0/(2d0*EHat**2)
 
   call EvalPhaseSpace_2to2(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)
-  call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+!   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+print *, "MaRKUS: boost off for checks"
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
@@ -1244,6 +1245,11 @@ complex(8) :: rdiv(1:2)
 
      !!! Integrated Dipoles !!!
 
+Ga_Zpr=0d0; print *, "MARKUS: ga_zpr to zero for checks"
+! gR_Zpr(top_) = 1d0; gL_Zpr(top_) = 1d0! vector contribution
+gR_Zpr(top_) = -1d0; gL_Zpr(top_) = 1d0! axial contribution
+m_zpr=91d0*GeV
+
      do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
@@ -1254,12 +1260,30 @@ complex(8) :: rdiv(1:2)
         ! Now compute the gluon part
         call Tree_Zprime_tbtqbq_gluefordip(LO_Res_Pol_glue)
 
-        LO_for_dip_Left = LO_for_dip_Left +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
+        LO_for_dip_Left  = LO_for_dip_Left  +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
         LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
+
 
      enddo!helicity loop
 
-     z = yRnd(5)
+beta = dsqrt(1d0-4d0*m_top**2/Ehat**2)
+z = Get_CosTheta(Momext(1:4,3))
+print *, beta,z
+
+! vector contribution
+! AndreasResult = 2d0*ehat**2/(ehat**2-m_Zpr**2) *( 2d0-beta**2*(1-z**2) )! vector contribution
+! print *, "TOPAZ: ", (LO_for_dip_Left+LO_for_dip_Right)
+! print *, "Andreas: ",AndreasResult
+! print *, "ratio vector", AndreasResult / (LO_for_dip_Left  + LO_for_dip_Right )! vector contribution
+
+! axial contribution
+AndreasResult = 2d0*ehat**2/(ehat**2-m_Zpr**2) *( 2d0*beta*z )! axial  contribution
+print *, "TOPAZ: ", (LO_for_dip_Left-LO_for_dip_Right)
+print *, "Andreas: ",AndreasResult
+print *, "ratio axial", AndreasResult / (LO_for_dip_Left  - LO_for_dip_Right )! axial  contribution
+pause
+
+     z = yRnd(5); print * , "careful here, if tops decay, yrnd(5) is used already!!"
 
      call setPDFs(eta1/z,eta2/z,MuFac,pdf_z)
 
@@ -1336,7 +1360,7 @@ complex(8) :: rdiv(1:2)
 
         call IntDip_qbg_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-     ELSEIF ( PROCESS.EQ.69) THEN
+     ELSEIF ( PROCESS.EQ.69 ) THEN
      
         ! qqb initial state !
 
@@ -1398,7 +1422,7 @@ complex(8) :: rdiv(1:2)
         IDip = IDip * (nc**2-1d0)
 
      ENDIF ! Integrated Dipoles process
-        
+     
      IDip = IDip * (alpha_s*RunFactor)/(2d0*Pi) * PreFac * (4d0*Pi*alpha_s*RunFactor)
         
      IDipAmp = IDip(1) * (PDFFac_dip_L(1) * LO_for_dip_Left + PDFFac_dip_R(1) * LO_for_dip_Right)

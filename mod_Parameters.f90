@@ -161,6 +161,10 @@ integer, public, parameter :: DKJ_RE2_QQ=20
 integer, public, parameter :: DKX_HTA0_LO=21
 integer, public, parameter :: DKX_HTBH_LO=22
 integer, public, parameter :: DKX_STChi0_LO=23
+integer, public, parameter :: ST_Chi0_T_G=24
+integer, public, parameter :: DKX_STChi0_RE1=25
+integer, public, parameter :: DKX_STChi0_RE2=26
+integer, public, parameter :: DKX_STChi0_RE3=27
 
 integer, public, parameter :: WDK_Lep=1
 integer, public, parameter :: WDK_LepPho=2
@@ -474,7 +478,7 @@ ENDIF
 
 !!! Zprime section !!!
 
-gR_Zpr(top_) = eL*(sw/cw)*2d0/3d0
+gR_Zpr(top_) =  eL*(sw/cw)*2d0/3d0
 gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
 
 gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)

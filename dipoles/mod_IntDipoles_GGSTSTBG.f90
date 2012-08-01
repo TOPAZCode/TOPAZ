@@ -155,7 +155,7 @@ contains
 !res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
 
    enddo
-   res(1:3) = alpha_sOver2Pi * res(1:3)!   remove a minus sign here
+   res(1:3) = -alpha_sOver2Pi * res(1:3)
 
        mtrsq = Tree_ij(0)
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)

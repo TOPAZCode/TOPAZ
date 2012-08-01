@@ -877,8 +877,9 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (  -1d0/6d0          -2d0/3d0)*LO_Res_Unpol! gluon self energy (scalar,light fermion loops)
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_stop)*LO_Res_Unpol  ! finite log(mu) contrib. from  stop WFRC
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-7d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from stop WFRC's
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
+!    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-7d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from stop WFRC's   ! set to zero in MSBAR
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + 1d0*LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
+
 
 ! call Catani_1L_ststbgg(MomExt(1:4,1:4),CataniRes(-2:-1))!  alpha_s renormalization needs to be switched off
 ! print *, "LO",LO_Res_Unpol
@@ -945,8 +946,8 @@ ENDIF
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbgg)
-      EvalCounter = EvalCounter + 1
    enddo
+   EvalCounter = EvalCounter + 1
 
    EvalCS_1L_ststbgg = EvalCS_1L_ststbgg/VgsWgt
 
@@ -1337,7 +1338,9 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol; ! print *, "remove Nf_heavy for comparison"
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +            (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + dZStop(0)*LO_Res_Unpol ! finite contribution from dZStop
+!    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + dZStop(0)*LO_Res_Unpol ! finite contribution from dZStop !  set to zero in MSBAR
+
+! print *, "xx", dZStop(0)*alpha_sOver2Pi*RunFactor;pause
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
 
@@ -1446,8 +1449,9 @@ ENDIF
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ststbqqb)
-      EvalCounter = EvalCounter + 1
    enddo
+   EvalCounter = EvalCounter + 1
+
 
    EvalCS_1L_ststbqqb = EvalCS_1L_ststbqqb/VgsWgt
 
@@ -1916,10 +1920,7 @@ include 'vegas_common.f'
 
    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
 
-
 ! applyPScut = .true.! this is for inverted check
-
-
 
 if(  applyPSCut ) then
    EvalCS_Real_ststbggg = 0d0
@@ -1953,8 +1954,8 @@ else
 
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbggg)
-      EvalCounter = EvalCounter + 1
    enddo
+   EvalCounter = EvalCounter + 1
 
 ! !     gg->ttbg
 !       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
@@ -2142,9 +2143,9 @@ else
    EvalCS_Real_ststbqqbg = EvalCS_Real_ststbqqbg + LO_Res_Unpol
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ststbqqbg)
-      EvalCounter = EvalCounter + 1
+      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
    enddo
+   EvalCounter = EvalCounter + 1
 endif! applyPSCut
 
 
@@ -2183,6 +2184,1068 @@ ENDDO! npdf loop
 
    EvalCS_Real_ststbqqbg = (EvalCS_Real_ststbqqbg + EvalCS_Dips_ttbqqbgp)/VgsWgt
 
+END FUNCTION
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_DKJ_Real_ststbgg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModAmplitudes
+use ModParameters
+use ModExoticDecay
+use ModHadrWDecay
+use ModMisc
+implicit none
+real(8) ::  EvalCS_DKJ_Real_ststbgg,EvalCS_DKJ_Real_ststbgg_1,EvalCS_DKJ_Real_ststbgg_2
+real(8) :: yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2)
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+integer :: nJetRad,nJetRad1,nJetRad2,nJetRad3,nJetRad4,GluHel,ndip
+real(8) :: pbDpg,ptDpg,ptDpb,omz,rsq,z,y
+real(8),parameter :: CF=4d0/3d0
+include 'vegas_common.f'
+
+
+
+
+   EvalCS_DKJ_Real_ststbgg   = 0d0
+   EvalCS_DKJ_Real_ststbgg_1 = 0d0
+   EvalCS_DKJ_Real_ststbgg_2 = 0d0
+
+
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_STop ) then
+      EvalCS_DKJ_Real_ststbgg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+
+   ISFac = MomCrossing(MomExt)
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac = pdf(0,1) * pdf(0,2)
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+
+
+
+   nJetRad1=1
+   nJetRad3=1
+   if( TOPDECAYS.eq.1 ) then
+      nJetRad2=2;  nJetRad4=2
+   elseif( TOPDECAYS.eq.2 ) then
+      nJetRad2=3;  nJetRad4=3
+   elseif( TOPDECAYS.eq.3 ) then
+      nJetRad2=2;  nJetRad4=3
+   elseif( TOPDECAYS.eq.4 ) then
+      nJetRad2=3;  nJetRad4=2
+   endif
+!----------------------------------
+!  gluon  emission off anti-stop   |
+!----------------------------------
+do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
+
+   EvalCS_DKJ_Real_ststbgg = 0d0
+   IF(XTOPDECAYS.EQ.3) THEN
+   if( nJetRad.eq.1 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T_G,MomExt(1:4,3),yRnd(5:9),MomExt(1:4,5:7),PSWgt2)!  Chi(5) top(6) glu(7->15)
+      MomExt(1:4,15) = MomExt(1:4,7)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(10:13),MomExt(1:4,7:9),PSWgt3)!  b(7) el(8) nu(9)
+   elseif( nJetRad.eq.2 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi(5) top(6)
+      call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      MomExt(1:4,15) = MomExt(1:4,10)
+   elseif( nJetRad.eq.3 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi(5) top(6)
+      call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      MomExt(1:4,15) = MomExt(1:4,10)
+   endif   
+   call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(14:15),MomExt(1:4,10:11),PSWgt4)! Chi(10) Top(11)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
+   ENDIF
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
+   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   if( PreFac.eq.0d0 ) cycle
+   if( applyPSCut ) then
+      EvalCS_DKJ_Real_ststbgg = 0d0
+      PSCutCounter = PSCutCounter + 1
+      goto 2000
+   endif
+
+
+   LO_Res_Unpol = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=1,-1,-2
+
+      call HelCrossing(Helicities(iHel,1:6))
+      call SetPolarizations()
+      if( nJetRad.eq.1 ) then
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      elseif( nJetRad.eq.2 ) then
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      else
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      endif
+      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+   enddo!helicity loop
+   enddo!helicity loop
+
+   EvalCS_DKJ_Real_ststbgg = LO_Res_UnPol * PreFac * ISFac * (alpha_s4Pi*RunFactor)**2
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ststbgg)
+   enddo
+   EvalCounter = EvalCounter + 1
+
+   EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + EvalCS_DKJ_Real_ststbgg
+
+
+
+
+2000 continue!! dipoles for gluon emission off anti-stop
+
+print *, "check helicity arrays"
+
+
+
+   if( nJetRad.eq.1 ) then
+
+        MomExtTdIn(1:4,1) = MomExt(1:4,6)
+        MomExtTdIn(1:4,2) = MomExt(1:4,5)
+        MomExtTdIn(1:4,3) = MomExt(1:4,15)
+        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+        call swapMom(MomExtTd(1:4,5),MomExtTd(1:4,6))
+        MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
+        MomExtTd(1:4,7:14) = MomExt(1:4,7:14)
+        
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0 ) then
+            cycle
+        endif
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
+
+
+
+
+   elseif( nJetRad.eq.2 ) then
+
+        MomExtTd(1:4,1:6) = MomExt(1:4,1:6)
+        MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
+        MomExtTdIn(1:4,1:3) = MomExt(1:4,7:9)
+        MomExtTdIn(1:4,4)  = MomExt(1:4,15)
+        call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),pbDpg,ptDpg,ptDpb)
+        
+        omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
+        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        z=1d0-omz
+        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
+
+
+   elseif( nJetRad.eq.3 ) then
+          MomExtTd(1:4,1:6) = MomExt(1:4,1:6)
+          MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
+          MomExtTdIn(1:4,1:3) = MomExt(1:4,7:9)
+          MomExtTdIn(1:4,4) = MomExt(1:4,15)
+          do ndip=1,2
+              call wdec_trans(ndip,MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),alpha_DKWff,TheDipole)
+              TheDipole = - alpha_s4Pi*RunFactor * CF * TheDipole
+
+              call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+              if( applyPSCut .or. TheDipole.eq.0d0 ) then
+                  cycle
+              endif
+
+              LO_Res_Unpol = (0d0,0d0)
+              do iHel=1,NumHelicities! helicity summation
+                  call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+                  call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+                  call HelCrossing(Helicities(iHel,1:4))
+                  call SetPolarizations()
+                  do iPrimAmp=1,NumBornAmps
+                      call EvalTree(BornAmps(iPrimAmp))
+                  enddo
+
+                  LO_Res_Pol = (0d0,0d0)
+                  do jPrimAmp=1,NumBornAmps
+                  do iPrimAmp=1,NumBornAmps
+                      LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+                  enddo
+                  enddo
+                  LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+              enddo!helicity loop
+              DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+              do NHisto=1,NumHistograms
+                  call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+              enddo
+              EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
+          enddo   !dipole loop
+  endif! nJetRad for dipoles
+
+enddo! nJetRad loop
+
+
+
+
+
+
+
+!----------------------------------
+!  gluon  emission off stop   |
+!----------------------------------
+do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
+
+   EvalCS_DKJ_Real_ststbgg = 0d0
+   IF(XTOPDECAYS.EQ.3) THEN
+   if( nJetRad.eq.1 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T_G,MomExt(1:4,4),yRnd(11:15),MomExt(1:4,10:12),PSWgt2)!  Chi(10) top(11) glu(12->15)
+      MomExt(1:4,15) = MomExt(1:4,12)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt3)!  b(12) el(13) nu(14)
+   elseif( nJetRad.eq.2 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  Chi(10) top(11)
+      call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+   elseif( nJetRad.eq.3 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  Chi(10) top(11)
+      call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+   endif   
+   call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt4)! Chi(5) Top(6)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
+   ENDIF
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
+   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   if( PreFac.eq.0d0 ) cycle
+   if( applyPSCut ) then
+      EvalCS_DKJ_Real_ststbgg = 0d0
+      PSCutCounter = PSCutCounter + 1
+      goto 2001
+   endif
+
+
+   LO_Res_Unpol = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=1,-1,-2
+
+      call HelCrossing(Helicities(iHel,1:6))
+      call SetPolarizations()
+      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+      if( nJetRad.eq.1 ) then
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      elseif( nJetRad.eq.2 ) then
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      else
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      endif
+
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+   enddo!helicity loop
+   enddo!helicity loop
+
+   EvalCS_DKJ_Real_ststbgg = LO_Res_UnPol * PreFac * ISFac * (alpha_s4Pi*RunFactor)**2
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ststbgg)
+   enddo
+   EvalCounter = EvalCounter + 1
+
+   EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + EvalCS_DKJ_Real_ststbgg
+
+
+
+
+2001 continue!! dipoles for gluon emission off stop
+
+
+
+
+   if( nJetRad.eq.1 ) then
+
+        MomExtTdIn(1:4,1) = MomExt(1:4,11)
+        MomExtTdIn(1:4,2) = MomExt(1:4,10)
+        MomExtTdIn(1:4,3) = MomExt(1:4,15)
+        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+        call swapMom(MomExtTd(1:4,10),MomExtTd(1:4,11))
+        MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
+        MomExtTd(1:4,12:14) = MomExt(1:4,12:14)
+        
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0 ) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + DipoleResult
+
+
+
+
+   elseif( nJetRad.eq.2 ) then
+
+        MomExtTd(1:4,1:11) = MomExt(1:4,1:11)
+        MomExtTdIn(1:4,1:4) = MomExt(1:4,12:15)
+        call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),pbDpg,ptDpg,ptDpb)
+        
+        omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
+        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        z=1d0-omz
+        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + DipoleResult
+
+
+   elseif( nJetRad.eq.3 ) then
+          MomExtTd(1:4,1:11) = MomExt(1:4,1:11)
+          MomExtTdIn(1:4,1:4) = MomExt(1:4,12:15)
+          do ndip=1,2
+              call wdec_trans(ndip,MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),alpha_DKWff,TheDipole)
+              TheDipole = - alpha_s4Pi*RunFactor * CF * TheDipole
+
+              call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+              if( applyPSCut .or. TheDipole.eq.0d0 ) then
+                  cycle
+              endif
+
+              LO_Res_Unpol = (0d0,0d0)
+              do iHel=1,NumHelicities! helicity summation
+                  call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+                  call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+                  call HelCrossing(Helicities(iHel,1:4))
+                  call SetPolarizations()
+                  do iPrimAmp=1,NumBornAmps
+                      call EvalTree(BornAmps(iPrimAmp))
+                  enddo
+
+                  LO_Res_Pol = (0d0,0d0)
+                  do jPrimAmp=1,NumBornAmps
+                  do iPrimAmp=1,NumBornAmps
+                      LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+                  enddo
+                  enddo
+                  LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+              enddo!helicity loop
+              DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+              do NHisto=1,NumHistograms
+                  call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+              enddo
+              EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + DipoleResult
+          enddo   !dipole loop
+  endif! nJetRad for dipoles
+
+enddo! nJetRad loop
+
+
+
+
+
+   EvalCS_DKJ_Real_ststbgg = (EvalCS_DKJ_Real_ststbgg_1+EvalCS_DKJ_Real_ststbgg_2)/VgsWgt
+
+
+
+   if( IsNan(EvalCS_DKJ_Real_ststbgg) ) then
+        print *, "NAN:",EvalCS_DKJ_Real_ststbgg
+        print *, yRnd(:)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1:11)
+        print *, "SKIP EVENT!!!!!"
+        EvalCS_DKJ_Real_ststbgg = 0d0
+        return
+   endif
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_DKJ_Real_ststbqqb(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModAmplitudes
+use ModParameters
+use ModExoticDecay
+use ModHadrWDecay
+use ModMisc
+implicit none
+real(8) ::  EvalCS_DKJ_Real_ststbqqb,EvalCS_DKJ_Real_ststbqqb_1,EvalCS_DKJ_Real_ststbqqb_2
+real(8) :: yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult,PDFFac_a,PDFFac_b
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2)
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+integer :: nJetRad,nJetRad1,nJetRad2,nJetRad3,nJetRad4,GluHel,ndip
+real(8) :: pbDpg,ptDpg,ptDpb,omz,rsq,z,y
+real(8),parameter :: CF=4d0/3d0
+include 'vegas_common.f'
+
+
+
+
+   EvalCS_DKJ_Real_ststbqqb   = 0d0
+   EvalCS_DKJ_Real_ststbqqb_1 = 0d0
+   EvalCS_DKJ_Real_ststbqqb_2 = 0d0
+
+
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_STop ) then
+      EvalCS_DKJ_Real_ststbqqb = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+
+   ISFac = MomCrossing(MomExt)
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+            + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+            + pdf(Bot_,1)*pdf(ABot_,2)
+   PDFFac_b = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+            + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+            + pdf(Bot_,2)*pdf(ABot_,1)
+   PDFFac = PDFFac_a + PDFFac_b
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+
+
+   nJetRad1=1
+   nJetRad3=1
+   if( TOPDECAYS.eq.1 ) then
+      nJetRad2=2;  nJetRad4=2
+   elseif( TOPDECAYS.eq.2 ) then
+      nJetRad2=3;  nJetRad4=3
+   elseif( TOPDECAYS.eq.3 ) then
+      nJetRad2=2;  nJetRad4=3
+   elseif( TOPDECAYS.eq.4 ) then
+      nJetRad2=3;  nJetRad4=2
+   endif
+!-----------------------------------
+!  gluon  emission off anti-stop   |
+!----------------------------------
+do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
+
+   EvalCS_DKJ_Real_ststbqqb = 0d0
+   IF(XTOPDECAYS.EQ.3) THEN
+   if( nJetRad.eq.1 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T_G,MomExt(1:4,3),yRnd(5:9),MomExt(1:4,5:7),PSWgt2)!  Chi(5) top(6) glu(7->15)
+      MomExt(1:4,15) = MomExt(1:4,7)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(10:13),MomExt(1:4,7:9),PSWgt3)!  b(7) el(8) nu(9)
+   elseif( nJetRad.eq.2 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi(5) top(6)
+      call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      MomExt(1:4,15) = MomExt(1:4,10)
+   elseif( nJetRad.eq.3 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi(5) top(6)
+      call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      MomExt(1:4,15) = MomExt(1:4,10)
+   endif   
+   call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(14:15),MomExt(1:4,10:11),PSWgt4)! Chi(10) Top(11)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
+   ENDIF
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
+   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   if( PreFac.eq.0d0 ) cycle
+   if( applyPSCut ) then
+      EvalCS_DKJ_Real_ststbqqb = 0d0
+      PSCutCounter = PSCutCounter + 1
+      goto 2000
+   endif
+
+
+   LO_Res_Unpol = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=1,-1,-2
+
+      call HelCrossing(Helicities(iHel,1:6))
+      call SetPolarizations()
+      if( nJetRad.eq.1 ) then
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      elseif( nJetRad.eq.2 ) then
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      else
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+      endif
+      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+   enddo!helicity loop
+   enddo!helicity loop
+
+   EvalCS_DKJ_Real_ststbqqb = LO_Res_UnPol * PreFac * ISFac * (alpha_s4Pi*RunFactor)**2
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ststbqqb)
+   enddo
+   EvalCounter = EvalCounter + 1
+
+   EvalCS_DKJ_Real_ststbqqb_1 = EvalCS_DKJ_Real_ststbqqb_1 + EvalCS_DKJ_Real_ststbqqb
+
+
+
+
+2000 continue!! dipoles for gluon emission off anti-stop
+
+
+
+print *, "check helicity arrays"
+
+
+   if( nJetRad.eq.1 ) then
+
+        MomExtTdIn(1:4,1) = MomExt(1:4,6)
+        MomExtTdIn(1:4,2) = MomExt(1:4,5)
+        MomExtTdIn(1:4,3) = MomExt(1:4,15)
+        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+        call swapMom(MomExtTd(1:4,5),MomExtTd(1:4,6))
+        MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
+        MomExtTd(1:4,7:14) = MomExt(1:4,7:14)
+        
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0 ) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbqqb_1 = EvalCS_DKJ_Real_ststbqqb_1 + DipoleResult
+
+
+   elseif( nJetRad.eq.2 ) then
+
+        MomExtTd(1:4,1:6) = MomExt(1:4,1:6)
+        MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
+        MomExtTdIn(1:4,1:3) = MomExt(1:4,7:9)
+        MomExtTdIn(1:4,4)  = MomExt(1:4,15)
+        call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),pbDpg,ptDpg,ptDpb)
+        
+        omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
+        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        z=1d0-omz
+        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbqqb_1 = EvalCS_DKJ_Real_ststbqqb_1 + DipoleResult
+
+
+   elseif( nJetRad.eq.3 ) then
+          MomExtTd(1:4,1:6) = MomExt(1:4,1:6)
+          MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
+          MomExtTdIn(1:4,1:3) = MomExt(1:4,7:9)
+          MomExtTdIn(1:4,4) = MomExt(1:4,15)
+          do ndip=1,2
+              call wdec_trans(ndip,MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),alpha_DKWff,TheDipole)
+              TheDipole = - alpha_s4Pi*RunFactor * CF * TheDipole
+
+              call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+              if( applyPSCut .or. TheDipole.eq.0d0 ) then
+                  cycle
+              endif
+
+              LO_Res_Unpol = (0d0,0d0)
+              do iHel=1,NumHelicities! helicity summation
+                  call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+                  call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+                  call HelCrossing(Helicities(iHel,1:4))
+                  call SetPolarizations()
+                  do iPrimAmp=1,NumBornAmps
+                      call EvalTree(BornAmps(iPrimAmp))
+                  enddo
+
+                  LO_Res_Pol = (0d0,0d0)
+                  do jPrimAmp=1,NumBornAmps
+                  do iPrimAmp=1,NumBornAmps
+                      LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+                  enddo
+                  enddo
+                  LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+              enddo!helicity loop
+              DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+              do NHisto=1,NumHistograms
+                  call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+              enddo
+              EvalCS_DKJ_Real_ststbqqb_1 = EvalCS_DKJ_Real_ststbqqb_1 + DipoleResult
+          enddo   !dipole loop
+  endif! nJetRad for dipoles
+
+enddo! nJetRad loop
+
+
+
+
+
+
+
+!----------------------------------
+!  gluon  emission off stop   |
+!----------------------------------
+do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
+
+   EvalCS_DKJ_Real_ststbqqb = 0d0
+   IF(XTOPDECAYS.EQ.3) THEN
+   if( nJetRad.eq.1 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T_G,MomExt(1:4,4),yRnd(11:15),MomExt(1:4,10:12),PSWgt2)!  Chi(10) top(11) glu(12->15)
+      MomExt(1:4,15) = MomExt(1:4,12)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt3)!  b(12) el(13) nu(14)
+   elseif( nJetRad.eq.2 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  Chi(10) top(11)
+      call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+   elseif( nJetRad.eq.3 ) then
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  Chi(10) top(11)
+      call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+   endif   
+   call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt4)! Chi(5) Top(6)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
+   ENDIF
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
+   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   if( PreFac.eq.0d0 ) cycle
+   if( applyPSCut ) then
+      EvalCS_DKJ_Real_ststbqqb = 0d0
+      PSCutCounter = PSCutCounter + 1
+      goto 2001
+   endif
+
+
+   LO_Res_Unpol = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=1,-1,-2
+
+      call HelCrossing(Helicities(iHel,1:6))
+      call SetPolarizations()
+      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+      if( nJetRad.eq.1 ) then
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      elseif( nJetRad.eq.2 ) then
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      else
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+      endif
+
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+   enddo!helicity loop
+   enddo!helicity loop
+
+   EvalCS_DKJ_Real_ststbqqb = LO_Res_UnPol * PreFac * ISFac * (alpha_s4Pi*RunFactor)**2
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ststbqqb)
+   enddo
+   EvalCounter = EvalCounter + 1
+
+   EvalCS_DKJ_Real_ststbqqb_2 = EvalCS_DKJ_Real_ststbqqb_2 + EvalCS_DKJ_Real_ststbqqb
+
+
+
+
+2001 continue!! dipoles for gluon emission off stop
+
+
+
+
+   if( nJetRad.eq.1 ) then
+
+        MomExtTdIn(1:4,1) = MomExt(1:4,11)
+        MomExtTdIn(1:4,2) = MomExt(1:4,10)
+        MomExtTdIn(1:4,3) = MomExt(1:4,15)
+        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+        call swapMom(MomExtTd(1:4,10),MomExtTd(1:4,11))
+        MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
+        MomExtTd(1:4,12:14) = MomExt(1:4,12:14)
+        
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0 ) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbqqb_2 = EvalCS_DKJ_Real_ststbqqb_2 + DipoleResult
+
+
+   elseif( nJetRad.eq.2 ) then
+
+        MomExtTd(1:4,1:11) = MomExt(1:4,1:11)
+        MomExtTdIn(1:4,1:4) = MomExt(1:4,12:15)
+        call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),pbDpg,ptDpg,ptDpb)
+        
+        omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
+        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        z=1d0-omz
+        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+
+        call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+        if( applyPSCut .or. TheDipole.eq.0d0) then
+            cycle
+        endif
+
+
+        LO_Res_Unpol = (0d0,0d0)
+        do iHel=1,NumHelicities! helicity summation
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+            call HelCrossing(Helicities(iHel,1:4))
+            call SetPolarizations()
+            do iPrimAmp=1,NumBornAmps
+                call EvalTree(BornAmps(iPrimAmp))
+            enddo
+
+            LO_Res_Pol = (0d0,0d0)
+            do jPrimAmp=1,NumBornAmps
+            do iPrimAmp=1,NumBornAmps
+                LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+            enddo
+            enddo
+            LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+        enddo!helicity loop
+        DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+        enddo
+        EvalCS_DKJ_Real_ststbqqb_2 = EvalCS_DKJ_Real_ststbqqb_2 + DipoleResult
+
+
+   elseif( nJetRad.eq.3 ) then
+          MomExtTd(1:4,1:11) = MomExt(1:4,1:11)
+          MomExtTdIn(1:4,1:4) = MomExt(1:4,12:15)
+          do ndip=1,2
+              call wdec_trans(ndip,MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),alpha_DKWff,TheDipole)
+              TheDipole = - alpha_s4Pi*RunFactor * CF * TheDipole
+
+              call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+              if( applyPSCut .or. TheDipole.eq.0d0 ) then
+                  cycle
+              endif
+
+              LO_Res_Unpol = (0d0,0d0)
+              do iHel=1,NumHelicities! helicity summation
+                  call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExtTd(1:4,5:9))
+                  call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExtTd(1:4,10:14))
+                  call HelCrossing(Helicities(iHel,1:4))
+                  call SetPolarizations()
+                  do iPrimAmp=1,NumBornAmps
+                      call EvalTree(BornAmps(iPrimAmp))
+                  enddo
+
+                  LO_Res_Pol = (0d0,0d0)
+                  do jPrimAmp=1,NumBornAmps
+                  do iPrimAmp=1,NumBornAmps
+                      LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+                  enddo
+                  enddo
+                  LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+              enddo!helicity loop
+              DipoleResult = LO_Res_UnPol * PreFac * TheDipole * (alpha_s4Pi*RunFactor)**2 * ISFac
+
+              do NHisto=1,NumHistograms
+                  call intoHisto(NHisto,NBin(NHisto),DipoleResult)
+              enddo
+              EvalCS_DKJ_Real_ststbqqb_2 = EvalCS_DKJ_Real_ststbqqb_2 + DipoleResult
+          enddo   !dipole loop
+  endif! nJetRad for dipoles
+
+enddo! nJetRad loop
+
+
+
+
+
+   EvalCS_DKJ_Real_ststbqqb = (EvalCS_DKJ_Real_ststbqqb_1+EvalCS_DKJ_Real_ststbqqb_2)/VgsWgt
+
+
+
+   if( IsNan(EvalCS_DKJ_Real_ststbqqb) ) then
+        print *, "NAN:",EvalCS_DKJ_Real_ststbqqb
+        print *, yRnd(:)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1:11)
+        print *, "SKIP EVENT!!!!!"
+        EvalCS_DKJ_Real_ststbqqb = 0d0
+        return
+   endif
+
+
+return
 END FUNCTION
 
 

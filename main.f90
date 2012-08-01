@@ -1343,11 +1343,11 @@ IF( PDFSET.EQ.1 ) THEN! MRST/MSTW
 
 ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
   IF( NLOPARAM.EQ.2) THEN
-      call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
+!       call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
 !       call SetCtq6(200) !  updated CTEQ6.1M Standard MSbar scheme   0.118     326   226    cteq6m.tbl
-!      call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
+     call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
 
-print *, "SWITCHED TO CTEQ6M FOR CHINESE CHECK"
+! print *, "SWITCHED TO CTEQ6M FOR CHINESE CHECK"
 
      PDFSetString = " CTEQ6.6M NLO (ctq66.00.pds)"
 !      call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
