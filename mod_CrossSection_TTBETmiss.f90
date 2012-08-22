@@ -2192,7 +2192,7 @@ END FUNCTION
 
 
 
-
+! should be named DKReal
 FUNCTION EvalCS_DKJ_Real_ststbgg(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -2210,7 +2210,7 @@ real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult
-real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2)
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2), mydummy(1:10)
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
 integer :: nJetRad,nJetRad1,nJetRad2,nJetRad3,nJetRad4,GluHel,ndip
 real(8) :: pbDpg,ptDpg,ptDpb,omz,rsq,z,y
@@ -2219,10 +2219,30 @@ include 'vegas_common.f'
 
 
 
-
    EvalCS_DKJ_Real_ststbgg   = 0d0
    EvalCS_DKJ_Real_ststbgg_1 = 0d0
    EvalCS_DKJ_Real_ststbgg_2 = 0d0
+
+! yRnd( 1)=  0.3385585941088194d0
+! yRnd( 2)=  0.2799513116385563d0
+! yRnd( 3)=  0.012473622342792d0
+! yRnd( 4)=  0.2879364093709448d0
+! yRnd( 5)=  0.1334328211068331d0
+! yRnd( 6)=  0.7829718273519412d0
+! yRnd( 7)=  0.3479862101366653d0
+! yRnd( 8)=  0.1332233664734401d0
+! yRnd( 9)=  0.2332185946559626d0
+! yRnd(10)=  0.7471774192280964d0
+! yRnd(11)=  0.438860277849650d0
+! yRnd(12)=  0.02669250668338154d0
+! yRnd(13)=  0.1692973097643342d0
+! yRnd(14)=  0.6054243425398250d0
+! yRnd(15)=  0.1081832926292833d0
+! yRnd(16)=  0.1284279972912875d0
+! yRnd(17)=  0.4608715537287632d0
+! yRnd(18)=  0.3695206294159972d0
+! yRnd(19)=  0.4436338681465174d0
+! print *, "fixing yrnds"
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -2241,7 +2261,6 @@ include 'vegas_common.f'
    RunFactor = RunAlphaS(NLOParam,MuRen)
 
 
-
    nJetRad1=1
    nJetRad3=1
    if( TOPDECAYS.eq.1 ) then
@@ -2253,6 +2272,11 @@ include 'vegas_common.f'
    elseif( TOPDECAYS.eq.4 ) then
       nJetRad2=3;  nJetRad4=2
    endif
+
+! print *, "fixing nJetRads"; nJetRad1=1; nJetRad2=1
+! print *, "fixing nJetRads"; nJetRad3=2; nJetRad4=-2
+
+
 !----------------------------------
 !  gluon  emission off anti-stop   |
 !----------------------------------
@@ -2272,11 +2296,12 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
       call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi(5) top(6)
       call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
       MomExt(1:4,15) = MomExt(1:4,10)
-   endif   
+   endif
    call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(14:15),MomExt(1:4,10:11),PSWgt4)! Chi(10) Top(11)
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
+
    PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    if( PreFac.eq.0d0 ) cycle
@@ -2294,11 +2319,11 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
       call HelCrossing(Helicities(iHel,1:6))
       call SetPolarizations()
       if( nJetRad.eq.1 ) then
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       else
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       endif
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -2317,6 +2342,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    enddo!helicity loop
    enddo!helicity loop
 
+
    EvalCS_DKJ_Real_ststbgg = LO_Res_UnPol * PreFac * ISFac * (alpha_s4Pi*RunFactor)**2
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_Real_ststbgg)
@@ -2325,27 +2351,22 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + EvalCS_DKJ_Real_ststbgg
 
-
+mydummy(1) = EvalCS_DKJ_Real_ststbgg
 
 
 2000 continue!! dipoles for gluon emission off anti-stop
 
-print *, "check helicity arrays"
 
 
 
    if( nJetRad.eq.1 ) then
 
-        MomExtTdIn(1:4,1) = MomExt(1:4,6)
-        MomExtTdIn(1:4,2) = MomExt(1:4,5)
-        MomExtTdIn(1:4,3) = MomExt(1:4,15)
-        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
-        call swapMom(MomExtTd(1:4,5),MomExtTd(1:4,6))
+        call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+        call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(10:13),MomExtTd(1:4,7:9),PSWgt3)
         MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
-        MomExtTd(1:4,7:14) = MomExt(1:4,7:14)
+        MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
         
         TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
-!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -2377,8 +2398,13 @@ print *, "check helicity arrays"
         enddo
         EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
 
-
-
+! mydummy(2) = DipoleResult
+! print *, "E(glu)/E(stop)",MomExt(1,15)/MomExt(1,5)
+! print *, "real    result",mydummy(1)
+! print *, "dipole  result",mydummy(2)
+! print *, "ratios        ",mydummy(1)/mydummy(2), mydummy(1)/mydummy(2)+1d0
+! pause
+! return
 
    elseif( nJetRad.eq.2 ) then
 
@@ -2429,6 +2455,15 @@ print *, "check helicity arrays"
         EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
 
 
+! mydummy(2) = DipoleResult
+! print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,7))/EHat**2
+! print *, "E(glu)/E(stop)",MomExt(1,15)/MomExt(1,7)
+! print *, "real    result",mydummy(1)
+! print *, "dipole  result",mydummy(2)
+! print *, "ratios        ",mydummy(1)/mydummy(2), mydummy(1)/mydummy(2)+1d0
+! pause
+! return
+
    elseif( nJetRad.eq.3 ) then
           MomExtTd(1:4,1:6) = MomExt(1:4,1:6)
           MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
@@ -2467,7 +2502,17 @@ print *, "check helicity arrays"
                   call intoHisto(NHisto,NBin(NHisto),DipoleResult)
               enddo
               EvalCS_DKJ_Real_ststbgg_1 = EvalCS_DKJ_Real_ststbgg_1 + DipoleResult
+mydummy(2) = mydummy(2) + DipoleResult
           enddo   !dipole loop
+
+print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,7))/EHat**2
+print *, "E(glu)/E(stop)",MomExt(1,15)/MomExt(1,7)
+print *, "real    result",mydummy(1)
+print *, "dipole  result",mydummy(2)
+print *, "ratios        ",mydummy(1)/mydummy(2), mydummy(1)/mydummy(2)+1d0
+pause
+return
+
   endif! nJetRad for dipoles
 
 enddo! nJetRad loop
@@ -2518,11 +2563,11 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
       call SetPolarizations()
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       if( nJetRad.eq.1 ) then
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       else
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       endif
 
       do iPrimAmp=1,NumBornAmps
@@ -2548,7 +2593,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + EvalCS_DKJ_Real_ststbgg
 
-
+mydummy(3) = EvalCS_DKJ_Real_ststbgg
 
 
 2001 continue!! dipoles for gluon emission off stop
@@ -2558,16 +2603,11 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    if( nJetRad.eq.1 ) then
 
-        MomExtTdIn(1:4,1) = MomExt(1:4,11)
-        MomExtTdIn(1:4,2) = MomExt(1:4,10)
-        MomExtTdIn(1:4,3) = MomExt(1:4,15)
-        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
-        call swapMom(MomExtTd(1:4,10),MomExtTd(1:4,11))
+        call WTransform3(MomExt(1:4,10:11),MomExt(1:4,15),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+        call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,11),yRnd(16:19),MomExtTd(1:4,12:14),PSWgt3)
         MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
-        MomExtTd(1:4,12:14) = MomExt(1:4,12:14)
-        
+
         TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
-!         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -2601,6 +2641,13 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
         EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + DipoleResult
 
 
+! mydummy(4) = DipoleResult
+! print *, "E(glu)/E(stop)",MomExt(1,15)/MomExt(1,10)
+! print *, "real    result",mydummy(3)
+! print *, "dipole  result",mydummy(4)
+! print *, "ratios        ",mydummy(3)/mydummy(4), mydummy(3)/mydummy(4)+1d0
+! pause
+! return
 
 
    elseif( nJetRad.eq.2 ) then
@@ -2649,6 +2696,15 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
         enddo
         EvalCS_DKJ_Real_ststbgg_2 = EvalCS_DKJ_Real_ststbgg_2 + DipoleResult
 
+
+! mydummy(4) = DipoleResult
+! print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,12))/EHat**2
+! print *, "E(glu)/E(top)",MomExt(1,15)/MomExt(1,12)
+! print *, "real    result",mydummy(3)
+! print *, "dipole  result",mydummy(4)
+! print *, "ratios        ",mydummy(3)/mydummy(4), mydummy(3)/mydummy(4)+1d0
+! pause
+! return
 
    elseif( nJetRad.eq.3 ) then
           MomExtTd(1:4,1:11) = MomExt(1:4,1:11)
@@ -2829,11 +2885,11 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
       call HelCrossing(Helicities(iHel,1:6))
       call SetPolarizations()
       if( nJetRad.eq.1 ) then
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE2,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       else
-          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15))
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE3,Helicities(iHel,5),MomExt(1:4,5:9),MomExt(1:4,15),GluHel)
       endif
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -2875,7 +2931,7 @@ print *, "check helicity arrays"
         MomExtTdIn(1:4,1) = MomExt(1:4,6)
         MomExtTdIn(1:4,2) = MomExt(1:4,5)
         MomExtTdIn(1:4,3) = MomExt(1:4,15)
-        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+!         call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
         call swapMom(MomExtTd(1:4,5),MomExtTd(1:4,6))
         MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
         MomExtTd(1:4,7:14) = MomExt(1:4,7:14)
@@ -3053,11 +3109,11 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
       call SetPolarizations()
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       if( nJetRad.eq.1 ) then
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       else
-          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15))
+          call STopDecay(ExtParticle(2),DKX_STChi0_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       endif
 
       do iPrimAmp=1,NumBornAmps
@@ -3096,7 +3152,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
         MomExtTdIn(1:4,1) = MomExt(1:4,11)
         MomExtTdIn(1:4,2) = MomExt(1:4,10)
         MomExtTdIn(1:4,3) = MomExt(1:4,15)
-        call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+!         call WTransform3(MomExtTdIn(1:4,1:3),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
         call swapMom(MomExtTd(1:4,10),MomExtTd(1:4,11))
         MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
         MomExtTd(1:4,12:14) = MomExt(1:4,12:14)
@@ -3246,6 +3302,173 @@ enddo! nJetRad loop
 
 
 return
+END FUNCTION
+
+
+
+
+
+
+! should be named DK1L
+FUNCTION EvalCS_DKJ_1L_ststbgg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModIntegrals
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+implicit none
+real(8) ::  EvalCS_DKJ_1L_ststbgg,yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: NLO_Res_Pol,NLO_Res_Unpol,TreeResult(1:6),VirtResult(1:6)
+integer :: iHel,iPrimAmp,jPrimAmp,nHel(1:2)
+integer :: NBin(1:NumMaxHisto),NHisto
+real(8) :: SpinAvg,ColorAvg,EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,RunFactor
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac
+real(8) :: MomExt(1:4,1:15)
+real(8) :: pdf(-6:6,1:2)
+logical :: applyPSCut
+include 'vegas_common.f'
+
+
+   EvalCS_DKJ_1L_ststbgg = 0d0
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_STop ) then
+      EvalCS_DKJ_1L_ststbgg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+   ISFac = MomCrossing(MomExt)
+
+   IF(XTOPDECAYS.EQ.3) THEN
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  Chi top
+      call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   ENDIF
+ 
+
+   call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+   if( applyPSCut ) then
+      EvalCS_DKJ_1L_ststbgg = 0d0
+      return
+   endif
+
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac = pdf(0,1) * pdf(0,2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+   nHel(1:2) = getHelicity(yrnd(17))
+   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+
+
+!----------------------------------------
+! one loop correction on anti-stop decay |
+!----------------------------------------
+    NLO_Res_Unpol = (0d0,0d0)
+!     do iHel=nHel(1),nHel(2)
+!         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+!         call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+!         call HelCrossing(Helicities(iHel,1:4))
+!         call SetPolarizations()
+!         
+!         do iPrimAmp=1,NumBornAmps
+!             call EvalTree(BornAmps(iPrimAmp))
+!             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+!         enddo
+! 
+!         call STopDecay(ExtParticle(1),DKX_STChi0_1L,Helicities(iHel,5),MomExt(1:4,5:9))
+!         do iPrimAmp=1,NumBornAmps
+!             call EvalTree(BornAmps(iPrimAmp))
+!             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+!         enddo
+! 
+!         NLO_Res_Pol = (0d0,0d0)
+!         do jPrimAmp=1,NumBornAmps
+!         do iPrimAmp=1,NumBornAmps
+!             NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
+!         enddo
+!         enddo
+!         NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
+! 
+!     enddo! iHel loop
+    NLO_Res_Unpol = NLO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * PreFac
+    EvalCS_DKJ_1L_ststbgg = NLO_Res_Unpol
+
+
+
+
+
+!----------------------------------------
+! one loop correction on stop decay |
+!----------------------------------------
+    NLO_Res_Unpol = (0d0,0d0)
+    do iHel=nHel(1),nHel(2)
+        call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+        call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+        call HelCrossing(Helicities(iHel,1:4))
+        call SetPolarizations()
+        
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        call STopDecay(ExtParticle(2),DKX_STChi0_1L,Helicities(iHel,6),MomExt(1:4,10:14))
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        NLO_Res_Pol = (0d0,0d0)
+        do jPrimAmp=1,NumBornAmps
+        do iPrimAmp=1,NumBornAmps
+            NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
+        enddo
+        enddo
+        NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
+
+    enddo! iHel loop
+    NLO_Res_Unpol = NLO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * PreFac
+    EvalCS_DKJ_1L_ststbgg = EvalCS_DKJ_1L_ststbgg + NLO_Res_Unpol
+
+
+
+
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_DKJ_1L_ststbgg)
+   enddo
+
+
+   EvalCS_DKJ_1L_ststbgg = EvalCS_DKJ_1L_ststbgg/VgsWgt
+   if( IsNan(EvalCS_DKJ_1L_ststbgg) ) then
+        print *, "NAN:",EvalCS_DKJ_1L_ststbgg
+        call printYrnd(yrnd(:))
+        EvalCS_DKJ_1L_ststbgg = 0d0
+        return
+   endif
+
+return
+END FUNCTION
+
+
+
+
+
+
+FUNCTION EvalCS_DKJ_1L_ststbqqb(yRnd,VgsWgt)
+use ModParameters
+implicit none
+real(8) ::  EvalCS_DKJ_1L_ststbqqb
+real(8) :: yRnd(1:VegasMxDim),VgsWgt
+include 'vegas_common.f'
+
+
+EvalCS_DKJ_1L_ststbqqb= 0d0
+
 END FUNCTION
 
 

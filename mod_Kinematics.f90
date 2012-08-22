@@ -419,11 +419,11 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar + Chi production (st
 ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops)
     Rsep_jet    = 0.4d0
 
-    pT_bjet_cut = 25d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
-    pT_miss_cut = 80d0*GeV
+    pT_bjet_cut = 25d0*GeV     *0d0
+    eta_bjet_cut= 2.5d0        *100d0 
+    pT_lep_cut  = 20d0*GeV     *0d0
+    eta_lep_cut = 2.5d0        *100d0
+    pT_miss_cut = 80d0*GeV     *0d0
 
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
@@ -3363,6 +3363,9 @@ real(8) :: xRndPS(:)
 
    if( Topol.eq.ST_Chi0_T ) then
       call EvalPhasespace_STopDecay(STopMom,xRndPS,.false.,MomDK,PSWgt)
+
+   elseif( Topol.eq.ST_Chi0_T_G ) then
+      call EvalPhasespace_STopDecay(STopMom,xRndPS,.true.,MomDK,PSWgt)
    else
       call Error("EvalPS not yet implemented")
    endif
@@ -3390,7 +3393,7 @@ real(8) :: SingDepth,soft,coll
 logical,save :: flip=.true.
 
     if( .not.GluonRad ) then!  no extra gluon radiation
-!     MomDK(1:4,i): i= 1:bottom, 2:lepton, 3:neutrino
+!     MomDK(1:4,i): i= 1:Chi, 2:top
       call genps(2,m_STop,xRndPS(1:2),(/m_Chi,m_Top/),MomDK(1:4,1:2),PSWgt2)! Stop decay
 !     boost all guys to the top frame:
       call boost(MomDK(1:4,1),STopMom(1:4),m_STop)
@@ -3398,7 +3401,21 @@ logical,save :: flip=.true.
       PSWgt = PSWgt2*PiWgt2
 
     else! extra gluon emission
+!     MomDK(1:4,i): i= 1:Chi, 2:top, 3:gluon
+      call genps(3,m_STop,xRndPS(1:5),(/m_Chi,m_Top,0d0/),MomDK(1:4,1:3),PSWgt2)! Stop decay with gluon
 
+!          Pcol1= 5 -1
+!          Pcol2= 5 -1
+!          SingDepth = 1e-10
+!          Steps = 20
+!          call gensing(3,m_STop,(/m_Chi,m_Top,0d0/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "running gensing"
+!          PSWgt2=1d0
+
+!     boost all guys to the top frame:
+      call boost(MomDK(1:4,1),STopMom(1:4),m_STop)
+      call boost(MomDK(1:4,2),STopMom(1:4),m_STop)
+      call boost(MomDK(1:4,3),STopMom(1:4),m_STop)
+      PSWgt = PSWgt2*PiWgt3
     endif
 
 
@@ -3494,7 +3511,7 @@ logical,save :: flip=.true.
 !         Pcol2= 4 -1
 !         SingDepth = 1e-10
 !         Steps = 20
-!         call gensing(3,m_Top,(/0d0,0d0,m_W/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps)
+!         call gensing(3,m_Top,(/0d0,0d0,m_W/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
 !         PSWgt2=1d0
 !         WMom(1:4) = MomDK(1:4,3)
 !         MomDK(1:4,4) = MomDK(1:4,2)
@@ -3554,11 +3571,11 @@ logical,save :: flip=.true.
 
 ! flip=.not.flip
 ! if( flip ) then!  every second call the singular event is generated
-!         Pcol1= 3 -1
+!         Pcol1= 5 -1
 !         Pcol2= 5 -1
 !         SingDepth = 1e-10
 !         Steps = 20
-!         call gensing(3,m_W,(/0d0,0d0,0d0/),MomDK(1:4,2:4),Pcol1,Pcol2,SingDepth,Steps)
+!         call gensing(3,m_W,(/0d0,0d0,0d0/),MomDK(1:4,2:4),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
 !         PSWgt3=1d0
 ! endif
 
@@ -7207,23 +7224,36 @@ IF(XTOPDECAYS.NE.0) THEN
       print *, Mom(:,:)
    endif
 
-   zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar)-Mom(1:4,tbar)
-   zeros(5:8) = Mom(1:4,Ht)-Mom(1:4,X0)-Mom(1:4,t)
-   if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
-      print *, "momentum dump:"
-      print *, Mom(:,:)
-      pause
-   endif
+   if( Correction.ne.5 .or. .not.NPlus1PS ) then
+          zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar)-Mom(1:4,tbar)
+          zeros(5:8) = Mom(1:4,Ht)-Mom(1:4,X0)-Mom(1:4,t)
+          if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
+              print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+              print *, "momentum dump:"
+              print *, Mom(:,:)
+              pause
+          endif
 
-   zeros(1:4) = Mom(1:4,tbar)-Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar)
-   zeros(5:8) = Mom(1:4,t)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
-   if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
-      print *, "momentum dump:"
-      print *, Mom(:,:)
-      pause
-   endif
+          zeros(1:4) = Mom(1:4,tbar)-Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar)
+          zeros(5:8) = Mom(1:4,t)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
+          if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
+              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+              print *, "momentum dump:"
+              print *, Mom(:,:)
+              pause
+          endif
+    else
+          zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar) + Mom(1:4,Ht)-Mom(1:4,X0) & 
+                     - Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar) -Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu) - Mom(1:4,realp)
+          if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
+              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+              print *, "momentum dump:"
+              print *, Mom(:,:)
+              pause
+          endif
+    endif
+
+
 
    zeros(:) = 0d0
 IF( ObsSet.eq.31 .or. ObsSet.eq.32 .or. ObsSet.eq.33 ) then

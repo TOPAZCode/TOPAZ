@@ -1260,7 +1260,7 @@ m_zpr=91d0*GeV
         ! Now compute the gluon part
         call Tree_Zprime_tbtqbq_gluefordip(LO_Res_Pol_glue)
 
-        LO_for_dip_Left  = LO_for_dip_Left  +  dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
+        LO_for_dip_Left  = LO_for_dip_Left  + dreal(LO_res_pol_Left*dconjg(LO_res_pol_glue))
         LO_for_dip_Right = LO_for_dip_Right + dreal(LO_res_pol_Right*dconjg(LO_res_pol_glue))
 
 

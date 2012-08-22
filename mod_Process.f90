@@ -1656,6 +1656,31 @@ ELSEIF( PROCESS.EQ.51 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 200000
       VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=12
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=12
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 4    ! stop decays
+      NDim = NDim + 3    ! real gluon
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
 
   ELSE
       call Error("Correction to this process is not available")
@@ -2914,6 +2939,12 @@ ELSEIF( MASTERPROCESS.EQ.12 ) THEN
       NumPrimAmps = 12
       NumBornAmps = 2
     ELSEIF( Correction.EQ.3 ) THEN
+    ELSEIF( Correction.EQ.4 ) THEN
+      NumPrimAmps = 2
+      NumBornAmps = 2
+    ELSEIF( Correction.EQ.5 ) THEN
+      NumPrimAmps = 2
+      NumBornAmps = 2
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -2967,6 +2998,13 @@ ELSEIF( MASTERPROCESS.EQ.13 ) THEN
       NumPrimAmps = 7
       NumBornAmps = 1
     ELSEIF( Correction.EQ.3 ) THEN
+
+    ELSEIF( Correction.EQ.4 ) THEN
+      NumPrimAmps = 1
+      NumBornAmps = 1
+    ELSEIF( Correction.EQ.5 ) THEN
+      NumPrimAmps = 1
+      NumBornAmps = 1
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))

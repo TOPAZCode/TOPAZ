@@ -1666,25 +1666,23 @@ END SUBROUTINE
 
 
 ! Lorentz transformation for the dipole matrix element in stop decays (taken from John and Keith, arXiv:1204.1513 hep-ph)
-SUBROUTINE WTransform3(MomDK,MomDKTd,pbDpg,ptDpg,ptDpb)! MomDK: 1=stop, 2=Chi, 3=glu
+SUBROUTINE WTransform3(MomDK,MomGlu,MomDKTd,pbDpg,ptDpg,ptDpb)! MomDK: 1=Chi, 2=top
 implicit none
-real(8) :: MomDK(1:4,1:3),MomDKTd(1:4,1:2),pw(4),pt(4),lDt(3:4),lDw(3:4)
+real(8) :: MomDK(1:4,1:2),MomGlu(1:4),MomDKTd(1:4,1:2),pw(4),pt(4),lDt(3:4),lDw(3:4)
 real(8) :: root,hsin,hcos,a,b
-real(8) :: ptDpt,pwDpw,ptDpw,ptDpg,pbDpg,ptDpb,pWDpl,ptDpl,pWDpn,ptDpn,pbDpb
+real(8) :: ptDpt,pwDpw,ptDpw,ptDpg,pbDpg,ptDpb,pWDpn,ptDpn,pbDpb
+integer :: n
 
+    pw(1:4) = MomDK(1:4,1)
+    pt(1:4) = pw(1:4) + MomDK(1:4,2) + MomGlu(1:4)
 
-    pw(1:4) = MomDK(1:4,2)
-    pt(1:4) = pw(1:4) + MomDK(1:4,1) + MomDK(1:4,3)
-
-    pbDpg = MomDK(1:4,1).dot.MomDK(1:4,3)
-    ptDpg = pt(1:4).dot.MomDK(1:4,3)
-    ptDpb = pt(1:4).dot.MomDK(1:4,1)
+    pbDpg = MomDK(1:4,2).dot.MomGlu(1:4)
+    ptDpg = pt(1:4).dot.MomGlu(1:4)
+    ptDpb = pt(1:4).dot.MomDK(1:4,2)
     ptDpw = pt(1:4).dot.pw(1:4)
     ptDpt = pt(1:4).dot.pt(1:4)
-    pbDpb = MomDK(1:4,1).dot.MomDK(1:4,1)
+    pbDpb = MomDK(1:4,2).dot.MomDK(1:4,2)
     pwDpw = pw(1:4).dot.pw(1:4)
-    pWDpl = pw(1:4).dot.MomDK(1:4,2)
-    ptDpl = pt(1:4).dot.MomDK(1:4,2)
 
 
 !   SqrtLambda(x,y,z)
@@ -1695,10 +1693,15 @@ real(8) :: ptDpt,pwDpw,ptDpw,ptDpg,pbDpg,ptDpb,pWDpl,ptDpl,pWDpn,ptDpn,pbDpb
     a=hsin/root
     b=(hcos-1d0)/root**2
 
-    MomDKTd(1:4,2) = MomDK(1:4,2) + a*( pt(1:4)*pwDpl-pw(1:4)*ptDpl )  &
-                                  + b*( ptDpw*(pt(1:4)*pwDpl+pw(1:4)*ptDpl) - pt(1:4)*pwDpw*ptDpl - pw(1:4)*ptDpt*pwDpl )
+    do n=1,1!  doesnt seem to work for 3..5; mom-conserv. is violated
+          MomDKTd(1:4,n) = MomDK(1:4,n) + a*( pt(1:4)*(pw(1:4).dot.MomDK(1:4,n))-pw(1:4)*(pt(1:4).dot.MomDK(1:4,n)) )  &
+                                        + b*( ptDpw*(pt(1:4)*(pw(1:4).dot.MomDK(1:4,n))+pw(1:4)*(pt(1:4).dot.MomDK(1:4,n))) & 
+                                        - pt(1:4)*pwDpw*(pt(1:4).dot.MomDK(1:4,n)) - pw(1:4)*ptDpt*(pw(1:4).dot.MomDK(1:4,n)) )
+    enddo
 
-    MomDKTd(1:4,1) = pt(1:4) - MomDKTd(1:4,2)
+    MomDKTd(1:4,2) = pt(1:4) - MomDKTd(1:4,1)
+
+
 
 RETURN
 END SUBROUTINE

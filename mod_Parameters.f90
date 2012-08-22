@@ -165,6 +165,7 @@ integer, public, parameter :: ST_Chi0_T_G=24
 integer, public, parameter :: DKX_STChi0_RE1=25
 integer, public, parameter :: DKX_STChi0_RE2=26
 integer, public, parameter :: DKX_STChi0_RE3=27
+integer, public, parameter :: DKX_STChi0_1L=28
 
 integer, public, parameter :: WDK_Lep=1
 integer, public, parameter :: WDK_LepPho=2

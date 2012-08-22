@@ -67,7 +67,7 @@ logical :: dirresult
    XTopDecays=-100
    HelSampling=.false.
    m_Top=172d0*GeV
-   m_STop=100d0*GeV
+   m_STop=300d0*GeV
    m_Zpr=1500d0*GeV
    Ga_Zpr=m_Zpr*0.01d0
    Q_top = Q_up
@@ -1035,6 +1035,30 @@ ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.55 ) THEN
     call InitHisto()
     call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
   endif
+
+
+ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.51 ) THEN
+  call vegas(EvalCS_DKJ_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+
+
+ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.51 ) THEN
+  call vegas(EvalCS_DKJ_Real_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+
+
 ENDIF
 ENDIF
 
@@ -1059,6 +1083,30 @@ ELSEIF( CORRECTION.EQ.3 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.53 .OR. PROCESS.EQ.
     call InitHisto()
     call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
+
+
+ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.52 ) THEN
+  call vegas(EvalCS_DKJ_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+
+
+ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.52 ) THEN
+  call vegas(EvalCS_DKJ_Real_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+
+
 ENDIF
 ENDIF
 
