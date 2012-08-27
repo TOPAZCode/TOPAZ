@@ -3152,7 +3152,7 @@ ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
 ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
-          NumHistograms = 6
+          NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3194,6 +3194,18 @@ ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dile
           Histo(6)%BinSize= 0.08d0
           Histo(6)%LowVal = 0d0
           Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "dPhiMinus"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 0.126d0
+          Histo(7)%LowVal = -DblPi
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "dPhiPlus"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 0.126d0
+          Histo(8)%LowVal = 0
+          Histo(8)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.62 ) THEN! set of observables for Zprime, fully hadronic top decay
@@ -7567,8 +7579,9 @@ real(8) :: MomTops(1:4,1:2),MomBoost(1:4)
 logical :: applyPSCut,NPlus1PS
 integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet_Tree,NObsJet
 real(8) :: y_Top,y_ATop,pT_Top,pT_ATop,M_TTbar,Dphi_TTbar,pT_Lept,y_Lept,Dphi_LL,M_LL
-real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star
-real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9)
+real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star,Phi,Phibar,dPhiPlus,dPhiMinus,MassAux
+real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
+real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
 integer :: i,j,n,k
 
 !DEC$ IF(_CheckMomenta .EQ.1)
@@ -7769,7 +7782,7 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
 !   see chinese paper, approximates scattering angle in ttb rest frame
     MomAux1(1:4) = MomTops(1:4,2)
     MomAux2(1:4) = MomExt(1:4,1)
-    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)! this seems wrong!!!
     call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
     CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
 
@@ -7805,6 +7818,52 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
 
 
 
+!   construct Baumgart-Tweedie angles
+
+!   step 1: boost top momenta into a frame with pT+pTbar=0
+    MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
+    MomAux1(2:4) =-MomAux1(2:4)
+    MassAux = dsqrt( (MomAux1(1:4).dot.MomAux1(1:4)) +1d-12 )
+    MomTopsCMS(1:4,1:2) = MomTops(1:4,1:2)
+    call boost(MomTopsCMS(1:4,1),MomAux1(1:4),MassAux)
+    call boost(MomTopsCMS(1:4,2),MomAux1(1:4),MassAux)
+
+!   step 2: construct coordinate system for the production frame
+    MomBeam(2:4) = (/0d0,0d0,1d0/)
+    ny(2:4) = MomTopsCMS(2:4,2).cross.MomBeam(2:4)
+    ny(2:4) = ny(2:4)/dsqrt(ny(2)**2+ny(3)**2+ny(4)**2)
+    nz(2:4) = MomTopsCMS(2:4,2)/dsqrt(MomTopsCMS(2,2)**2+MomTopsCMS(3,2)**2+MomTopsCMS(4,2)**2)
+    nx(2:4) = ny(2:4).cross.nz(2:4)
+
+!   step 3: boost lepton momenta into frame with ptop=0 and call it MomLeptTRF
+    MomAux1(1:4) = MomTops(1:4,2)
+    MomAux1(2:4) =-MomAux1(2:4)
+    MomLeptTRF(1:4) = MomLept(1:4,3)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
+    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+    Phi = dacos(cosPhi)
+
+!------- repeat the same for the anti-top
+
+!   step 3: boost lepton momenta into frame with patop=0 and call it MomLeptTRF
+    MomAux1(1:4) = MomTops(1:4,1)
+    MomAux1(2:4) =-MomAux1(2:4)
+    MomLeptTRF(1:4) = MomLept(1:4,1)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
+    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+    Phibar = dacos(cosPhibar)
+
+    dPhiMinus = Phi-Phibar          ! -pi..pi
+    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
+
+!    print *, phi/DblPi,phibar/DblPi
+!    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
+!pause
+
 ! binning
     NBin(1) = WhichBin(1,pT_Top)
     NBin(2) = WhichBin(2,pT_Lept)
@@ -7812,6 +7871,8 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
     NBin(4) = WhichBin(4,y_Lept)
     NBin(5) = WhichBin(5,M_LL)
     NBin(6) = WhichBin(6,Dphi_LL)
+    NBin(7) = WhichBin(7,dPhiMinus)
+    NBin(8) = WhichBin(8,dPhiPlus)
 
 
 !-------------------------------------------------------

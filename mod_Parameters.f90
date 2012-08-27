@@ -59,7 +59,7 @@ real(8), public            :: m_STop
 real(8), public            :: m_SBot
 real(8), public            :: Ga_STop
 real(8), public            :: Ga_Stop_ChiTop
-real(8), public, parameter :: m_Chi   = 50d0*GeV
+real(8), public, parameter :: m_Chi   = 400d0*GeV
 
 !!! Zprime section !!!
 
@@ -165,7 +165,9 @@ integer, public, parameter :: ST_Chi0_T_G=24
 integer, public, parameter :: DKX_STChi0_RE1=25
 integer, public, parameter :: DKX_STChi0_RE2=26
 integer, public, parameter :: DKX_STChi0_RE3=27
-integer, public, parameter :: DKX_STChi0_1L=28
+integer, public, parameter :: DKX_STChi0_1L1=28
+integer, public, parameter :: DKX_STChi0_1L2=29
+integer, public, parameter :: DKX_STChi0_1L3=30
 
 integer, public, parameter :: WDK_Lep=1
 integer, public, parameter :: WDK_LepPho=2
@@ -424,8 +426,8 @@ ENDIF
 
 
 !  chiral couplings for stop-Chi^0-top
-   IChiStt(+1) = 1d0/50d0  *1d0
-   IChiStt(-1) = 1d0/50d0  *1d0
+   IChiStt(+1) = 3d0/10d0  
+   IChiStt(-1) = 1d0/10d0  
 
 !  stop-->Chi^0 + top partial width!
    Ga_Stop_ChiTop = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 

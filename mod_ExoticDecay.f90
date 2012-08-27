@@ -239,13 +239,12 @@ endif
    NWAFactor_STop = 1d0/dsqrt(2d0*Ga_STop*M_STop)
 
 
-IF( Topol.eq.DKX_STChi0_LO ) THEN
+IF( Topol.eq.DKX_STChi0_LO ) THEN! leading order
 
    TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
    TopQuark%Mass = m_Top
    TopQuark%Mass2= m_Top**2
    TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
-   call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
    if( present(HelTop) ) then! stable top
       TopQuark%Helicity = HelTop
       if( TopQuark%PartType.gt.0 ) then 
@@ -253,6 +252,8 @@ IF( Topol.eq.DKX_STChi0_LO ) THEN
       else
           call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
       endif
+   else
+      call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
    endif
 
    if( StopQuark%PartType.eq.Stop_ ) then
@@ -261,8 +262,8 @@ IF( Topol.eq.DKX_STChi0_LO ) THEN
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
-      Spi(1:4) = TopQuark%Pol(1:4)      
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
+      Spi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
@@ -284,7 +285,7 @@ IF( Topol.eq.DKX_STChi0_LO ) THEN
 
 
 
-ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN
+ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN! gluon emission off (anti)stop
 
    TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
    TopQuark%Mass = m_Top
@@ -319,13 +320,13 @@ ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
       Diagram1 = psp1_(BarSpi(1:4),Spi(1:4)) * cgbs(PolGlu(1:4),dcmplx(MomGlu(1:4)),StopQuark%Mom(1:4)-MomGlu(1:4)) * sqrt2! sqrt2 removes 1/sqrt2 from cgbs
       Diagram1 = Diagram1 * (0d0,1d0)/( ((StopQuark%Mom(1:4)-MomGlu(1:4)).dot.(StopQuark%Mom(1:4)-MomGlu(1:4))) -m_stop**2 )
 
       Spi(1:4) = vgbq(PolGlu(1:4),TopQuark%Pol(1:4)) * sqrt2! sqrt2 removes 1/sqrt2 from vgbq
       Spi(1:4) = ( -spi2_(TopQuark%Mom(1:4)+MomGlu(1:4),Spi(1:4)) + m_top*Spi(1:4) ) * (0d0,1d0)/( ((TopQuark%Mom(1:4)+MomGlu(1:4)).dot.(TopQuark%Mom(1:4)+MomGlu(1:4))) -m_top**2 )
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
       Diagram2 = psp1_(BarSpi(1:4),Spi(1:4))
 
    endif
@@ -333,7 +334,7 @@ ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN
    StopQuark%Pol(1) = ( Diagram1 + Diagram2 ) * NWAFactor_STop * dsqrt( alpha_s4Pi*RunAlphaS(NLOParam,MuRen) * CF )
 
 
-ELSEIF( Topol.eq.DKX_STChi0_RE2 ) THEN
+ELSEIF( Topol.eq.DKX_STChi0_RE2 ) THEN! gluon emission off (anti)top
 
    TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
    TopQuark%Mass = m_Top
@@ -350,13 +351,13 @@ ELSEIF( Topol.eq.DKX_STChi0_RE2 ) THEN
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)      
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
 
 
-ELSEIF( Topol.eq.DKX_STChi0_RE3 ) THEN
+ELSEIF( Topol.eq.DKX_STChi0_RE3 ) THEN! gluon emission off W+/-
 
 
    TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
@@ -374,7 +375,7 @@ ELSEIF( Topol.eq.DKX_STChi0_RE3 ) THEN
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)      
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
@@ -383,7 +384,7 @@ ELSEIF( Topol.eq.DKX_STChi0_RE3 ) THEN
 
 
 
-ELSEIF( Topol.eq.DKX_STChi0_1L ) THEN
+ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on (anti)stop
 
    TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
    TopQuark%Mass = m_Top
@@ -405,72 +406,48 @@ ELSEIF( Topol.eq.DKX_STChi0_1L ) THEN
    if( StopQuark%PartType.eq.Stop_ ) then
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
-      SpiPlus(1:4)  = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )!  =Tree(1)
-      SpiMinus(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.false.,Spi(1:4)) + IChiStt(+1)*Chir(.true.,Spi(1:4)) )!  =Tree(-1)
+      SpiPlus(1:4)  = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4))  + IChiStt(-1)*Chir(.false.,Spi(1:4)) )!  =Tree(1)
+      SpiMinus(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) ) !  =Tree(-1)
 
 
-      Norm = CF   *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
-      epMI = -1
+      Norm = CF *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
+      epMI = 0
 
-      MI(1) = 1  *  qlI2(M_Chi**2,M_Stop**2,M_top**2,MuRen**2,epMI) !MI(2,M_Chi**2,M_Stop**2,M_top**2)
-      MI(2) = 1  *  qlI2(M_Stop**2,0d0,M_Stop**2,MuRen**2,epMI) !MI(2,M_Stop**2,0,M_Stop**2)
-      MI(3) = 1  *  qlI2(M_top**2,0d0,M_top**2,MuRen**2,epMI) !MI(2,M_top**2,0,M_top**2)
-      MI(4) = 1  *  qlI3(M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0d0,MuRen**2,epMI) !MI(3,M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0)
-
+      MI(1) = 1 * qlI2(M_Chi**2,M_Stop**2,M_top**2,MuRen**2,epMI) !MI(2,M_Chi**2,M_Stop**2,M_top**2)
+      MI(2) = 1 * qlI2(M_Stop**2,0d0,M_Stop**2,MuRen**2,epMI) !MI(2,M_Stop**2,0,M_Stop**2)
+      MI(3) = 1 * qlI2(M_top**2,0d0,M_top**2,MuRen**2,epMI) !MI(2,M_top**2,0,M_top**2)
+      MI(4) = 1 * qlI3(M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0d0,MuRen**2,epMI) !MI(3,M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0)
 
       ! virtual spinor
-!       FF1 = (M_Chi**2*(-M_Chi**2 + M_Stop**2 + M_top**2)*              &
-!               MI(1))/(M_Chi**4 + (M_Stop**2 - M_top**2)**2 - 2*M_Chi**2*(M_Stop**2 + M_top**2))              &
-!             + ((-M_Stop**4 + (M_Chi**2 - M_top**2)**2)*MI(2))/              &
-!             (2.0d0*(M_Chi**4 + (M_Stop**2 - M_top**2)**2 -               &
-!                 2*M_Chi**2*(M_Stop**2 + M_top**2))) +               &
-!            (((M_Chi**2 - M_Stop**2)**2 - (M_Chi**2 + M_Stop**2)*M_top**2)*              &
-!               MI(3))/(M_Chi**4 + (M_Stop**2 - M_top**2)**2 - 2*M_Chi**2*(M_Stop**2 + M_top**2))              &
-!             + (-M_Chi**2 + M_Stop**2 + M_top**2)*MI(4)
-!       FF2 =-((M_Chi*M_top*(M_Chi**2 + M_Stop**2 - M_top**2)*               &
-!                 MI(1))/(M_Chi**4 + (M_Stop**2 - M_top**2)**2 - 2*M_Chi**2*(M_Stop**2 + M_top**2))) +               &
-!            (2*M_Chi*M_Stop**2*M_top*MI(2))/              &
-!             (M_Chi**4 + (M_Stop**2 - M_top**2)**2 - 2*M_Chi**2*(M_Stop**2 + M_top**2))              &
-!             + (M_Chi*M_top*(M_Chi**2 - M_Stop**2 - M_top**2)*MI(3))/              &
-!             (M_Chi**4 + (M_Stop**2 - M_top**2)**2 - 2*M_Chi**2*(M_Stop**2 + M_top**2)) 
-  
-!       FF1 = (m_Chi**2*(m_Chi**2 - m_Stop**2 - m_Top**2)*MI(1))/ &
-!              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-!              + ((m_Stop**4 - (m_Chi**2 - m_Top**2)**2)*MI(2))/ &
-!              (2.0d0*(m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - &
-!                  2*m_Chi**2*(m_Stop**2 + m_Top**2))) + &
-!             ((-(m_Chi**2 - m_Stop**2)**2 + (m_Chi**2 + m_Stop**2)*m_Top**2)*MI(3))/ &
-!              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-!              + (m_Chi**2 - m_Stop**2 - m_Top**2)*MI(4)
-!       FF2 = -((m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
-!                (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - &
-!                  2*m_Chi**2*(m_Stop**2 + m_Top**2))) + &
-!             (2*m_Chi*m_Stop**2*m_Top*MI(2))/ &
-!              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-!              + (m_Chi*m_Top*(m_Chi**2 - m_Stop**2 - m_Top**2)*MI(3))/ &
-!              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2))
-     FF1 = (m_Chi**2*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(1))/ &
+      ff2= ((m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
+             - (2*m_Chi*m_Stop**2*m_Top*MI(2))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
+             + (m_Chi*m_Top*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(3))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)))
+           
+      ff1= ((m_Chi**2*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(1))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
              + ((-m_Stop**4 + (m_Chi**2 - m_Top**2)**2)*MI(2))/ &
              (2.0d0*(m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - &
                  2*m_Chi**2*(m_Stop**2 + m_Top**2))) + &
             (((m_Chi**2 - m_Stop**2)**2 - (m_Chi**2 + m_Stop**2)*m_Top**2)*MI(3))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             + (-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(4)
-     FF2 = (m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             - (2*m_Chi*m_Stop**2*m_Top*MI(2))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             + (m_Chi*m_Top*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(3))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2))
+             + (-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(4))
 
-!   check signs
 
       FF1 = FF1*dsqrt(2d0)**2
       FF2 = FF2*dsqrt(2d0)**2
       if(epMI.eq.-1) FF1 = FF1 - 3d0
-      if(epMI.eq.0)  FF1 = FF1 - 4d0
+      if(epMI.eq.0)  FF1 = FF1 - ( 4d0 +3d0*dlog(MuRen**2/m_Top**2) )
       Spi(1:4) = ( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) ) * Norm
+
+
+!print *, "comparison stop"! should be done outside because i have to sum over helicities
+!print *, psp1_(BarSpi(1:4),Spi(1:4)) / psp1_(BarSpi(1:4),SpiPlus(1:4))
+!pause
+
+
 
       ! integrated dipole
       beta = m_top/m_STop
@@ -490,21 +467,22 @@ ELSEIF( Topol.eq.DKX_STChi0_1L ) THEN
       ID(0)  = 1d0*( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
+! print *, "switch off integr.dipole"
 
 
-print *, "check stop"
-print *, "integrals",MI(1)
-print *, "integrals",MI(2)
-print *, "integrals",MI(3)
-print *, "integrals",MI(4)
-print *, "virt",FF1,FF2
-print *, "intD",ID(epMI)
-print *, "sum ",FF1 + ID(epMI)
-print *, "ratio",FF1/ID(epMI)
- v13 = dsqrt( 1d0-4d0*m_Stop**2*m_Top**2/(m_Stop**2+m_Top**2-m_Chi**2)**2 )
- Catani = -2d0 - 1/v13 * dlog((1d0-v13)/(1d0+v13))
- print *, "Catani",Catani
-pause
+!print *, "check stop"
+!print *, "integrals",MI(1)
+!print *, "integrals",MI(2)
+!print *, "integrals",MI(3)
+!print *, "integrals",MI(4)
+!print *, "virt",FF1,FF2
+!print *, "intD",ID(epMI)
+!print *, "sum ",FF1 + ID(epMI)
+!print *, "ratio",FF1/ID(epMI)
+! v13 = dsqrt( 1d0-4d0*m_Stop**2*m_Top**2/(m_Stop**2+m_Top**2-m_Chi**2)**2 )
+! Catani = -2d0 - 1/v13 * dlog((1d0-v13)/(1d0+v13))
+! print *, "Catani",Catani
+!pause
 
 
 
@@ -513,10 +491,8 @@ pause
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)      
-
       SpiPlus(1:4)  = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )!  =Tree(1)
       SpiMinus(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.false.,Spi(1:4)) + IChiStt(+1)*Chir(.true.,Spi(1:4)) )!  =Tree(-1)
-
 
       Norm = CF   *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
       epMI = -1
@@ -528,24 +504,25 @@ pause
             
 
       ! virtual spinor
-     FF1 = (m_Chi**2*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(1))/ &
+      ff2 = ((m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
+             - (2*m_Chi*m_Stop**2*m_Top*MI(2))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
+             + (m_Chi*m_Top*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(3))/ &
+             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)))
+
+      ff1 = ((m_Chi**2*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(1))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
              + ((-m_Stop**4 + (m_Chi**2 - m_Top**2)**2)*MI(2))/ &
              (2.0d0*(m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - &
                  2*m_Chi**2*(m_Stop**2 + m_Top**2))) + &
             (((m_Chi**2 - m_Stop**2)**2 - (m_Chi**2 + m_Stop**2)*m_Top**2)*MI(3))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             + (-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(4)
-     FF2 = (m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             - (2*m_Chi*m_Stop**2*m_Top*MI(2))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
-             + (m_Chi*m_Top*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(3))/ &
-             (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2))
-
+             + (-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(4))
 
       FF1 = FF1*dsqrt(2d0)**2
       FF2 = FF2*dsqrt(2d0)**2
+
       if(epMI.eq.-1) FF1 = FF1 - 3d0
       if(epMI.eq.0)  FF1 = FF1 - 4d0
       Spi(1:4) = ( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) ) * Norm
@@ -569,24 +546,86 @@ pause
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
 
-print *, "check astop"
-print *, "integrals",MI(1)
-print *, "integrals",MI(2)
-print *, "integrals",MI(3)
-print *, "integrals",MI(4)
-print *, "virt",FF1,FF2
-print *, "intD",ID(epMI)
-print *, "sum ",FF1 + ID(epMI)
-print *, "ratio",FF1/ID(epMI)
- v13 = dsqrt( 1d0-4d0*m_Stop**2*m_Top**2/(m_Stop**2+m_Top**2-m_Chi**2)**2 )
- Catani = -2d0 - 1/v13 * dlog((1d0-v13)/(1d0+v13))
- print *, "Catani",Catani
-pause
+!print *, "check astop"
+!print *, "integrals",MI(1)
+!print *, "integrals",MI(2)
+!print *, "integrals",MI(3)
+!print *, "integrals",MI(4)
+!print *, "virt",FF1,FF2
+!print *, "intD",ID(epMI)
+!print *, "sum ",FF1 + ID(epMI)
+!print *, "ratio",FF1/ID(epMI)
+! v13 = dsqrt( 1d0-4d0*m_Stop**2*m_Top**2/(m_Stop**2+m_Top**2-m_Chi**2)**2 )
+! Catani = -2d0 - 1/v13 * dlog((1d0-v13)/(1d0+v13))
+! print *, "Catani",Catani
+!pause
 
 
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
+
+
+
+
+
+ELSEIF( Topol.eq.DKX_STChi0_1L2 ) THEN! virtual correction and integr.dipole on (anti)top
+
+
+   TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
+   TopQuark%Mass = m_Top
+   TopQuark%Mass2= m_Top**2
+   TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
+   call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
+   if( present(HelTop) ) then! stable top
+      TopQuark%Helicity = HelTop
+      if( TopQuark%PartType.gt.0 ) then 
+          call ubarSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
+      else
+          call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
+      endif
+   endif
+
+   if( StopQuark%PartType.eq.Stop_ ) then
+      call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
+      BarSpi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+   elseif( StopQuark%PartType.eq.AStop_ ) then
+      call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
+      Spi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+   endif
+   StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
+
+
+
+ELSEIF( Topol.eq.DKX_STChi0_1L3 ) THEN! virtual correction and integr.dipole on W+/W-
+
+
+   TopQuark%PartType= sign(1,StopQuark%PartType) * Top_
+   TopQuark%Mass = m_Top
+   TopQuark%Mass2= m_Top**2
+   TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
+   call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
+   if( present(HelTop) ) then! stable top
+      TopQuark%Helicity = HelTop
+      if( TopQuark%PartType.gt.0 ) then 
+          call ubarSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
+      else
+          call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
+      endif
+   endif
+
+   if( StopQuark%PartType.eq.Stop_ ) then
+      call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
+      BarSpi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+   elseif( StopQuark%PartType.eq.AStop_ ) then
+      call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
+      Spi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+   endif
+   StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
 
 

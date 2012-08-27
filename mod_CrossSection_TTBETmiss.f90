@@ -3319,8 +3319,8 @@ use ModMyRecurrence
 use ModParameters
 implicit none
 real(8) ::  EvalCS_DKJ_1L_ststbgg,yRnd(1:VegasMxDim),VgsWgt
-complex(8) :: NLO_Res_Pol,NLO_Res_Unpol,TreeResult(1:6),VirtResult(1:6)
-integer :: iHel,iPrimAmp,jPrimAmp,nHel(1:2)
+complex(8) :: NLO_Res_Pol,NLO_Res_Unpol,TreeResult(1:6),VirtResult(1:6),LO_Res_Unpol
+integer :: iHel,jHel,iPrimAmp,jPrimAmp,nHel(1:2)
 integer :: NBin(1:NumMaxHisto),NHisto
 real(8) :: SpinAvg,ColorAvg,EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,RunFactor
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac
@@ -3368,34 +3368,73 @@ include 'vegas_common.f'
 ! one loop correction on anti-stop decay |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-!     do iHel=nHel(1),nHel(2)
-!         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
-!         call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
-!         call HelCrossing(Helicities(iHel,1:4))
-!         call SetPolarizations()
-!         
-!         do iPrimAmp=1,NumBornAmps
-!             call EvalTree(BornAmps(iPrimAmp))
-!             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
-!         enddo
-! 
-!         call STopDecay(ExtParticle(1),DKX_STChi0_1L,Helicities(iHel,5),MomExt(1:4,5:9))
-!         do iPrimAmp=1,NumBornAmps
-!             call EvalTree(BornAmps(iPrimAmp))
-!             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
-!         enddo
-! 
-!         NLO_Res_Pol = (0d0,0d0)
-!         do jPrimAmp=1,NumBornAmps
-!         do iPrimAmp=1,NumBornAmps
-!             NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
-!         enddo
-!         enddo
-!         NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
-! 
-!     enddo! iHel loop
+    do iHel=nHel(1),nHel(2)
+        call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+        call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+        call HelCrossing(Helicities(iHel,1:4))
+        call SetPolarizations()
+        
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        call STopDecay(ExtParticle(1),DKX_STChi0_1L1,Helicities(iHel,5),MomExt(1:4,5:9))
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        NLO_Res_Pol = (0d0,0d0)
+        do jPrimAmp=1,NumBornAmps
+        do iPrimAmp=1,NumBornAmps
+            NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
+        enddo
+        enddo
+        NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
+
+    enddo! iHel loop
     NLO_Res_Unpol = NLO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * PreFac
     EvalCS_DKJ_1L_ststbgg = NLO_Res_Unpol
+
+
+
+
+!----------------------------------------
+! one loop correction on anti-top decay |
+!----------------------------------------
+    NLO_Res_Unpol = (0d0,0d0)
+    do iHel=nHel(1),nHel(2)
+        call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+        call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+        call HelCrossing(Helicities(iHel,1:4))
+        call SetPolarizations()
+        
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        call STopDecay(ExtParticle(1),DKX_STChi0_1L2,Helicities(iHel,5),MomExt(1:4,5:9))
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        NLO_Res_Pol = (0d0,0d0)
+        do jPrimAmp=1,NumBornAmps
+        do iPrimAmp=1,NumBornAmps
+            NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
+        enddo
+        enddo
+        NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
+
+    enddo! iHel loop
+    NLO_Res_Unpol = NLO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * PreFac
+    EvalCS_DKJ_1L_ststbgg = NLO_Res_Unpol
+
+
+
 
 
 
@@ -3416,7 +3455,82 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call STopDecay(ExtParticle(2),DKX_STChi0_1L,Helicities(iHel,6),MomExt(1:4,10:14))
+        call STopDecay(ExtParticle(2),DKX_STChi0_1L1,Helicities(iHel,6),MomExt(1:4,10:14))
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        NLO_Res_Pol = (0d0,0d0)
+        do jPrimAmp=1,NumBornAmps
+        do iPrimAmp=1,NumBornAmps
+            NLO_Res_Pol = NLO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( TreeResult(iPrimAmp)*dconjg(VirtResult(jPrimAmp)) )
+        enddo
+        enddo
+        NLO_Res_UnPol = NLO_Res_UnPol + NLO_Res_Pol
+
+    enddo! iHel loop
+    NLO_Res_Unpol = NLO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * PreFac
+    EvalCS_DKJ_1L_ststbgg = EvalCS_DKJ_1L_ststbgg + NLO_Res_Unpol
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+LO_Res_UnPol = (0d0,0d0)
+NLO_Res_UnPol = (0d0,0d0)
+do ihel=-1,1,2
+do jhel=-1,1,2
+
+ print *, "hel",ihel,jhel
+ call STopDecay(ExtParticle(2),DKX_STChi0_LO,iHel,MomExt(1:4,10:14),HelTop=jhel)
+ TreeResult(1)=ExtParticle(2)%Pol(1)    *dsqrt(2d0*Ga_STop*M_STop)
+ call STopDecay(ExtParticle(2),DKX_STChi0_1L1,iHel,MomExt(1:4,10:14),HelTop=jhel)
+ VirtResult(1)=ExtParticle(2)%Pol(1)    *dsqrt(2d0*Ga_STop*M_STop)/(alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen))
+ print *, "tree",treeresult(1)
+ print *, "virt",virtresult(1)
+ 
+ LO_Res_UnPol  = LO_Res_UnPol + TreeResult(1)*dconjg(TreeResult(1))
+ NLO_Res_UnPol = NLO_Res_UnPol + dreal(  TreeResult(1)*dconjg(VirtResult(1))   )
+
+enddo
+enddo
+
+print *, "--unpol--"
+write(*,"(A,3F10.4)") "mstop,mchi,mtop",m_stop*100d0,m_chi*100d0,m_top*100d0
+write(*,"(A,3F10.4)") "muren",MuRen*100d0
+ga_stop_chitop=( (IChiStt(+1)**2+IChiStt(-1)**2)*(m_stop**2-m_top**2-m_chi**2) - 4d0*(IChiStt(+1)*IChiStt(-1))*m_top*m_chi )
+
+print *, "tree",LO_Res_UnPol
+!print *, "my LO width",Ga_Stop_ChiTop
+!print *, "LO ratio",LO_Res_UnPol/(Ga_Stop_ChiTop)
+
+nlo_res_unpol=nlo_res_unpol*2d0
+print *, "my nlo( 0)",NLO_Res_UnPol/LO_Res_UnPol
+print *, "radja(-1)",6.35546544566007d0!5.19664786378765d0 !3.45067452120216d0
+print *, "ratio to radja(-1)",6.35546544566007d0/(NLO_Res_UnPol/LO_Res_UnPol)
+print *, "radja( 0)",11.4104415737049d0!7.94514801248857!2.47361046117698d0
+print *, "ratio to radja( 0)",11.4104415737049d0/(NLO_Res_UnPol/LO_Res_UnPol)
+pause
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!----------------------------------------
+! one loop correction on top decay |
+!----------------------------------------
+    NLO_Res_Unpol = (0d0,0d0)
+    do iHel=nHel(1),nHel(2)
+        call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+        call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+        call HelCrossing(Helicities(iHel,1:4))
+        call SetPolarizations()
+        
+        do iPrimAmp=1,NumBornAmps
+            call EvalTree(BornAmps(iPrimAmp))
+            TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
+        enddo
+
+        call STopDecay(ExtParticle(2),DKX_STChi0_1L2,Helicities(iHel,6),MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
