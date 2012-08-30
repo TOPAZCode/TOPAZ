@@ -52,14 +52,18 @@ real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
 real(8), public, parameter :: sw2 = sw**2 
 real(8), public, parameter :: cw = dsqrt(1d0-sw2)
 real(8), public, parameter :: EL = dsqrt(4.d0*DblPi*alpha)
-real(8), public            :: Ga_HTop
-real(8), public            :: Ga_Htop_A0Top
-real(8), public            :: Ga_Htop_BHTop
+real(8), public            :: Ga_Top(0:1)
+real(8), public            :: Ga_W(0:1)
+real(8), public            :: Ga_TopExp = 1.99d0*GeV
+real(8), public            :: Ga_WExp   = 2.14d0*GeV
+real(8), public            :: Ga_HTop(0:1)
+real(8), public            :: Ga_Htop_A0Top(0:1)
+real(8), public            :: Ga_Htop_BHTop(0:1)
 real(8), public            :: m_STop
 real(8), public            :: m_SBot
-real(8), public            :: Ga_STop
-real(8), public            :: Ga_Stop_ChiTop
-real(8), public, parameter :: m_Chi   = 400d0*GeV
+real(8), public            :: Ga_STop(0:1)
+real(8), public            :: Ga_Stop_ChiTop(0:1)
+real(8), public, parameter :: m_Chi   = 50d0*GeV
 
 !!! Zprime section !!!
 
@@ -78,9 +82,7 @@ real(8), public            :: Q_top
 real(8), public, parameter :: Q_Wp    =+1d0
 real(8), public, parameter :: Q_Wm    =-1d0
 real(8), public            :: Q_in
-real(8), public :: Ga_Top(0:1),Ga_W(0:1), WidthExpansion
-real(8), public :: Ga_TopExp = 1.99d0*GeV
-real(8), public :: Ga_WExp   = 2.14d0*GeV
+real(8), public :: WidthExpansion
 real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
 
 
@@ -161,13 +163,18 @@ integer, public, parameter :: DKJ_RE2_QQ=20
 integer, public, parameter :: DKX_HTA0_LO=21
 integer, public, parameter :: DKX_HTBH_LO=22
 integer, public, parameter :: DKX_STChi0_LO=23
-integer, public, parameter :: ST_Chi0_T_G=24
 integer, public, parameter :: DKX_STChi0_RE1=25
 integer, public, parameter :: DKX_STChi0_RE2=26
 integer, public, parameter :: DKX_STChi0_RE3=27
 integer, public, parameter :: DKX_STChi0_1L1=28
 integer, public, parameter :: DKX_STChi0_1L2=29
 integer, public, parameter :: DKX_STChi0_1L3=30
+integer, public, parameter :: DKX_HTBH_1L1=31
+integer, public, parameter :: DKX_HTBH_1L2=32
+integer, public, parameter :: DKX_HTBH_1L3=33
+integer, public, parameter :: DKX_HTBH_RE1=34
+integer, public, parameter :: DKX_HTBH_RE2=35
+integer, public, parameter :: DKX_HTBH_RE3=36
 
 integer, public, parameter :: WDK_Lep=1
 integer, public, parameter :: WDK_LepPho=2
@@ -184,6 +191,8 @@ integer, public, parameter :: T_B_WGG=6
 integer, public, parameter :: HT_A0_T=7
 integer, public, parameter :: HT_BH_T=8
 integer, public, parameter :: ST_Chi0_T=9
+integer, public, parameter :: ST_Chi0_T_G=24
+integer, public, parameter :: HT_BH_T_G=10
 
 real(8), public :: IA0Tt(-1:+1)
 real(8), public :: IBHTt(-1:+1)
@@ -430,9 +439,10 @@ ENDIF
    IChiStt(-1) = 1d0/10d0  
 
 !  stop-->Chi^0 + top partial width!
-   Ga_Stop_ChiTop = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 
+   Ga_Stop_ChiTop(0) = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 
                   ( (IChiStt(+1)**2+IChiStt(-1)**2)*(m_stop**2-m_top**2-m_chi**2) - 4d0*(IChiStt(+1)*IChiStt(-1))*m_top*m_chi )
-   Ga_Stop = Ga_Stop_ChiTop! assuming no other decay channel
+   Ga_Stop_ChiTop(1) = 0d0
+   Ga_Stop(:) = Ga_Stop_ChiTop(:)! assuming no other decay channel
 
 
 
@@ -444,9 +454,10 @@ IF( XTOPDECAYS.EQ.2 ) THEN
    IA0Tt(-1) = M_Top/M_A0  * 1d0/50d0  *1d0
 
 !  HTop-->A0 + top partial width!
-   Ga_Htop_A0Top = SqrtLambda(m_Htop**2,m_top**2,m_A0**2)/(16d0*DblPi*m_Htop**3) * & 
+   Ga_Htop_A0Top(0) = SqrtLambda(m_Htop**2,m_top**2,m_A0**2)/(16d0*DblPi*m_Htop**3) * & 
                    1d0/2d0*( (IA0Tt(+1)**2+IA0Tt(-1)**2)*(m_Htop**2+m_top**2-m_A0**2) + 4d0*(IA0Tt(+1)*IA0Tt(-1))*m_top*m_HTop )
-   Ga_HTop = Ga_Htop_A0Top! assuming no other decay channel
+   Ga_Htop_A0Top(1) = 0d0
+   Ga_HTop(:) = Ga_Htop_A0Top(:)! assuming no other decay channel
 
 ELSEIF( XTOPDECAYS.EQ.1 ) THEN
 !  chiral couplings for HTop-BH-top
@@ -454,9 +465,10 @@ ELSEIF( XTOPDECAYS.EQ.1 ) THEN
    IBHTt(-1) = 1d0/50d0  *1d0
 
 !  HTop-->BH + top partial width!
-   Ga_Htop_BHTop =SqrtLambda(m_Htop**2,m_top**2,m_BH**2)/(16d0*DblPi*m_Htop**3) * & 
+   Ga_Htop_BHTop(0) = SqrtLambda(m_Htop**2,m_top**2,m_BH**2)/(16d0*DblPi*m_Htop**3) * & 
                   1d0/2d0 *( (IBHTt(+1)**2+IBHTt(-1)**2)*( m_HTop**2+m_Top**2-2d0*m_BH**2+(m_HTop**2-m_top**2)**2/m_BH**2 ) - 12d0*(IBHTt(+1)*IBHTt(-1))*( m_Top*m_HTop ) )
-   Ga_HTop = Ga_Htop_BHTop! assuming no other decay channel
+   Ga_Htop_BHTop(1) = 0d0
+   Ga_HTop(:) = Ga_Htop_BHTop(:)! assuming no other decay channel
 ENDIF
 
 

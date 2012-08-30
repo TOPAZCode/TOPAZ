@@ -417,8 +417,10 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar + Chi production (st
 
 
 ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops)
-    Rsep_jet    = 0.4d0
 
+print *, "REMOVE ALL CUTS FOR ObsSet 42" 
+
+    Rsep_jet    = 0.4d0        *0d0
     pT_bjet_cut = 25d0*GeV     *0d0
     eta_bjet_cut= 2.5d0        *100d0 
     pT_lep_cut  = 20d0*GeV     *0d0
@@ -427,16 +429,17 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
 
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
-    Rsep_jet    = 0.4d0
 
-    pT_bjet_cut = 30d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_jet_cut = 25d0*GeV
-    eta_jet_cut= 2.5d0
+print *, "REMOVE ALL CUTS FOR ObsSet 43" 
 
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0 
-    pT_miss_cut = 25d0*GeV 
+    Rsep_jet    = 0.4d0        *0d0
+    pT_bjet_cut = 30d0*GeV        *0d0
+    eta_bjet_cut= 2.5d0       *100d0
+    pT_jet_cut = 25d0*GeV        *0d0
+    eta_jet_cut= 2.5d0       *100d0
+    pT_lep_cut  = 20d0*GeV        *0d0
+    eta_lep_cut = 2.5d0         *100d0
+    pT_miss_cut = 25d0*GeV         *0d0
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
@@ -7231,7 +7234,7 @@ IF(XTOPDECAYS.NE.0) THEN
    zeros(1:4) = Mom(1:4,1)+Mom(1:4,2) - (Mom(1:4,X0bar)+Mom(1:4,X0)+Mom(1:4,bbar)+Mom(1:4,lepM)+Mom(1:4,nubar)+Mom(1:4,b)+Mom(1:4,lepP)+Mom(1:4,nu))
    if( NPlus1PS ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
    if( any(abs(zeros(1:4)/m_HTop).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation 1 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:4)
+      print *, "ERROR: energy-momentum violation 1 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:4),NPlus1PS
       print *, "momentum dump:"
       print *, Mom(:,:)
    endif
@@ -7240,7 +7243,7 @@ IF(XTOPDECAYS.NE.0) THEN
           zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar)-Mom(1:4,tbar)
           zeros(5:8) = Mom(1:4,Ht)-Mom(1:4,X0)-Mom(1:4,t)
           if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-              print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+              print *, "ERROR: energy-momentum violation 2 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8),NPlus1PS
               print *, "momentum dump:"
               print *, Mom(:,:)
               pause
@@ -7249,7 +7252,7 @@ IF(XTOPDECAYS.NE.0) THEN
           zeros(1:4) = Mom(1:4,tbar)-Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar)
           zeros(5:8) = Mom(1:4,t)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
           if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8),NPlus1PS
               print *, "momentum dump:"
               print *, Mom(:,:)
               pause
@@ -7257,8 +7260,8 @@ IF(XTOPDECAYS.NE.0) THEN
     else
           zeros(1:4) = Mom(1:4,Htbar)-Mom(1:4,X0bar) + Mom(1:4,Ht)-Mom(1:4,X0) & 
                      - Mom(1:4,bbar)-Mom(1:4,LepM)-Mom(1:4,nubar) -Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu) - Mom(1:4,realp)
-          if( any(abs(zeros(1:8)/m_HTop).gt.1d-8) ) then
-              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:8)
+          if( any(abs(zeros(1:4)/m_HTop).gt.1d-8) ) then
+              print *, "ERROR: energy-momentum violation 3 in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:4),NPlus1PS
               print *, "momentum dump:"
               print *, Mom(:,:)
               pause
@@ -7373,8 +7376,6 @@ ENDIF
     call JetAlgo_kt(Rsep_jet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr)) ! hard protojets in beam pipe are counted as jets
     call pT_order(2,MomJet(1:4,1:2))
     call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
-
-
 ! call SwitchEnergyComponent(MomHadr(1:4,1:NumHadr))
 ! call fastjetppgenkt(MomHadr(1:4,1:NumHadr),NumHadr,Rsep_jet,-1d0,MomJet(1:4,1:NumHadr),NJet)! 4th argument:  +1d0=kT,  -1d0=anti-kT,   0d0=CA
 ! call SwitchEnergyComponentBack(MomJet_CHECK(1:4,1:NumHadr))
@@ -7417,7 +7418,6 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.42) then! set of observables for TTbar -> tt
     if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
 
     m_ll = get_MInv(Mom(1:4,lepM)+Mom(1:4,lepP))
-
 
 ! check cuts
     if( pT_jet(1).lt.pT_bjet_cut .or. pT_jet(2).lt.pT_bjet_cut ) then

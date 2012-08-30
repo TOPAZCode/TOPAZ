@@ -1559,8 +1559,8 @@ ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
       NDim = NDim + 2    ! shat integration
       NDim = NDim + 4    ! T -> A0+t decays
       NDim = NDim + 3+3  ! additional gluons in the top decay
-      VegasNc0_default = 10000000
-      VegasNc1_default = 10000000
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -1621,8 +1621,8 @@ ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
       NDim = NDim + 2    ! shat integration
       NDim = NDim + 4    ! T -> A0+t decays
       NDim = NDim + 3+3  ! additional gluons in the top decay
-      VegasNc0_default = 10000000
-      VegasNc1_default = 10000000
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -1714,6 +1714,32 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop
       IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! stop decays
       VegasNc0_default = 200000
       VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 4    ! stop decays
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=13
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 4    ! stop decays
+      NDim = NDim + 3    ! real gluon
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+
   ELSE
       call Error("Correction to this process is not available")
   ENDIF

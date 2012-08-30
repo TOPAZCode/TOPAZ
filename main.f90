@@ -400,6 +400,16 @@ integer TheUnit
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(NLO)=",(Ga_Top(0)+Ga_Top(1))*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_W(LO) =",Ga_W(0)*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_W(NLO)=",(Ga_W(0)+Ga_W(1))*100d0," GeV"
+    if( XTOPDECAYS.eq.1 .or. XTOPDECAYS.eq.2 ) then
+        write(TheUnit,'(A,F8.3,A)') "# m(Htop)=",m_HTop *100d0, " GeV"
+        write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(LO) =",Ga_HTop(0)*100d0," GeV"
+        write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(NLO)=",(Ga_HTop(0)+Ga_HTop(1))*100d0," GeV"
+    endif
+    if( XTOPDECAYS.eq.3 ) then
+        write(TheUnit,'(A,F8.3,A)') "# m(stop)=",m_STop *100d0, " GeV"
+        write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(LO) =",Ga_STop(0)*100d0," GeV"
+        write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(NLO)=",(Ga_STop(0)+Ga_STop(1))*100d0," GeV"
+    endif
     if( AlgoType.eq.1 ) then
         write(TheUnit,"(A,A)") "# Jet Algorithm= kT"
     elseif( AlgoType.eq.-1 ) then
@@ -601,6 +611,14 @@ ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.33 ) THEN
    call InitHisto()
    call vegas1(EvalCS_1LDKJ_ttb,VG_Result,VG_Error,VG_Chi2)
   endif
+ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.41 ) THEN
+  call vegas(EvalCS_DKJ_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
 ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.1 ) THEN
   if( TOPDECAYS.GT.0 ) call vegas(EvalCS_NLODK_ttb,     VG_Result,VG_Error,VG_Chi2)
   if( TOPDECAYS.LT.0 ) call vegas(EvalCS_NLODK_ttb_noSC,VG_Result,VG_Error,VG_Chi2)
@@ -626,6 +644,14 @@ ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.33 ) THEN
    ncall= VegasNc1
    call InitHisto()
    call vegas1(EvalCS_REDKJ_ttb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.41 ) THEN
+  call vegas(EvalCS_DKJ_Real_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
   endif
 ENDIF
 ENDIF
@@ -717,6 +743,14 @@ ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.34 ) THEN
    call InitHisto()
    call vegas1(EvalCS_1LDKJ_ttb,VG_Result,VG_Error,VG_Chi2)
   endif
+ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.42 ) THEN
+  call vegas(EvalCS_DKJ_Real_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
 ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.2 ) THEN
   if( TOPDECAYS.GT.0 ) call vegas(EvalCS_NLODK_ttb,     VG_Result,VG_Error,VG_Chi2)
   if( TOPDECAYS.LT.0 ) call vegas(EvalCS_NLODK_ttb_noSC,VG_Result,VG_Error,VG_Chi2)
@@ -742,6 +776,14 @@ ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.34 ) THEN
    ncall= VegasNc1
    call InitHisto()
    call vegas1(EvalCS_REDKJ_ttb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.42 ) THEN
+  call vegas(EvalCS_DKJ_Real_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_DKJ_Real_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
 ENDIF
 ENDIF
@@ -1043,7 +1085,7 @@ ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.51 ) THEN
     itmx = VegasIt1
     ncall= VegasNc1
     call InitHisto()
-    call vegas1(EvalCS_DKJ_Real_ststbgg,VG_Result,VG_Error,VG_Chi2)
+    call vegas1(EvalCS_DKJ_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
   endif
 
 
@@ -1091,7 +1133,7 @@ ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.52 ) THEN
     itmx = VegasIt1
     ncall= VegasNc1
     call InitHisto()
-    call vegas1(EvalCS_DKJ_Real_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+    call vegas1(EvalCS_DKJ_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
 
 

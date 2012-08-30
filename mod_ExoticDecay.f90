@@ -56,7 +56,7 @@ integer,parameter :: A0=1,top=2,bot=3,lep=4,neu=5
 
 
 
-NWAFactor_HTop = 1d0/dsqrt(2d0*Ga_HTop*M_HTop)
+NWAFactor_HTop = 1d0/dsqrt(2d0*Ga_HTop(0)*M_HTop)
 !-----------------------------------------------------------------------------
 IF( Topol.eq.DKX_HTA0_LO ) THEN! leading order
 !-----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE HTopBHDecay(HeavyTop,Topol,BHHel,Mom)
+SUBROUTINE HTopBHDecay(HeavyTop,Topol,BHHel,Mom,MomGlu,HelGlu)
 use ModMisc
 use ModProcess
 use ModParameters
@@ -103,6 +103,8 @@ use ModTopDecay
 implicit none
 type(Particle) :: HeavyTop,TopQuark
 integer :: Topol,NMom,BHHel,i
+real(8),optional :: MomGlu(1:4)
+integer,optional :: HelGlu
 real(8) :: NWAFactor_HTop,zeros(1:7)
 real(8) :: Mom(:,:)! order: BH,t,b,lep,neu
 complex(8) :: BarSpi(1:4,-1,1), Spi(1:4,-1,+1),BHPol(1:4)
@@ -139,7 +141,7 @@ integer,parameter :: BH=1,top=2,bot=3,lep=4,neu=5
 
 
 
-NWAFactor_HTop = 1d0/dsqrt(2d0*Ga_HTop*M_HTop)
+NWAFactor_HTop = 1d0/dsqrt(2d0*Ga_HTop(0)*M_HTop)
 !-----------------------------------------------------------------------------
 IF( Topol.eq.DKX_HTBH_LO ) THEN! leading order
 !-----------------------------------------------------------------------------
@@ -236,7 +238,7 @@ endif
 
 
 
-   NWAFactor_STop = 1d0/dsqrt(2d0*Ga_STop*M_STop)
+   NWAFactor_STop = 1d0/dsqrt(2d0*Ga_STop(0)*M_STop)
 
 
 IF( Topol.eq.DKX_STChi0_LO ) THEN! leading order
@@ -260,10 +262,18 @@ IF( Topol.eq.DKX_STChi0_LO ) THEN! leading order
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+
+! StopQuark%Pol(1) = 1d0
+! RETURN
+
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
+
+! StopQuark%Pol(1) = 1d0
+! RETURN
+
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
@@ -406,8 +416,8 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
    if( StopQuark%PartType.eq.Stop_ ) then
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
-      SpiPlus(1:4)  = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4))  + IChiStt(-1)*Chir(.false.,Spi(1:4)) )!  =Tree(1)
-      SpiMinus(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) ) !  =Tree(-1)
+      SpiPlus(1:4)  = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )!  =Tree(+1)
+      SpiMinus(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )!  =Tree(-1)
 
 
       Norm = CF *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
@@ -425,7 +435,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
              + (m_Chi*m_Top*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(3))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)))
-           
+
       ff1= ((m_Chi**2*(-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(1))/ &
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
              + ((-m_Stop**4 + (m_Chi**2 - m_Top**2)**2)*MI(2))/ &
@@ -435,17 +445,11 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
              (m_Chi**4 + (m_Stop**2 - m_Top**2)**2 - 2*m_Chi**2*(m_Stop**2 + m_Top**2)) &
              + (-m_Chi**2 + m_Stop**2 + m_Top**2)*MI(4))
 
-
       FF1 = FF1*dsqrt(2d0)**2
       FF2 = FF2*dsqrt(2d0)**2
       if(epMI.eq.-1) FF1 = FF1 - 3d0
       if(epMI.eq.0)  FF1 = FF1 - ( 4d0 +3d0*dlog(MuRen**2/m_Top**2) )
       Spi(1:4) = ( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) ) * Norm
-
-
-!print *, "comparison stop"! should be done outside because i have to sum over helicities
-!print *, psp1_(BarSpi(1:4),Spi(1:4)) / psp1_(BarSpi(1:4),SpiPlus(1:4))
-!pause
 
 
 
@@ -467,8 +471,12 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       ID(0)  = 1d0*( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
-! print *, "switch off integr.dipole"
 
+! spi=spiplus! this has to give the LO result
+! print *, "spi=spiplus"
+
+! StopQuark%Pol(1) = 1d0
+! RETURN
 
 !print *, "check stop"
 !print *, "integrals",MI(1)
@@ -495,13 +503,13 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       SpiMinus(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.false.,Spi(1:4)) + IChiStt(+1)*Chir(.true.,Spi(1:4)) )!  =Tree(-1)
 
       Norm = CF   *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
-      epMI = -1
+      epMI = 0
 
       MI(1) = 1  *  qlI2(M_Chi**2,M_Stop**2,M_top**2,MuRen**2,epMI) !SI(2,M_Chi**2,M_Stop**2,M_top**2)
       MI(2) = 1  *  qlI2(M_Stop**2,0d0,M_Stop**2,MuRen**2,epMI) !SI(2,M_Stop**2,0,M_Stop**2)
       MI(3) = 1  *  qlI2(M_top**2,0d0,M_top**2,MuRen**2,epMI) !SI(2,M_top**2,0,M_top**2)
       MI(4) = 1  *  qlI3(M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0d0,MuRen**2,epMI) !SI(3,M_Chi**2,M_top**2,M_Stop**2,M_Stop**2,M_top**2,0)
-            
+      
 
       ! virtual spinor
       ff2 = ((m_Chi*m_Top*(m_Chi**2 + m_Stop**2 - m_Top**2)*MI(1))/ &
@@ -522,10 +530,11 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
 
       FF1 = FF1*dsqrt(2d0)**2
       FF2 = FF2*dsqrt(2d0)**2
-
       if(epMI.eq.-1) FF1 = FF1 - 3d0
-      if(epMI.eq.0)  FF1 = FF1 - 4d0
+      if(epMI.eq.0)  FF1 = FF1 - ( 4d0 +3d0*dlog(MuRen**2/m_Top**2) )
       Spi(1:4) = ( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) ) * Norm
+
+
 
       ! integrated dipole
       beta = m_top/m_STop
@@ -545,6 +554,11 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       ID(0)  = 1d0*( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
+
+! spi=spiminus! this has to give the LO result
+! print *, "spi=spiplus"
+
+
 
 !print *, "check astop"
 !print *, "integrals",MI(1)
@@ -576,7 +590,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L2 ) THEN! virtual correction and integr.dipole on 
    TopQuark%Mass = m_Top
    TopQuark%Mass2= m_Top**2
    TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
-   call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
+   call TopDecay(TopQuark,DK_1L_T,Mom(1:4,3:5))
    if( present(HelTop) ) then! stable top
       TopQuark%Helicity = HelTop
       if( TopQuark%PartType.gt.0 ) then 
@@ -606,7 +620,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L3 ) THEN! virtual correction and integr.dipole on 
    TopQuark%Mass = m_Top
    TopQuark%Mass2= m_Top**2
    TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
-   call TopDecay(TopQuark,DK_LO,Mom(1:4,3:5))
+   call TopDecay(TopQuark,DK_1L_Q,Mom(1:4,3:5))
    if( present(HelTop) ) then! stable top
       TopQuark%Helicity = HelTop
       if( TopQuark%PartType.gt.0 ) then 
@@ -626,7 +640,6 @@ ELSEIF( Topol.eq.DKX_STChi0_1L3 ) THEN! virtual correction and integr.dipole on 
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
-
 
 
 ELSE
