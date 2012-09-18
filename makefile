@@ -200,6 +200,25 @@ DipoleObjSTSTB = $(ObjectDir)/mod_Dipoles_GGSTSTBG.o \
                  $(ObjectDir)/mod_IntDipoles_QQBSTSTBG.o \
                  $(ObjectDir)/mod_IntDipoles_QGSTSTBQ.o
 
+
+
+
+DipoleDepHTHTB = $(Here)/dipoles/mod_Dipoles_GGHTHTBG.f90 \
+		 $(Here)/dipoles/mod_Dipoles_QQBHTHTBG.f90  \
+		 $(Here)/dipoles/mod_Dipoles_QGHTHTBQ.f90  \
+		 $(Here)/dipoles/mod_IntDipoles_GGHTHTBG.f90 \
+                 $(Here)/dipoles/mod_IntDipoles_QQBHTHTBG.f90 \
+                 $(Here)/dipoles/mod_IntDipoles_QGHTHTBQ.f90
+
+DipoleObjHTHTB = $(ObjectDir)/mod_Dipoles_GGHTHTBG.o \
+		 $(ObjectDir)/mod_Dipoles_QQBHTHTBG.o  \
+		 $(ObjectDir)/mod_Dipoles_QGHTHTBQ.o \
+		 $(ObjectDir)/mod_IntDipoles_GGHTHTBG.o \
+                 $(ObjectDir)/mod_IntDipoles_QQBHTHTBG.o \
+                 $(ObjectDir)/mod_IntDipoles_QGHTHTBQ.o
+
+
+
 # Zprime section
 
 DipoleDepZprime = $(Here)/dipoles/mod_Dipoles_ZprimeTTB.f90 \
@@ -321,6 +340,7 @@ allObjects =   $(ObjectDir)/mod_Misc.o \
 					$(DipoleObjTTBJ) \
 					$(DipoleObjTTBP) \
 					$(DipoleObjSTSTB) \
+					$(DipoleObjHTHTB) \
 					$(DipoleObjZprime) \
 					$(ObjectDir)/mod_SixFermionProcs2.o \
 					$(ObjectDir)/mod_CrossSection_TTB.o \

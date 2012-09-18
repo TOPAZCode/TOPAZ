@@ -2070,7 +2070,7 @@ real(8), parameter :: CF=4d0/3d0
 real(8) :: MomBoost(1:4),MomLep1(1:4),MomLep2(1:4)
 real(8) :: ThresholdCutOff = 1.0d0
 include "vegas_common.f"
-logical, parameter :: include_WCorr=.false.
+logical, parameter :: include_WCorr=.true.
 
 ! print *, "fixed yrnd"
 ! yrnd(1)= 0.120417488562138

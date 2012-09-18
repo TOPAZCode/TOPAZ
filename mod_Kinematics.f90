@@ -32,7 +32,7 @@ type(Histogram),allocatable   :: Histo(:)
 !type(Histogram2D),allocatable :: Histo2D(:)
 
 real(8) :: pT_jet_cut, pT_bjet_cut, pT_lep_cut, Rsep_jet, Rsep_LepJet, pT_miss_cut, eta_sepa_cut, MInv_jets_cut, eta_lep_cut, eta_jet_cut, eta_bjet_cut, HT_cut, pT_hardestjet_cut
-real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut
+real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut
 
 real(8),public ::MInv_LB
 
@@ -385,10 +385,10 @@ ELSEIF( ObsSet.EQ.29 ) THEN! this is for the factorization check
 
 
 
-ELSEIF( ObsSet.EQ.31 ) THEN! set of observables for TTbar + A0/BH production (stable)
+ELSEIF( ObsSet.EQ.31 ) THEN! set of observables for HTHTbar + A0/BH production (stable)
 
 
-ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for TTbar + A0/BH production (di-lept. tops)
+ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for HTHTbar + A0/BH production (di-lept. tops)
     Rsep_jet    = 0.4d0
 
     pT_bjet_cut = 30d0*GeV 
@@ -396,10 +396,10 @@ ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for TTbar + A0/BH production (di
 
     pT_lep_cut  = 20d0*GeV  
     eta_lep_cut = 2.5d0 
-    pT_miss_cut = 25d0*GeV
+    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
 
 
-ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for TTbar + A0/BH production (semi-hadr. tops)
+ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for HTHTbar + A0/BH production (semi-hadr. tops)
     Rsep_jet    = 0.4d0
 
     pT_bjet_cut = 30d0*GeV
@@ -409,7 +409,46 @@ ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for TTbar + A0/BH production (se
  
     pT_lep_cut  = 20d0*GeV  
     eta_lep_cut = 2.5d0      
-    pT_miss_cut = 25d0*GeV  
+    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
+
+    MTW_cut = 150d0*GeV
+
+! these are the cuts for T.Han comparison
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 20d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut = 30d0*GeV 
+    eta_jet_cut= 2.5d0     
+    pT_lep_cut  = 20d0*GeV  
+    eta_lep_cut = 2.5d0      
+    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
+    MTW_cut = 0d0
+
+
+ELSEIF( ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + A0/BH production (di-lept. tops) without acceptance cuts
+    Rsep_jet    = 0d0
+
+    pT_bjet_cut = 0d0*GeV 
+    eta_bjet_cut= 100d0 
+
+    pT_lep_cut  = 0d0*GeV  
+    eta_lep_cut = 100d0 
+    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+
+ELSEIF( ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production (semi-hadr. tops) without acceptance cuts
+    Rsep_jet    = 0d0
+
+    pT_bjet_cut = 0d0*GeV
+    eta_bjet_cut= 100d0
+    pT_jet_cut =  0d0*GeV 
+    eta_jet_cut=  100d0     
+ 
+    pT_lep_cut  = 0d0*GeV  
+    eta_lep_cut = 100d0      
+    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+    MTW_cut = 150d0*GeV  * 0d0
 
 
 ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar + Chi production (stable)
@@ -418,28 +457,53 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar + Chi production (st
 
 ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops)
 
-print *, "REMOVE ALL CUTS FOR ObsSet 42" 
-
-    Rsep_jet    = 0.4d0        *0d0
-    pT_bjet_cut = 25d0*GeV     *0d0
-    eta_bjet_cut= 2.5d0        *100d0 
-    pT_lep_cut  = 20d0*GeV     *0d0
-    eta_lep_cut = 2.5d0        *100d0
-    pT_miss_cut = 80d0*GeV     *0d0
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 25d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_lep_cut  = 20d0*GeV
+    eta_lep_cut = 2.5d0
+    pT_miss_cut = 80d0*GeV! note that this is ET and not pT
 
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
 
-print *, "REMOVE ALL CUTS FOR ObsSet 43" 
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 30d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut = 25d0*GeV
+    eta_jet_cut= 2.5d0
+    pT_lep_cut  = 20d0*GeV
+    eta_lep_cut = 2.5d0
+    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
 
-    Rsep_jet    = 0.4d0        *0d0
-    pT_bjet_cut = 30d0*GeV        *0d0
-    eta_bjet_cut= 2.5d0       *100d0
-    pT_jet_cut = 25d0*GeV        *0d0
-    eta_jet_cut= 2.5d0       *100d0
-    pT_lep_cut  = 20d0*GeV        *0d0
-    eta_lep_cut = 2.5d0         *100d0
-    pT_miss_cut = 25d0*GeV         *0d0
+    MTW_cut = 150d0*GeV
+
+ELSEIF( ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops) without acceptance cuts
+
+    Rsep_jet    = 0d0
+    pT_bjet_cut = 0d0*GeV
+    eta_bjet_cut= 100d0
+    pT_lep_cut  = 0d0*GeV
+    eta_lep_cut = 100d0
+    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+
+ELSEIF( ObsSet.EQ.45 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops) without acceptance cuts
+
+    Rsep_jet    = 0d0
+    pT_bjet_cut = 0d0*GeV
+    eta_bjet_cut= 100d0
+    pT_jet_cut = 0d0*GeV
+    eta_jet_cut= 100d0
+    pT_lep_cut  = 0d0*GeV
+    eta_lep_cut = 100d0
+    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+    MTW_cut = 150d0*GeV  * 0d0
+
+
+ELSEIF( ObsSet.EQ.48 ) THEN! set of observables for STOP width
+
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
@@ -2844,17 +2908,27 @@ ELSEIF( ObsSet.EQ.29 ) THEN! set of observables for ttbgamma production without 
 
 
 
-ELSEIF( ObsSet.EQ.31 ) THEN! set of observables for TTbar + A0 production
+ELSEIF( ObsSet.EQ.31 ) THEN! set of observables for HTHTbar + A0 production
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(XTopDecays.ne.0)  call Error("XTopDecays needs to be 0")
           NumHistograms = 1
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
-ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for TTbar + A0/BH production
+          Histo(1)%Info   = "pT_ATop"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 25d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 100d0
+
+
+
+ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + A0/BH production
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
+          if(XTopDecays.ne.1 .and. XTopDecays.ne.2 ) call Error("XTopDecays needs to be 1(BH) or 2(A0)!")
           NumHistograms = 7
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -2904,9 +2978,10 @@ ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for TTbar + A0/BH production
           Histo(7)%SetScale= 100d0
 
 
-ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for TTbar + A0/BH production
+ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
+          if(XTopDecays.ne.1 .and. XTopDecays.ne.2 ) call Error("XTopDecays needs to be 1(BH) or 2(A0)!")
           NumHistograms = 9
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -2957,7 +3032,7 @@ ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for TTbar + A0/BH production
 
           Histo(8)%Info   = "pT_Top"
           Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 40d0*GeV
+          Histo(8)%BinSize= 50d0*GeV
           Histo(8)%LowVal = 0d0*GeV
           Histo(8)%SetScale= 100d0
 
@@ -2985,7 +3060,7 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar (stable stops)
 
 
 
-ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops)
+ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops)
 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
@@ -3027,9 +3102,10 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
           Histo(5)%SetScale= 100d0
 
 
-ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
+ELSEIF( ObsSet.EQ.43 .OR. ObsSet.EQ.45 ) THEN! set of observables for STSTbar + Chi production
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
+          if(XTopDecays.ne.3 ) call Error("XTopDecays needs to be 3!")
           NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -3080,10 +3156,20 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for TTbar + A0/BH production
 
           Histo(8)%Info   = "pT_Top"
           Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 20d0*GeV
+          Histo(8)%BinSize= 50d0*GeV
           Histo(8)%LowVal = 0d0*GeV
           Histo(8)%SetScale= 100d0
 
+
+
+ELSEIF( ObsSet.EQ.48 ) THEN! set of observables for STOP width
+          if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
+          if(XTopDecays.ne.3 .and. XTopDecays.ne.1) call Error("XTopDecays needs to be 1 or 3!")
+!           NumHistograms = 0
+!           if( .not.allocated(Histo) ) then
+!                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+!                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+!           endif
 
 
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
@@ -3945,6 +4031,56 @@ END SUBROUTINE
 
 
 
+SUBROUTINE EvalPhasespace_2to3HT(EHat,xRndPS,Mom,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
+real(8) :: Mom(1:4,1:5),MomW(1:4),xRndPS(1:5)
+real(8),parameter :: N3=3, PiWgt3 = (2d0*Pi)**(4-N3*3) * (4d0*Pi)**(N3-1)
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8) :: s13,s23
+
+
+   call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Htop,m_Htop/),Mom(1:4,3:5),PSWgt)
+   PSWgt = PSWgt*PiWgt3
+
+!     Pcol1= 2 -1
+!     Pcol2= 3 -1
+!     SingDepth = 1e-10
+!     Steps = 15
+!     PSWgt = 1d0
+!     call gensing(3,EHat,(/0d0,m_HTop,m_HTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+   s13 = Mom(1:4,1).dot.Mom(1:4,3)
+   s23 = Mom(1:4,2).dot.Mom(1:4,3)
+   if( abs(s13)/EHat**2.lt.1d-9 .or. abs(s23)/EHat**2.lt.1d-9 ) PSWgt=0d0
+   if( abs(Mom(1,3)/EHat).lt.1d-5  ) PSWgt=0d0
+
+
+return
+END SUBROUTINE
+
+
+
+
+
+
+
 
 SUBROUTINE EvalPhasespace_2to2Stops(EHat,xRndPS,Mom,PSWgt)
 use ModProcess
@@ -3958,7 +4094,7 @@ real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 integer,save :: it=1
 real(8) :: beta,t,u,cos13,phi
 
-!  generate PS: massless + massless --> massive(anti-top) + massive(top)
+
    call genps(2,Ehat,xRndPS(1:2),(/m_Stop,m_Stop/),Mom(1:4,3:4),PSWgt)
    PSWgt = PSWgt*PiWgt2
 
@@ -4048,7 +4184,7 @@ integer :: Pcol1,Pcol2,Steps
 real(8) :: SingDepth,velo,parx
 real(8) :: s13,s23
 
-!  generate PS: massless + massless --> massive(anti-top) + massive(top)
+
    call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Stop,m_Stop/),Mom(1:4,3:5),PSWgt)
    PSWgt = PSWgt*PiWgt3
 
@@ -7222,10 +7358,10 @@ integer :: Htbar,Ht,X0bar,X0,tbar,t,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbd
   qbdn   = lepP
   qup    = nu
 
-IF( ObsSet.eq.31 .or. ObsSet.eq.32 .or. ObsSet.eq.33 ) then
+IF( ObsSet.eq.31 .or. ObsSet.eq.32 .or. ObsSet.eq.33 .or. ObsSet.eq.34 .or. ObsSet.eq.35 ) then
    IF(XTOPDECAYS.EQ.1) m_X0 = m_BH
    IF(XTOPDECAYS.EQ.2) m_X0 = m_A0
-elseif( ObsSet.eq.41 .or. ObsSet.eq.42 .or. ObsSet.eq.43 ) then
+elseif( ObsSet.eq.41 .or. ObsSet.eq.42 .or. ObsSet.eq.43 .or. ObsSet.eq.44 .or. ObsSet.eq.45 ) then
    m_X0 = m_Chi
 endif
 
@@ -7271,10 +7407,10 @@ IF(XTOPDECAYS.NE.0) THEN
 
 
    zeros(:) = 0d0
-IF( ObsSet.eq.31 .or. ObsSet.eq.32 .or. ObsSet.eq.33 ) then
+IF( ObsSet.eq.31 .or. ObsSet.eq.32 .or. ObsSet.eq.33 .or. ObsSet.eq.34 .or. ObsSet.eq.35 ) then
    zeros(1) = (Mom(1:4,HTbar).dot.Mom(1:4,HTbar))  - m_HTop**2
    zeros(2) = (Mom(1:4,HT).dot.Mom(1:4,HT)) - m_HTop**2
-elseif( ObsSet.eq.41 .or. ObsSet.eq.42 .or. ObsSet.eq.43 ) then
+elseif( ObsSet.eq.41 .or. ObsSet.eq.42 .or. ObsSet.eq.43 .or. ObsSet.eq.44 .or. ObsSet.eq.45 ) then
    zeros(1) = (Mom(1:4,HTbar).dot.Mom(1:4,HTbar))  - m_STop**2
    zeros(2) = (Mom(1:4,HT).dot.Mom(1:4,HT)) - m_STop**2
 endif
@@ -7393,7 +7529,7 @@ if( ObsSet.eq.31 .or. ObsSet.eq.41) then! no decays
 
 
 !-------------------------------------------------------
-elseif( ObsSet.eq.32 .or. ObsSet.eq.42) then! set of observables for TTbar -> ttbar + ETmiss  in di-lept. top decays
+elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  then! set of observables for TTbar -> ttbar + ETmiss  in di-lept. top decays
 
 ! request at least two b-jets
     NObsJet_Tree = 2
@@ -7412,7 +7548,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.42) then! set of observables for TTbar -> tt
     eta_lepM = get_ETA(Mom(1:4,lepM))
     eta_lepP = get_ETA(Mom(1:4,lepP))
 
-    pT_miss = get_PT( Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar) )
+    pT_miss = get_ET( Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar) )! note that this is ET and not pT
 
     phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
     if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
@@ -7438,7 +7574,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.42) then! set of observables for TTbar -> tt
         RETURN
     endif
 
-    if( pT_miss.lt.pT_miss_cut ) then
+    if( pT_miss.lt.pT_miss_cut ) then! note that this is ET and not pT
        applyPSCut = .true.
         RETURN
     endif
@@ -7456,7 +7592,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.42) then! set of observables for TTbar -> tt
 
 
 !-------------------------------------------------------
-elseif( ObsSet.eq.33 .or. ObsSet.eq.43) then! set of observables for TTbar -> ttbar + ETmiss  in semi-hadr. top decays
+elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then! set of observables for TTbar -> ttbar + ETmiss  in semi-hadr. top decays
 
 ! request at least two b-jets
     NObsJet_Tree = 4
@@ -7477,7 +7613,7 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.43) then! set of observables for TTbar -> tt
     pT_lepP  = get_PT(Mom(1:4,lep))
     eta_lepP = get_ETA(Mom(1:4,lep))
 
-    pT_miss = get_PT( Mom(1:4,nu)+Mom(1:4,X0)+Mom(1:4,X0bar) )
+    pT_miss = get_ET( Mom(1:4,nu)+Mom(1:4,X0)+Mom(1:4,X0bar) )! note that this is ET and not pT
 
     phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
     if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
@@ -7516,7 +7652,7 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.43) then! set of observables for TTbar -> tt
         RETURN
     endif
 
-    if( pT_miss.lt.pT_miss_cut ) then
+    if( pT_miss.lt.pT_miss_cut ) then! note that this is ET and not pT
        applyPSCut = .true.
         RETURN
     endif
@@ -7528,10 +7664,10 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.43) then! set of observables for TTbar -> tt
    MTeff = pt_jet(1)+pt_jet(2)+pt_jet(3)+pt_jet(4)+pT_lepP + pT_miss
 
 
-!    if( MTW.lt.220*GeV ) then
-!       applyPSCut = .true.
-!        RETURN
-!    endif
+   if( MTW.lt.MTW_cut ) then
+      applyPSCut = .true.
+       RETURN
+   endif
 
 
 !    if( MTeff.lt.1000*GeV ) then
@@ -8366,7 +8502,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!         ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

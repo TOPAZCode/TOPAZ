@@ -21,7 +21,7 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
-use ModIntDipoles_GGTTBG
+use ModIntDipoles_GGHTHTBG
 implicit none
 real(8) ::  EvalCS_1L_HtHtbgg,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(7:8,-2:1)
@@ -40,7 +40,6 @@ IF( XTopDecays.ge.1 ) THEN
 ELSE
   ParityFlip=2
 ENDIF
-
 
   EvalCS_1L_HtHtbgg = 0d0
   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -270,7 +269,7 @@ ELSEIF( Correction.EQ.3 ) THEN
 
    xE = yRnd(13)
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-!   call EvalIntDipoles_GGTTBG(MomP(1:4,1:4),(/Mom(1:4,),/),xE,HOp(1:3))
+   call EvalIntDipoles_GGHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
    EvalCS_1L_HtHtbgg = HOp(1)    * pdf(0,1)  * pdf(0,2)   &
                    + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
@@ -305,6 +304,8 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModIntDipoles_QQBHTHTBG
+use ModIntDipoles_QGHTHTBQ
 implicit none
 real(8) ::  EvalCS_1L_HtHtbqqb,yRnd(1:VegasMxDim),VgsWgt,xE,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1)
@@ -566,7 +567,7 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
 IF( PROCESS.EQ.6 ) THEN
       xE = yRnd(13)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-!      call EvalIntDipoles_QQBTTBG(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
+      call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
 
    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
    EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(Up_,1)*pdf(AUp_,2)+pdf(Dn_,1)*pdf(ADn_,2)+pdf(Chm_,1)*pdf(AChm_,2)+pdf(Str_,1)*pdf(AStr_,2)+pdf(Bot_,1)*pdf(ABot_,2) ) &
@@ -574,7 +575,8 @@ IF( PROCESS.EQ.6 ) THEN
                     + HOp(3)/xE * (pdf(Up_,1)*pdf_z(AUp_,2)+pdf(Dn_,1)*pdf_z(ADn_,2)+pdf(Chm_,1)*pdf_z(AChm_,2)+pdf(Str_,1)*pdf_z(AStr_,2)+pdf(Bot_,1)*pdf_z(ABot_,2) )
 
     call swapMom(MomP(1:4,3),MomP(1:4,4))
-!      call EvalIntDipoles_QQBTTBG(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
+    call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+
     HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
     EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb  &
                      + HOp(1)    * (pdf(Up_,2)*pdf(AUp_,1)+pdf(Dn_,2)*pdf(ADn_,1)+pdf(Chm_,2)*pdf(AChm_,1)+pdf(Str_,2)*pdf(AStr_,1)+pdf(Bot_,2)*pdf(ABot_,1) ) &
@@ -585,39 +587,41 @@ IF( PROCESS.EQ.6 ) THEN
 ELSEIF( PROCESS.EQ.3 ) THEN
       xE = yRnd(13)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-!      call EvalIntDipoles_QGTTBQ(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
-    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-    EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
                      + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
                      + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
 
 
-    call swapMom(MomP(1:4,3),MomP(1:4,4))
-!      call EvalIntDipoles_QGTTBQ(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
-    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-    EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb  &
-                    + HOp(1)    * (pdf(Up_,2)*pdf(0,1)+pdf(Dn_,2)*pdf(0,1)+pdf(Chm_,2)*pdf(0,1)+pdf(Str_,2)*pdf(0,1)+pdf(Bot_,2)*pdf(0,1) ) &
-                    + HOp(2)/xE * (pdf_z(Up_,2)*pdf(0,1)+pdf_z(Dn_,2)*pdf(0,1)+pdf_z(Chm_,2)*pdf(0,1)+pdf_z(Str_,2)*pdf(0,1)+pdf_z(Bot_,2)*pdf(0,1) ) &
-                    + HOp(3)/xE * (pdf(Up_,2)*pdf_z(0,1)+pdf(Dn_,2)*pdf_z(0,1)+pdf(Chm_,2)*pdf_z(0,1)+pdf(Str_,2)*pdf_z(0,1)+pdf(Bot_,2)*pdf_z(0,1) )
+      call swapMom(MomP(1:4,3),MomP(1:4,4))
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb  &
+                      + HOp(1)    * (pdf(Up_,2)*pdf(0,1)+pdf(Dn_,2)*pdf(0,1)+pdf(Chm_,2)*pdf(0,1)+pdf(Str_,2)*pdf(0,1)+pdf(Bot_,2)*pdf(0,1) ) &
+                      + HOp(2)/xE * (pdf_z(Up_,2)*pdf(0,1)+pdf_z(Dn_,2)*pdf(0,1)+pdf_z(Chm_,2)*pdf(0,1)+pdf_z(Str_,2)*pdf(0,1)+pdf_z(Bot_,2)*pdf(0,1) ) &
+                      + HOp(3)/xE * (pdf(Up_,2)*pdf_z(0,1)+pdf(Dn_,2)*pdf_z(0,1)+pdf(Chm_,2)*pdf_z(0,1)+pdf(Str_,2)*pdf_z(0,1)+pdf(Bot_,2)*pdf_z(0,1) )
 
 
 ELSEIF( PROCESS.EQ.4 ) THEN
       xE = yRnd(13)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-!      call EvalIntDipoles_QGTTBQ(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
-   HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-   EvalCS_1L_HtHtbqqb =HOp(1)    * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_HtHtbqqb =HOp(1)    * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
                     +HOp(2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
                     +HOp(3)/xE * (pdf(AUp_,1)*pdf_z(0,2)+pdf(ADn_,1)*pdf_z(0,2)+pdf(AChm_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
 
 
-   call swapMom(MomP(1:4,3),MomP(1:4,4))
-!   call EvalIntDipoles_QGTTBQ(MomP(1:4,1:4),MomDK(1:4,1:6),xE,HOp(1:3))
-   HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-   EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb &
-                    + HOp(1)    * (pdf(AUp_,2)*pdf(0,1)+pdf(ADn_,2)*pdf(0,1)+pdf(AChm_,2)*pdf(0,1)+pdf(AStr_,2)*pdf(0,1)+pdf(ABot_,2)*pdf(0,1) ) &
-                    + HOp(2)/xE * (pdf_z(AUp_,2)*pdf(0,1)+pdf_z(ADn_,2)*pdf(0,1)+pdf_z(AChm_,2)*pdf(0,1)+pdf_z(AStr_,2)*pdf(0,1)+pdf_z(ABot_,2)*pdf(0,1) ) &
-                    + HOp(3)/xE * (pdf(AUp_,2)*pdf_z(0,1)+pdf(ADn_,2)*pdf_z(0,1)+pdf(AChm_,2)*pdf_z(0,1)+pdf(AStr_,2)*pdf_z(0,1)+pdf(ABot_,2)*pdf_z(0,1) )
+      call swapMom(MomP(1:4,3),MomP(1:4,4))
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
+      EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb &
+                        + HOp(1)    * (pdf(AUp_,2)*pdf(0,1)+pdf(ADn_,2)*pdf(0,1)+pdf(AChm_,2)*pdf(0,1)+pdf(AStr_,2)*pdf(0,1)+pdf(ABot_,2)*pdf(0,1) ) &
+                        + HOp(2)/xE * (pdf_z(AUp_,2)*pdf(0,1)+pdf_z(ADn_,2)*pdf(0,1)+pdf_z(AChm_,2)*pdf(0,1)+pdf_z(AStr_,2)*pdf(0,1)+pdf_z(ABot_,2)*pdf(0,1) ) &
+                        + HOp(3)/xE * (pdf(AUp_,2)*pdf_z(0,1)+pdf(ADn_,2)*pdf_z(0,1)+pdf(AChm_,2)*pdf_z(0,1)+pdf(AStr_,2)*pdf_z(0,1)+pdf(ABot_,2)*pdf_z(0,1) )
 ENDIF
 ENDIF
 
@@ -631,6 +635,351 @@ ENDIF
 
 return
 END FUNCTION
+
+
+
+
+
+
+FUNCTION EvalCS_Real_HtHtbggg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModUCuts
+use ModUCuts_128
+use ModIntegrals
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+use ModDipoles_GGHtHtbG
+implicit none
+real(8) :: EvalCS_Real_HtHtbggg,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: LO_Res_Pol,LO_Res_Unpol
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac
+real(8) :: pdf(-6:6,1:2),s12,s13
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),BHMaxHel,BH1Hel,BH2Hel
+!include 'misc/global_import'
+include 'vegas_common.f'
+
+
+   EvalCS_Real_HtHtbggg = 0d0
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_HTop ) then
+      EvalCS_Real_HtHtbggg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhaseSpace_2to3HT(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu HTbar, HT
+   if( PSWgt.eq.0d0 ) then
+      EvalCS_Real_HtHtbggg = 0d0
+      SkipCounter = SkipCounter + 1
+      return
+   endif
+   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+   ISFac = MomCrossing(MomExt)
+   BHMaxHel = -1
+   IF(XTOPDECAYS.EQ.1) THEN
+      call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  BH top
+      call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,5),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
+
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,7), yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,12),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
+      PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+      BHMaxHel = +1
+   ELSEIF(XTOPDECAYS.EQ.2) THEN
+      call Error("XTOPDECAYS.EQ.2 is not yet supported")
+   ENDIF
+
+
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   PDFFac = pdf(0,1) * pdf(0,2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+   RunFactor = RunAlphaS(2,MuRen)
+
+   call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+
+! applyPScut = .true.! this is for inverted check
+
+if(  applyPSCut ) then
+   EvalCS_Real_HtHtbggg = 0d0
+else
+   call InitCurrCache()
+   call SetPropagators()
+   PreFac = PreFac
+   LO_Res_Unpol = (0d0,0d0)
+   do iHel=nHel(1),nHel(2)
+   do BH1Hel=-1,BHMaxHel
+   do BH2Hel=-1,BHMaxHel
+      IF( XTOPDECAYS.EQ.1 ) THEN
+         call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,6:10))
+         call HTopBHDecay(ExtParticle(2),DKX_HTBH_LO,BH2Hel,MomExt(1:4,11:15))
+      ENDIF
+
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbggg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+   enddo!helicity loop
+   enddo!helicity loop
+   enddo!helicity loop
+
+!  normalization
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3
+   EvalCS_Real_HtHtbggg = LO_Res_Unpol * PreFac
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_HtHtbggg)
+   enddo
+   EvalCounter = EvalCounter + 1
+
+! !     gg->ttbg
+!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!       MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
+!       MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
+!       MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+!       call coupsm(0)
+!       call SGG_TTBG(MG_MOM,MadGraph_tree)
+!       print *, ""
+!       print *, "Unpolarized LO result:"
+!       print *, "My tree:          ", LO_Res_Unpol
+!       print *, "MadGraph hel.amp:", MadGraph_tree*(100d0)**2
+!       print *, "ratio: ", MadGraph_tree*(100d0)**2/dble((LO_Res_Unpol))
+!       pause
+endif! applyPSCut
+
+
+     call EvalDipoles_GGHtHtbG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_HTop**2,m_HTop**2,0d0/),yRnd(8:19),PreFac,DipoleResult)
+
+
+!   s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
+!   s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+!   write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_HtHtbggg,DipoleResult, (EvalCS_Real_HtHtbggg/(-DipoleResult)-1d0)
+!   pause
+
+
+   if( IsNan(EvalCS_Real_HtHtbggg) .or. IsNan(DipoleResult) ) then
+        print *, "NAN:",EvalCS_Real_HtHtbggg,DipoleResult
+        print *, yRnd(:)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1)
+        print *, MomExt(1:4,2)
+        print *, MomExt(1:4,3)
+        print *, MomExt(1:4,4)
+        print *, MomExt(1:4,5)
+        stop
+   endif
+
+        EvalCS_Real_HtHtbggg = (EvalCS_Real_HtHtbggg + DipoleResult)/VgsWgt
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_Real_HtHtbqqbg(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModUCuts
+use ModUCuts_128
+use ModIntegrals
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+use ModDipoles_QQBHtHtbG
+use ModDipoles_QGHtHtbQ
+implicit none
+real(8) ::  EvalCS_Real_HtHtbqqbg,EvalCS_Dips_ttbqqbgp,DipoleResult,yRnd(1:VegasMxDim),VgsWgt
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,PreFacDip
+real(8) :: MomExt(1:4,1:15)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a,PDFFac_b,PDFFac
+real(8) :: pdf(-6:6,1:2),s12,s13
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),npdf,BHMaxHel,BH1Hel,BH2Hel
+real(8),parameter :: Nc=3d0
+include 'vegas_common.f'
+
+
+
+   EvalCS_Real_HtHtbqqbg = 0d0
+   EvalCS_Dips_ttbqqbgp = 0d0
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   if( EHat.le.2d0*m_HTop ) then
+      EvalCS_Real_HtHtbqqbg = 0d0
+      return
+   endif
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   call EvalPhaseSpace_2to3HT(EHat,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! Glu HTbar, HT
+   if( PSWgt.eq.0d0 ) then
+      EvalCS_Real_HtHtbqqbg = 0d0
+      SkipCounter = SkipCounter + 1
+      return
+   endif
+   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+   ISFac = MomCrossing(MomExt)
+   BHMaxHel = -1
+   IF(XTOPDECAYS.EQ.1) THEN
+      call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  BH top
+      call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,5),yRnd(10:11),MomExt(1:4,11:12),PSWgt3)
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,7), yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
+      call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,12),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
+      PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+      BHMaxHel = +1
+   ELSEIF(XTOPDECAYS.EQ.2) THEN
+      call Error("XTOPDECAYS.EQ.2 is not yet supported")
+   ENDIF
+
+
+   call SetPDFs(eta1,eta2,MuFac,pdf)
+   IF( PROCESS.EQ.46 ) THEN
+          PDFFac_a = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+                   + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+                   + pdf(Bot_,1)*pdf(ABot_,2)
+          PDFFac_b = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+                   + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+                   + pdf(Bot_,2)*pdf(ABot_,1)
+    ELSEIF( PROCESS.EQ.43 ) THEN
+          PDFFac_a = pdf(Up_,1) *pdf(0,2) + pdf(Dn_,1) *pdf(0,2)  &
+                   + pdf(Chm_,1)*pdf(0,2) + pdf(Str_,1)*pdf(0,2)  &
+                   + pdf(Bot_,1)*pdf(0,2)
+          PDFFac_b = pdf(Up_,2) *pdf(0,1) + pdf(Dn_,2) *pdf(0,1)  &
+                   + pdf(Chm_,2)*pdf(0,1) + pdf(Str_,2)*pdf(0,1)  &
+                   + pdf(Bot_,2)*pdf(0,1)
+    ELSEIF( PROCESS.EQ.44 ) THEN
+          PDFFac_a = pdf(AUp_,2) *pdf(0,1) + pdf(ADn_,2) *pdf(0,1)  &
+                   + pdf(AChm_,2)*pdf(0,1) + pdf(AStr_,2)*pdf(0,1)  &
+                   + pdf(ABot_,2)*pdf(0,1)
+          PDFFac_b = pdf(AUp_,1) *pdf(0,2) + pdf(ADn_,1) *pdf(0,2)  &
+                   + pdf(AChm_,1)*pdf(0,2) + pdf(AStr_,1)*pdf(0,2)  &
+                   + pdf(ABot_,1)*pdf(0,2)
+    ENDIF
+
+
+DO NPDF=1,2
+    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
+
+! applyPScut = .true.! this is for inverted check
+
+    if(npdf.eq.1) then
+        PDFFac = PDFFac_a
+    elseif(npdf.eq.2) then
+        PDFFac = PDFFac_b
+        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
+    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
+    RunFactor = RunAlphaS(2,MuRen)
+    ISFac = MomCrossing(MomExt)
+    call InitCurrCache()
+    call SetPropagators()
+
+
+if(  applyPSCut ) then
+    EvalCS_Real_HtHtbqqbg = 0d0
+else
+
+!------------ LO ----------------
+   LO_Res_Unpol = (0d0,0d0)
+    do iHel=1,NumHelicities
+    do BH1Hel=-1,BHMaxHel
+    do BH2Hel=-1,BHMaxHel
+        IF(XTOPDECAYS.eq.1) THEN
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,5:9))
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_LO,BH2Hel,MomExt(1:4,10:14))
+        ELSEIF(XTOPDECAYS.EQ.2) THEN
+          call HTopA0Decay(ExtParticle(1),DKX_HTA0_LO,MomExt(1:4,5:9))
+          call HTopA0Decay(ExtParticle(2),DKX_HTA0_LO,MomExt(1:4,10:14))
+        ENDIF
+      call HelCrossing(Helicities(iHel,1:5))
+      call SetPolarizations()
+      
+       do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+      do jPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,NumBornAmps
+          LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+      enddo
+      enddo
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+   enddo!helicity loop
+   enddo!helicity loop
+   enddo!helicity loop
+
+!  normalization
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * PreFac *  PDFFac 
+   EvalCS_Real_HtHtbqqbg = EvalCS_Real_HtHtbqqbg + LO_Res_Unpol
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
+   enddo
+   EvalCounter = EvalCounter + 1
+endif! applyPSCut
+
+
+
+  PreFacDip = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+  IF( PROCESS.EQ.46 ) THEN
+      call EvalDipoles_QQBHtHtbG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_HTop**2,m_HTop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ELSEIF( PROCESS.EQ.43 ) THEN
+      call EvalDipoles_QGHtHtbQ((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_HTop**2,m_HTop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ELSEIF( PROCESS.EQ.44 ) THEN
+      call EvalDipoles_QGHtHtbQ((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_HTop**2,m_HTop**2,0d0/),yRnd(8:19),PreFacDip,DipoleResult)
+  ENDIF
+  EvalCS_Dips_ttbqqbgp = EvalCS_Dips_ttbqqbgp + DipoleResult
+
+ENDDO! npdf loop
+! call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back, not necessary here
+
+!  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
+!  s13 = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
+!  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_HtHtbqqbg,EvalCS_Dips_ttbqqbgp, (EvalCS_Real_HtHtbqqbg/(-EvalCS_Dips_ttbqqbgp)- 1d0)
+!  pause
+
+   if( IsNan(EvalCS_Real_HtHtbqqbg) .or. IsNan(EvalCS_Dips_ttbqqbgp) ) then
+        print *, "NAN:",EvalCS_Real_HtHtbqqbg,EvalCS_Dips_ttbqqbgp
+        print *, yRnd(:)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1)
+        print *, MomExt(1:4,2)
+        print *, MomExt(1:4,3)
+        print *, MomExt(1:4,4)
+        print *, MomExt(1:4,5)
+        stop
+   endif
+
+   EvalCS_Real_HtHtbqqbg = (EvalCS_Real_HtHtbqqbg + EvalCS_Dips_ttbqqbgp)/VgsWgt
+
+END FUNCTION
+
+
+
 
 
 
@@ -2321,7 +2670,6 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    LO_Res_Unpol = (0d0,0d0)
    do iHel=1,NumHelicities
    do GluHel=1,-1,-2
-
       call HelCrossing(Helicities(iHel,1:6))
       call SetPolarizations()
       if( nJetRad.eq.1 ) then
@@ -5902,6 +6250,268 @@ END FUNCTION
 
 
 
+
+
+
+FUNCTION EvalCS_StopWidth(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+implicit none
+real(8) ::  EvalCS_StopWidth,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1)
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4),MomExtTd(1:4,1:9),pbDpg,ptDpg,ptDpb,TheDipole
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+real(8), parameter :: CF=4d0/3d0
+include 'vegas_common.f'
+
+
+   EvalCS_StopWidth = 0d0
+
+   IF(XTOPDECAYS.EQ.3) THEN
+      MomExt(1:4,3) = (/m_Stop,0d0,0d0,0d0/)
+      ExtParticle(1)%Mom(1:4) = dcmplx( MomExt(1:4,3) )
+      IF( CORRECTION.EQ.0 .OR.CORRECTION.EQ.4  ) THEN
+          call EvalPhasespace_StopDK(ST_Chi0_T,MomExt(1:4,3),yRnd(1:2),MomExt(1:4,5:6),PSWgt2)!  Chi top
+          call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(3:6),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+      ELSEIF( CORRECTION.EQ.5 ) THEN
+          call EvalPhasespace_StopDK(ST_Chi0_T_G,MomExt(1:4,3),yRnd(1:5),MomExt(1:4,5:7),PSWgt2)!  Chi(5) top(6) glu(7->15)
+          MomExt(1:4,15) = MomExt(1:4,7)
+          call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(6:9),MomExt(1:4,7:9),PSWgt4)!  b(7) el(8) nu(9)
+      ENDIF
+      PSWgt = PSWgt2
+   ENDIF
+ 
+
+   PreFac = PSWgt * VgsWgt /(2d0*m_Stop) * (2d0*Ga_STop(0)*M_STop)
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+
+   IF( CORRECTION.EQ.0 ) THEN
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,2
+      do jHel=-1,+1,2
+          call STopDecay(ExtParticle(1),DKX_STChi0_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          LO_Res_Pol = ExtParticle(1)%Pol(1)
+          LO_Res_UnPol = LO_Res_UnPol +  LO_Res_Pol*dconjg( LO_Res_Pol )
+      enddo!helicity loop
+      enddo!helicity loop
+!     normalization
+      EvalCS_StopWidth = LO_Res_Unpol * PreFac
+
+
+
+
+   ELSEIF( CORRECTION.EQ.4 ) THEN
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,2
+      do jHel=-1,+1,2
+          call STopDecay(ExtParticle(1),DKX_STChi0_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          LO_Res_Pol = ExtParticle(1)%Pol(1)
+          call STopDecay(ExtParticle(1),DKX_STChi0_1L1,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          NLO_Res_Pol(0) = ExtParticle(1)%Pol(1)
+
+          LO_Res_UnPol = LO_Res_UnPol +  dreal( LO_Res_Pol*dconjg(NLO_Res_Pol(0)) )
+      enddo!helicity loop
+      enddo!helicity loop
+!     normalization
+      EvalCS_StopWidth = LO_Res_Unpol * PreFac
+
+
+
+   ELSEIF( CORRECTION.EQ.5 ) THEN
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,2
+      do jHel=-1,+1,2
+      do kHel=-1,+1,2
+          call STopDecay(ExtParticle(1),DKX_STChi0_RE1,iHel,MomExt(1:4,5:9),MomExt(1:4,15),HelGlu=kHel,HelTop=jHel)
+          LO_Res_Pol = ExtParticle(1)%Pol(1)
+          LO_Res_UnPol = LO_Res_UnPol +  LO_Res_Pol*dconjg( LO_Res_Pol )
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
+!     normalization
+      EvalCS_StopWidth = LO_Res_Unpol * PreFac
+! print *, LO_Res_Unpol * PreFac
+
+
+
+
+      call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+      call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(6:9),MomExtTd(1:4,7:9),PSWgt4)    
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,2
+      do jHel=-1,+1,2
+          call STopDecay(ExtParticle(1),DKX_STChi0_LO,iHel,MomExtTd(1:4,5:9),HelTop=jHel)
+          LO_Res_Pol = ExtParticle(1)%Pol(1)
+          LO_Res_UnPol = LO_Res_UnPol +  LO_Res_Pol*dconjg( LO_Res_Pol )
+      enddo!helicity loop
+      enddo!helicity loop
+
+      TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+! print *, LO_Res_Unpol * TheDipole * PreFac
+! pause
+!     normalization
+      EvalCS_StopWidth = EvalCS_StopWidth + LO_Res_Unpol * TheDipole * PreFac
+
+
+
+   ENDIF
+
+
+
+
+
+
+
+
+   if( IsNan(EvalCS_StopWidth) ) then
+        print *, "NAN:",EvalCS_StopWidth
+        print *, yRnd(:)
+        print *, NLO_Res_UnPol(0),NLO_Res_UnPol(1)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,((1d0-eta1)*xE+eta1),((1d0-eta2)*xE+eta2),MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1:11)
+        print *, "SKIP EVENT!!!!!"
+        EvalCS_StopWidth = 0d0
+        return
+   endif
+
+   EvalCounter = EvalCounter + 1
+   EvalCS_StopWidth = EvalCS_StopWidth/VgsWgt
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+FUNCTION EvalCS_HTopWidth(yRnd,VgsWgt)
+use ModProcess
+use ModKinematics
+use ModAmplitudes
+use ModMyRecurrence
+use ModParameters
+implicit none
+real(8) ::  EvalCS_HTopWidth,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),Amp,Spi(1:4),BarSpi(1:4)
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
+logical :: applyPSCut
+real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+include 'vegas_common.f'
+
+
+   EvalCS_HTopWidth = 0d0
+
+   IF(XTOPDECAYS.EQ.1) THEN
+      MomExt(1:4,3) = (/m_HTop,0d0,0d0,0d0/)
+      ExtParticle(1)%Mom(1:4) = dcmplx( MomExt(1:4,3) )
+      IF( CORRECTION.EQ.0 .OR.CORRECTION.EQ.4  ) THEN
+          call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(1:2),MomExt(1:4,5:6),PSWgt2)!  BH top
+          call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(3:6),MomExt(1:4,7:9),PSWgt4)! bot lep neu
+      ELSEIF( CORRECTION.EQ.5 ) THEN
+          call EvalPhasespace_HTopDK(HT_BH_T_G,MomExt(1:4,3),yRnd(1:5),MomExt(1:4,5:7),PSWgt2)!  BH(5) top(6) glu(7->15)
+          MomExt(1:4,15) = MomExt(1:4,7)
+          call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(6:9),MomExt(1:4,7:9),PSWgt4)!  b(7) el(8) nu(9)
+      ENDIF
+      PSWgt = PSWgt2
+   ENDIF
+ 
+
+   PreFac = PSWgt * VgsWgt /(2d0*m_HTop) * 2d0*Ga_HTop(0)*M_HTop
+   RunFactor = RunAlphaS(NLOParam,MuRen)
+
+
+   IF( CORRECTION.EQ.0 ) THEN
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,2
+      do jHel=-1,+1,2
+      do kHel=-1,+1,2
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          Spi(1:4) = ExtParticle(1)%Pol(1:4)
+          IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
+                call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ELSE
+                call uSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ENDIF
+          Amp = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
+          LO_Res_UnPol = LO_Res_UnPol +  Amp*dconjg(Amp) * 0.5d0
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
+
+
+   ELSEIF( CORRECTION.EQ.4 ) THEN
+!       LO_Res_Unpol = (0d0,0d0)
+!       do iHel=-1,+1,2
+!       do jHel=-1,+1,2
+!           call STopDecay(ExtParticle(1),DKX_STChi0_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+!           LO_Res_Pol = ExtParticle(1)%Pol(1)
+!           call STopDecay(ExtParticle(1),DKX_STChi0_1L1,iHel,MomExt(1:4,5:9),HelTop=jHel)
+!           NLO_Res_Pol(0) = ExtParticle(1)%Pol(1)
+! 
+!           LO_Res_UnPol = LO_Res_UnPol +  dreal( LO_Res_Pol*dconjg(NLO_Res_Pol(0)) )
+!       enddo!helicity loop
+!       enddo!helicity loop
+
+
+
+   ELSEIF( CORRECTION.EQ.5 ) THEN
+!       LO_Res_Unpol = (0d0,0d0)
+!       do iHel=-1,+1,2
+!       do jHel=-1,+1,2
+!       do kHel=-1,+1,2
+!           call STopDecay(ExtParticle(1),DKX_STChi0_RE1,iHel,MomExt(1:4,5:9),MomGlu=MomExt(1:4,15),HelGlu=kHel,HelTop=jHel)
+!           LO_Res_Pol = ExtParticle(1)%Pol(1)
+!           LO_Res_UnPol = LO_Res_UnPol +  LO_Res_Pol*dconjg( LO_Res_Pol )
+!       enddo!helicity loop
+!       enddo!helicity loop
+!       enddo!helicity loop
+   ENDIF
+
+
+!  normalization
+   EvalCS_HTopWidth = LO_Res_Unpol * PreFac
+
+
+   if( IsNan(EvalCS_HTopWidth) ) then
+        print *, "NAN:",EvalCS_HTopWidth
+        print *, yRnd(:)
+        print *, NLO_Res_UnPol(0),NLO_Res_UnPol(1)
+        print *, PSWgt , VgsWgt , PDFFac, sHatJacobi
+        print *, eta1,eta2,((1d0-eta1)*xE+eta1),((1d0-eta2)*xE+eta2),MuFac,EHat
+        print *, "Mom"
+        print *, MomExt(1:4,1:11)
+        print *, "SKIP EVENT!!!!!"
+        EvalCS_HTopWidth = 0d0
+        return
+   endif
+
+   EvalCounter = EvalCounter + 1
+   EvalCS_HTopWidth = EvalCS_HTopWidth/VgsWgt
+
+return
+END FUNCTION
 
 
 

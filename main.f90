@@ -67,7 +67,8 @@ logical :: dirresult
    XTopDecays=-100
    HelSampling=.false.
    m_Top=172d0*GeV
-   m_STop=300d0*GeV
+   m_STop=500d0*GeV
+   m_HTop=500d0*GeV
    m_Zpr=1500d0*GeV
    Ga_Zpr=m_Zpr*0.01d0
    Q_top = Q_up
@@ -116,6 +117,10 @@ logical :: dirresult
         read(arg(7:11),*) m_STop
         MuRen=m_STop
         MuFac=m_STop
+    elseif( arg(1:6).eq."MHTop=" ) then
+        read(arg(7:11),*) m_HTop
+        MuRen=m_HTop
+        MuFac=m_HTop
     elseif( arg(1:5).eq."MZpr=" ) then
         read(arg(6:10),*) m_Zpr
         MuRen=m_Zpr
@@ -394,7 +399,11 @@ integer TheUnit
         write(TheUnit,'(A,F10.5,A)') "# m(Zpr)=",m_Zpr*100d0, " GeV"
         write(TheUnit,'(A,F10.5,A)') "# Gamma(Zpr)=",Ga_Zpr*100d0, " GeV"
     endif
-    write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_Top *100d0, " GeV"
+    if( m_Top.eq.m_SMTop ) then 
+        write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_Top *100d0, " GeV"
+    else
+        write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_SMTop *100d0, " GeV"
+    endif
     write(TheUnit,"(A,F10.6)") "# Width expansion factor=",WidthExpansion
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(LO) =",Ga_Top(0)*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(NLO)=",(Ga_Top(0)+Ga_Top(1))*100d0," GeV"
@@ -1198,6 +1207,34 @@ IF( CORRECTION.LE.1 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.59) ) THEN
     ncall= VegasNc1
     call InitHisto()
     call vegas1(EvalCS_1L_ststbgggg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+IF( MASTERPROCESS.EQ.41 .OR. MASTERPROCESS.EQ.42 ) THEN
+IF( CORRECTION.EQ.0 .OR. CORRECTION.EQ.4 .OR. CORRECTION.EQ.5) THEN
+  call vegas(EvalCS_StopWidth,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_StopWidth,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+IF( MASTERPROCESS.EQ.43 .OR. MASTERPROCESS.EQ.44 ) THEN
+IF( CORRECTION.EQ.0 .OR. CORRECTION.EQ.4 .OR. CORRECTION.EQ.5) THEN
+  call vegas(EvalCS_HTopWidth,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_HTopWidth,VG_Result,VG_Error,VG_Chi2)
   endif
 ENDIF
 ENDIF

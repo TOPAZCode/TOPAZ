@@ -130,6 +130,7 @@ IF(HelSampling) THEN
   NDim = NDim + 1
 ENDIF
 
+m_SMTop = m_Top
 
 IF( PROCESS.EQ.0 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_Glu  + 2_Glu + 6_Glu
   IF( CORRECTION.EQ.0 ) THEN
@@ -1631,6 +1632,49 @@ ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
 
 
 
+ELSEIF( PROCESS.EQ.47 .OR. PROCESS.EQ.48 ) THEN !   A/HTop -> BH/Bar + A/Top (HTop width)
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 3
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.47 ) MasterProcess=43
+      IF( PROCESS.EQ.48 ) MasterProcess=44
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 4    ! fake t PS integration
+!       NDim = NDim + 1    ! for dummy integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 3
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.47 ) MasterProcess=43
+      IF( PROCESS.EQ.48 ) MasterProcess=44
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 4    ! fake t PS integration
+!       NDim = NDim + 1    ! for dummy integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.47 ) MasterProcess=43
+      IF( PROCESS.EQ.48 ) MasterProcess=44
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 3    ! real gluon
+      NDim = NDim + 4    ! fake t PS integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
+
+
 ELSEIF( PROCESS.EQ.51 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop
   IF( CORRECTION.EQ.0 ) THEN
       NumExtParticles = 4
@@ -1878,6 +1922,52 @@ ELSEIF( PROCESS.EQ.56 ) THEN !   3_Str  + 4_AStr  --> 1_ASTop + 2_STop + 5_Glu(i
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
+
+
+
+
+
+
+ELSEIF( PROCESS.EQ.57 .OR. PROCESS.EQ.58 ) THEN !   A/Stop -> Chi/Bar + A/Top (stop width)
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 3
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.57 ) MasterProcess=41
+      IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 4    ! fake t PS integration
+!       NDim = NDim + 1    ! for dummy integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 3
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.57 ) MasterProcess=41
+      IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 4    ! fake t PS integration
+!       NDim = NDim + 1    ! for dummy integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      IF( PROCESS.EQ.57 ) MasterProcess=41
+      IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = NDim + 2    ! st PS integration
+      NDim = NDim + 3    ! real gluon
+      NDim = NDim + 4    ! fake t PS integration
+      VegasNc0_default = 200000
+      VegasNc1_default = 200000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
 
 
 
@@ -3210,6 +3300,32 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
     ENDIF
 
 
+
+
+
+
+ELSEIF( MASTERPROCESS.EQ.41 ) THEN
+
+    ExtParticle(1)%PartType = ASTop_
+
+
+ELSEIF( MASTERPROCESS.EQ.42 ) THEN
+
+    ExtParticle(1)%PartType = STop_
+
+
+ELSEIF( MASTERPROCESS.EQ.43 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+
+
+ELSEIF( MASTERPROCESS.EQ.44 ) THEN
+
+    ExtParticle(1)%PartType = Top_
+
+
+
+
 !!! Zprime section !!!
 
 ELSEIF( MASTERPROCESS.EQ.62 ) THEN
@@ -4529,6 +4645,27 @@ print *, "check this here"
       PrimAmps(1)%ExtLine = BornAmps(1)%ExtLine
       PrimAmps(1)%AmpType = 1
    ENDIF
+
+
+
+
+ELSEIF( MasterProcess.EQ.41) THEN
+!   do nothing 
+
+
+ELSEIF( MasterProcess.EQ.42) THEN
+!   do nothing 
+
+
+ELSEIF( MasterProcess.EQ.43) THEN
+!   do nothing 
+
+
+ELSEIF( MasterProcess.EQ.44) THEN
+!   do nothing 
+
+
+
 
 
 !!! Zprime section !!!
