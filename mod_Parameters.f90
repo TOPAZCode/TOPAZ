@@ -311,7 +311,11 @@ SUBROUTINE InitParameters
 use ModMisc
 implicit none
 real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice
-real(8) :: cL,cR
+real(8) :: cL,cR,omegasq,f,z
+real(8) :: beta,omega,P0,P3,W0,Ppl,Pmi,Wpl,Wmi,Yp,Yw
+real(8) :: term4,term7,term9
+
+
 
 
 m_Bot  = m_Top  ! this is NOT the bottom mass! it is the mass for massive fermion in closed loops
@@ -464,12 +468,88 @@ IF( XTOPDECAYS.EQ.2 ) THEN
 
 ELSEIF( XTOPDECAYS.EQ.1 ) THEN
 !  chiral couplings for HTop-BH-top
-   IBHTt(+1) = 1d0/50d0  *1d0
-   IBHTt(-1) = 1d0/50d0  *1d0
+   IBHTt(+1) = 1d0/10d0  *0d0; print *, "setting RH coupling to zero!!"
+   IBHTt(-1) = 1d0/10d0  *1d0
 !  HTop-->BH + top partial width!
    Ga_Htop_BHTop(0) = SqrtLambda(m_Htop**2,m_top**2,m_BH**2)/(16d0*DblPi*m_Htop**3) * & 
                   1d0/2d0 *( (IBHTt(+1)**2+IBHTt(-1)**2)*( m_HTop**2+m_Top**2-2d0*m_BH**2+(m_HTop**2-m_top**2)**2/m_BH**2 ) - 12d0*(IBHTt(+1)*IBHTt(-1))*( m_Top*m_HTop ) )
    Ga_Htop_BHTop(1) = 0d0
+   Ga_HTop(:) = Ga_Htop_BHTop(:)! assuming no other decay channel
+
+! print *, "xx",Ga_Htop_BHTop(0)
+
+
+
+    beta = m_top/m_Htop
+    omega = m_BH/m_Htop
+    omegasq = omega**2
+    z = m_Top**2/m_Htop**2
+    P0 = 0.5d0*( 1d0 - omegasq + z )
+    P3 = 0.5d0*SqrtLambda(1d0,omegasq,z)
+    f = (1d0-z)**2 + omegasq*(1d0+z) - 2d0*omegasq**2
+    W0 = 0.5d0*( 1d0+omegasq-z )
+    Ppl = P0 + P3
+    Pmi = P0 - P3
+    Wpl = W0 + P3
+    Wmi = W0 - P3
+    Yp = 0.5d0 * dlog(Ppl/Pmi)
+    Yw = 0.5d0 * dlog(Wpl/Wmi)
+
+
+! !  this is the MCFM result (actually Czarnecki)
+   Ga_Htop_BHTop(0) = 2d0 * P3 * f
+print *, "remember: this is only the LH part"
+   Ga_Htop_BHTop(0) = Ga_Htop_BHTop(0) * m_Htop**3/(8d0*DblPi*dsqrt(2d0)) * ( IBHTt(-1)**2/2d0/dsqrt(2d0)/m_BH**2 )! this corresponds to Gamma_0
+
+!    Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+!                     ( 8d0*f*P0*( DLi2(1d0-Pmi) - DLi2(1d0-Ppl) - 2d0*DLi2(1d0-Pmi/Ppl) + Yp*dlog(4d0*P3**2/Ppl**2/Wpl) + Yw*dlog(Ppl))   &
+!                      +4d0*(1d0-z)*( (1d0-z)**2 + omegasq*(1d0+z) -4d0*omegasq )*Yw   &
+!                      +(3d0 -z + 11d0*z**2 - z**3 + omegasq*(6d0-12d0*z+2d0*z**2) -omegasq**2*(21d0+5d0*z) + 12d0*omegasq**3  )*Yp   &
+!                      +8d0*f*P3*dlog(omega/4d0/P3**2) + 6d0*(1d0 -4d0*z +3d0*z**2 +omegasq*(3d0+z) -4d0*omegasq**2)*P3*dlog(beta)   &
+!                      +(5d0 -22d0*z + 5d0*z**2 + 9d0*omegasq*(1d0+z) - 6d0*omegasq**2)*P3  &
+!                     )
+
+! print *, "masses",m_Htop,m_top,m_BH
+! print *, "xx",Ga_Htop_BHTop(0)
+! print *, "xx",Ga_Htop_BHTop(1)
+! print *, "yy",Ga_Htop_BHTop(1)/Ga_Htop_BHTop(0), -0.8d0*RunAlphaS(NLOParam,MuRen)*alpha_s
+! print *, "ra",Ga_Htop_BHTop(1)/Ga_Htop_BHTop(0)/( -0.8d0*RunAlphaS(NLOParam,MuRen)*alpha_s)
+
+
+! print *, "limit",RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+!                     ( 4d0*(1d0-omegasq)**2*(1d0+2d0*omegasq)*( DLi2(1d0-omegasq)-DblPi**2/3d0 + 0.5d0*dlog(1d0-omegasq)*dlog(omegasq) )  & 
+!                      -2d0*omegasq*(1d0+omegasq)*(1d0-2d0*omegasq)*dlog(omegasq) - (1d0-omegasq)**2*(4d0*omegasq+5d0)*dlog(1d0-omegasq)  &
+!                      +0.5d0*(1d0-omegasq)*(5d0+9d0*omegasq-6d0*omegasq**2)   &
+!                     )
+
+
+
+!     this is stolen from MCFM code
+      term4=(log(Ppl)-log(beta))*dlog(4d0*P3**2*Wmi/(omegasq*Ppl**2))
+      term7=  &
+      +(3d0-z+11d0*z**2-z**3+omegasq*(6d0-12d0*z+2d0*z**2)   &
+      -omegasq**2*(21d0+5d0*z)+12d0*omegasq**3)*log(Ppl)   &
+      -(-z+11d0*z**2-z**3+omegasq*(-12d0*z+2d0*z**2)   &
+      -omegasq**2*(5d0*z))*log(beta)
+      term9=   &
+      +6d0*(1d0-4d0*z+3d0*z**2+omegasq*(3d0+z)-4d0*omegasq**2)   &
+      *(P3-0.5d0*(1d0-omegasq))*dlog(beta)   &
+      +3d0*(1d0-omegasq)*(-4d0*z+3d0*z**2+omegasq*(z))*dlog(beta)  
+      Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+                        ( 8d0*f*P0*(DLi2(1d0-Pmi)-DLi2(1d0-Ppl)                &
+                            -2d0*DLi2(1d0-Pmi/Ppl)+term4    &
+                            +Yw*dlog(Ppl))   &
+                            +4d0*(1d0-z)*((1d0-z)**2+omegasq*(1d0+z)-4d0*omegasq**2)*Yw   &
+                            +term7    &
+                            +8d0*f*P3*dlog(omega/4d0/P3**2)+term9    &
+                            +(5d0-22d0*z+5d0*z**2+9d0*omegasq*(1d0+z)-6d0*omegasq**2)*P3  & 
+                        )
+! print *, "xx",Ga_Htop_BHTop(1)
+! pause
+
+
+
+
    Ga_HTop(:) = Ga_Htop_BHTop(:)! assuming no other decay channel
 ENDIF
 

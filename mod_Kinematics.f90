@@ -3405,6 +3405,8 @@ real(8) :: xRndPS(:)
       call EvalPhasespace_HTopDecay(HTopMom,xRndPS,m_A0,.false.,MomDK,PSWgt)
    elseif( Topol.eq.HT_BH_T ) then
       call EvalPhasespace_HTopDecay(HTopMom,xRndPS,m_BH,.false.,MomDK,PSWgt)
+   elseif( Topol.eq.HT_BH_T_G ) then
+      call EvalPhasespace_HTopDecay(HTopMom,xRndPS,m_BH,.true.,MomDK,PSWgt)
    else
       call Error("EvalPS not yet implemented")
    endif
@@ -3439,6 +3441,21 @@ logical,save :: flip=.true.
       PSWgt = PSWgt2*PiWgt2
 
     else! extra gluon emission
+
+     call genps(3,m_HTop,xRndPS(1:5),(/Mass,m_Top,0d0/),MomDK(1:4,1:3),PSWgt2)! Htop decay with gluon
+
+!          Pcol1= 5 -1
+!          Pcol2= 5 -1
+!          SingDepth = 1e-10
+!          Steps = 20
+!          call gensing(3,m_HTop,(/Mass,m_Top,0d0/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "running gensing"
+!          PSWgt2=1d0
+
+!     boost all guys to the top frame:
+      call boost(MomDK(1:4,1),HTopMom(1:4),m_HTop)
+      call boost(MomDK(1:4,2),HTopMom(1:4),m_HTop)
+      call boost(MomDK(1:4,3),HTopMom(1:4),m_HTop)
+      PSWgt = PSWgt2*PiWgt3
 
     endif
 

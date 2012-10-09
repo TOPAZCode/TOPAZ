@@ -6288,6 +6288,7 @@ include 'vegas_common.f'
       ENDIF
       PSWgt = PSWgt2
    ENDIF
+
  
 
    PreFac = PSWgt * VgsWgt /(2d0*m_Stop) * (2d0*Ga_STop(0)*M_STop)
@@ -6410,14 +6411,15 @@ use ModMyRecurrence
 use ModParameters
 implicit none
 real(8) ::  EvalCS_HTopWidth,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
-complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),Amp,Spi(1:4),BarSpi(1:4)
-integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),Amp,Amp2,Spi(1:4),BarSpi(1:4)
+integer :: iHel,jHel,kHel,lHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
-real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
+real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4),MomExtTd(1:4,1:9),pbDpg,ptDpg,ptDpb,TheDipole
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+real(8), parameter :: CF=4d0/3d0
 include 'vegas_common.f'
 
 
@@ -6444,7 +6446,7 @@ include 'vegas_common.f'
 
    IF( CORRECTION.EQ.0 ) THEN
       LO_Res_Unpol = (0d0,0d0)
-      do iHel=-1,+1,2
+      do iHel=-1,+1,1
       do jHel=-1,+1,2
       do kHel=-1,+1,2
           call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
@@ -6460,38 +6462,91 @@ include 'vegas_common.f'
       enddo!helicity loop
       enddo!helicity loop
 
+!  normalization
+   EvalCS_HTopWidth = LO_Res_Unpol * PreFac
+
 
    ELSEIF( CORRECTION.EQ.4 ) THEN
-!       LO_Res_Unpol = (0d0,0d0)
-!       do iHel=-1,+1,2
-!       do jHel=-1,+1,2
-!           call STopDecay(ExtParticle(1),DKX_STChi0_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
-!           LO_Res_Pol = ExtParticle(1)%Pol(1)
-!           call STopDecay(ExtParticle(1),DKX_STChi0_1L1,iHel,MomExt(1:4,5:9),HelTop=jHel)
-!           NLO_Res_Pol(0) = ExtParticle(1)%Pol(1)
-! 
-!           LO_Res_UnPol = LO_Res_UnPol +  dreal( LO_Res_Pol*dconjg(NLO_Res_Pol(0)) )
-!       enddo!helicity loop
-!       enddo!helicity loop
 
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,1
+      do jHel=-1,+1,2
+      do kHel=-1,+1,2
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          Spi(1:4) = ExtParticle(1)%Pol(1:4)
+          IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
+                call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ELSE
+                call uSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ENDIF
+          Amp = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
 
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_1L1,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          Spi(1:4) = ExtParticle(1)%Pol(1:4)
+          Amp2= psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
 
-   ELSEIF( CORRECTION.EQ.5 ) THEN
-!       LO_Res_Unpol = (0d0,0d0)
-!       do iHel=-1,+1,2
-!       do jHel=-1,+1,2
-!       do kHel=-1,+1,2
-!           call STopDecay(ExtParticle(1),DKX_STChi0_RE1,iHel,MomExt(1:4,5:9),MomGlu=MomExt(1:4,15),HelGlu=kHel,HelTop=jHel)
-!           LO_Res_Pol = ExtParticle(1)%Pol(1)
-!           LO_Res_UnPol = LO_Res_UnPol +  LO_Res_Pol*dconjg( LO_Res_Pol )
-!       enddo!helicity loop
-!       enddo!helicity loop
-!       enddo!helicity loop
-   ENDIF
-
+          LO_Res_UnPol = LO_Res_UnPol +  dreal( Amp*dconjg(Amp2) ) * 0.5d0
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
 
 !  normalization
    EvalCS_HTopWidth = LO_Res_Unpol * PreFac
+
+   ELSEIF( CORRECTION.EQ.5 ) THEN
+
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,1
+      do jHel=-1,+1,2
+      do kHel=-1,+1,2
+      do lHel=-1,+1,2
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_RE1,iHel,MomExt(1:4,5:9),MomGlu=MomExt(1:4,15),GluHel=lHel,HelTop=jHel)
+          Spi(1:4) = ExtParticle(1)%Pol(1:4)
+          IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
+                call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ELSE
+                call uSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ENDIF
+          Amp = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
+          LO_Res_UnPol = LO_Res_UnPol +  Amp*dconjg(Amp) * 0.5d0
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
+!     normalization
+      EvalCS_HTopWidth = LO_Res_Unpol * PreFac
+! print *, LO_Res_Unpol * PreFac
+! pause
+
+      call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+      call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(6:9),MomExtTd(1:4,7:9),PSWgt4)    
+      LO_Res_Unpol = (0d0,0d0)
+      do iHel=-1,+1,1
+      do jHel=-1,+1,2
+      do kHel=-1,+1,2
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExtTd(1:4,5:9),HelTop=jHel)
+          Spi(1:4) = ExtParticle(1)%Pol(1:4)
+          IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
+                call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ELSE
+                call uSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
+          ENDIF
+          Amp = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
+          LO_Res_UnPol = LO_Res_UnPol +  Amp*dconjg(Amp) * 0.5d0
+      enddo!helicity loop
+      enddo!helicity loop
+      enddo!helicity loop
+      TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_HTop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+! print *, LO_Res_Unpol * TheDipole * PreFac
+! pause
+!     normalization
+      EvalCS_HTopWidth = EvalCS_HTopWidth + LO_Res_Unpol * TheDipole * PreFac
+
+
+   ENDIF
+
+
+
 
 
    if( IsNan(EvalCS_HTopWidth) ) then
