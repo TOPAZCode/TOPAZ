@@ -54,7 +54,7 @@ contains
 !    epinv2=0d0
 !    epinv =0d0
 
-    ! all-outgoing
+   ! all-outgoing
     pflip(:,1) = -p(:,1)
     pflip(:,2) = -p(:,2)
     pflip(:,3) = p(:,3)
@@ -105,8 +105,8 @@ contains
        endif
 
 !       print *, 'dipoles set to zero for 1/ep'
-!       dipplus = 0d0
-!       dipfini = 0d0
+!       dipplus = 0d0; print *, 'int dip ep check'
+!       dipfini = 0d0; print *, 'int dip ep check'
 
        if(emi.eq.1) then
           IDip(1) = IDip(1) + (dipsoft-dipplus)
@@ -184,8 +184,8 @@ contains
        endif
 
        ! this is for check against virtual amplitude
-       !dipplus = 0d0
-       !dipfini = 0d0
+!       dipplus = 0d0; print *, 'dipoles check'
+!       dipfini = 0d0; print *, 'dipoles check'
 
        if(emi.eq.1) then
           IDip(1) = IDip(1) + (dipsoft-dipplus)
@@ -213,8 +213,8 @@ contains
     APplus= 2d0*CF/(1d0-z) * epcorr
 
     ! this is for check against virtual amplitude
-    !APplus = 0d0
-    !APfini = 0d0
+!    APplus = 0d0; print *, 'dipoles check'
+!    APfini = 0d0; print *, 'dipoles check'
 
     IDip(1) = IDip(1) + (APsoft - APplus)*2d0
     IDip(2) = IDip(2) + (APfini + APplus)

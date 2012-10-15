@@ -414,8 +414,6 @@ Ga_Top(1) = Ga_Top(0) * ( - RUNALPHAS(2,MuRen)*alpha_sOver2Pi*4d0/3d0*(   &   ! 
                          +(3d0+27d0*dlog(1d0-r2)-4d0*dlog(r2))/9d0/(1d0+2d0*r2)  &
                         ))   ! taken from eq.(26), hep-ph/0408158
 
-
-
 WWidthChoice = 1!          0=experimental W width,    =calculated W width
 IF( WWidthChoice.eq. 1 ) THEN
 !   calculated W width:

@@ -1273,6 +1273,15 @@ ELSEIF( CORRECTION.EQ.4 .AND. PROCESS.EQ.62 ) THEN
    call InitHisto()
    call vegas1(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
   endif
+ELSEIF( CORRECTION.EQ.5 .AND. PROCESS.EQ.62 ) THEN
+   print *, 'Real in decay, qqb->Zprime->ttb'
+   call vegas(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_Zprime_ttb,VG_Result,VG_Error,VG_Chi2)
+  endif
 ENDIF
 ENDIF
 

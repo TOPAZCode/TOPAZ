@@ -35,7 +35,6 @@ include "vegas_common.f"
   EvalCS_1L_Zprime_ttbqqb = 0d0
 
 !  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! Flat mapping
-
   call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! BW mapping for Ehat
 
   if( EHat.le.2d0*m_Top) then
@@ -135,6 +134,26 @@ include "vegas_common.f"
         LO_Res_UnPol_Right = LO_Res_UnPol_Right + dreal(LO_Res_Pol_Right*dconjg(LO_Res_Pol_Right))
      enddo
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!! F- MadGraph check, Oct 13th
+!
+!     open(unit=66,file='/home/caola/tools/MG_ME_V4.5.2/zprime/SubProcesses/kin.dat', status='unknown')
+!     do iHel = 1,4
+!        write(66,*) MomExt(1,iHel) * 100d0
+!        write(66,*) MomExt(2,iHel) * 100d0
+!        write(66,*) MomExt(3,iHel) * 100d0
+!        write(66,*) MomExt(4,iHel) * 100d0
+!     enddo
+!     close(66)
+!     print *, 'MZpr', m_zpr * 100d0
+!     print *, 'Ga_zpr', Ga_Zpr * 100d0
+!     print *, 'gL_Zpr(up_), gL_Zpr(dn_)', gL_Zpr(up_), gL_Zpr(dn_)
+!     print *, 'gR_Zpr(up_), gR_Zpr(dn_)', gR_Zpr(up_), gR_Zpr(dn_)
+!     print *, 'uub->ttb ', ISFac * (gL_Zpr(up_)**2 * LO_Res_Unpol_Left + gR_Zpr(up_)**2 * LO_Res_Unpol_Right)*9d0
+!     print *, 'ddb->ttb ', ISFac * (gL_Zpr(dn_)**2 * LO_Res_Unpol_Left + gR_Zpr(dn_)**2 * LO_Res_Unpol_Right)*9d0
+!     pause
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 !!!! M-F checked on May 26th
 
 !     call coupsm(0)
@@ -147,9 +166,7 @@ include "vegas_common.f"
 !     print *, 'madgraph dn', MadGraphRes
 !     print *, 'us         ', ISFac * (gL_Zpr(dn_)**2 * LO_Res_Unpol_Left + gR_Zpr(dn_)**2 * LO_Res_Unpol_Right)*9d0
 !     print *, ISFac*(gL_Zpr(dn_)**2 * LO_Res_Unpol_Left + gR_Zpr(dn_)**2 * LO_Res_Unpol_Right)*9d0/MadGraphRes
-
 !     pause
-
 
      EvalCS_1L_Zprime_ttbqqb = ISFac*PreFac* (PDFFac_L * LO_Res_Unpol_Left + PDFFac_R * LO_Res_Unpol_Right)
      EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb * 9d0 ! Sum over initial / final colors
@@ -190,7 +207,11 @@ include "vegas_common.f"
   !!! Integrated dipoles !!!
   ELSEIF(CORRECTION.EQ.3) THEN
 
-     z = yRnd(5)
+     IF ( TOPDECAYS.EQ.0 ) THEN 
+        z = yRnd(5)
+     ELSE
+        z = yRnd(13)
+     END IF
 
      call setPDFs(eta1/z,eta2/z,MuFac,pdf_z)
 
@@ -270,7 +291,6 @@ include "vegas_common.f"
         IDipAmp = IDipAmp * ISFac * 9d0 * (4d0/3d0) * 2d0!  9* CF/TR
 
         EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb + IDipAmp
-
 
      ELSEIF(PROCESS.EQ.64) THEN
 
@@ -431,6 +451,7 @@ include "vegas_common.f"
 
   ENDIF
 
+!--F Oct 13: poles cancellation checks
 !  print *, 'full result', EvalCS_1L_Zprime_ttbqqb
 !  pause
 
@@ -479,7 +500,8 @@ integer :: i1,i2,i3,i4,i5
   EvalCS_Dips_Zprime_ttbqqb = 0d0
 
 
-!   yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
+!  yrnd(1:15) = 0.4d0; yrnd(8)=0.6d0; yrnd(16)=0.6d0; print *, "fixed y,y16"
+!  yRnd(1:2) = (/0.1d0,0.3d0/); print *, 'fixed yRnd(1:2)'
 
   if ((TOPDECAYS.EQ.0 .AND. yRnd(8).GT.0.5d0) .OR. (TOPDECAYS.NE.0 .AND. yRnd(16).GT.0.5d0)) then
      call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi) ! BW mapping for Ehat
@@ -570,7 +592,7 @@ integer :: i1,i2,i3,i4,i5
   ELSEIF (PROCESS.EQ.64 ) THEN
 
      call random_number(xpdf)
- 
+
     if( xpdf.le.0.5d0 ) then
         PDFFac_L = gL_Zpr(up_)**2 * (pdf(0,1)*pdf(aup_,2))
         PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(0,1)*pdf(adn_,2))
@@ -612,7 +634,6 @@ integer :: i1,i2,i3,i4,i5
 !     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(0,1)*pdf(abot_,2) + pdf(0,2)*pdf(abot_,1))
 
   ELSEIF( PROCESS.EQ.66 ) THEN
-
 
     call random_number(xpdf)
 
@@ -674,6 +695,8 @@ integer :: i1,i2,i3,i4,i5
      EvalCS_Real_Zprime_ttbqqb = 0d0
   else
 
+     ISFac = MomCrossing(MomExt)
+
      Res_UnPol_L = 0d0
      Res_UnPol_R = 0d0
      do iHel=1,NumHelicities
@@ -685,10 +708,34 @@ integer :: i1,i2,i3,i4,i5
 
         Res_UnPol_L = Res_UnPol_L +  dreal(prim1_L*dconjg(prim1_L) + prim2_L*dconjg(prim2_L))
         Res_UnPol_R = Res_UnPol_R +  dreal(prim1_R*dconjg(prim1_R) + prim2_R*dconjg(prim2_R))
+
      enddo!helicity loop
 
      EvalCS_Real_Zprime_ttbqqb = (PDFFac_R * Res_UnPol_R + PDFFac_L * Res_UnPol_L)
      EvalCS_Real_Zprime_ttbqqb = EvalCS_Real_Zprime_ttbqqb * (4d0*Pi*alpha_s*RunFactor) * PreFac * ISFac * colf
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!! F- MadGraph check, Oct 13th
+!
+!     open(unit=66,file='/home/caola/tools/MG_ME_V4.5.2/zprime/SubProcesses/kin.dat', status='unknown')
+!     do iHel = 1,5
+!        write(66,*) MomExt(1,iHel) * 100d0
+!        write(66,*) MomExt(2,iHel) * 100d0
+!        write(66,*) MomExt(3,iHel) * 100d0
+!        write(66,*) MomExt(4,iHel) * 100d0
+!     enddo
+!     close(66)
+!     print *, 'MZpr', m_zpr * 100d0
+!     print *, 'Ga_zpr', Ga_Zpr * 100d0
+!     print *, 'gL_Zpr(up_), gL_Zpr(dn_)', gL_Zpr(up_), gL_Zpr(dn_)
+!     print *, 'gR_Zpr(up_), gR_Zpr(dn_)', gR_Zpr(up_), gR_Zpr(dn_)
+!     print *, 'alpha_s', alpha_s*RunFactor
+!     print *, 'gs', dsqrt(alpha_s*RunFactor*4d0*Pi)
+!     print *, ''
+!     print *, 'up',  ISFac * colf * (4d0*Pi*alpha_s*RunFactor) * (gL_Zpr(up_)**2 * Res_UnPol_L + gR_Zpr(up_)**2 * Res_UnPol_R)*GeV**2
+!     print *, 'dn',  ISFac * colf * (4d0*Pi*alpha_s*RunFactor) * (gL_Zpr(dn_)**2 * Res_UnPol_L + gR_Zpr(dn_)**2 * Res_UnPol_R)*GeV**2
+!     pause
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
      do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_ttbqqb)
@@ -973,11 +1020,14 @@ integer :: i1,i2,i3,i4,i5
     
   ENDIF
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!--F Oct 13: dipoles check
 !  print *, 'inv    ', (MomExt(1:4,1).dot.MomExt(1:4,3))/Ehat**2,(MomExt(1:4,2).dot.MomExt(1:4,3))/Ehat**2
 !  print *, 'real   ', EvalCS_Real_Zprime_ttbqqb
 !  print *, 'dipoles', dipoles
 !  print *, 'dipoles/real+1', dipoles/EvalCS_Real_Zprime_ttbqqb + 1d0
 !  pause 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  
   EvalCS_Real_Zprime_ttbqqb = (EvalCS_Real_Zprime_ttbqqb+dipoles)/VgsWgt
 
@@ -1032,8 +1082,8 @@ complex(8) :: rdiv(1:2)
   FluxFac = 1d0/(2d0*EHat**2)
 
   call EvalPhaseSpace_2to2(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)
-!   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-print *, "MaRKUS: boost off for checks"
+  call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
+!print *, "MaRKUS: boost off for checks"
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
@@ -1082,6 +1132,8 @@ print *, "MaRKUS: boost off for checks"
 
   call random_number(xpdf)
 
+!  xpdf = 0.4d0; print *, 'fixed xpdf'
+
   if( xpdf.le.0.5d0 ) then
      PDFFac_L = gL_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2))
      PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2))
@@ -1095,13 +1147,13 @@ print *, "MaRKUS: boost off for checks"
      PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2))
      PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2))
   else
-     PDFFac_L = gL_Zpr(up_) * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_L = gL_Zpr(up_) * (pdf(up_,2)*pdf(aup_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
      PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,2)*pdf(abot_,1))
      
-     PDFFac_R = gR_Zpr(up_) * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_R = gR_Zpr(up_) * (pdf(up_,2)*pdf(aup_,1))
      PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
      PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
      PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
@@ -1141,7 +1193,6 @@ print *, "MaRKUS: boost off for checks"
   ISFac = MomCrossing(MomExt)
 
   IF( TOPDECAYS.GE.1 ) THEN
-     !     top decays with spin correlations
      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
   ENDIF
@@ -1178,7 +1229,7 @@ print *, "MaRKUS: boost off for checks"
            PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
            call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
            AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-           !call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+           !call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv); print *, 'checking poles'
            if( AccPoles.gt.1d-4 ) then
 !                 print *, "PrimAmp",iPrimAmp
 !                 print *, "AccPoles",AccPoles
@@ -1223,8 +1274,8 @@ print *, "MaRKUS: boost off for checks"
         NLO_Res_Pol(2) = (BosonicPartAmp(2,0) + BosonicPartAmp(2,1)) ! cc + rational
 
         ! eps-cancellation check
-!        NLO_Res_Pol(1) = (BosonicPartAmp(1,-1))
-!        NLO_Res_Pol(2) = (BosonicPartAmp(2,-1))
+!        NLO_Res_Pol(1) = (BosonicPartAmp(1,-1)); print *, 'eps cancellation check'
+!        NLO_Res_Pol(2) = (BosonicPartAmp(2,-1)); print *, 'eps cancellation check'
 
         ! Z' virt, glue tree
         LO_res_pol_glue = BornAmps(1)%Result
@@ -1241,14 +1292,14 @@ print *, "MaRKUS: boost off for checks"
      EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf * (alpha_sOver2Pi*RunFactor) * (4d0*Pi*alpha_s*RunFactor)
 
 
-  ELSEIF ( CORRECTION.EQ.3 ) THEN
+  ELSEIF ( CORRECTION.EQ.3 ) THEN 
 
      !!! Integrated Dipoles !!!
 
-Ga_Zpr=0d0; print *, "MARKUS: ga_zpr to zero for checks"
-! gR_Zpr(top_) = 1d0; gL_Zpr(top_) = 1d0! vector contribution
-gR_Zpr(top_) = -1d0; gL_Zpr(top_) = 1d0! axial contribution
-m_zpr=91d0*GeV
+!Ga_Zpr=0d0; print *, "MARKUS: ga_zpr to zero for checks"
+!gR_Zpr(top_) = 1d0; gL_Zpr(top_) = 1d0! vector contribution
+!gR_Zpr(top_) = -1d0; gL_Zpr(top_) = 1d0! axial contribution
+!m_zpr=91d0*GeV
 
      do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
@@ -1266,9 +1317,9 @@ m_zpr=91d0*GeV
 
      enddo!helicity loop
 
-beta = dsqrt(1d0-4d0*m_top**2/Ehat**2)
-z = Get_CosTheta(Momext(1:4,3))
-print *, beta,z
+!beta = dsqrt(1d0-4d0*m_top**2/Ehat**2)
+!z = Get_CosTheta(Momext(1:4,3))
+!print *, beta,z
 
 ! vector contribution
 ! AndreasResult = 2d0*ehat**2/(ehat**2-m_Zpr**2) *( 2d0-beta**2*(1-z**2) )! vector contribution
@@ -1277,13 +1328,17 @@ print *, beta,z
 ! print *, "ratio vector", AndreasResult / (LO_for_dip_Left  + LO_for_dip_Right )! vector contribution
 
 ! axial contribution
-AndreasResult = 2d0*ehat**2/(ehat**2-m_Zpr**2) *( 2d0*beta*z )! axial  contribution
-print *, "TOPAZ: ", (LO_for_dip_Left-LO_for_dip_Right)
-print *, "Andreas: ",AndreasResult
-print *, "ratio axial", AndreasResult / (LO_for_dip_Left  - LO_for_dip_Right )! axial  contribution
-pause
+!AndreasResult = 2d0*ehat**2/(ehat**2-m_Zpr**2) *( 2d0*beta*z )! axial  contribution
+!print *, "TOPAZ: ", (-LO_for_dip_Left+LO_for_dip_Right)
+!print *, "Andreas: ",AndreasResult
+!print *, "ratio axial", AndreasResult / (-LO_for_dip_Left  + LO_for_dip_Right )! axial  contribution
+!pause
 
-     z = yRnd(5); print * , "careful here, if tops decay, yrnd(5) is used already!!"
+     IF ( TOPDECAYS.EQ.0 ) THEN 
+        z = yRnd(5)
+     ELSE
+        z = yRnd(13)
+     END IF
 
      call setPDFs(eta1/z,eta2/z,MuFac,pdf_z)
 
@@ -1360,7 +1415,7 @@ pause
 
         call IntDip_qbg_ZprimeInt_ttb(MomExt(1:4,1:4), z, IDip) ! Normalization: as/(2 Pi)
 
-     ELSEIF ( PROCESS.EQ.69 ) THEN
+     ELSEIF ( PROCESS.EQ.69 ) THEN 
      
         ! qqb initial state !
 
@@ -1430,19 +1485,20 @@ pause
      IDipAmp = IDipAmp + IDip(3)/z * (PDFFac_dip_L(3) * LO_for_dip_Left + PDFFac_dip_R(3) * LO_for_dip_Right)
      
      IDipAmp = IDipAmp * ISFac 
-     
+
      EvalCS_Virt_Zprime_Interf = IDipAmp
      
   ENDIF ! Correction
+
+!--F Oct 15: 1/ep poles cancellation checked
+!     print *, 'virt', EvalCS_Virt_Zprime_Interf
+!     print *, 'idip', IDipAmp
+!     pause
 
 
   do NHisto=1,NumHistograms
      call intoHisto(NHisto,NBin(NHisto),EvalCS_Virt_Zprime_Interf)
   enddo
-
-!     print *, 'virt', EvalCS_Virt_Zprime_Interf
-!     print *, 'idip', IDipAmp
-!     pause
 
 
   EvalCS_Virt_Zprime_Interf = EvalCS_Virt_Zprime_Interf/VgsWgt
@@ -1522,30 +1578,32 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
 
     call random_number(xpdf)
 
+!    xpdf = 0.4d0; print *, 'fixed xpdf'
+
     if( xpdf.le.0.5d0 ) then
-       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
-       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
-       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
-       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
-       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+       PDFFac_L =            gL_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2))
        
-       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
-       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
-       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
-       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
-       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+       PDFFac_R =            gR_Zpr(up_) * (pdf(up_,1)*pdf(aup_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(adn_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(achm_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(astr_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(abot_,2))
     else
-       PDFFac_L =            gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
-       PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
-       PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
-       PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
-       PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       PDFFac_L =            gL_Zpr(up_) * (pdf(up_,2)*pdf(aup_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,2)*pdf(abot_,1))
        
-       PDFFac_R =            gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
-       PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
-       PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
-       PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
-       PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+       PDFFac_R =            gR_Zpr(up_) * (pdf(up_,2)*pdf(aup_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,2)*pdf(adn_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,2)*pdf(achm_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,2)*pdf(astr_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,2)*pdf(abot_,1))
        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
   
@@ -1564,9 +1622,8 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
   ENDIF
 
-!!! INVERTED DIPOLES CHECK !!!
-if (1.eq.1) then
-!  if( applyPSCut ) then
+!if (1.eq.1) then !!! INVERTED DIPOLES CHECK 
+  if( applyPSCut ) then
      EvalCS_Real_Zprime_interf = 0d0
   else
 
@@ -1591,24 +1648,48 @@ if (1.eq.1) then
            call EvalTree(BornAmps(iPrimAmp))
         enddo
 
-        Res_UnPol_L = Res_UnPol_L + 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_L)) + &
+        !--F Oct 14: sign fixed by comparing against MadGraph
+        Res_UnPol_L = Res_UnPol_L - ( + 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_L)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim2_L)) + &
              2d0 * dreal(BornAmps(PrimAmp1_15234)%Result * dconjg(prim2_L)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim1_L)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim2_L)) + &
-             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_L)) 
+             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_L)))
 
-        Res_UnPol_R = Res_UnPol_R + 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_R)) + &
+        !--F Oct 14: sign fixed by comparing against MadGraph
+        Res_UnPol_R = Res_UnPol_R - ( 2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim1_R)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12345)%Result * dconjg(prim2_R)) + &
              2d0 * dreal(BornAmps(PrimAmp1_15234)%Result * dconjg(prim2_R)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim1_R)) + &
              2d0 * dreal(BornAmps(PrimAmp1_12534)%Result * dconjg(prim2_R)) + &
-             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_R)) 
+             2d0 * dreal(BornAmps(PrimAmp1_12354)%Result * dconjg(prim1_R)) )
 
      enddo!helicity loop
 
      EvalCS_Real_Zprime_interf = (PDFFac_R * Res_UnPol_R + PDFFac_L * Res_UnPol_L)
      EvalCS_Real_Zprime_interf = EvalCS_Real_Zprime_interf * (4d0*Pi*alpha_s*RunFactor)**2 * PreFac * ISFac * colf
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!--F Oct 14 MadGraph Check 
+!     open(unit=66,file='/home/caola/tools/MG_ME_V4.5.2/zprime/SubProcesses/kin.dat', status='unknown')
+!     do iHel = 1,5
+!        write(66,*) MomExt(1,iHel) * 100d0
+!        write(66,*) MomExt(2,iHel) * 100d0
+!        write(66,*) MomExt(3,iHel) * 100d0
+!        write(66,*) MomExt(4,iHel) * 100d0
+!     enddo
+!     close(66)
+!     print *, 'MZpr', m_zpr * 100d0
+!     print *, 'Ga_zpr', Ga_Zpr * 100d0
+!     print *, 'gL_Zpr(up_), gL_Zpr(dn_)', gL_Zpr(up_), gL_Zpr(dn_)
+!     print *, 'gR_Zpr(up_), gR_Zpr(dn_)', gR_Zpr(up_), gR_Zpr(dn_)
+!     print *, 'alpha_s', alpha_s*RunFactor
+!     print *, 'gs', dsqrt(alpha_s*RunFactor*4d0*Pi)
+!     print *, ''
+!     print *, 'up',  ISFac * colf * (4d0*Pi*alpha_s*RunFactor)**2 * (gL_Zpr(up_) * Res_UnPol_L + gR_Zpr(up_) * Res_UnPol_R)*GeV**2
+!     print *, 'dn',  ISFac * colf * (4d0*Pi*alpha_s*RunFactor)**2 * (gL_Zpr(dn_) * Res_UnPol_L + gR_Zpr(dn_) * Res_UnPol_R)*GeV**2
+!     pause
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
      do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_interf)
@@ -1624,7 +1705,7 @@ if (1.eq.1) then
      do nDip = 1,8
 
         call Dipoles_qqb_Zprime_interf(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
- 
+
         if (resdip .EQ. 0d0) cycle
 
         Crossing(:) = (/3,4,-1,-2,0/) ! For dipoles
@@ -1636,7 +1717,7 @@ if (1.eq.1) then
         IF( TOPDECAYS.NE.0 ) THEN
            call EvalPhasespace_TopDecay(MomExtTd(1:4,3),yRnd(8:11),.false.,MomDKTd(1:4,1:3),PSWgt2)
            call EvalPhasespace_TopDecay(MomExtTd(1:4,4),yRnd(12:15),.false.,MomDKTd(1:4,4:6),PSWgt3)
-           PSWgt = PSWgt * PSWgt2*PSWgt3! this is better never be used anywhere below
+!           PSWgt = PSWgt * PSWgt2*PSWgt3! this is better never be used anywhere below
            
            call Kinematics_TTBARZprime(.false.,MomExtTd,MomDKTd,applyPSCut,NBin)
 
@@ -1705,8 +1786,9 @@ if (1.eq.1) then
         do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),resdip)
         enddo
-     
-        dipoles = dipoles + resdip
+
+        !--F Oct 14 sign fixed against MadGraph
+        dipoles = dipoles - resdip
 
      enddo
 
@@ -1726,7 +1808,6 @@ END FUNCTION EvalCS_Real_Zprime_Interf
 
 
 
-
 FUNCTION EvalCS_NLODK_Zprime_ttb(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -1734,16 +1815,25 @@ use ModAmplitudes_Zprime
 use ModParameters
 use ModHadrWDecay
 implicit none
+#DEFINE TheReal_Top 2233
+#DEFINE TheDipole_Top 2244
+#DEFINE TheDipole_ATop 2255
+#DEFINE TheWm_decay 2260
+#DEFINE TheReal_Top_Wdecay 2266
+#DEFINE TheDipole_Top_Wdecay 2277
+#DEFINE TheWp_decay 2280
+#DEFINE TheDipole_ATop_Wdecay 2288
+#DEFINE TheEnd 2299
 real(8) ::  EvalCS_NLODK_Zprime_ttb, yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: LO_Res_Pol_Left, LO_Res_Pol_Right
 complex(8) :: NLO_Res_Pol_Left, NLO_Res_Pol_Right, NLO_Res_Unpol_Left, NLO_Res_Unpol_Right, NLO_Res_Unpol
 complex(8) :: Dip_Res_Unpol
 integer :: iHel,jHel,kHel,GluHel,iPrimAmp,jPrimAmp,ndip
 real(8) :: EHat,PSWgt1,PSWgt2,PSWgt3,ISFac,dip_res_w
-real(8) :: MomExt(1:4,1:NumExtParticles),MomDK(1:4,1:6)
+real(8) :: MomExt(1:4,1:NumExtParticles),MomDK(1:4,1:7),MomDKTd(1:4,1:6),MomDKx(1:4,1:7)
 logical :: applyPSCut,applySingCut
 real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,RunFactor
-real(8) :: pdf(-6:6,1:2), PDFFac_L, PDFFac_R
+real(8) :: pdf(-6:6,1:2), PDFFac_L, PDFFac_R,xpdf
 integer :: NBin(1:NumMaxHisto),NHisto,npdf
 real(8) :: pbDpg,ptDpg,ptDpb,z,omz,Dipole,rsq,y
 real(8), parameter :: CF=4d0/3d0,PhotonCouplCorr=2d0
@@ -1756,7 +1846,7 @@ include "vegas_common.f"
 
   EvalCS_NLODK_Zprime_ttb = 0d0
 
-  call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+  call PDFMapping(62,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
   if( EHat.le.2d0*m_Top) then
       EvalCS_NLODK_Zprime_ttb = 0d0
       return
@@ -1767,25 +1857,50 @@ include "vegas_common.f"
   call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 
   call setPDFs(eta1,eta2,MuFac,pdf)
+  call random_number(xpdf)
+  if( xpdf.le.0.5d0 ) then
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2))
+  else
+     PDFFac_L = gL_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+     PDFFac_R = gR_Zpr(up_)**2 * (pdf(Up_,2)*pdf(aup_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,2)*pdf(adn_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,2)*pdf(achm_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,2)*pdf(astr_,1))
+     PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,2)*pdf(abot_,1))
+     call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+  endif
+  PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+  PDFFac_L = PDFFac_L * 2d0
 
-  PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-  PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+!   PDFFac_L = gL_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
+!   PDFFac_L = PDFFac_L + gL_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!   PDFFac_L = PDFFac_L + gL_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!   PDFFac_L = PDFFac_L + gL_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!   PDFFac_L = PDFFac_L + gL_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
+!   PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
+!   PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
+!   PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
+!   PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
+!   PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
 
-  PDFFac_R = gR_Zpr(up_)**2 * (pdf(up_,1)*pdf(aup_,2) + pdf(Up_,2)*pdf(aup_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(dn_)**2 * (pdf(dn_,1)*pdf(adn_,2) + pdf(dn_,2)*pdf(adn_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(chm_)**2 * (pdf(chm_,1)*pdf(achm_,2) + pdf(chm_,2)*pdf(achm_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(str_)**2 * (pdf(str_,1)*pdf(astr_,2) + pdf(str_,2)*pdf(astr_,1))
-  PDFFac_R = PDFFac_R + gR_Zpr(bot_)**2 * (pdf(bot_,1)*pdf(abot_,2) + pdf(bot_,2)*pdf(abot_,1))
 
 IF( CORRECTION.EQ.4 ) THEN
-!----------------------------------------
-! one loop correction to Anti-top decay |
-!----------------------------------------
-   call EvalPhasespace_TopDecay(MomExt(1:4,3),yRnd(5:8),.false.,MomDK(1:4,1:3),PSWgt2)
-   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(9:12),.false.,MomDK(1:4,4:6),PSWgt3)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,3),yRnd(5:8) ,MomDK(1:4,1:3),PSWgt2)
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,4),yRnd(9:12),MomDK(1:4,4:6),PSWgt3)
+
    call Kinematics_TTBARZprime(.false.,MomExt,MomDK,applyPSCut,NBin)!,xJPsiFrag=xFrag)
    if( applyPSCut ) then
       EvalCS_NLODK_Zprime_ttb = 0d0
@@ -1794,9 +1909,11 @@ IF( CORRECTION.EQ.4 ) THEN
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
    RunFactor = RunAlphaS(2,MuRen)
-
    ISFac = MomCrossing(MomExt)
-      
+
+!----------------------------------------
+! one loop correction to Anti-top decay |
+!----------------------------------------
    NLO_Res_UnPol_Left = (0d0,0d0)
    NLO_Res_UnPol_Right = (0d0,0d0)
    do iHel=1,NumHelicities
@@ -1816,13 +1933,13 @@ IF( CORRECTION.EQ.4 ) THEN
 
    !  normalization
    NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
-   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
 
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
    EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
-   
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
    enddo
+
 
 
 !-------------------------------------
@@ -1830,12 +1947,9 @@ IF( CORRECTION.EQ.4 ) THEN
 !-------------------------------------
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
    RunFactor = RunAlphaS(2,MuRen)
-
    ISFac = MomCrossing(MomExt)
-
    NLO_Res_UnPol_Left = (0d0,0d0)
    NLO_Res_UnPol_Right = (0d0,0d0)
-
    do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
@@ -1854,23 +1968,425 @@ IF( CORRECTION.EQ.4 ) THEN
    !  normalization
    NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
    NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
-
    EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
-   
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
    enddo
 
+
+
+
+IF( TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.4 ) THEN
+!----------------------------------------
+! one loop correction to W- decay |
+!----------------------------------------
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
+      call Tree_Zprime_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
+
+      call TopDecay(ExtParticle(1),DK_1L_Q,MomDK(1:4,1:3))
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left, NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + dreal(LO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left))
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + dreal(LO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right))
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
+   RunFactor = RunAlphaS(2,MuRen)
+   ISFac = MomCrossing(MomExt)
 ENDIF
 
 
+IF( TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.3 ) THEN
+!-------------------------------------
+! one loop correction to W+ decay   |
+!-------------------------------------
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,4:6))
+      call Tree_Zprime_tbtqbq(LO_Res_Pol_Left,LO_Res_Pol_Right)
+
+      call TopDecay(ExtParticle(2),DK_1L_Q,MomDK(1:4,4:6))
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + dreal(LO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left))
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + dreal(LO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right))
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+ENDIF
+
+
+
+ELSEIF( CORRECTION.EQ.5 ) THEN
+!------------------------------------
+! real correction to Anti-top decay |
+!------------------------------------
+   call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,3),yRnd(5:11),MomDK(1:4,1:4),PSWgt2) 
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,4),yRnd(12:15),MomDK(1:4,5:7),PSWgt3) 
+!   write(6,*) dsqrt(dabs(MomExt(1,4)**2-MomExt(2,4)**2-MomExt(3,4)**2-MomExt(4,4)**2))
+!   pause
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
+   RunFactor = RunAlphaS(2,MuRen)
+   ISFac = MomCrossing(MomExt)
+
+   MomDKx(1:4,1:3) = MomDK(1:4,1:3) 
+   MomDKx(1:4,4:6) = MomDK(1:4,5:7) 
+   MomDKx(1:4,7) = MomDK(1:4,4) 
+   call Kinematics_TTBARZprime(.true.,MomExt,MomDKx,applyPSCut,NBin)
+   if( applyPSCut ) goto TheDipole_ATop
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=-1,1,2 
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_RE_T,MomDK(1:4,1:4),GluonHel=GluHel) 
+      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,5:7)) 
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop 
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) 
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+!print *, "real  ", dble(NLO_Res_Unpol)
+
+
+TheDipole_ATop continue
+
+   call WTransform(MomDK(1:4,1:4),MomDKTd(1:4,1:3),pbDpg,ptDpg,ptDpb)
+   MomDKTd(1:4,4:6) = MomDK(1:4,5:7)
+   omz=ptDpg/(ptDpb+ptDpg-pbDpg)
+   rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+   z=1d0-omz
+   y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+   Dipole = - alpha_s*4d0*Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+   Dipole = Dipole * (1d0 - StepFunc(1d0-alpha_DK-z) * StepFunc(y-alpha_DK*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+   call Kinematics_TTBARZprime(.false.,MomExt,MomDKTd,applyPSCut,NBin)
+   if( applyPSCut ) goto TheReal_Top
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) * Dipole
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol) 
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+! print *, "dipole", dble(NLO_Res_Unpol)
+! print *, "sing", (MomDK(1:4,1).dot.MomDK(1:4,4))/m_Top**2
+! pause
+
+TheReal_Top continue
+
+!------------------------------------
+! real correction to Top decay |
+!------------------------------------
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,3),yRnd(5:8),MomDK(1:4,1:3),PSWgt2)
+   call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,4),yRnd(9:15),MomDK(1:4,4:7),PSWgt3)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
+   RunFactor = RunAlphaS(2,MuRen)
+   ISFac = MomCrossing(MomExt)
+   call Kinematics_TTBARZprime(.true.,MomExt,MomDK(1:4,1:7),applyPSCut,NBin)
+   if( applyPSCut ) goto TheDipole_Top
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=-1,1,2
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_RE_T,MomDK(1:4,4:7),GluonHel=GluHel)
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+   enddo!helicity loop
+
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol) 
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+!   print *, 'real  ', dble(NLO_Res_Unpol)
+
+TheDipole_Top continue
+
+   call WTransform(MomDK(1:4,4:7),MomDKTd(1:4,4:6),pbDpg,ptDpg,ptDpb)
+   MomDKTd(1:4,1:3) = MomDK(1:4,1:3)
+   omz=ptDpg/(ptDpb+ptDpg-pbDpg)
+   rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+   z=1d0-omz
+   y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+   Dipole = - alpha_s*4d0*Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+   Dipole = Dipole * (1d0 - StepFunc(1d0-alpha_DK-z) * StepFunc(y-alpha_DK*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
+
+   call Kinematics_TTBARZprime(.false.,MomExt,MomDKTd,applyPSCut,NBin)
+   if( applyPSCut ) goto TheWm_decay
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6))
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) * Dipole
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol) 
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+! print *, "dipole", dble(NLO_Res_Unpol)
+! print *, "sing", (MomDK(1:4,4).dot.MomDK(1:4,7))/m_Top**2
+! pause
+
+TheWm_decay continue
+
+IF (TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.4) THEN
+!------------------------------
+! real correction to W- decay |
+!------------------------------
+   call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,3),yRnd(5:11),MomDK(1:4,1:4),PSWgt2) 
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,4),yRnd(12:15),MomDK(1:4,5:7),PSWgt3) 
+!   write(6,*) dsqrt(dabs(MomExt(1,4)**2-MomExt(2,4)**2-MomExt(3,4)**2-MomExt(4,4)**2))
+!   pause
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
+   RunFactor = RunAlphaS(2,MuRen)
+   ISFac = MomCrossing(MomExt)
+
+   MomDKx(1:4,1:3) = MomDK(1:4,1:3) 
+   MomDKx(1:4,4:6) = MomDK(1:4,5:7) 
+   MomDKx(1:4,7) = MomDK(1:4,4) 
+   call Kinematics_TTBARZprime(.true.,MomExt,MomDKx,applyPSCut,NBin)
+   if( applyPSCut ) goto TheDipole_ATop_Wdecay
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=-1,1,2 
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_RE_Q,MomDK(1:4,1:4),GluonHel=GluHel) 
+      call TopDecay(ExtParticle(2),DK_LO,MomDK(1:4,5:7)) 
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop 
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) 
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+
+!print *, "real              ", dble(NLO_Res_Unpol)
+
+TheDipole_ATop_Wdecay continue
+
+do ndip=1,2
+   call wdec_trans(ndip,MomDK(1:4,1:4),MomDKTd(1:4,1:3),alpha_DKWff,dip_res_w)
+   if( dip_res_w.eq.0d0 ) goto 20
+   Dipole = - alpha_s4Pi*RunFactor * CF * dip_res_w
+
+   MomDKTd(1:4,4:6) = MomDK(1:4,5:7)
+
+   call Kinematics_TTBARZprime(.false.,MomExt,MomDKTd,applyPSCut,NBin)
+   if( applyPSCut ) then
+      goto 20
+      return
+   endif
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3)) 
+      call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6)) 
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) 
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   NLO_Res_Unpol = NLO_Res_Unpol * Dipole
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+
+!   print *, "dipole", ndip, dble(NLO_Res_Unpol)
+!   print *, "sing", (MomDK(1:4,2).dot.MomDK(1:4,4))/m_Top**2
+
+20 continue
+enddo ! dipole loop
+
+ENDIF ! Wm decay real correction
+
+
+TheWp_decay continue
+
+IF (TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.3) THEN
+!------------------------------
+! real correction to W+ decay |
+!------------------------------
+   call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,3),yRnd(5:8),MomDK(1:4,1:3),PSWgt2)
+   call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,4),yRnd(9:15),MomDK(1:4,4:7),PSWgt3)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
+   RunFactor = RunAlphaS(2,MuRen)
+   ISFac = MomCrossing(MomExt)
+   call Kinematics_TTBARZprime(.true.,MomExt,MomDK(1:4,1:7),applyPSCut,NBin)
+   if( applyPSCut ) goto TheDipole_Top_Wdecay
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+   do GluHel=-1,1,2
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDK(1:4,1:3))
+      call TopDecay(ExtParticle(2),DK_RE_Q,MomDK(1:4,4:7),GluonHel=GluHel)
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+   enddo!helicity loop
+
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right)
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol) 
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+
+!print *, "real              ", dble(NLO_Res_Unpol)
+
+TheDipole_Top_Wdecay continue
+
+do ndip=1,2
+   call wdec_trans(ndip,MomDK(1:4,4:7),MomDKTd(1:4,4:6),alpha_DKWff,dip_res_w)
+   if( dip_res_w.eq.0d0 ) goto 22
+   Dipole = - alpha_s4Pi*RunFactor * CF * dip_res_w
+
+   MomDKTd(1:4,1:3) = MomDK(1:4,1:3)
+
+   call Kinematics_TTBARZprime(.false.,MomExt,MomDKTd,applyPSCut,NBin)
+   if( applyPSCut ) then
+      goto 22
+      return
+   endif
+
+   NLO_Res_UnPol_Left = (0d0,0d0)
+   NLO_Res_UnPol_Right = (0d0,0d0)
+   do iHel=1,NumHelicities
+      call HelCrossing(Helicities(iHel,1:NumExtParticles))
+      call SetPolarizations()
+      call TopDecay(ExtParticle(1),DK_LO,MomDKTd(1:4,1:3)) 
+      call TopDecay(ExtParticle(2),DK_LO,MomDKTd(1:4,4:6)) 
+      call Tree_Zprime_tbtqbq(NLO_Res_Pol_Left,NLO_Res_Pol_Right)
+
+      NLO_Res_UnPol_Left = NLO_Res_UnPol_Left + NLO_Res_Pol_Left*dconjg(NLO_Res_Pol_Left)
+      NLO_Res_UnPol_Right = NLO_Res_UnPol_Right + NLO_Res_Pol_Right*dconjg(NLO_Res_Pol_Right)
+   enddo!helicity loop
+
+   !  normalization
+   NLO_Res_Unpol = ISFac * PreFac * (PDFFac_L * NLO_Res_Unpol_Left + PDFFac_R * NLO_Res_Unpol_Right) 
+   NLO_Res_Unpol = NLO_Res_Unpol * 9d0 ! color sum
+   NLO_Res_Unpol = NLO_Res_Unpol * Dipole
+   EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb + dble(NLO_Res_Unpol)
+
+   do NHisto=1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+   enddo
+
+! print *, "dipole", ndip, dble(NLO_Res_Unpol)
+! print *, "sing", (MomDK(1:4,4).dot.MomDK(1:4,7))/m_Top**2
+
+22 continue
+enddo ! dipole loop
+
+! pause
+
+ENDIF ! Wp decay real correction
+
+TheEnd continue
+
+
+ENDIF
+
    EvalCS_NLODK_Zprime_ttb = EvalCS_NLODK_Zprime_ttb/VgsWgt
-
-return
-
+RETURN
 END FUNCTION
-
-
 
 
 END MODULE ModCrossSection_ZprimeTTB

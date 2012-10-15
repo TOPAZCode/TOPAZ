@@ -225,7 +225,7 @@ DipoleDepZprime = $(Here)/dipoles/mod_Dipoles_ZprimeTTB.f90 \
 		  $(Here)/dipoles/mod_IntDipoles_ZprimeTTB.f90
 
 DipoleObjZprime = $(ObjectDir)/mod_Dipoles_ZprimeTTB.o \
-		 $(ObjectDir)/mod_IntDipoles_ZprimeTTB.o
+		 $(ObjectDir)/mod_IntDipoles_ZprimeTTB.o 
 
 # End Zprime section
 
@@ -366,7 +366,7 @@ all: $(allObjects)
 	@echo " executable file is " $(Exec)
 	@echo " "
 # 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) 
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj)
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 

@@ -3292,7 +3292,7 @@ ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dile
 
           Histo(8)%Info   = "dPhiPlus"
           Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 0.126d0
+          Histo(8)%BinSize= 0.063d0
           Histo(8)%LowVal = 0
           Histo(8)%SetScale= 1d0
 
@@ -3627,8 +3627,8 @@ logical,save :: flip=.true.
 ! if( flip ) then!  every second call the singular event is generated
 !         Pcol1= 4 -1
 !         Pcol2= 4 -1
-!         SingDepth = 1e-10
-!         Steps = 20
+!         SingDepth = 1d-5
+!         Steps = 2
 !         call gensing(3,m_Top,(/0d0,0d0,m_W/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
 !         PSWgt2=1d0
 !         WMom(1:4) = MomDK(1:4,3)
@@ -3691,8 +3691,8 @@ logical,save :: flip=.true.
 ! if( flip ) then!  every second call the singular event is generated
 !         Pcol1= 5 -1
 !         Pcol2= 5 -1
-!         SingDepth = 1e-10
-!         Steps = 20
+!         SingDepth = 1e-5
+!         Steps = 5
 !         call gensing(3,m_W,(/0d0,0d0,0d0/),MomDK(1:4,2:4),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
 !         PSWgt3=1d0
 ! endif
@@ -4265,7 +4265,7 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 !      Pcol1= 3 -1
 !      Pcol2= 3 -1
-!      SingDepth = 1e-5
+!      SingDepth = 1e-10
 !      Steps = 10
 !      PSWgt = 1d0
 !      call gensing(3,EHat,(/0d0,m_Top,m_Top/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing activated"
@@ -7736,6 +7736,7 @@ real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star,Phi,Phibar,dPhiPlus,dPh
 real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
 real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
 integer :: i,j,n,k
+real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4)
 
 !DEC$ IF(_CheckMomenta .EQ.1)
    zeros(:) = 0d0
@@ -7969,11 +7970,9 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
     Dphi_LL = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
     if( Dphi_LL.gt.Pi ) Dphi_LL=2d0*Pi-Dphi_LL
 
+    !   construct Baumgart-Tweedie angles // for non-zero transverse momentum of TTBAR, use Collins-Soper construction
 
-
-!   construct Baumgart-Tweedie angles
-
-!   step 1: boost top momenta into a frame with pT+pTbar=0
+!   step 1: boost top momenta into a TTBAR CMS frame ( pT+pTbar=0 )
     MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
     MomAux1(2:4) =-MomAux1(2:4)
     MassAux = dsqrt( (MomAux1(1:4).dot.MomAux1(1:4)) +1d-12 )
@@ -7981,37 +7980,71 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
     call boost(MomTopsCMS(1:4,1),MomAux1(1:4),MassAux)
     call boost(MomTopsCMS(1:4,2),MomAux1(1:4),MassAux)
 
-!   step 2: construct coordinate system for the production frame
-    MomBeam(2:4) = (/0d0,0d0,1d0/)
+!   step 2: construct coordinate system in a TTBAR CMS frame
+
+    MomBeam1(1:4) = (/1d0,0d0,0d0,1d0/)
+    call boost(MomBeam1(1:4),MomAux1(1:4),MassAux)
+
+    MomBeam2(1:4) = (/1d0,0d0,0d0,-1d0/)
+    call boost(MomBeam2(1:4),MomAux1(1:4),MassAux)
+
+    MomBeam(2:4) = MomBeam1(2:4)-MomBeam2(2:4)
+    MomBeam(2:4) = MomBeam(2:4)/dsqrt(MomBeam(2)**2+MomBeam(3)**2+MomBeam(4)**2)     ! Collins-Soper direction
+
     ny(2:4) = MomTopsCMS(2:4,2).cross.MomBeam(2:4)
     ny(2:4) = ny(2:4)/dsqrt(ny(2)**2+ny(3)**2+ny(4)**2)
     nz(2:4) = MomTopsCMS(2:4,2)/dsqrt(MomTopsCMS(2,2)**2+MomTopsCMS(3,2)**2+MomTopsCMS(4,2)**2)
     nx(2:4) = ny(2:4).cross.nz(2:4)
 
-!   step 3: boost lepton momenta into frame with ptop=0 and call it MomLeptTRF
-    MomAux1(1:4) = MomTops(1:4,2)
-    MomAux1(2:4) =-MomAux1(2:4)
+!   step 3: boost lepton momenta first into CMS frame, then into frame with ptop=0 and call it MomLeptTRF
     MomLeptTRF(1:4) = MomLept(1:4,3)
-    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),MassAux)
+    MomAux2(1:4) = MomTopsCMS(1:4,2)
+    MomAux2(2:4) =-MomAux2(2:4)
+    call boost(MomLeptTRF(1:4),MomAux2(1:4),m_top)
 
 !   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
-    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
-    Phi = dacos(cosPhi)
+
+    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2  & 
+    + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+    sinPhi = VectorProd(MomLeptTRF(2:4),ny(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2  & 
+    + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+
+!    Phi = dacos(cosPhi)
 
 !------- repeat the same for the anti-top
 
 !   step 3: boost lepton momenta into frame with patop=0 and call it MomLeptTRF
-    MomAux1(1:4) = MomTops(1:4,1)
-    MomAux1(2:4) =-MomAux1(2:4)
     MomLeptTRF(1:4) = MomLept(1:4,1)
-    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),MassAux)
 
-!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
-    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
-    Phibar = dacos(cosPhibar)
+    MomAux2(1:4) = MomTopsCMS(1:4,1)
+    MomAux2(2:4) =-MomAux2(2:4)
+    call boost(MomLeptTRF(1:4),MomAux2(1:4),m_top)
 
-    dPhiMinus = Phi-Phibar          ! -pi..pi
-    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with n
+    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 & 
+      + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+    sinPhibar = VectorProd(MomLeptTRF(2:4),ny(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 & 
+      + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+!    Phibar = dacos(cosPhibar)
+
+    deltaSin = sinPhi * cosPhibar - cosPhi * sinPhibar
+
+    if (deltaSin .gt. 0d0) then
+       dPhiMinus = dacos( cosPhi*cosPhibar + sinPhi*sinPhibar)
+    else
+       dPhiMinus = -dacos( cosPhi*cosPhibar + sinPhi*sinPhibar)
+    endif
+
+    dPhiPlus = dabs(dacos(cosPhi*cosPhibar - sinPhi*sinPhibar))
+
+!    dPhiMinus = Phi-Phibar          ! -pi..pi
+!    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
 
 !    print *, phi/DblPi,phibar/DblPi
 !    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
@@ -8026,6 +8059,64 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
     NBin(6) = WhichBin(6,Dphi_LL)
     NBin(7) = WhichBin(7,dPhiMinus)
     NBin(8) = WhichBin(8,dPhiPlus)
+
+
+
+!   construct Baumgart-Tweedie angles
+
+!   step 1: boost top momenta into a frame with pT+pTbar=0
+!    MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
+!    MomAux1(2:4) =-MomAux1(2:4)
+!    MassAux = dsqrt( (MomAux1(1:4).dot.MomAux1(1:4)) +1d-12 )
+!    MomTopsCMS(1:4,1:2) = MomTops(1:4,1:2)
+!    call boost(MomTopsCMS(1:4,1),MomAux1(1:4),MassAux)
+!    call boost(MomTopsCMS(1:4,2),MomAux1(1:4),MassAux)
+
+!   step 2: construct coordinate system for the production frame
+!    MomBeam(2:4) = (/0d0,0d0,1d0/)
+!    ny(2:4) = MomTopsCMS(2:4,2).cross.MomBeam(2:4)
+!    ny(2:4) = ny(2:4)/dsqrt(ny(2)**2+ny(3)**2+ny(4)**2)
+!    nz(2:4) = MomTopsCMS(2:4,2)/dsqrt(MomTopsCMS(2,2)**2+MomTopsCMS(3,2)**2+MomTopsCMS(4,2)**2)
+!    nx(2:4) = ny(2:4).cross.nz(2:4)
+
+!   step 3: boost lepton momenta into frame with ptop=0 and call it MomLeptTRF
+!    MomAux1(1:4) = MomTops(1:4,2)
+!    MomAux1(2:4) =-MomAux1(2:4)
+!    MomLeptTRF(1:4) = MomLept(1:4,3)
+!    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
+!    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+!    Phi = dacos(cosPhi)
+
+!------- repeat the same for the anti-top
+
+!   step 3: boost lepton momenta into frame with patop=0 and call it MomLeptTRF
+!    MomAux1(1:4) = MomTops(1:4,1)
+!    MomAux1(2:4) =-MomAux1(2:4)
+!    MomLeptTRF(1:4) = MomLept(1:4,1)
+!    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
+!    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+!    Phibar = dacos(cosPhibar)
+
+!    dPhiMinus = Phi-Phibar          ! -pi..pi
+!    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
+
+!    print *, phi/DblPi,phibar/DblPi
+!    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
+!pause
+
+! binning
+!    NBin(1) = WhichBin(1,pT_Top)
+!    NBin(2) = WhichBin(2,pT_Lept)
+!    NBin(3) = WhichBin(3,y_ATop)
+!    NBin(4) = WhichBin(4,y_Lept)
+!    NBin(5) = WhichBin(5,M_LL)
+!    NBin(6) = WhichBin(6,Dphi_LL)
+!    NBin(7) = WhichBin(7,dPhiMinus)
+!    NBin(8) = WhichBin(8,dPhiPlus)
 
 
 !-------------------------------------------------------

@@ -2031,6 +2031,18 @@ ELSEIF( PROCESS.EQ.62 ) THEN !   3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top
       NDim = NDim + 2    ! shat integration
       VegasNc0_default = 50000
       VegasNc1_default = 50000
+   ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=62
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 3    ! additional gluons in the top decay
+      VegasNc0_default = 50000
+      VegasNc1_default = 50000
   ELSE
       call Error("Correction to this process is not available")
   ENDIF
@@ -2134,6 +2146,7 @@ ELSEIF( PROCESS.EQ.65 ) THEN ! Zprime-gluon interference
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1; print *, 'to have same kinematics of ID for poles cancellation'
       VegasNc0_default = 50000
       VegasNc1_default = 50000
    ENDIF
