@@ -510,6 +510,12 @@ ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
    
 ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
 
+    pT_lep_cut  = 20d0*GeV
+    eta_lep_cut = 2.5d0
+
+    pT_bjet_cut = 50d0*GeV
+    eta_bjet_cut = 2.5d0
+
 ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
 
 ENDIF
@@ -7732,6 +7738,7 @@ real(8) :: MomTops(1:4,1:2),MomBoost(1:4)
 logical :: applyPSCut,NPlus1PS
 integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet_Tree,NObsJet
 real(8) :: y_Top,y_ATop,pT_Top,pT_ATop,M_TTbar,Dphi_TTbar,pT_Lept,y_Lept,Dphi_LL,M_LL
+real(8) :: pT_LeptP, pT_LeptM, eta_LeptP, eta_LeptM, pT_b, pT_bbar, eta_b, eta_bbar
 real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star,Phi,Phibar,dPhiPlus,dPhiMinus,MassAux
 real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
 real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
@@ -7961,7 +7968,6 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
     pT_Top  = get_PT(MomTops(1:4,2))
     pT_Lept = get_PT(MomLept(1:4,3))
 
-
     y_Top  = get_ETA(MomTops(1:4,2))
     y_Lept = get_ETA(MomLept(1:4,3))
 
@@ -7969,6 +7975,41 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
 
     Dphi_LL = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
     if( Dphi_LL.gt.Pi ) Dphi_LL=2d0*Pi-Dphi_LL
+
+
+    !--F PS cuts
+
+    pT_b = get_PT(MomHadr(1:4,2))
+    pT_bbar = get_PT(MomHadr(1:4,2))
+
+    eta_b = get_eta(MomHadr(1:4,2))
+    eta_bbar = get_eta(MomHadr(1:4,1))
+
+    pT_LeptP = get_PT(MomLept(1:4,3))
+    pT_LeptM = get_PT(MomLept(1:4,1))
+
+    eta_LeptP = get_eta(MomLept(1:4,3))
+    eta_LeptM = get_eta(MomLept(1:4,1))
+
+    if (pT_LeptP.lt.pt_lep_cut .or. pT_LeptM.lt.pt_lep_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (dabs(eta_LeptP).gt.eta_lep_cut .or. dabs(eta_LeptM).gt.eta_lep_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (pT_b.lt.pt_bjet_cut .or. pT_bbar.lt.pt_bjet_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (dabs(eta_b).gt.eta_bjet_cut .or. dabs(eta_bbar).gt.eta_bjet_cut) then
+       applypscut = .true.
+       RETURN
+    endif
 
     !   construct Baumgart-Tweedie angles // for non-zero transverse momentum of TTBAR, use Collins-Soper construction
 
