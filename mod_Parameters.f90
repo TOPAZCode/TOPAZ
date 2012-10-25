@@ -73,6 +73,7 @@ real(8), public, parameter :: Vev  = 246d0*GeV
 real(8), public :: m_Zpr
 real(8), public :: Ga_Zpr
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
+real(8) :: myCos2thw, cot2thH, g_Zpr
 
 !!! End Zprime section !!!
 
@@ -573,21 +574,44 @@ ENDIF
 
 !!! Zprime section !!!
 
-gR_Zpr(top_) =  eL*(sw/cw)*2d0/3d0
-gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
+!-- Sequential couplings
+!gR_Zpr(top_) =  eL*(sw/cw)*2d0/3d0
+!gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
 
-gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
-gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
+!gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
+!gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
 
-gL_Zpr(up_) = gL_Zpr(top_)
-gR_Zpr(up_) = gR_Zpr(top_)
-gL_Zpr(chm_) = gL_Zpr(top_)
-gR_Zpr(chm_) = gR_Zpr(top_)
+!gL_Zpr(up_) = gL_Zpr(top_)
+!gR_Zpr(up_) = gR_Zpr(top_)
+!gL_Zpr(chm_) = gL_Zpr(top_)
+!gR_Zpr(chm_) = gR_Zpr(top_)
 
-gL_Zpr(str_) = gL_Zpr(dn_)
-gR_Zpr(str_) = gR_Zpr(dn_)
-gL_Zpr(bot_) = gL_Zpr(dn_)
-gR_Zpr(bot_) = gR_Zpr(dn_)
+!gL_Zpr(str_) = gL_Zpr(dn_)
+!gR_Zpr(str_) = gR_Zpr(dn_)
+!gL_Zpr(bot_) = gL_Zpr(dn_)
+!gR_Zpr(bot_) = gR_Zpr(dn_)
+
+!-- Leptophobic top-color Z', see 1112.4928
+myCos2thw = 0.768d0
+cot2thH = 8d0 * myCos2thw * Ga_Zpr/(alpha*m_Zpr) / &
+     (dsqrt(1d0-4d0*m_top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0)
+
+!print *, 'cot(th_H)**2', cot2thH
+!g_Zpr = 1d0/2d0 * dsqrt(4d0*pi*alpha/myCos2thw * cot2thH)
+
+g_Zpr = dsqrt(Ga_Zpr/M_Zpr * 8d0 * Pi / (dsqrt(1d0-4d0*m_Top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0))
+
+gL_Zpr(:) = 0d0
+gR_Zpr(:) = 0d0
+
+gL_Zpr(up_) = -g_Zpr
+gL_Zpr(dn_) = -g_Zpr
+gL_Zpr(top_) = g_Zpr
+gL_Zpr(bot_) = g_Zpr
+
+gR_Zpr(up_) = -g_Zpr
+gR_Zpr(top_) = g_Zpr
+
 
 !!! End Zprime section !!!
 

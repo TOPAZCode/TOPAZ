@@ -32,7 +32,7 @@ type(Histogram),allocatable   :: Histo(:)
 !type(Histogram2D),allocatable :: Histo2D(:)
 
 real(8) :: pT_jet_cut, pT_bjet_cut, pT_lep_cut, Rsep_jet, Rsep_LepJet, pT_miss_cut, eta_sepa_cut, MInv_jets_cut, eta_lep_cut, eta_jet_cut, eta_bjet_cut, HT_cut, pT_hardestjet_cut
-real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut
+real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut, Mttbar_cut
 
 real(8),public ::MInv_LB
 
@@ -507,17 +507,23 @@ ELSEIF( ObsSet.EQ.48 ) THEN! set of observables for STOP width
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
-   
+
+   Mttbar_cut = 500d0*GeV
+
 ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
 
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
+   Rsep_jet = 0.4d0
 
-    pT_bjet_cut = 50d0*GeV
-    eta_bjet_cut = 2.5d0
+   pT_lep_cut  = 20d0*GeV
+   eta_lep_cut = 2.5d0
+
+   pT_bjet_cut = 50d0*GeV
+   eta_bjet_cut = 2.5d0
 
 ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
 
+   
+   
 ENDIF
 
 END SUBROUTINE
@@ -6358,6 +6364,8 @@ real(8) :: second_pair, first_pair, pT_bjet_min, mtop_reconstr,ptaux,pt_cand(4),
 real(8) :: ptmax, xij, MomBBar(1:4),diff,cosLeBb,Ebjets,r_sc,mT_lp
 integer :: i1,i,j,n,k
 
+real(8) :: costheta_star, MomAux1(1:4), MomAux2(1:4), y_Top, y_Atop, m_ttbar, Mttb_cut, dphi_ttbar, costheta_scatter
+
 ! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top    ! HERE WAS A BUG: tops need to be at the end
 !                          MomDK(:,1:7) : 1=ABot, 2=lep-, 3=ANeu, 4=Bot, 5=lep+, 6=Neu, 7=(Glu)
 ! MomLept(:,1:4): 1=lep-, 2=ANeu, 3=lep+, 4=Neu
@@ -6553,6 +6561,51 @@ endif
 
 !--------------------------------------------------------------------------
 
+if( ObsSet.eq.60 ) then! set of observables for ttb production without decays -- Zprime range
+
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
+
+    y_ATop = get_ETA(MomTops(1:4,1))
+    y_Top  = get_ETA(MomTops(1:4,2))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+    if (M_TTbar.lt.Mttb_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
+    if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
+
+!   scattering angle of the top quark in lab frame
+    CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
+
+!   see chinese paper, approximates scattering angle in ttb rest frame
+    MomAux1(1:4) = MomTops(1:4,2)
+    MomAux2(1:4) = MomExt(1:4,1)
+    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)! this seems wrong!!!
+    call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
+
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,pT_Top)
+    NBin(3) = WhichBin(3,y_ATop)
+    NBin(4) = WhichBin(4,y_Top)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,Dphi_TTbar)
+    NBin(7) = WhichBin(7,CosTheta_scatter)
+    NBin(8) = WhichBin(8,CosTheta_star)
+
+    if( NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
+    if( .not. NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)))
+
+endif
 
 if( ObsSet.eq.0 .or. ObsSet.eq.1 .or. ObsSet.eq.9) then! set of observables for ttb production without decays at Tevatron & LHC
 !  eval kinematic variables
@@ -7743,7 +7796,7 @@ real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star,Phi,Phibar,dPhiPlus,dPh
 real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
 real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
 integer :: i,j,n,k
-real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4)
+real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4), Mttb_cut
 
 !DEC$ IF(_CheckMomenta .EQ.1)
    zeros(:) = 0d0
@@ -7934,6 +7987,12 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
 
     M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
 
+    if (M_TTbar.lt.Mttb_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
     Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
     if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
 
@@ -7979,17 +8038,23 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
 
     !--F PS cuts
 
-    pT_b = get_PT(MomHadr(1:4,2))
-    pT_bbar = get_PT(MomHadr(1:4,2))
+!   check that there are two b jets    
+    if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
 
-    eta_b = get_eta(MomHadr(1:4,2))
-    eta_bbar = get_eta(MomHadr(1:4,1))
+    pT_b = get_PT(MomJet(1:4,2)) !-- pt order --> 2 is the lowest pt one
+
+    eta_b = get_eta(MomJet(1:4,2))
+    eta_bbar = get_eta(MomJet(1:4,1))
 
     pT_LeptP = get_PT(MomLept(1:4,3))
     pT_LeptM = get_PT(MomLept(1:4,1))
 
     eta_LeptP = get_eta(MomLept(1:4,3))
     eta_LeptM = get_eta(MomLept(1:4,1))
+
 
     if (pT_LeptP.lt.pt_lep_cut .or. pT_LeptM.lt.pt_lep_cut) then
        applypscut = .true.
@@ -8001,7 +8066,7 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
        RETURN
     endif
 
-    if (pT_b.lt.pt_bjet_cut .or. pT_bbar.lt.pt_bjet_cut) then
+    if (pT_b.lt.pt_bjet_cut) then
        applypscut = .true.
        RETURN
     endif
