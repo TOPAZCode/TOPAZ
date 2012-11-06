@@ -73,7 +73,10 @@ real(8), public, parameter :: Vev  = 246d0*GeV
 real(8), public :: m_Zpr
 real(8), public :: Ga_Zpr
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
-real(8) :: myCos2thw, cot2thH, g_Zpr
+real(8) :: myCos2thw, cot2thH, g_Zpr, f1, f2, Ga_Zpr_pref
+real(8) :: ratio, gamma, rhoplus, rhominus, phi, chi, c0, d0, c1, d1
+real(8) :: Ga_Zpr_TOT(0:1), Ga_Zpr_top(0:1), Ga_Zpr_up(0:1), Ga_Zpr_dn(0:1)
+real(8), external :: ddilog
 
 !!! End Zprime section !!!
 
@@ -591,27 +594,104 @@ ENDIF
 !gL_Zpr(bot_) = gL_Zpr(dn_)
 !gR_Zpr(bot_) = gR_Zpr(dn_)
 
+!print *, 'gR_Zpr(top_)', gR_Zpr(top_)
+!print *, 'gL_Zpr(top_)', gL_Zpr(top_)
+!print *, 'gR_Zpr(dn_)', gR_Zpr(dn_)
+!print *, 'gL_Zpr(dn_)', gL_Zpr(dn_)
+
 !-- Leptophobic top-color Z', see 1112.4928
 myCos2thw = 0.768d0
-cot2thH = 8d0 * myCos2thw * Ga_Zpr/(alpha*m_Zpr) / &
-     (dsqrt(1d0-4d0*m_top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0)
 
+!cot2thH = 8d0 * myCos2thw * Ga_Zpr/(alpha*m_Zpr) / &
+!     (dsqrt(1d0-4d0*m_top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0)
+!
+!Ga_Zpr_pref = alpha * M_Zpr * cot2thH / myCos2thw / 4d0
 !print *, 'cot(th_H)**2', cot2thH
 !g_Zpr = 1d0/2d0 * dsqrt(4d0*pi*alpha/myCos2thw * cot2thH)
-
-g_Zpr = dsqrt(Ga_Zpr/M_Zpr * 8d0 * Pi / (dsqrt(1d0-4d0*m_Top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0))
+!g_Zpr = dsqrt(Ga_Zpr/M_Zpr * 8d0 * Pi / (dsqrt(1d0-4d0*m_Top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0))
 
 gL_Zpr(:) = 0d0
 gR_Zpr(:) = 0d0
 
-gL_Zpr(up_) = -g_Zpr
-gL_Zpr(dn_) = -g_Zpr
-gL_Zpr(top_) = g_Zpr
-gL_Zpr(bot_) = g_Zpr
+!-- original experimental setup: f1 = 1, f2 = 0
+f1 = 1d0
+f2 = 0d0
 
-gR_Zpr(up_) = -g_Zpr
-gR_Zpr(top_) = g_Zpr
+gL_Zpr(up_) = -1d0
+gR_Zpr(up_) = -f1 * 1d0
 
+gL_Zpr(dn_) = -1d0
+gR_Zpr(dn_) = -f2 * 1d0
+
+gL_Zpr(top_) = 1d0
+gR_Zpr(top_) = f1 * 1d0
+
+gL_Zpr(bot_) = 1d0
+gR_Zpr(bot_) = f2 * 1d0
+
+ratio = M_Zpr**2/(4d0*M_Top**2)
+gamma = dlog(2d0*dsqrt(ratio))
+rhoplus = dsqrt(ratio)+dsqrt(ratio-1d0)
+rhominus = dsqrt(ratio)-dsqrt(ratio-1d0)
+chi = dlog(rhoplus-rhominus)
+phi = dlog(rhoplus)
+
+!-- LO decay width, c0 is vector d0 is axial
+c0 = dsqrt(1d0-1d0/ratio) * (1d0+1d0/(2d0*ratio))
+d0 = (1d0-1d0/ratio)**(3d0/2d0)
+
+!-- NLO decay, coefficients of asonpi
+c1 = 8d0/3d0 * (1d0-1d0/(4d0*ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
+     + ddilog(rhominus**4) + 2d0 * phi * (3d0 * phi - gamma-2d0 * chi)) &
+     - 8d0/3d0 * dsqrt(1d0-1d0/ratio) * (1d0+1d0/(2d0 * ratio)) * (gamma + 2d0 * chi) &
+     + 8d0 * (1d0-1d0/(6d0*ratio) - 7d0/(48d0*ratio**2))*phi + dsqrt(1d0-1d0/ratio) * (1d0+3d0/(2d0 * ratio))
+
+d1 = 8d0/3d0 * (1d0-3d0/(2d0 * ratio) + 1d0/(2d0 * ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
+     + ddilog(rhominus**4) + 2d0 * phi * (3d0 * phi-gamma-2d0 * chi)) - 8d0/3d0 * &
+     (1d0-1d0/ratio)**(3d0/2d0) * (gamma+2d0 * chi) + 8d0 * (1d0-11d0/(12d0 * ratio) + 5d0/(48d0 * ratio**2) &
+     + 1d0/(32d0 * ratio**3)) * phi + dsqrt(1d0-1d0/ratio) * (1d0-3d0/ratio+1d0/(4d0 * ratio**2))
+
+Ga_Zpr_top(0) = ( c0 * ((1d0 + f1)/2d0)**2 + d0 * ((1d0-f1)/2d0)**2 )
+Ga_Zpr_up(0) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 )
+Ga_Zpr_dn(0) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 )
+
+Ga_Zpr_top(1) = ( c1 * ((1d0 + f1)/2d0)**2 + d1 * ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+Ga_Zpr_up(1) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+Ga_Zpr_dn(1) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+
+Ga_Zpr_TOT = Ga_Zpr_top + Ga_Zpr_up + 2d0 * Ga_Zpr_dn
+
+!-- use the Ga_Zpr(0) as input for couplings
+Ga_Zpr_pref = Ga_Zpr/Ga_Zpr_TOT(0)
+
+!if (NLOParam.le.1) then
+!   Ga_Zpr_pref = Ga_Zpr/Ga_Zpr_TOT(0)
+!else
+!   Ga_Zpr_pref = Ga_Zpr/(Ga_Zpr_TOT(0) + Ga_Zpr_TOT(1))
+!endif
+
+Ga_Zpr_TOT = Ga_Zpr_TOT * Ga_Zpr_pref
+
+if (NLOParam.le.1) then
+   Ga_Zpr = Ga_Zpr_TOT(0)
+else
+   Ga_Zpr = Ga_Zpr_TOT(0) + Ga_Zpr_TOT(1)
+endif
+
+!-- properly normalize couplings
+g_Zpr = dsqrt(4d0*pi/M_Zpr * Ga_Zpr_pref)
+
+gR_Zpr(:) = gR_Zpr(:) * g_Zpr
+gL_Zpr(:) = gL_Zpr(:) * g_Zpr
+
+!print *, 'g_Zpr', g_Zpr
+!print *, 'Ga_Zpr_TOT(0)', Ga_Zpr_TOT(0)
+!print *, 'Ga_Zpr_TOT(0)+Ga_Zpr_Tot(0)+Ga_Zpr_tot(1)', Ga_Zpr_TOT(0)+Ga_Zpr_Tot(1)
+!print *, 'alpha_s*RUNALPHAS(2,MuRen)', alpha_s*RUNALPHAS(2,MuRen)
+!print *, 'c0', c0
+!print *, 'c1', c1
+!print *, 'Ga_Zpr', Ga_Zpr
+!stop
 
 !!! End Zprime section !!!
 

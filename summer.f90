@@ -20,8 +20,10 @@ real(8):: factor =1d10
       op=4
   elseif( trim(operation).eq.'quo' ) then
       op=5
+  elseif( trim(operation).eq.'rebin' ) then
+      op=6
   else
-      print *, "operation not available (add,avg,sumbins,mul,quo)",trim(operation)
+      print *, "operation not available (add,avg,sumbins,mul,quo,rebin)",trim(operation)
       stop
   endif
 
@@ -80,6 +82,16 @@ real(8):: factor =1d10
       enddo
       call divide(NumArgs,op)
       print *, "output written to "//trim(filename_out)
+
+  elseif( op.eq.6 ) then
+      print *, "rebinning"
+      call GetArg(2,filename_in)
+      open(unit=12,file=trim(filename_in),form='formatted',access='sequential')  ! open input file
+      call GetArg(3,filename_out)
+      open(unit=13,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
+      call GetArg(4,iHisto_str)
+      read(iHisto_str,"(I2)") iHisto
+      call rebinning(iHisto)
   endif
 
 
@@ -263,6 +275,51 @@ character :: dummy*(1)
 END SUBROUTINE
 
 
+
+SUBROUTINE rebinning(iHisto)
+implicit none
+character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
+integer :: NumArgs,NArg,iHisto
+integer,parameter :: MaxFiles=50
+integer :: NHisto(1:MaxFiles)=-999999,Hits(1:MaxFiles)=-999999
+real(8) :: BinVal(1:MaxFiles)=-1d-99,Value(1:MaxFiles)=-1d-99,Error(1:MaxFiles)=-1d-99
+real(8) :: SumValue,BinSize_Tmp,BinSize
+character :: dummy*(1)
+
+
+  BinSize_Tmp = 1d-100
+  BinSize = 1d-100
+
+  SumValue = 0d0
+  do while(.not.eof(12))  ! loop over all rows
+
+
+      read(unit=12,fmt="(A)") dummy
+      if(dummy(1:1).eq."#") cycle
+      backspace(unit=12) ! go to the beginning of the line
+      read(unit=12,fmt=fmt1) NHisto(1),dummy,BinVal(1),dummy,Value(1),dummy,Error(1),dummy,Hits(1),dummy
+
+      if(NHisto(1).eq.iHisto) then
+!         write(* ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"
+
+         read(unit=12,fmt="(A)") dummy
+         if(dummy(1:1).eq."#") cycle
+         backspace(unit=12) ! go to the beginning of the line
+
+         read(unit=12,fmt=fmt1) NHisto(2),dummy,BinVal(2),dummy,Value(2),dummy,Error(2),dummy,Hits(2),dummy
+!         write(* ,fmt1) NHisto(2),"|",BinVal(2),"|",Value(2),"|",Error(2),"|",Hits(2),"|"
+    
+         write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",(Value(1)+Value(2))/2d0,"|",dsqrt(Error(1)**2+Error(2)**2)/2d0,"|",Hits(1)+Hits(2),"|"
+         write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",(Value(1)+Value(2))/2d0,"|",dsqrt(Error(1)**2+Error(2)**2)/2d0,"|",Hits(1)+Hits(2),"|"
+      else
+         write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"
+         write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"
+      endif
+
+  enddo
+
+
+END SUBROUTINE
 
 
 

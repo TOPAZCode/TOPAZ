@@ -512,14 +512,14 @@ ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
 
 ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
 
-   Rsep_jet = 0.4d0
+   Rsep_jet = 0.5d0
 
    pT_lep_cut  = 20d0*GeV
    eta_lep_cut = 2.5d0
 
-   pT_bjet_cut = 50d0*GeV
+   pT_bjet_cut = 30d0*GeV
    eta_bjet_cut = 2.5d0
-
+   
 ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
 
    
@@ -3248,65 +3248,92 @@ ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           Histo(9)%LowVal = 350d0*GeV
           Histo(9)%SetScale= 100d0
 
-
-
 ELSEIF( ObsSet.EQ.61 ) THEN! set of observables for Zprime, top decaying to dileptons
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
-          NumHistograms = 8
+          NumHistograms = 13
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
-
-          Histo(1)%Info   = "pT_Top"
+          Histo(1)%Info   = "pT_lep1"
           Histo(1)%NBins  = 50
-          Histo(1)%BinSize= 50d0*GeV
-          Histo(1)%LowVal = 0d0
+          Histo(1)%BinSize= 20d0*GeV
+          Histo(1)%LowVal = 20d0*GeV
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "pT_leptP"
+          Histo(2)%Info   = "pT_bjet1"
           Histo(2)%NBins  = 50
-          Histo(2)%BinSize= 50d0*GeV
-          Histo(2)%LowVal = 0d0
+          Histo(2)%BinSize= 20d0*GeV
+          Histo(2)%LowVal = 30d0*GeV
           Histo(2)%SetScale= 100d0
 
-          Histo(3)%Info   = "y_Top"
+          Histo(3)%Info   = "pT_lep2"
           Histo(3)%NBins  = 50
-          Histo(3)%BinSize= 0.5d0
-          Histo(3)%LowVal =-5.0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%BinSize= 20d0*GeV
+          Histo(3)%LowVal = 20d0*GeV
+          Histo(3)%SetScale= 100d0
 
-          Histo(4)%Info   = "y_leptP"
+          Histo(4)%Info   = "pT_bjet2"
           Histo(4)%NBins  = 50
-          Histo(4)%BinSize= 0.5d0
-          Histo(4)%LowVal =-5.0d0
-          Histo(4)%SetScale= 1d0
+          Histo(4)%BinSize= 20d0*GeV
+          Histo(4)%LowVal = 30d0*GeV
+          Histo(4)%SetScale= 100d0
 
-          Histo(5)%Info   = "M_LL"
-          Histo(5)%NBins  = 50
+          Histo(5)%Info   = "M_TTbar"
+          Histo(5)%NBins  = 20
           Histo(5)%BinSize= 50d0*GeV
-          Histo(5)%LowVal = 350d0*GeV
+          Histo(5)%LowVal = 1025d0*GeV
           Histo(5)%SetScale= 100d0
 
-          Histo(6)%Info   = "deltaPhi_LL"
-          Histo(6)%NBins  = 50
-          Histo(6)%BinSize= 0.08d0
-          Histo(6)%LowVal = 0d0
-          Histo(6)%SetScale= 1d0
+          Histo(6)%Info   = "M_eff"
+          Histo(6)%NBins  = 20
+          Histo(6)%BinSize= 50d0*GeV
+          Histo(6)%LowVal = 1025d0*GeV
+          Histo(6)%SetScale= 100d0
 
-          Histo(7)%Info   = "dPhiMinus"
-          Histo(7)%NBins  = 50
-          Histo(7)%BinSize= 0.126d0
-          Histo(7)%LowVal = -DblPi
+          Histo(7)%Info   = "y_lep1"
+          Histo(7)%NBins  = 30
+          Histo(7)%BinSize= 0.2d0
+          Histo(7)%LowVal =-3.0d0
           Histo(7)%SetScale= 1d0
 
-          Histo(8)%Info   = "dPhiPlus"
-          Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 0.063d0
-          Histo(8)%LowVal = 0
+          Histo(8)%Info   = "y_bjet1"
+          Histo(8)%NBins  = 30
+          Histo(8)%BinSize= 0.2d0
+          Histo(8)%LowVal =-3.0d0
           Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "y_lep2"
+          Histo(9)%NBins  = 30
+          Histo(9)%BinSize= 0.2d0
+          Histo(9)%LowVal =-3.0d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "y_bjet2"
+          Histo(10)%NBins  = 30
+          Histo(10)%BinSize= 0.2d0
+          Histo(10)%LowVal =-3.0d0
+          Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "deltaPhi_LL"
+          Histo(11)%NBins  = 50
+          Histo(11)%BinSize= 0.08d0
+          Histo(11)%LowVal = 0d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "dPhiMinus"
+          Histo(12)%NBins  = 50
+          Histo(12)%BinSize= 0.126d0
+          Histo(12)%LowVal = -DblPi
+          Histo(12)%SetScale= 1d0
+
+          Histo(13)%Info   = "dPhiPlus"
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 0.063d0
+          Histo(13)%LowVal = 0
+          Histo(13)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.62 ) THEN! set of observables for Zprime, fully hadronic top decay
@@ -6363,8 +6390,13 @@ real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),MomJet_aux(1:4,1:7)
 real(8) :: second_pair, first_pair, pT_bjet_min, mtop_reconstr,ptaux,pt_cand(4),pij(4)
 real(8) :: ptmax, xij, MomBBar(1:4),diff,cosLeBb,Ebjets,r_sc,mT_lp
 integer :: i1,i,j,n,k
+real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), M_eff, Minv_Lept
 
+!-- for Zprime background
 real(8) :: costheta_star, MomAux1(1:4), MomAux2(1:4), y_Top, y_Atop, m_ttbar, Mttb_cut, dphi_ttbar, costheta_scatter
+real(8) :: pt_lep1, pt_lep2, eta_lep1, eta_lep2, dphi_LL, MassAux, MomTopsCMS(1:4,1:2)
+real(8) :: MomBeam1(1:4), MomBeam2(1:4), MomBeam(1:4), nx(2:4), ny(2:4), nz(2:4), MomLeptTRF(1:4)
+real(8) :: cosPhi, sinPhi, cosPhiBar, sinPhiBar, deltaSin, dPhiMinus, dPhiPlus
 
 ! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top    ! HERE WAS A BUG: tops need to be at the end
 !                          MomDK(:,1:7) : 1=ABot, 2=lep-, 3=ANeu, 4=Bot, 5=lep+, 6=Neu, 7=(Glu)
@@ -6560,52 +6592,6 @@ endif
 ! pause
 
 !--------------------------------------------------------------------------
-
-if( ObsSet.eq.60 ) then! set of observables for ttb production without decays -- Zprime range
-
-    pT_ATop = get_PT(MomTops(1:4,1))
-    pT_Top  = get_PT(MomTops(1:4,2))
-
-    y_ATop = get_ETA(MomTops(1:4,1))
-    y_Top  = get_ETA(MomTops(1:4,2))
-
-    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
-
-    if (M_TTbar.lt.Mttb_cut) then
-        applyPSCut = .true.
-        RETURN
-    endif
-
-
-    Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
-    if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
-
-!   scattering angle of the top quark in lab frame
-    CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
-
-!   see chinese paper, approximates scattering angle in ttb rest frame
-    MomAux1(1:4) = MomTops(1:4,2)
-    MomAux2(1:4) = MomExt(1:4,1)
-    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)! this seems wrong!!!
-    call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
-    CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
-
-
-
-! binning
-    NBin(1) = WhichBin(1,pT_ATop)
-    NBin(2) = WhichBin(2,pT_Top)
-    NBin(3) = WhichBin(3,y_ATop)
-    NBin(4) = WhichBin(4,y_Top)
-    NBin(5) = WhichBin(5,M_TTbar)
-    NBin(6) = WhichBin(6,Dphi_TTbar)
-    NBin(7) = WhichBin(7,CosTheta_scatter)
-    NBin(8) = WhichBin(8,CosTheta_star)
-
-    if( NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
-    if( .not. NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)))
-
-endif
 
 if( ObsSet.eq.0 .or. ObsSet.eq.1 .or. ObsSet.eq.9) then! set of observables for ttb production without decays at Tevatron & LHC
 !  eval kinematic variables
@@ -7381,6 +7367,227 @@ elseif( ObsSet.eq.8 ) then! set of observables for ttb spin correlations at LHC 
     NBin(3) = WhichBin(3,pT_lepP)
     NBin(4) = WhichBin(4,DeltaPhi)
 
+elseif (ObsSet.EQ.60) then ! set of observables for ttb production without decays, for Zprime background
+
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
+
+    y_ATop = get_ETA(MomTops(1:4,1))
+    y_Top  = get_ETA(MomTops(1:4,2))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+    if (M_TTbar.lt.Mttb_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
+    if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
+
+!   scattering angle of the top quark in lab frame
+    CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
+
+!   see chinese paper, approximates scattering angle in ttb rest frame
+    MomAux1(1:4) = MomTops(1:4,2)
+    MomAux2(1:4) = MomExt(1:4,1)
+    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)! this seems wrong!!!
+    call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
+
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,pT_Top)
+    NBin(3) = WhichBin(3,y_ATop)
+    NBin(4) = WhichBin(4,y_Top)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,Dphi_TTbar)
+    NBin(7) = WhichBin(7,CosTheta_scatter)
+    NBin(8) = WhichBin(8,CosTheta_star)
+
+    if( NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
+    if( .not. NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)))
+
+!-------------------------------------------------------
+elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept. decays, for Zprime background
+
+   !-- define ordering for leptons, without modifying existing lepton array used below for angles
+   MomLeptOrd(1:4,1) = MomLept(1:4,1)
+   MomLeptOrd(1:4,2) = MomLept(1:4,3)
+
+   call pT_order(2,MomLeptOrd)! pT-order for leptons
+
+   !-- order all jets, irrespective whether they are b-jets or not
+   MomJetOrd(1:4,1:8) = MomJet(1:4,1:8)
+   call pT_order(NumHadr,MomJetOrd(1:4,1:NumHadr))
+
+
+!   M_LL = get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!--F Phase space cuts
+
+!   check that there are two b jets    
+    if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    pT_bjet2 = get_PT(MomJet(1:4,2))
+    pT_lep2  = get_PT(MomLeptOrd(1:4,2))
+
+    eta_bjet1 = get_eta(MomJet(1:4,1))
+    eta_bjet2 = get_eta(MomJet(1:4,2))
+
+    eta_lep1 = get_eta(MomLept(1:4,1))
+    eta_lep2 = get_eta(MomLeptOrd(1:4,2))
+
+    if (pT_lep2.lt.pt_lep_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (dabs(eta_lep1).gt.eta_lep_cut .or. dabs(eta_lep2).gt.eta_lep_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (pT_bjet2.lt.pt_bjet_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+    if (dabs(eta_bjet1).gt.eta_bjet_cut .or. dabs(eta_bjet2).gt.eta_bjet_cut) then
+       applypscut = .true.
+       RETURN
+    endif
+
+!-- If we pass the cuts, compute other observables
+    pT_bjet1 = get_PT(MomJet(1:4,1))
+    pT_lep1 = get_PT(MomLeptOrd(1:4,1))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+    Dphi_LL = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
+    if( Dphi_LL.gt.Pi ) Dphi_LL=2d0*Pi-Dphi_LL
+
+    pT_miss = get_pT(MomLept(1:4,2) + MomLept(1:4,4))
+    Minv_Lept = get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
+    ET_miss = dsqrt(pT_miss**2 + Minv_Lept**2)
+
+    pT_jet1 = get_PT(MomJetOrd(1:4,1))
+    pT_jet2 = get_PT(MomJetOrd(1:4,2))
+
+    HT = pT_lep1 + pT_lep2 + pT_jet1 + pT_jet2
+
+    M_eff = ET_miss + HT
+
+!   construct Baumgart-Tweedie angles // for non-zero transverse momentum of TTBAR, use Collins-Soper construction
+
+    if (dabs(M_TTbar-M_Zpr).le.(100d0*GeV)) then ! compute angles only close to the resonance
+
+!   step 1: boost top momenta into a TTBAR CMS frame ( pT+pTbar=0 )
+    MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
+    MomAux1(2:4) =-MomAux1(2:4)
+    MassAux = dsqrt( (MomAux1(1:4).dot.MomAux1(1:4)) +1d-12 )
+    MomTopsCMS(1:4,1:2) = MomTops(1:4,1:2)
+    call boost(MomTopsCMS(1:4,1),MomAux1(1:4),MassAux)
+    call boost(MomTopsCMS(1:4,2),MomAux1(1:4),MassAux)
+
+!   step 2: construct coordinate system in a TTBAR CMS frame
+
+    MomBeam1(1:4) = (/1d0,0d0,0d0,1d0/)
+    call boost(MomBeam1(1:4),MomAux1(1:4),MassAux)
+
+    MomBeam2(1:4) = (/1d0,0d0,0d0,-1d0/)
+    call boost(MomBeam2(1:4),MomAux1(1:4),MassAux)
+
+    MomBeam(2:4) = MomBeam1(2:4)-MomBeam2(2:4)
+    MomBeam(2:4) = MomBeam(2:4)/dsqrt(MomBeam(2)**2+MomBeam(3)**2+MomBeam(4)**2)     ! Collins-Soper direction
+
+    ny(2:4) = MomTopsCMS(2:4,2).cross.MomBeam(2:4)
+    ny(2:4) = ny(2:4)/dsqrt(ny(2)**2+ny(3)**2+ny(4)**2)
+    nz(2:4) = MomTopsCMS(2:4,2)/dsqrt(MomTopsCMS(2,2)**2+MomTopsCMS(3,2)**2+MomTopsCMS(4,2)**2)
+    nx(2:4) = ny(2:4).cross.nz(2:4)
+
+!   step 3: boost lepton momenta first into CMS frame, then into frame with ptop=0 and call it MomLeptTRF
+    MomLeptTRF(1:4) = MomLept(1:4,3)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),MassAux)
+    MomAux2(1:4) = MomTopsCMS(1:4,2)
+    MomAux2(2:4) =-MomAux2(2:4)
+    call boost(MomLeptTRF(1:4),MomAux2(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
+
+    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2  & 
+    + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+    sinPhi = VectorProd(MomLeptTRF(2:4),ny(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2  & 
+    + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+
+!    Phi = dacos(cosPhi)
+
+!------- repeat the same for the anti-top
+
+!   step 3: boost lepton momenta into frame with patop=0 and call it MomLeptTRF
+    MomLeptTRF(1:4) = MomLept(1:4,1)
+    call boost(MomLeptTRF(1:4),MomAux1(1:4),MassAux)
+
+    MomAux2(1:4) = MomTopsCMS(1:4,1)
+    MomAux2(2:4) =-MomAux2(2:4)
+    call boost(MomLeptTRF(1:4),MomAux2(1:4),m_top)
+
+!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with n
+    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 & 
+      + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+    sinPhibar = VectorProd(MomLeptTRF(2:4),ny(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 & 
+      + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
+
+!    Phibar = dacos(cosPhibar)
+
+    deltaSin = sinPhi * cosPhibar - cosPhi * sinPhibar
+
+    if (deltaSin .gt. 0d0) then
+       dPhiMinus = dacos( cosPhi*cosPhibar + sinPhi*sinPhibar)
+    else
+       dPhiMinus = -dacos( cosPhi*cosPhibar + sinPhi*sinPhibar)
+    endif
+
+    dPhiPlus = dabs(dacos(cosPhi*cosPhibar - sinPhi*sinPhibar))
+
+!    dPhiMinus = Phi-Phibar          ! -pi..pi
+!    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
+
+!    print *, phi/DblPi,phibar/DblPi
+!    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
+!pause
+
+    else
+       dPhiPlus=20d0
+       dPhiMinus=20d0
+
+    endif
+
+! binning
+    NBin(1) = WhichBin(1,pT_lep1)
+    NBin(2) = WhichBin(2,pT_bjet1)
+    NBin(3) = WhichBin(3,pT_lep2)
+    NBin(4) = WhichBin(4,pT_bjet2)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,M_eff)
+    NBin(7) = WhichBin(7,eta_lep1)
+    NBin(8) = WhichBin(8,eta_bjet1)
+    NBin(9) = WhichBin(9,eta_lep2)
+    NBin(10) = WhichBin(10,eta_bjet2)
+    NBin(11) = WhichBin(11,dPhi_LL)
+    NBin(12) = WhichBin(12,dPhiMinus)
+    NBin(13) = WhichBin(13,dPhiPlus)
+
 endif
 
 return
@@ -7797,6 +8004,8 @@ real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
 real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
 integer :: i,j,n,k
 real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4), Mttb_cut
+real(8) :: pT_bjet1, pT_bjet2, pT_lep1, pT_lep2, eta_bjet1, eta_bjet2, eta_lep1, eta_lep2
+real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), pT_miss, ET_miss, pT_jet1, pT_jet2, M_eff, HT, Minv_Lept
 
 !DEC$ IF(_CheckMomenta .EQ.1)
    zeros(:) = 0d0
@@ -8024,19 +8233,21 @@ if( ObsSet.eq.60 ) then! set of observables for ttb production without decays
 !-------------------------------------------------------
 elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept. decays
 
-    pT_Top  = get_PT(MomTops(1:4,2))
-    pT_Lept = get_PT(MomLept(1:4,3))
+   !-- define ordering for leptons, without modifying existing lepton array used below for angles
+   MomLeptOrd(1:4,1) = MomLept(1:4,1)
+   MomLeptOrd(1:4,2) = MomLept(1:4,3)
 
-    y_Top  = get_ETA(MomTops(1:4,2))
-    y_Lept = get_ETA(MomLept(1:4,3))
+   call pT_order(2,MomLeptOrd)! pT-order for leptons
 
-    M_LL = get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
-
-    Dphi_LL = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
-    if( Dphi_LL.gt.Pi ) Dphi_LL=2d0*Pi-Dphi_LL
+   !-- order all jets, irrespective whether they are b-jets or not
+   MomJetOrd(1:4,1:8) = MomJet(1:4,1:8)
+   call pT_order(NumHadr,MomJetOrd(1:4,1:NumHadr))
 
 
-    !--F PS cuts
+!   M_LL = get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!--F Phase space cuts
 
 !   check that there are two b jets    
     if( .not.(any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
@@ -8044,39 +8255,58 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
         RETURN
     endif
 
-    pT_b = get_PT(MomJet(1:4,2)) !-- pt order --> 2 is the lowest pt one
+    pT_bjet2 = get_PT(MomJet(1:4,2))
+    pT_lep2  = get_PT(MomLeptOrd(1:4,2))
 
-    eta_b = get_eta(MomJet(1:4,2))
-    eta_bbar = get_eta(MomJet(1:4,1))
+    eta_bjet1 = get_eta(MomJet(1:4,1))
+    eta_bjet2 = get_eta(MomJet(1:4,2))
 
-    pT_LeptP = get_PT(MomLept(1:4,3))
-    pT_LeptM = get_PT(MomLept(1:4,1))
+    eta_lep1 = get_eta(MomLept(1:4,1))
+    eta_lep2 = get_eta(MomLeptOrd(1:4,2))
 
-    eta_LeptP = get_eta(MomLept(1:4,3))
-    eta_LeptM = get_eta(MomLept(1:4,1))
-
-
-    if (pT_LeptP.lt.pt_lep_cut .or. pT_LeptM.lt.pt_lep_cut) then
+    if (pT_lep2.lt.pt_lep_cut) then
        applypscut = .true.
        RETURN
     endif
 
-    if (dabs(eta_LeptP).gt.eta_lep_cut .or. dabs(eta_LeptM).gt.eta_lep_cut) then
+    if (dabs(eta_lep1).gt.eta_lep_cut .or. dabs(eta_lep2).gt.eta_lep_cut) then
        applypscut = .true.
        RETURN
     endif
 
-    if (pT_b.lt.pt_bjet_cut) then
+    if (pT_bjet2.lt.pt_bjet_cut) then
        applypscut = .true.
        RETURN
     endif
 
-    if (dabs(eta_b).gt.eta_bjet_cut .or. dabs(eta_bbar).gt.eta_bjet_cut) then
+    if (dabs(eta_bjet1).gt.eta_bjet_cut .or. dabs(eta_bjet2).gt.eta_bjet_cut) then
        applypscut = .true.
        RETURN
     endif
 
-    !   construct Baumgart-Tweedie angles // for non-zero transverse momentum of TTBAR, use Collins-Soper construction
+!-- If we pass the cuts, compute other observables
+    pT_bjet1 = get_PT(MomJet(1:4,1))
+    pT_lep1 = get_PT(MomLeptOrd(1:4,1))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+    Dphi_LL = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
+    if( Dphi_LL.gt.Pi ) Dphi_LL=2d0*Pi-Dphi_LL
+
+    pT_miss = get_pT(MomLept(1:4,2) + MomLept(1:4,4))
+    Minv_Lept = get_MInv(MomLept(1:4,1)+MomLept(1:4,3))
+    ET_miss = dsqrt(pT_miss**2 + Minv_Lept**2)
+
+    pT_jet1 = get_PT(MomJetOrd(1:4,1))
+    pT_jet2 = get_PT(MomJetOrd(1:4,2))
+
+    HT = pT_lep1 + pT_lep2 + pT_jet1 + pT_jet2
+
+    M_eff = ET_miss + HT
+
+!   construct Baumgart-Tweedie angles // for non-zero transverse momentum of TTBAR, use Collins-Soper construction
+
+    if (dabs(M_TTbar-M_Zpr).le.(100d0*GeV)) then ! compute angles only close to the resonance
 
 !   step 1: boost top momenta into a TTBAR CMS frame ( pT+pTbar=0 )
     MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
@@ -8156,74 +8386,25 @@ elseif( ObsSet.eq.61 ) then! set of observables for ttb production with di-lept.
 !    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
 !pause
 
-! binning
-    NBin(1) = WhichBin(1,pT_Top)
-    NBin(2) = WhichBin(2,pT_Lept)
-    NBin(3) = WhichBin(3,y_ATop)
-    NBin(4) = WhichBin(4,y_Lept)
-    NBin(5) = WhichBin(5,M_LL)
-    NBin(6) = WhichBin(6,Dphi_LL)
-    NBin(7) = WhichBin(7,dPhiMinus)
-    NBin(8) = WhichBin(8,dPhiPlus)
-
-
-
-!   construct Baumgart-Tweedie angles
-
-!   step 1: boost top momenta into a frame with pT+pTbar=0
-!    MomAux1(1:4) = MomTops(1:4,1)+MomTops(1:4,2)
-!    MomAux1(2:4) =-MomAux1(2:4)
-!    MassAux = dsqrt( (MomAux1(1:4).dot.MomAux1(1:4)) +1d-12 )
-!    MomTopsCMS(1:4,1:2) = MomTops(1:4,1:2)
-!    call boost(MomTopsCMS(1:4,1),MomAux1(1:4),MassAux)
-!    call boost(MomTopsCMS(1:4,2),MomAux1(1:4),MassAux)
-
-!   step 2: construct coordinate system for the production frame
-!    MomBeam(2:4) = (/0d0,0d0,1d0/)
-!    ny(2:4) = MomTopsCMS(2:4,2).cross.MomBeam(2:4)
-!    ny(2:4) = ny(2:4)/dsqrt(ny(2)**2+ny(3)**2+ny(4)**2)
-!    nz(2:4) = MomTopsCMS(2:4,2)/dsqrt(MomTopsCMS(2,2)**2+MomTopsCMS(3,2)**2+MomTopsCMS(4,2)**2)
-!    nx(2:4) = ny(2:4).cross.nz(2:4)
-
-!   step 3: boost lepton momenta into frame with ptop=0 and call it MomLeptTRF
-!    MomAux1(1:4) = MomTops(1:4,2)
-!    MomAux1(2:4) =-MomAux1(2:4)
-!    MomLeptTRF(1:4) = MomLept(1:4,3)
-!    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
-
-!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
-!    cosPhi = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
-!    Phi = dacos(cosPhi)
-
-!------- repeat the same for the anti-top
-
-!   step 3: boost lepton momenta into frame with patop=0 and call it MomLeptTRF
-!    MomAux1(1:4) = MomTops(1:4,1)
-!    MomAux1(2:4) =-MomAux1(2:4)
-!    MomLeptTRF(1:4) = MomLept(1:4,1)
-!    call boost(MomLeptTRF(1:4),MomAux1(1:4),m_top)
-
-!   step 4: project MomLeptTRF onto the nx-ny plane and calculate its angle with nx
-!    cosPhibar = VectorProd(MomLeptTRF(2:4),nx(2:4))/dsqrt( VectorProd(MomLeptTRF(2:4),nx(2:4))**2 + VectorProd(MomLeptTRF(2:4),ny(2:4))**2 )
-!    Phibar = dacos(cosPhibar)
-
-!    dPhiMinus = Phi-Phibar          ! -pi..pi
-!    dPhiPlus  = dabs(Phi+Phibar)    ! 0...2pi
-
-!    print *, phi/DblPi,phibar/DblPi
-!    print *, dPhiMinus/DblPi,dPhiPlus/DblPi
-!pause
+ else
+    dPhiPlus = 20d0
+    dPhiMinus = 20d0
+ endif
 
 ! binning
-!    NBin(1) = WhichBin(1,pT_Top)
-!    NBin(2) = WhichBin(2,pT_Lept)
-!    NBin(3) = WhichBin(3,y_ATop)
-!    NBin(4) = WhichBin(4,y_Lept)
-!    NBin(5) = WhichBin(5,M_LL)
-!    NBin(6) = WhichBin(6,Dphi_LL)
-!    NBin(7) = WhichBin(7,dPhiMinus)
-!    NBin(8) = WhichBin(8,dPhiPlus)
-
+    NBin(1) = WhichBin(1,pT_lep1)
+    NBin(2) = WhichBin(2,pT_bjet1)
+    NBin(3) = WhichBin(3,pT_lep2)
+    NBin(4) = WhichBin(4,pT_bjet2)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,M_eff)
+    NBin(7) = WhichBin(7,eta_lep1)
+    NBin(8) = WhichBin(8,eta_bjet1)
+    NBin(9) = WhichBin(9,eta_lep2)
+    NBin(10) = WhichBin(10,eta_bjet2)
+    NBin(11) = WhichBin(11,dPhi_LL)
+    NBin(12) = WhichBin(12,dPhiMinus)
+    NBin(13) = WhichBin(13,dPhiPlus)
 
 !-------------------------------------------------------
 elseif( ObsSet.eq.62 ) then! set of observables for ttb production with hadr. Atop, hadr. top decay

@@ -58,6 +58,7 @@ include "vegas_common.f"
 
 
   call Kinematics_TTBARZprime(.false.,MomExt,MomDK,applyPSCut,NBin)
+
   if( applyPSCut ) then
      EvalCS_1L_Zprime_ttbqqb = 0d0
      return

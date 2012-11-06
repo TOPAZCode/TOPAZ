@@ -398,6 +398,10 @@ integer TheUnit
     if( ObsSet.ge.60 .and. ObsSet.le.69 ) then
         write(TheUnit,'(A,F10.5,A)') "# m(Zpr)=",m_Zpr*100d0, " GeV"
         write(TheUnit,'(A,F10.5,A)') "# Gamma(Zpr)=",Ga_Zpr*100d0, " GeV"
+        write(TheUnit,'(A,F10.5)') "# gL_Zpr(top_)=",gL_Zpr(top_)
+        write(TheUnit,'(A,F10.5)') "# gR_Zpr(top_)=",gR_Zpr(top_)
+        write(TheUnit,'(A,F10.5)') "# gL_Zpr(dn_)=",gL_Zpr(dn_)
+        write(TheUnit,'(A,F10.5)') "# gR_Zpr(dn_)=",gR_Zpr(dn_)
     endif
     if( m_Top.eq.m_SMTop ) then 
         write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_Top *100d0, " GeV"
@@ -1491,8 +1495,7 @@ ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
 !      print *, "check that in cteq2mrst.f ct10 is really called!"; stop
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
      call SetCtq6(4)  ! CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
-  !     call SetCtq6(3)  ! CTEQ6L  Leading Order            0.118**   326   226    cteq6l.tbl
-     PDFSetString = " CTEQ6L1 LO (cteq6l.tbl)"
+!       call SetCtq6(3)  ! CTEQ6L  Leading Order            0.118**   326   226    cteq6l.tbl
   ENDIF
 ENDIF
 
