@@ -256,6 +256,7 @@ C                             ********************
       Parameter (Isetmax0=8)
       Character Flnm(Isetmax0)*6, nn*3, Tablefile*40
       Logical fmtpds
+      integer iiostat!MARKUS
       Data (Flnm(I), I=1,Isetmax0)
      > / 'cteq6m', 'cteq6d', 'cteq6l', 'cteq6l','ctq61.','cteq6s'
      >  ,'ctq65.', 'ctq66.' /
@@ -348,8 +349,11 @@ C                                                   (Cteq6.6AS)  470 - 473
           Stop
         Endif
         IU= NextUn()
-        Open(IU, File='./PDFS/'//Tablefile,
-     .           Status='OLD', Err=100)
+        Open(IU, File='./PDFS/'//Tablefile,Status='OLD',iostat=iiostat)
+        if( iiostat.ne.0 ) then
+            Open(IU, File='./'//Tablefile,Status='OLD',iostat=iiostat)
+            if( iiostat.ne.0 ) goto 100
+        endif
  21     Call Readpds (IU,fmtpds)
         Close (IU)
         Isetold=Iset

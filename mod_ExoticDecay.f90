@@ -625,13 +625,13 @@ ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN! gluon emission off (anti)stop
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
       Diagram1 = psp1_(BarSpi(1:4),Spi(1:4)) * cgbs(PolGlu(1:4),dcmplx(MomGlu(1:4)),StopQuark%Mom(1:4)-MomGlu(1:4)) * sqrt2! sqrt2 removes 1/sqrt2 from cgbs
       Diagram1 = Diagram1 * (0d0,1d0)/( ((StopQuark%Mom(1:4)-MomGlu(1:4)).dot.(StopQuark%Mom(1:4)-MomGlu(1:4))) -m_stop**2 )
 
       Spi(1:4) = vgbq(PolGlu(1:4),TopQuark%Pol(1:4)) * sqrt2! sqrt2 removes 1/sqrt2 from vgbq
       Spi(1:4) = ( -spi2_(TopQuark%Mom(1:4)+MomGlu(1:4),Spi(1:4)) + m_top*Spi(1:4) ) * (0d0,1d0)/( ((TopQuark%Mom(1:4)+MomGlu(1:4)).dot.(TopQuark%Mom(1:4)+MomGlu(1:4))) -m_top**2 )
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.false.,Spi(1:4)) + IChiStt(-1)*Chir(.true.,Spi(1:4)) )
       Diagram2 = psp1_(BarSpi(1:4),Spi(1:4))
 
    endif
@@ -655,8 +655,8 @@ ELSEIF( Topol.eq.DKX_STChi0_RE2 ) THEN! gluon emission off (anti)top
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
-      Spi(1:4) = TopQuark%Pol(1:4)      
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
@@ -672,15 +672,14 @@ ELSEIF( Topol.eq.DKX_STChi0_RE3 ) THEN! gluon emission off W+/-
    MomIn(1:4,1:3) = Mom(1:4,3:5)
    MomIn(1:4,4)   = MomGlu(1:4)
    call TopDecay(TopQuark,DK_RE_Q,MomIn(1:4,1:4),GluonHel=HelGlu)
-
    if( StopQuark%PartType.eq.Stop_ ) then
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
-      Spi(1:4) = TopQuark%Pol(1:4)      
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = TopQuark%Pol(1:4)
+      Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 
@@ -887,6 +886,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L2 ) THEN! virtual correction and integr.dipole on 
    TopQuark%Mass2= m_Top**2
    TopQuark%Mom(1:4)=dcmplx(Mom(1:4,2))
    call TopDecay(TopQuark,DK_1L_T,Mom(1:4,3:5))
+
    if( present(HelTop) ) then! stable top
       TopQuark%Helicity = HelTop
       if( TopQuark%PartType.gt.0 ) then 
@@ -895,7 +895,6 @@ ELSEIF( Topol.eq.DKX_STChi0_1L2 ) THEN! virtual correction and integr.dipole on 
           call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
       endif
    endif
-
    if( StopQuark%PartType.eq.Stop_ ) then
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
@@ -903,9 +902,10 @@ ELSEIF( Topol.eq.DKX_STChi0_1L2 ) THEN! virtual correction and integr.dipole on 
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
+
 
 
 
@@ -925,7 +925,6 @@ ELSEIF( Topol.eq.DKX_STChi0_1L3 ) THEN! virtual correction and integr.dipole on 
           call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
       endif
    endif
-
    if( StopQuark%PartType.eq.Stop_ ) then
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
@@ -933,7 +932,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L3 ) THEN! virtual correction and integr.dipole on 
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
-      Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+      Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 

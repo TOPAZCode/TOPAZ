@@ -158,15 +158,20 @@ C--   are large enough.
 
          write(set,'(I2.2)') ih  ! convert integer to string
 C--   Remove trailing blanks from prefix before assigning filename.
-         filename = '/home/schulze/lib/PDFS/'
+         filename = './PDFS/'
      &              //prefix(1:lentrim(prefix))//'.'//set//'.dat'
 C--   Line below can be commented out if you don't want this message.
 !          print *,"Reading PDF grid from ",filename(1:lentrim(filename))
          open(unit=33,file=filename,iostat=io,status='old')
          if (io.ne.0) then
-            print *,"Error in GetOnePDF: can't open ",
-     &           filename(1:lentrim(filename))
-            stop
+            filename = './'
+     &              //prefix(1:lentrim(prefix))//'.'//set//'.dat'
+            open(unit=33,file=filename,iostat=io,status='old')! try again in main dir
+            if (io.ne.0) then
+               print *,"Error in GetOnePDF: can't open ",
+     &            filename(1:lentrim(filename))
+              stop
+            end if
          end if
 
 C--   Read header containing heavy quark masses and alphaS values.

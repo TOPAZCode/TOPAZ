@@ -64,6 +64,7 @@ ENDIF
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1     
+      nHel(1:2) = getHelicity(yrnd(17))
 
    ELSEIF(XTOPDECAYS.EQ.2) THEN
       call EvalPhasespace_HTopDK(HT_A0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  A0 top
@@ -75,6 +76,10 @@ ENDIF
      
       call HTopA0Decay(ExtParticle(1),DKX_HTA0_LO,MomExt(1:4,5:9))
       call HTopA0Decay(ExtParticle(2),DKX_HTA0_LO,MomExt(1:4,10:14))
+      nHel(1:2) = getHelicity(yrnd(17))
+  
+   ELSEIF(XTOPDECAYS.EQ.0) THEN
+      nHel(1:2) = getHelicity(yrnd(5))
    ENDIF
 
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
@@ -90,7 +95,6 @@ ENDIF
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
    LO_Res_Unpol             = (0d0,0d0)
@@ -353,6 +357,7 @@ ENDIF
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1
+      nHel(1:2) = getHelicity(yrnd(17))
    ELSEIF(XTOPDECAYS.EQ.2) THEN
       call EvalPhasespace_HTopDK(HT_A0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  A0 top
       call EvalPhasespace_HTopDK(HT_A0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
@@ -360,6 +365,9 @@ ENDIF
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+      nHel(1:2) = getHelicity(yrnd(17))
+   ELSEIF(XTOPDECAYS.EQ.0) THEN
+      nHel(1:2) = getHelicity(yrnd(5))
    ENDIF
 
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
@@ -378,7 +386,6 @@ ENDIF
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
    LO_Res_Unpol             = (0d0,0d0)
@@ -1039,7 +1046,9 @@ include 'vegas_common.f'
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
-! PSWgt = PSWgt * PSWgt2* PSWgt4
+      nHel(1:2) = getHelicity(yrnd(17))
+   ELSE
+      nHel(1:2) = getHelicity(yrnd(5))
    ENDIF
  
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
@@ -1054,7 +1063,6 @@ include 'vegas_common.f'
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
 
@@ -1110,6 +1118,8 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
+
+
 !------------ bosonic loops --------------
        do iPrimAmp=1,6
 ! print *, "hel",ihel,"primamp no",iPrimAmp
@@ -1125,7 +1135,6 @@ ELSEIF( Correction.EQ.1 ) THEN
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
 ! print *, "gauge inv. fails for XTopDK=3", PrimAmps(iPrimAmp)%Result(-2:-1)
-! pause
 ! print *, "------"
 ! print *, "LO", BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2)
@@ -1136,26 +1145,29 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! pause
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+! print *, "DP AccPoles",AccPoles
           if( AccPoles.gt.1d-4 ) then
 !               call PentCut_128(PrimAmps(iPrimAmp))
-!               call QuadCut_128(PrimAmps(iPrimAmp))
-!               call TripCut_128(PrimAmps(iPrimAmp))
-!               call DoubCut_128(PrimAmps(iPrimAmp))
-!               call SingCut_128(PrimAmps(iPrimAmp))
-!               call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-!               call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
-!               PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!               AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-!               if( AccPoles.gt.5d-2 ) then
-!                   print *, "SKIP",AccPoles
-!                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+              call QuadCut_128(PrimAmps(iPrimAmp))
+              call TripCut_128(PrimAmps(iPrimAmp))
+              call DoubCut_128(PrimAmps(iPrimAmp))
+              call SingCut_128(PrimAmps(iPrimAmp))
+              call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+              call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
+              PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+              AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+! print *, "QP AccPoles",AccPoles;pause
+              if( AccPoles.gt.5d-2 ) then
+                  print *, "SKIP",AccPoles
+                  call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
                   EvalCS_1L_ststbgg = 0d0
                   SkipCounter = SkipCounter + 1
                   return
-!               endif
+              endif
           endif
 !DEC$ ENDIF
       enddo
+
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,6
@@ -1213,7 +1225,6 @@ IF( Correction.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * WidthExpansion
    EvalCS_1L_ststbgg = LO_Res_Unpol * PreFac
-
 
 ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
@@ -1436,6 +1447,9 @@ include 'vegas_common.f'
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+      nHel(1:2) = getHelicity(yrnd(17))
+   ELSE
+      nHel(1:2) = getHelicity(yrnd(5))
    ENDIF
  
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
@@ -1453,7 +1467,6 @@ include 'vegas_common.f'
             + pdf(Bot_,2)*pdf(ABot_,1)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
    PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
 !!!!! for of total cross section (fix y1,y2!)
@@ -1536,7 +1549,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !         call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))!    this fails for iPrimAmp=3 because ssss vertex is not accounted for in OneLoopDiv
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
 ! print *, "LO",BornAmps(iPrimAmp)%Result
 ! print *, "NLO",PrimAmps(iPrimAmp)%Result(-2:1)
@@ -1548,26 +1561,28 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+
+ if( iPrimAmp.eq.3 ) AccPoles = 0d0!   remove checking PrimAmp no.3 because ssss vertex is not accounted for in OneLoopDiv
+
           if( AccPoles.gt.1d-4 ) then
-!               call PentCut_128(PrimAmps(iPrimAmp))
-!               call QuadCut_128(PrimAmps(iPrimAmp))
-!               call TripCut_128(PrimAmps(iPrimAmp))
-!               call DoubCut_128(PrimAmps(iPrimAmp))
-!               call SingCut_128(PrimAmps(iPrimAmp))
-!               call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+              call PentCut_128(PrimAmps(iPrimAmp))
+              call QuadCut_128(PrimAmps(iPrimAmp))
+              call TripCut_128(PrimAmps(iPrimAmp))
+              call DoubCut_128(PrimAmps(iPrimAmp))
+              call SingCut_128(PrimAmps(iPrimAmp))
+              call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 !               call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
-!               PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!               AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-!               if( AccPoles.gt.5d-2 ) then
-!                   print *, "SKIP",AccPoles
-!                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+              PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+              AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+              if( AccPoles.gt.5d-2 ) then
+                  print *, "SKIP",AccPoles
+                  call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
                   EvalCS_1L_ststbqqb = 0d0
                   SkipCounter = SkipCounter + 1
                   return
-!               endif
+              endif
           endif
 !DEC$ ENDIF
-
       enddo
 
 
@@ -1607,8 +1622,8 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(-1),BornAmps(1)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(0),BornAmps(1)%Result
 ! print *, "ratio",PrimAmps(iPrimAmp)%Result(1),BornAmps(1)%Result
-      enddo
 ! pause
+      enddo
                          ! minus to remove minus from closed fermion loop
       FermionLoopPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
       FermionLoopPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) - PrimAmps(7)%Result(-2:1) )
@@ -1686,7 +1701,6 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +            (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
 !    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + dZStop(0)*LO_Res_Unpol ! finite contribution from dZStop !  set to zero in MSBAR
 
-! print *, "xx", dZStop(0)*alpha_sOver2Pi*RunFactor;pause
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
 
@@ -2552,7 +2566,7 @@ real(8) ::  EvalCS_DKJ_Real_ststbgg,EvalCS_DKJ_Real_ststbgg_1,EvalCS_DKJ_Real_st
 real(8) :: yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt0,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult
@@ -2598,7 +2612,7 @@ include 'vegas_common.f'
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt0)! AStop, Stop
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 
    ISFac = MomCrossing(MomExt)
@@ -2619,15 +2633,11 @@ include 'vegas_common.f'
       nJetRad2=3;  nJetRad4=2
    endif
 
-! print *, "fixing nJetRads"; nJetRad1=1; nJetRad2=1
-! print *, "fixing nJetRads"; nJetRad3=2; nJetRad4=-2
-
-
 ! ------------------- for checks --------------------------
-!    nJetRad1=1
-!    nJetRad2=-1
-!    nJetRad3=2
-!    nJetRad4=2
+!      nJetRad1=3
+!      nJetRad2=3
+!      nJetRad3=99
+!      nJetRad4=2
 ! ---------------------------------------------
 
 
@@ -2657,9 +2667,12 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
 
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ststbgg = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -2809,7 +2822,7 @@ mydummy(1) = EvalCS_DKJ_Real_ststbgg
 
 
 ! mydummy(2) = DipoleResult
-! print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,7))/EHat**2
+! print *, "sij/mtop",(MomExt(1:4,15).dot.MomExt(1:4,7))/m_top
 ! print *, "E(glu)/E(stop)",MomExt(1,15)/MomExt(1,7)
 ! print *, "real    result",mydummy(1)
 ! print *, "dipole  result",mydummy(2)
@@ -2898,9 +2911,12 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+      SkipCounter = SkipCounter + 1
+      cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ststbgg = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -3106,8 +3122,6 @@ enddo! nJetRad loop
 
    EvalCS_DKJ_Real_ststbgg = (EvalCS_DKJ_Real_ststbgg_1+EvalCS_DKJ_Real_ststbgg_2)/VgsWgt
 
-
-
    if( IsNan(EvalCS_DKJ_Real_ststbgg) ) then
         print *, "NAN:",EvalCS_DKJ_Real_ststbgg
         print *, yRnd(:)
@@ -3145,7 +3159,7 @@ real(8) ::  EvalCS_DKJ_Real_ststbqqb,EvalCS_DKJ_Real_ststbqqb_1,EvalCS_DKJ_Real_
 real(8) :: yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt0,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult,PDFFac_a,PDFFac_b
@@ -3155,7 +3169,6 @@ integer :: nJetRad,nJetRad1,nJetRad2,nJetRad3,nJetRad4,GluHel,ndip
 real(8) :: pbDpg,ptDpg,ptDpb,omz,rsq,z,y
 real(8),parameter :: CF=4d0/3d0
 include 'vegas_common.f'
-
 
 
 
@@ -3171,7 +3184,7 @@ include 'vegas_common.f'
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! AStop, Stop
+   call EvalPhaseSpace_2to2Stops(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt0)! AStop, Stop
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
 
    ISFac = MomCrossing(MomExt)
@@ -3235,9 +3248,12 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ststbqqb = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -3455,9 +3471,12 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_ststbqqb = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -3796,7 +3815,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction to W- decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.4 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
@@ -3951,7 +3970,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction on W+ decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.3 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
@@ -4150,7 +4169,7 @@ EvalCS_DKJ_1L_ststbqqb= 0d0
 !----------------------------------------
 ! one loop correction to W- decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.4 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
@@ -4263,7 +4282,7 @@ EvalCS_DKJ_1L_ststbqqb= 0d0
 !----------------------------------------
 ! one loop correction on W+ decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.2 .OR. TOPDECAYS.EQ.3 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
         call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
@@ -4339,7 +4358,7 @@ real(8) ::  EvalCS_DKJ_Real_HtHtbgg,EvalCS_DKJ_Real_HtHtbgg_1,EvalCS_DKJ_Real_Ht
 real(8) :: yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp,BH1Hel,BH2Hel
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt0,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult
@@ -4383,7 +4402,7 @@ include 'vegas_common.f'
       return
    endif
    FluxFac = 1d0/(2d0*EHat**2)
-   call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! HTbar, HT
+   call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt0)! HTbar, HT
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    ISFac = MomCrossing(MomExt)
 
@@ -4439,9 +4458,12 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
 
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_HtHtbgg = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -4696,9 +4718,12 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_HtHtbgg = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -4956,7 +4981,7 @@ real(8) ::  EvalCS_DKJ_Real_HtHtbqqb,EvalCS_DKJ_Real_HtHtbqqb_1,EvalCS_DKJ_Real_
 real(8) :: yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp,BH1Hel,BH2Hel
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt0,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomExtTd(1:4,1:15),MomExtTdIn(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,TheDipole,DipoleResult,PDFFac_a,PDFFac_b
@@ -5000,7 +5025,7 @@ include 'vegas_common.f'
       return
    endif
    FluxFac = 1d0/(2d0*EHat**2)
-   call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! HTbar, HT
+   call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt0)! HTbar, HT
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    ISFac = MomCrossing(MomExt)
 
@@ -5063,9 +5088,12 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
 
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_HtHtbqqb = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -5320,9 +5348,12 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
-   PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
+   PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
-   if( PreFac.eq.0d0 ) cycle
+   if( PreFac.eq.0d0 ) then
+        SkipCounter = SkipCounter + 1
+        cycle
+   endif
    if( applyPSCut ) then
       EvalCS_DKJ_Real_HtHtbqqb = 0d0
       PSCutCounter = PSCutCounter + 1
@@ -6287,11 +6318,15 @@ include 'vegas_common.f'
           call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(6:9),MomExt(1:4,7:9),PSWgt4)!  b(7) el(8) nu(9)
       ENDIF
       PSWgt = PSWgt2
+      if( PSWgt.eq.0d0 ) then
+            SkipCounter = SkipCounter + 1
+            return
+      endif
    ENDIF
 
  
 
-   PreFac = PSWgt * VgsWgt /(2d0*m_Stop) * (2d0*Ga_STop(0)*M_STop)
+   PreFac = PSWgt * VgsWgt /(2d0*m_Stop) * (2d0*Ga_STop(0)*M_STop)! this removed the factors from STopDecay
    RunFactor = RunAlphaS(NLOParam,MuRen)
 
    IF( CORRECTION.EQ.0 ) THEN

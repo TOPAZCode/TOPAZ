@@ -1935,6 +1935,7 @@ ELSEIF( PROCESS.EQ.57 .OR. PROCESS.EQ.58 ) THEN !   A/Stop -> Chi/Bar + A/Top (s
       allocate(ExtParticle(1:NumExtParticles))
       IF( PROCESS.EQ.57 ) MasterProcess=41
       IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = 0
       NDim = NDim + 2    ! st PS integration
       NDim = NDim + 4    ! fake t PS integration
 !       NDim = NDim + 1    ! for dummy integration
@@ -1946,6 +1947,7 @@ ELSEIF( PROCESS.EQ.57 .OR. PROCESS.EQ.58 ) THEN !   A/Stop -> Chi/Bar + A/Top (s
       allocate(ExtParticle(1:NumExtParticles))
       IF( PROCESS.EQ.57 ) MasterProcess=41
       IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = 0
       NDim = NDim + 2    ! st PS integration
       NDim = NDim + 4    ! fake t PS integration
 !       NDim = NDim + 1    ! for dummy integration
@@ -1957,6 +1959,7 @@ ELSEIF( PROCESS.EQ.57 .OR. PROCESS.EQ.58 ) THEN !   A/Stop -> Chi/Bar + A/Top (s
       allocate(ExtParticle(1:NumExtParticles))
       IF( PROCESS.EQ.57 ) MasterProcess=41
       IF( PROCESS.EQ.58 ) MasterProcess=42
+      NDim = 0
       NDim = NDim + 2    ! st PS integration
       NDim = NDim + 3    ! real gluon
       NDim = NDim + 4    ! fake t PS integration
@@ -2208,7 +2211,7 @@ ELSEIF( PROCESS.EQ.68 ) THEN ! 4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
       call Error("Correction to this process is not available")
    ENDIF
 
- ELSEIF( PROCESS.EQ. 69 ) THEN
+ ELSEIF( PROCESS.EQ.69 ) THEN
     IF (CORRECTION.EQ.2 ) THEN
        NumExtParticles = 5
        allocate(Crossing(1:NumExtParticles))

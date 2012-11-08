@@ -1230,7 +1230,7 @@ complex(8) :: rdiv(1:2)
            PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
            call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
            AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-           !call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv); print *, 'checking poles'
+!            call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv); print *, 'checking poles',AccPoles
            if( AccPoles.gt.1d-4 ) then
 !                 print *, "PrimAmp",iPrimAmp
 !                 print *, "AccPoles",AccPoles
@@ -1575,7 +1575,71 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
   call setPDFs(eta1,eta2,MuFac,pdf)
 
 
-  IF (PROCESS.EQ.69 ) THEN
+  IF (PROCESS.EQ.67 ) THEN
+
+    if( xpdf.le.0.5d0 ) then
+       PDFFac_L =            gL_Zpr(up_) * (pdf(up_,1)*pdf(0,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,1)*pdf(0,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,1)*pdf(0,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,1)*pdf(0,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,1)*pdf(0,2))
+       
+       PDFFac_R =            gR_Zpr(up_) * (pdf(up_,1)*pdf(0,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,1)*pdf(0,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,1)*pdf(0,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,1)*pdf(0,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,1)*pdf(0,2))
+    else
+       PDFFac_L =            gL_Zpr(up_) * (pdf(up_,2)*pdf(0,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(dn_,2)*pdf(0,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(chm_,2)*pdf(0,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(str_,2)*pdf(0,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(bot_,2)*pdf(0,1))
+       
+       PDFFac_R =            gR_Zpr(up_) * (pdf(up_,2)*pdf(0,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(dn_,2)*pdf(0,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(chm_,2)*pdf(0,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(str_,2)*pdf(0,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(bot_,2)*pdf(0,1))
+       call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
+
+    PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+    PDFFac_L = PDFFac_L * 2d0
+
+  ELSEIF (PROCESS.EQ.68 ) THEN
+
+    if( xpdf.le.0.5d0 ) then
+       PDFFac_L =            gL_Zpr(up_) * (pdf(0,1)*pdf(aup_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(0,1)*pdf(adn_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(0,1)*pdf(achm_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(0,1)*pdf(astr_,2))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(0,1)*pdf(abot_,2))
+       
+       PDFFac_R =            gR_Zpr(up_) * (pdf(0,1)*pdf(aup_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(0,1)*pdf(adn_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(0,1)*pdf(achm_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(0,1)*pdf(astr_,2))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(0,1)*pdf(abot_,2))
+    else
+       PDFFac_L =            gL_Zpr(up_) * (pdf(0,2)*pdf(aup_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(dn_) * (pdf(0,2)*pdf(adn_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(chm_) * (pdf(0,2)*pdf(achm_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(str_) * (pdf(0,2)*pdf(astr_,1))
+       PDFFac_L = PDFFac_L + gL_Zpr(bot_) * (pdf(0,2)*pdf(abot_,1))
+       
+       PDFFac_R =            gR_Zpr(up_) * (pdf(0,2)*pdf(aup_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(dn_) * (pdf(0,2)*pdf(adn_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(chm_) * (pdf(0,2)*pdf(achm_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(str_) * (pdf(0,2)*pdf(astr_,1))
+       PDFFac_R = PDFFac_R + gR_Zpr(bot_) * (pdf(0,2)*pdf(abot_,1))
+       call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+    endif
+
+    PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+    PDFFac_L = PDFFac_L * 2d0
+
+  ELSEIF (PROCESS.EQ.69 ) THEN
 
     call random_number(xpdf)
 
@@ -1608,8 +1672,8 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
        call swapMom(MomExt(1:4,1),MomExt(1:4,2))
     endif
   
-  PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
-  PDFFac_L = PDFFac_L * 2d0
+    PDFFac_R = PDFFac_R * 2d0!  factor two for sampling over pdfs
+    PDFFac_L = PDFFac_L * 2d0
 
   ENDIF
 
@@ -1695,14 +1759,15 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
      do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_Zprime_interf)
      enddo
+     EvalCounter = EvalCounter + 1
 
   endif!applyPSCut
 
 
   !!! Dipoles section
   colf = 8d0 ! NC^2 - 1
+  dipoles = 0d0
   IF ( PROCESS .EQ. 69 ) THEN ! qqb
-     dipoles = 0d0
      do nDip = 1,8
 
         call Dipoles_qqb_Zprime_interf(nDip, MomExt(1:4,1:5), MomExtTd(1:4,1:5), resdip)
@@ -1783,13 +1848,14 @@ integer :: i1,i2,i3,i4,i5, iPrimAmp
 
         resdip = resdip * (PDFFac_R * resLO_R + PDFFac_L * resLO_L)
         resdip = resdip * (4d0*Pi*alpha_s*RunFactor)**2 * PreFac * ISFac * colf
+        resdip =-resdip!--F Oct 14 sign fixed against MadGraph
         
         do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),resdip)
         enddo
 
-        !--F Oct 14 sign fixed against MadGraph
-        dipoles = dipoles - resdip
+        
+        dipoles = dipoles + resdip
 
      enddo
 
@@ -1911,6 +1977,7 @@ IF( CORRECTION.EQ.4 ) THEN
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt1*PSWgt2*PSWgt3 * VgsWgt
    RunFactor = RunAlphaS(2,MuRen)
    ISFac = MomCrossing(MomExt)
+
 
 !----------------------------------------
 ! one loop correction to Anti-top decay |

@@ -1412,10 +1412,10 @@ END SUBROUTINE
             endif
 
 
-
 !cccccccccccccccccccc endif for Ds = 5
          endif
 
+ 
 
 !     subtracting the 5-cut
 
@@ -1631,6 +1631,7 @@ END SUBROUTINE
        enddo
 !        res = res - res_Impr
 
+ 
        return
        end subroutine
 
@@ -1741,7 +1742,10 @@ END SUBROUTINE
 !ccccccccccccccccccccccccc Ds=4 end
           endif
 
-! print *, "resid1a",res
+
+ 
+
+
 
 
 
@@ -2066,7 +2070,7 @@ END SUBROUTINE
 
         enddo
 
-
+ 
           return
           end subroutine
 

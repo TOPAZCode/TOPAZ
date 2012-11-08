@@ -1,3 +1,4 @@
+(* MARKUS: checked *)
 
 (* first entry: 0000, second entry 2222 *)
 (* st: stable, dl: dilepton, fh: fully hadronic *)

@@ -6675,7 +6675,6 @@ endif
 
 
 
-
 ! adding the ssss vertex
       do n1a=0,NumGlu(1)
       do n2a=0,NumGlu(2)
@@ -6717,7 +6716,6 @@ endif
             endif
 
             Sca0 = Sca1 * Sca2 * Sca3 * (0d0,-1d0)/2d0  
-
 
             PMom1 = Scalars(2)%Mom+Scalars(3)%Mom+Scalars(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
             if(n1a.ge.1 .or. n4b.ge.1) then

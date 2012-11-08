@@ -67,7 +67,7 @@ logical :: dirresult
    XTopDecays=-100
    HelSampling=.false.
    m_Top=172d0*GeV
-   m_STop=500d0*GeV
+   m_STop=350d0*GeV
    m_HTop=500d0*GeV
    m_Zpr=1500d0*GeV
    Ga_Zpr=m_Zpr*0.01d0
@@ -338,7 +338,9 @@ logical :: dirresult
         HistoFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
     endif
 
-   GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
+   if( trim(GridFile).eq."grid" ) then
+      GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
+   endif
 
 return
 END SUBROUTINE
@@ -1329,7 +1331,27 @@ ENDIF
 ENDIF
 
 IF ( MASTERPROCESS.EQ.4) THEN
-IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.69 ) THEN
+IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.67 ) THEN
+   call qlinit()
+   print *, "Gluon-Z' interference, real"
+  call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.68 ) THEN
+   call qlinit()
+   print *, "Gluon-Z' interference, real"
+  call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call vegas1(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.69 ) THEN
    call qlinit()
    print *, "Gluon-Z' interference, real"
   call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
@@ -1557,7 +1579,7 @@ character :: filename*(100)
   write(TheUnit,"(A,2X,1F20.10)") "# EvalCounter  =",dble(EvalCounter)
   write(TheUnit,"(A,2X,1F20.10)") "# PSCutCounter =",dble(PSCutCounter)
   write(TheUnit,"(A,2X,1F20.10)") "# SkipCounter  =",dble(SkipCounter)
-
+  if( dble(SkipCounter)/dble(EvalCounter) .gt. 0.02d0 ) write(TheUnit,"(A,2X)") "# **** WARNING  ****: SkipCounter is larger than 2%"
   write(TheUnit,"(A,2X,1PE20.10,2X,1PE20.5)") "#TotCS[fb]=",VG_Result,VG_Error
   do NHisto=1,NumHistograms
       write(TheUnit,"(A,I2,A,A)") "# Histogram",NHisto,": ",Histo(NHisto)%Info
@@ -1651,7 +1673,12 @@ integer :: res
 
     res = system("./misc/PlotVegasRun.sh "//trim(filename)//" "//trim(istr))
     if( res.eq.-1 ) then
-        print *, "Error plotting vegas convergence"
+        res = system("./PlotVegasRun.sh "//trim(filename)//" "//trim(istr))
+        if( res.eq.-1 ) then
+            print *, "Error plotting vegas convergence"
+        else
+        print *, "Vegas convergence has been plotted in ",trim(filename)//".eps"
+        endif
     else
         print *, "Vegas convergence has been plotted in ",trim(filename)//".eps"
     endif
