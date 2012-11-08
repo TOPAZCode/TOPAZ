@@ -1,8 +1,8 @@
 PROGRAM summer
 use ifport
 implicit none
-integer :: NumArgs,NArg,op,iHisto
-character :: filename_in*(50),filename_out*(50),operation*(10),factor_str*(20),iHisto_str*(5)
+integer :: NumArgs,NArg,op,iHisto,nrebin
+character :: filename_in*(80),filename_out*(50),operation*(10),factor_str*(20),iHisto_str*(5),nrebin_str*(5)
 real(8):: factor =1d10
 
 ! get number of arguments
@@ -91,7 +91,9 @@ real(8):: factor =1d10
       open(unit=13,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
       call GetArg(4,iHisto_str)
       read(iHisto_str,"(I2)") iHisto
-      call rebinning(iHisto)
+      call GetArg(5,nrebin_str)
+      read(nrebin_str,"(I2)") nrebin
+      call rebinning(iHisto,nrebin)
   endif
 
 
@@ -276,13 +278,15 @@ END SUBROUTINE
 
 
 
-SUBROUTINE rebinning(iHisto)
+SUBROUTINE rebinning(iHisto,nrebin)
 implicit none
 character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
-integer :: NumArgs,NArg,iHisto
+integer :: NumArgs,NArg,iHisto,nrebin, ibin
 integer,parameter :: MaxFiles=50
 integer :: NHisto(1:MaxFiles)=-999999,Hits(1:MaxFiles)=-999999
 real(8) :: BinVal(1:MaxFiles)=-1d-99,Value(1:MaxFiles)=-1d-99,Error(1:MaxFiles)=-1d-99
+real(8) :: newvalue, newerror
+integer :: newhits
 real(8) :: SumValue,BinSize_Tmp,BinSize
 character :: dummy*(1)
 
@@ -306,11 +310,28 @@ character :: dummy*(1)
          if(dummy(1:1).eq."#") cycle
          backspace(unit=12) ! go to the beginning of the line
 
-         read(unit=12,fmt=fmt1) NHisto(2),dummy,BinVal(2),dummy,Value(2),dummy,Error(2),dummy,Hits(2),dummy
-!         write(* ,fmt1) NHisto(2),"|",BinVal(2),"|",Value(2),"|",Error(2),"|",Hits(2),"|"
-    
-         write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",(Value(1)+Value(2))/2d0,"|",dsqrt(Error(1)**2+Error(2)**2)/2d0,"|",Hits(1)+Hits(2),"|"
-         write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",(Value(1)+Value(2))/2d0,"|",dsqrt(Error(1)**2+Error(2)**2)/2d0,"|",Hits(1)+Hits(2),"|"
+         newvalue = Value(1) 
+         newerror = Error(1)**2
+         newhits = Hits(1)
+         
+         do ibin = 1, nrebin
+            read(unit=12,fmt=fmt1) NHisto(1+ibin),dummy,BinVal(1+ibin),dummy,Value(1+ibin),dummy,Error(1+ibin),dummy,Hits(1+ibin),dummy
+            !         write(* ,fmt1) NHisto(2),"|",BinVal(2),"|",Value(2),"|",Error(2),"|",Hits(2),"|"
+            newvalue = newvalue + Value(1+ibin)
+            newerror = newerror + Error(1+ibin)**2
+            newhits = newhits + Hits(1+ibin)
+         enddo
+
+         newerror = dsqrt(newerror)/real(nrebin+1)
+         newvalue = newvalue/real(nrebin+1)
+
+         write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",newvalue,"|",newerror,"|",newhits,"|"
+         do ibin = 1, nrebin
+            write(13 ,fmt1) NHisto(1),"|",BinVal(1+ibin),"|",newvalue,"|",newerror,"|",newhits,"|"
+         enddo
+
+         write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",newvalue,"|",newerror,"|",newhits,"|"
+
       else
          write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"
          write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"

@@ -63,7 +63,7 @@ real(8), public            :: m_STop
 real(8), public            :: m_SBot
 real(8), public            :: Ga_STop(0:1)
 real(8), public            :: Ga_Stop_ChiTop(0:1)
-real(8), public, parameter :: m_Chi   = 100d0*GeV
+real(8), public, parameter :: m_Chi   = 50d0*GeV
 real(8), public, parameter :: Vev  = 246d0*GeV
 
 !!! Zprime section !!!
@@ -73,8 +73,6 @@ real(8), public, parameter :: Vev  = 246d0*GeV
 real(8), public :: m_Zpr
 real(8), public :: Ga_Zpr
 real(8), public :: gL_Zpr(6), gR_Zpr(6)
-
-
 !!! End Zprime section !!!
 
 real(8), public, parameter :: Q_up    = 2d0/3d0
@@ -311,15 +309,18 @@ END SUBROUTINE
 SUBROUTINE InitParameters
 use ModMisc
 implicit none
-real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice,StopWidthExpansion,HTWidthExpansion
+real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice
 real(8) :: cL,cR,omegasq,f,z
 real(8) :: beta,omega,P0,P3,W0,Ppl,Pmi,Wpl,Wmi,Yp,Yw
 real(8) :: term4,term7,term9
 
+!--- Zprime section
 real(8) :: myCos2thw, cot2thH, g_Zpr, f1, f2, Ga_Zpr_pref
 real(8) :: ratio, gamma, rhoplus, rhominus, phi, chi, c0, d0, c1, d1
 real(8) :: Ga_Zpr_TOT(0:1), Ga_Zpr_top(0:1), Ga_Zpr_up(0:1), Ga_Zpr_dn(0:1)
-real(8), external :: ddilog! this is borrowed from QCDLoop
+real(8), external :: ddilog
+!--- End Zprime section
+
 
 
 m_Bot  = m_Top  ! this is NOT the bottom mass! it is the mass for massive fermion in closed loops
@@ -450,22 +451,9 @@ ENDIF
 !  stop-->Chi^0 + top partial width!
    Ga_Stop_ChiTop(0) = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 
                   ( (IChiStt(+1)**2+IChiStt(-1)**2)*(m_stop**2-m_top**2-m_chi**2) - 4d0*(IChiStt(+1)*IChiStt(-1))*m_top*m_chi )
-
-IF( Process.ge.51 .and. Process.le.59 ) then
-   if( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.350d0*GeV ) then
-      Ga_Stop_ChiTop(1) = (-0.00649d0 -0.00172d0) * GeV
-   elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.100d0*GeV .and. m_stop.eq.500d0*GeV ) then
-      Ga_Stop_ChiTop(1) = (-0.01709-0.00662) * GeV
-   else
-      call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi couplings")
-   endif
-ENDIF
-
+   Ga_Stop_ChiTop(1) = 0d0
    Ga_Stop(:) = Ga_Stop_ChiTop(:)! assuming no other decay channel
-   StopWidthExpansion   = -2d0*Ga_Stop(1)/Ga_Stop(0)
-IF( abs(XTOPDECAYS).EQ.3 .AND. NLOPARAM.EQ.2 .AND. CORRECTION.EQ.0 ) THEN
-   WidthExpansion = WidthExpansion + StopWidthExpansion
-ENDIF
+
 
 
 IF( XTOPDECAYS.EQ.2 ) THEN
@@ -627,8 +615,9 @@ gL_Zpr(:) = 0d0
 gR_Zpr(:) = 0d0
 
 !-- original experimental setup: f1 = 1, f2 = 0
-f1 = -1d0
-f2 = -1d0
+!-- topcolor tilting motivated parameters: f1 > 0 and / or f2 < 0
+f1 = 1d0
+f2 = 0d0
 
 gL_Zpr(up_) = -1d0
 gR_Zpr(up_) = -f1 * 1d0
@@ -648,6 +637,13 @@ rhoplus = dsqrt(ratio)+dsqrt(ratio-1d0)
 rhominus = dsqrt(ratio)-dsqrt(ratio-1d0)
 chi = dlog(rhoplus-rhominus)
 phi = dlog(rhoplus)
+
+!-- results for the NLO corrections for a generic coupled Z' taken from
+!-- Nucl.Phys. B329 (1990) 547 
+!-- Overall prefactor for LO width taken from hep-ph/9911288v1,
+!-- which is WRONG and must be corrected the following way:
+!-- Eq. 28: -3 f1 -> +6 f1
+!-- Eq. 32: +3 f1 -> -6 f1
 
 !-- LO decay width, c0 is vector d0 is axial
 c0 = dsqrt(1d0-1d0/ratio) * (1d0+1d0/(2d0*ratio))
