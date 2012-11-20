@@ -1089,11 +1089,12 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       do A0barHel=1,SecHel
       do A0Hel=1,SecHel
 
+        IF(XTOPDECAYS.EQ.1) THEN
          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
-
-         Quarks(1)%Pol => TopQuark(1)%Pol
-         Quarks(2)%Pol => TopQuark(2)%Pol
+        ENDIF
+        Quarks(1)%Pol => TopQuark(1)%Pol
+        Quarks(2)%Pol => TopQuark(2)%Pol
 
       do iHel=1,2
       Gluons(ngl)%Pol => PolV(:,HelList(iHel,1),ngl)

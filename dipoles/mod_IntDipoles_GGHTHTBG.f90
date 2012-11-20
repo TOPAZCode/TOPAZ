@@ -42,7 +42,7 @@ contains
     TreeMom(1:4,4) = dcmplx( p(1:4,1) )
 
 
-    Tree_ij= Tree_GG_TTb_ij(TreeMom,(/0d0,0d0,m_STop**2,m_STop**2/))
+    Tree_ij= Tree_GG_TTb_ij(TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
     Tree_12  =  Tree_ij(1) * 0.5d0
     Tree_13  =  Tree_ij(2) * 0.5d0
     Tree_14  =  Tree_ij(3) * 0.5d0
@@ -52,31 +52,31 @@ contains
 
    do n=1,12
       if(n.eq.1) then
-!       {if}=initial emitter, final spectator, {gg}=gluon parent, gluon not emitted, {zero,m_STop}=parent,spectator mass, {3,1}=parent, spectator in p
-        dipsoft =if_gg(zero,m_STop,p,3,1,z,1)
-        dipfini =if_gg(zero,m_STop,p,3,1,z,2)
-        dipplus =if_gg(zero,m_STop,p,3,1,z,3)
+!       {if}=initial emitter, final spectator, {gg}=gluon parent, gluon not emitted, {zero,m_HTop}=parent,spectator mass, {3,1}=parent, spectator in p
+        dipsoft =if_gg(zero,m_HTop,p,3,1,z,1)
+        dipfini =if_gg(zero,m_HTop,p,3,1,z,2)
+        dipplus =if_gg(zero,m_HTop,p,3,1,z,3)
         emi = 1 ! mom #3 is emitting
         mtrsq = Tree_14   ! (1-4)-color corr. for (1-3)-dipole because t and tbar are exchanged
       endif
       if(n.eq.2) then
-        dipsoft =if_gg(zero,m_STop,p,3,2,z,1)
-        dipfini =if_gg(zero,m_STop,p,3,2,z,2)
-        dipplus =if_gg(zero,m_STop,p,3,2,z,3)
+        dipsoft =if_gg(zero,m_HTop,p,3,2,z,1)
+        dipfini =if_gg(zero,m_HTop,p,3,2,z,2)
+        dipplus =if_gg(zero,m_HTop,p,3,2,z,3)
         emi = 1 ! mom #3 is emitting
         mtrsq = Tree_13
       endif
       if(n.eq.3) then
-        dipsoft =if_gg(zero,m_STop,p,4,1,z,1)
-        dipfini =if_gg(zero,m_STop,p,4,1,z,2)
-        dipplus =if_gg(zero,m_STop,p,4,1,z,3)
+        dipsoft =if_gg(zero,m_HTop,p,4,1,z,1)
+        dipfini =if_gg(zero,m_HTop,p,4,1,z,2)
+        dipplus =if_gg(zero,m_HTop,p,4,1,z,3)
         emi = 2 ! mom #4 is emitting
         mtrsq = Tree_24
       endif
       if(n.eq.4) then
-        dipsoft =if_gg(zero,m_STop,p,4,2,z,1)
-        dipfini =if_gg(zero,m_STop,p,4,2,z,2)
-        dipplus =if_gg(zero,m_STop,p,4,2,z,3)
+        dipsoft =if_gg(zero,m_HTop,p,4,2,z,1)
+        dipfini =if_gg(zero,m_HTop,p,4,2,z,2)
+        dipplus =if_gg(zero,m_HTop,p,4,2,z,3)
         emi = 2 ! mom #4 is emitting
         mtrsq = Tree_23
       endif
@@ -95,44 +95,44 @@ contains
         mtrsq = Tree_12
       endif
       if(n.eq.7) then
-        dipsoft =fi_qq(m_STop,zero,p,1,3,z,1)
-        dipfini =fi_qq(m_STop,zero,p,1,3,z,2)
-        dipplus =fi_qq(m_STop,zero,p,1,3,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,1,3,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,1,3,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,1,3,z,3)
         emi = 1
         mtrsq = Tree_14
       endif
       if(n.eq.8) then
-        dipsoft =fi_qq(m_STop,zero,p,1,4,z,1)
-        dipfini =fi_qq(m_STop,zero,p,1,4,z,2)
-        dipplus =fi_qq(m_STop,zero,p,1,4,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,1,4,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,1,4,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,1,4,z,3)
         emi = 2
         mtrsq = Tree_24
       endif
       if(n.eq.9) then
-        dipsoft =fi_qq(m_STop,zero,p,2,3,z,1)
-        dipfini =fi_qq(m_STop,zero,p,2,3,z,2)
-        dipplus =fi_qq(m_STop,zero,p,2,3,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,2,3,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,2,3,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,2,3,z,3)
         emi = 1
         mtrsq = Tree_13
       endif
       if(n.eq.10) then
-        dipsoft =fi_qq(m_STop,zero,p,2,4,z,1)
-        dipfini =fi_qq(m_STop,zero,p,2,4,z,2)
-        dipplus =fi_qq(m_STop,zero,p,2,4,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,2,4,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,2,4,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,2,4,z,3)
         emi = 2
         mtrsq = Tree_23
       endif
       if(n.eq.11) then
-        dipsoft =ff_qq(m_STop,m_STop,p,1,2,z,1)
-        dipfini =ff_qq(m_STop,m_STop,p,1,2,z,2)
-        dipplus =ff_qq(m_STop,m_STop,p,1,2,z,3)
+        dipsoft =ff_qq(m_HTop,m_HTop,p,1,2,z,1)
+        dipfini =ff_qq(m_HTop,m_HTop,p,1,2,z,2)
+        dipplus =ff_qq(m_HTop,m_HTop,p,1,2,z,3)
         emi = 3
         mtrsq = Tree_34
       endif
       if(n.eq.12) then
-        dipsoft =ff_qq(m_STop,m_STop,p,2,1,z,1)
-        dipfini =ff_qq(m_STop,m_STop,p,2,1,z,2)
-        dipplus =ff_qq(m_STop,m_STop,p,2,1,z,3)
+        dipsoft =ff_qq(m_HTop,m_HTop,p,2,1,z,1)
+        dipfini =ff_qq(m_HTop,m_HTop,p,2,1,z,2)
+        dipplus =ff_qq(m_HTop,m_HTop,p,2,1,z,3)
         emi = 3
         mtrsq = Tree_34
       endif
@@ -153,7 +153,6 @@ contains
       endif
 
 !res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
-
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 
@@ -225,9 +224,9 @@ contains
       MomTd(0:3,2) = -MomTd(0:3,2)
 
 
-              TopQuark(1)%PartType = STop_
+              TopQuark(1)%PartType = Top_
               TopQuark(1)%Mom(1:4) = MomTd(0:3,3)
-              TopQuark(2)%PartType = ASTop_
+              TopQuark(2)%PartType = ATop_
               TopQuark(2)%Mom(1:4) = MomTd(0:3,4)
 
 
@@ -244,13 +243,13 @@ contains
       Gluons(2)%Mass  => MassTd(2)
 
       Quarks(1)%Mom => MomTd(:,3)
-      Quarks(1)%PartType => STop_
+      Quarks(1)%PartType => Top_
       Quarks(1)%ExtRef => ExtRef
       Quarks(1)%Mass2 => Mass2Td(3)
       Quarks(1)%Mass  => MassTd(3)
 
       Quarks(2)%Mom => MomTd(:,4)
-      Quarks(2)%PartType => ASTop_
+      Quarks(2)%PartType => ATop_
       Quarks(2)%ExtRef => ExtRef
       Quarks(2)%Mass2 => Mass2Td(4)
       Quarks(2)%Mass  => MassTd(4)
@@ -277,10 +276,14 @@ do icorr=0,6
       do A0barHel=1,SecHel,-2
       do A0Hel=1,SecHel,-2
 
-            call STopDecay(TopQuark(2),DKX_STChi0_LO,A0barHel,MomDK(1:4,5:9))
-            call STopDecay(TopQuark(1),DKX_STChi0_LO,A0Hel,MomDK(1:4,10:14))
-            Quarks(1)%Pol => TopQuark(1)%Pol
-            Quarks(2)%Pol => TopQuark(2)%Pol
+
+        IF(XTOPDECAYS.EQ.1) THEN
+         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
+         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
+        ENDIF
+        Quarks(1)%Pol => TopQuark(1)%Pol
+        Quarks(2)%Pol => TopQuark(2)%Pol
+
 
       do iHel=1,2
 
@@ -292,11 +295,11 @@ do icorr=0,6
 !       Quarks(2)%Helicity => HelList(iHel,3)
 
 !      calc currents
-      Res(0:3) = cur_g_2s( (/Gluons(2)/),(/Quarks(2),Quarks(1)/),(/2,1,0,0/) )
+      Res(0:3) = cur_g_2f( (/Gluons(2)/),(/Quarks(2),Quarks(1)/),(/2,1,0,0/) )
       Amp(1,plus)  = Res(0:3).dot.PolV(0:3,plus,1)
       Amp(1,minus) = Res(0:3).dot.PolV(0:3,minus,1)
 
-      Res(0:3) = cur_g_2s( (/Gluons(2)/),(/Quarks(2),Quarks(1)/),(/2,0,0,1/) )
+      Res(0:3) = cur_g_2f( (/Gluons(2)/),(/Quarks(2),Quarks(1)/),(/2,0,0,1/) )
       Amp(2,plus)  = Res(0:3).dot.PolV(0:3,plus,1)
       Amp(2,minus) = Res(0:3).dot.PolV(0:3,minus,1)
 
@@ -305,7 +308,7 @@ do icorr=0,6
       do colP=1,2
 
         SqAmp(icorr) = SqAmp(icorr) + ColCorr(colP,col) * Split_A*( dconjg(Amp(colP,plus)) *Amp(col,plus)     &
-                                                    + dconjg(Amp(colP,minus))*Amp(col,minus) )
+                                                                   + dconjg(Amp(colP,minus))*Amp(col,minus) )
       enddo
       enddo
 

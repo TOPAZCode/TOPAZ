@@ -83,6 +83,7 @@ ENDIF
    ENDIF
 
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
+print *, applyPSCut;pause
    if( applyPSCut ) then
       EvalCS_1L_HtHtbgg = 0d0
       return
@@ -161,7 +162,8 @@ ELSEIF( Correction.EQ.1 ) THEN
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!	  call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+! pause
 
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
@@ -198,20 +200,37 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! ------------ fermionic loops --------------
       do iPrimAmp=7,10
           call SetKirill(PrimAmps(iPrimAmp))
-
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
           call TripCut(PrimAmps(iPrimAmp))
           call DoubCut(PrimAmps(iPrimAmp))
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
       enddo
       FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
       FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)
+
+! ------------ add fermionic loop with m_bot=m_SMTop -------------- 
+      m_Bot = m_SMTop
+      do iPrimAmp=9,10
+          call SetKirill(PrimAmps(iPrimAmp))
+          call PentCut(PrimAmps(iPrimAmp))
+          call QuadCut(PrimAmps(iPrimAmp))
+          call TripCut(PrimAmps(iPrimAmp))
+          call DoubCut(PrimAmps(iPrimAmp))
+          call SingCut(PrimAmps(iPrimAmp))
+          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+          PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+      enddo
+      FermionLoopPartAmp(7,-2:1) = FermionLoopPartAmp(7,-2:1) + PrimAmps(9)%Result(-2:1)
+      FermionLoopPartAmp(8,-2:1) = FermionLoopPartAmp(8,-2:1) + PrimAmps(10)%Result(-2:1)
+      m_Bot = m_Top
+
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=7,8
@@ -253,17 +272,11 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
 
 
-!   check Coulomb singularity
-!   print *, "EHat,beta:",EHat,dsqrt(1d0-4d0*m_top**2/EHat**2)
-!   CoulombFac = LO_Res_Unpol*(alpha_s*RunFactor)*DblPi/2d0/dsqrt(1d0-4d0*m_top**2/EHat**2) * 4d0/3d0/2d0
-!   print *, "ratio",dble(NLO_Res_UnPol(0))/CoulombFac
-!   print *, dsqrt(1d0-4d0*m_top**2/EHat**2), dble(NLO_Res_UnPol(0))/CoulombFac
-!    STOP
 
    EvalCS_1L_HtHtbgg = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
 
-ELSEIF( Correction.EQ.3 ) THEN
+! ELSEIF( Correction.EQ.3 ) THEN
 
    MomP(1:4,1) = MomExt(1:4,3)
    MomP(1:4,2) = MomExt(1:4,4)
@@ -272,12 +285,23 @@ ELSEIF( Correction.EQ.3 ) THEN
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
 
    xE = yRnd(13)
+xE=0.4d0
+
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
    call EvalIntDipoles_GGHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
    EvalCS_1L_HtHtbgg = HOp(1)    * pdf(0,1)  * pdf(0,2)   &
-                   + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
-                   + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
+                     + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
+                     + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
+
+print *, ( NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2) ) * PreFac
+print *, ( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac
+print *, "1L check",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+print *, "res1=", HOp(1)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+print *, "res2=", HOp(2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+print *, "res3=", HOp(3)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+pause
+
 ENDIF
 
 
@@ -670,7 +694,6 @@ real(8) :: pdf(-6:6,1:2),s12,s13
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),BHMaxHel,BH1Hel,BH2Hel
 !include 'misc/global_import'
 include 'vegas_common.f'
-
 
    EvalCS_Real_HtHtbggg = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)

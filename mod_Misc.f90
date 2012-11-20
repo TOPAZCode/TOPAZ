@@ -824,7 +824,7 @@ implicit none
 logical IsAQuark
 integer :: Type
 
-   if( abs(Type).le.6 .and. Type.ne.0 ) then
+   if( (abs(Type).le.6 .and. Type.ne.0) .or. (abs(Type).eq.14) ) then!   type=14 is the HTop
       IsAQuark = .true.
    else
       IsAQuark = .false.
@@ -975,6 +975,17 @@ implicit none
 real(8) ::Mom1(1:4),Mom2(1:4),Get_CosAlpha
 
     Get_CosAlpha = (Mom1(2)*Mom2(2)+Mom1(3)*Mom2(3)+Mom1(4)*Mom2(4))/dsqrt(Mom1(2)**2+Mom1(3)**2+Mom1(4)**2)/dsqrt(Mom2(2)**2+Mom2(3)**2+Mom2(4)**2)
+
+RETURN
+END FUNCTION
+
+
+
+FUNCTION Get_CosPhi(Mom1,Mom2)! same as Get_CosAlpha but only in transverse plane
+implicit none
+real(8) ::Mom1(1:4),Mom2(1:4),Get_CosPhi
+
+    Get_CosPhi = (Mom1(2)*Mom2(2)+Mom1(3)*Mom2(3))/dsqrt(Mom1(2)**2+Mom1(3)**2)/dsqrt(Mom2(2)**2+Mom2(3)**2)
 
 RETURN
 END FUNCTION

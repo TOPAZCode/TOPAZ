@@ -76,6 +76,8 @@ ELSEIF( PROCESS.EQ.64 ) THEN !   4_AStr + 5_Glu  --> Zprime --> 3_AStr + 1_ATop 
 ELSEIF( PROCESS.EQ.66 ) THEN !   3_Str  + 4_AStr --> Zprime --> 5_Glu  + 1_ATop + 2_Top
 
 ELSEIF( PROCESS.EQ.65 ) THEN !   3_Str  + 4_AStr --> Zprime/QCD --> 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.67 ) THEN !   3_Str  + 5_Glu  --> Zprime/QCD --> 4_Str  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.68 ) THEN !   4_AStr + 5_Glu  --> Zprime/QCD --> 3_AStr + 1_ATop + 2_Top
 ELSEIF( PROCESS.EQ.69 ) THEN !   3_Str  + 4_AStr --> Zprime/QCD --> 5_Glu  + 1_ATop + 2_Top
 
 

@@ -404,25 +404,15 @@ ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for HTHTbar + A0/BH production (
 
     pT_bjet_cut = 30d0*GeV
     eta_bjet_cut= 2.5d0
-    pT_jet_cut = 25d0*GeV 
+    pT_jet_cut = 30d0*GeV 
     eta_jet_cut= 2.5d0     
  
     pT_lep_cut  = 20d0*GeV  
     eta_lep_cut = 2.5d0      
-    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
+    pT_miss_cut = 150d0*GeV! note that this is ET and not pT
 
-    MTW_cut = 150d0*GeV
+    MTW_cut = 120d0*GeV
 
-! ! these are the cuts for T.Han comparison
-!     Rsep_jet    = 0.4d0
-!     pT_bjet_cut = 20d0*GeV
-!     eta_bjet_cut= 2.5d0
-!     pT_jet_cut = 30d0*GeV 
-!     eta_jet_cut= 2.5d0     
-!     pT_lep_cut  = 20d0*GeV  
-!     eta_lep_cut = 2.5d0      
-!     pT_miss_cut = 25d0*GeV! note that this is ET and not pT
-!     MTW_cut = 0d0
 
 
 ELSEIF( ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + A0/BH production (di-lept. tops) without acceptance cuts
@@ -466,32 +456,33 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
 
-!   these are the cuts for mstop/chi = 500/100 GeV analysis at 8TeV
- if( Collider.eq.12 ) then
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 30d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_jet_cut = 25d0*GeV
-    eta_jet_cut= 2.5d0
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
-    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
-    MTW_cut = 150d0*GeV
+! !   these are the cuts for mstop/chi = 500/100 GeV analysis at 8TeV
+!  if( Collider_Energy.eq.8000d0*GeV .or. Collider_Energy.eq.14000d0*GeV ) then
 
- elseif( Collider.eq.11 ) then
-!   these are the cuts for mstop/chi = 300/100 GeV analysis at 7TeV
     Rsep_jet    = 0.4d0
     pT_bjet_cut = 30d0*GeV
     eta_bjet_cut= 2.5d0
-    pT_jet_cut = 25d0*GeV
+    pT_jet_cut = 30d0*GeV
     eta_jet_cut= 2.5d0
     pT_lep_cut  = 20d0*GeV
     eta_lep_cut = 2.5d0
-    pT_miss_cut = 125d0*GeV! note that this is ET and not pT
-    MTW_cut = 0d0*GeV
- else
-    call Error("This ObsSet only supports Collider=1,11,12")
- endif
+    pT_miss_cut = 150d0*GeV! note that this is ET and not pT
+    MTW_cut = 120d0*GeV
+
+!  elseif( Collider_Energy.eq.7000d0*GeV ) then
+! !   these are the cuts for mstop/chi = 300/100 GeV analysis at 7TeV
+!     Rsep_jet    = 0.4d0
+!     pT_bjet_cut = 30d0*GeV
+!     eta_bjet_cut= 2.5d0
+!     pT_jet_cut = 25d0*GeV
+!     eta_jet_cut= 2.5d0
+!     pT_lep_cut  = 20d0*GeV
+!     eta_lep_cut = 2.5d0
+!     pT_miss_cut = 125d0*GeV! note that this is ET and not pT
+!     MTW_cut = 0d0*GeV
+!  else
+!     call Error("This ObsSet only supports Collider=1,11,12")
+!  endif
 
 
 ELSEIF( ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops) without acceptance cuts
@@ -3009,17 +3000,18 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
 ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
-          if(XTopDecays.ne.1 .and. XTopDecays.ne.2 ) call Error("XTopDecays needs to be 1(BH) or 2(A0)!")
-          NumHistograms = 9
+          if(XTopDecays.ne.1 ) call Error("XTopDecays needs to be 1!")
+          NumHistograms = 11
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
+
           Histo(1)%Info   = "pT_LepP"
           Histo(1)%NBins  = 40
           Histo(1)%BinSize= 40d0*GeV
-          Histo(1)%LowVal = 00d0*GeV
+          Histo(1)%LowVal = 20d0*GeV
           Histo(1)%SetScale= 100d0
 
           Histo(2)%Info   = "eta_LepP"
@@ -3034,15 +3026,15 @@ ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + 
           Histo(3)%LowVal = 20d0*GeV
           Histo(3)%SetScale= 100d0
 
-          Histo(4)%Info   = "phi(l+,l-)"
-          Histo(4)%NBins  = 15
-          Histo(4)%BinSize= 0.25d0
+          Histo(4)%Info   = "HT"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 50d0*GeV
           Histo(4)%LowVal = 0d0
-          Histo(4)%SetScale= 1d0
+          Histo(4)%SetScale= 100d0
 
-          Histo(5)%Info   = "m_l+l-"
+          Histo(5)%Info   = "pT(softest jet)"
           Histo(5)%NBins  = 50
-          Histo(5)%BinSize= 20d0*GeV
+          Histo(5)%BinSize= 10d0*GeV
           Histo(5)%LowVal = 0d0
           Histo(5)%SetScale= 100d0
 
@@ -3069,6 +3061,18 @@ ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + 
           Histo(9)%BinSize= 0.25d0
           Histo(9)%LowVal =-5.0d0
           Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "Log(S)"
+          Histo(10)%NBins  = 40
+          Histo(10)%BinSize= 1.0d0
+          Histo(10)%LowVal =-10.0d0
+          Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "r_pT"
+          Histo(11)%NBins  = 20
+          Histo(11)%BinSize= 0.2d0
+          Histo(11)%LowVal =-2.0d0
+          Histo(11)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar (stable stops)
@@ -3160,15 +3164,15 @@ ELSEIF( ObsSet.EQ.43 .OR. ObsSet.EQ.45 ) THEN! set of observables for STSTbar + 
           Histo(3)%LowVal = 20d0*GeV
           Histo(3)%SetScale= 100d0
 
-          Histo(4)%Info   = "phi(l+,l-)"
-          Histo(4)%NBins  = 15
-          Histo(4)%BinSize= 0.25d0
+          Histo(4)%Info   = "HT"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 50d0*GeV
           Histo(4)%LowVal = 0d0
-          Histo(4)%SetScale= 1d0
+          Histo(4)%SetScale= 100d0
 
-          Histo(5)%Info   = "m_l+l-"
+          Histo(5)%Info   = "pT(softest jet)"
           Histo(5)%NBins  = 50
-          Histo(5)%BinSize= 20d0*GeV
+          Histo(5)%BinSize= 10d0*GeV
           Histo(5)%LowVal = 0d0
           Histo(5)%SetScale= 100d0
 
@@ -3509,7 +3513,7 @@ real(8) :: SingDepth,soft,coll
 logical,save :: flip=.true.
 
     if( .not.GluonRad ) then!  no extra gluon radiation
-      call genps(2,m_HTop,xRndPS(1:2),(/Mass,m_Top/),MomDK(1:4,1:2),PSWgt2)! Htop decay
+      call genps(2,m_HTop,xRndPS(1:2),(/Mass,m_SMTop/),MomDK(1:4,1:2),PSWgt2)! Htop decay
 !     boost all guys to the top frame:
       call boost(MomDK(1:4,1),HTopMom(1:4),m_HTop)
       call boost(MomDK(1:4,2),HTopMom(1:4),m_HTop)
@@ -3517,13 +3521,13 @@ logical,save :: flip=.true.
 
     else! extra gluon emission
 
-     call genps(3,m_HTop,xRndPS(1:5),(/Mass,m_Top,0d0/),MomDK(1:4,1:3),PSWgt2)! Htop decay with gluon
+     call genps(3,m_HTop,xRndPS(1:5),(/Mass,m_SMTop,0d0/),MomDK(1:4,1:3),PSWgt2)! Htop decay with gluon
 
 !          Pcol1= 5 -1
 !          Pcol2= 5 -1
 !          SingDepth = 1e-10
 !          Steps = 20
-!          call gensing(3,m_HTop,(/Mass,m_Top,0d0/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "running gensing"
+!          call gensing(3,m_HTop,(/Mass,m_SMTop,0d0/),MomDK(1:4,1:3),Pcol1,Pcol2,SingDepth,Steps); print *, "running gensing"
 !          PSWgt2=1d0
 
 !     boost all guys to the top frame:
@@ -7657,7 +7661,7 @@ real(8) :: pT_lepM,pT_lepP,pT_miss,pT_ATop,pT_Top
 real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb
 real(8) :: pT_jet(1:7),eta_jet(1:7),m_X0,phi_ll,m_ll,MTW,MTeff
 integer :: Htbar,Ht,X0bar,X0,tbar,t,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,Lep,Neu,ib_lep,ib_had
-real(8) :: Stopness,rpT
+real(8) :: Stopness,rpT,H_T
 
 
 
@@ -7835,7 +7839,6 @@ ENDIF
 ! call fastjetppgenkt(MomHadr(1:4,1:NumHadr),NumHadr,Rsep_jet,-1d0,MomJet(1:4,1:NumHadr),NJet)! 4th argument:  +1d0=kT,  -1d0=anti-kT,   0d0=CA
 ! call SwitchEnergyComponentBack(MomJet_CHECK(1:4,1:NumHadr))
 
-
 !------------------------ cuts and binning --------------------------------
 if( ObsSet.eq.31 .or. ObsSet.eq.41) then! no decays
 
@@ -7912,7 +7915,6 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
 
 !-------------------------------------------------------
 elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then! set of observables for TTbar -> ttbar + ETmiss  in semi-hadr. top decays
-
 ! request at least two b-jets
     NObsJet_Tree = 4
     if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
@@ -7924,10 +7926,12 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
     pT_jet(2) = get_PT( MomJet(1:4,2))
     pT_jet(3) = get_PT( MomJet(1:4,3))
     pT_jet(4) = get_PT( MomJet(1:4,4))
+    if( NJet.eq.5 ) pT_jet(5) = get_PT( MomJet(1:4,5))
     eta_jet(1)= get_ETA(MomJet(1:4,1))
     eta_jet(2)= get_ETA(MomJet(1:4,2))
     eta_jet(3)= get_ETA(MomJet(1:4,3))
     eta_jet(4)= get_ETA(MomJet(1:4,4))
+    if( NJet.eq.5 ) eta_jet(5)= get_ETA(MomJet(1:4,5))
 
     pT_lepP  = get_PT(Mom(1:4,lep))
     eta_lepP = get_ETA(Mom(1:4,lep))
@@ -7935,13 +7939,17 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
     MomMiss(1:4) = Mom(1:4,nu)+Mom(1:4,X0)+Mom(1:4,X0bar)
     pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
 
-    phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
-    if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
-
-    m_ll = get_MInv(Mom(1:4,lepM)+Mom(1:4,lepP))
-
     pT_Top = get_PT(Mom(1:4,t))
     eta_Top = get_ETA(Mom(1:4,t))
+
+
+!    MTW = Get_MT(Mom(1:4,lep),MomMiss(1:4))!    ==  dsqrt(  2d0*pT_lepP*get_PT( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lep),MomMiss(1:4))) )
+   MTW = dsqrt(  2d0*pT_lepP*get_ET( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lep),MomMiss(1:4))) )! let's define MTW with ET instead of pT in accordance with ATLAS
+
+   MTeff = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4) + pT_lepP + pT_miss
+   if( NJet.eq.5 ) MTeff = MTeff + pt_jet(5)
+
+   H_T = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4) + MTW ! definition in accoradance with ATLAS
 
 
 ! check cuts
@@ -7977,14 +7985,13 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
        applyPSCut = .true.
         RETURN
     endif
+  
+   if( MTW.lt.MTW_cut ) then
+      applyPSCut = .true.
+       RETURN
+   endif
 
-   MomAux(2) = Mom(2,lep)+Mom(2,neu)
-   MomAux(3) = Mom(3,lep)+Mom(3,neu)
-!   MTW = dsqrt( (pT_lepP+get_PT(Mom(1:4,neu)))**2  - (MomAux(2)**2+MomAux(3)**2) )
-   MTW = Get_MT(Mom(1:4,lep),MomMiss(1:4))
-   MTeff = pt_jet(1)+pt_jet(2)+pt_jet(3)+pt_jet(4)+pT_lepP + pT_miss
 
-   
 !  topness: step 1
    if( get_MInv2(MomJet(1:4,1)+Mom(1:4,lep)) .lt. get_MInv2(MomJet(1:4,2)+Mom(1:4,lep)) ) then! select the b-jet that belongs to the leptonic side
         ib_lep=1
@@ -8019,24 +8026,14 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
     rpT = (pT_jet(1)-pT_lepP)/(pT_jet(1)+pT_lepP)
     
 
-   if( MTW.lt.MTW_cut ) then
-      applyPSCut = .true.
-       RETURN
-   endif
-
-
-!    if( MTeff.lt.1000*GeV ) then
-!       applyPSCut = .true.
-!        RETURN
-!    endif
 
 
 ! binning
     NBin(1)= WhichBin(1,pT_lepP)
     NBin(2)= WhichBin(2,eta_lepP)
     NBin(3)= WhichBin(3,pT_miss)
-    NBin(4)= WhichBin(4,phi_ll)
-    NBin(5)= WhichBin(5,m_ll)
+    NBin(4)= WhichBin(4,H_T)
+    NBin(5)= WhichBin(5,pt_jet(NJet))! softest jet
     NBin(6)= WhichBin(6,MTW)
     NBin(7)= WhichBin(7,MTeff)
     NBin(8)= WhichBin(8,pT_Top)

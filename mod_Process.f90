@@ -1630,9 +1630,174 @@ ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
 
 
 
+ELSEIF( PROCESS.EQ.43 ) THEN !   3_Str  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop + 5_Str
+
+! temporarily reset m_Top for InitMasterprocess and InitProcess
+ m_SMTop = m_Top
+ m_Top = m_HTop
+! will be restored in StartVegas
+
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,3,-2/)
+      MasterProcess=4
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=1
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! HeavyTop decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.44 ) THEN !   3_Glu  + 4_AStr  --> 1_AHeavyTop + 2_HeavyTop + 5_AStr
+
+! temporarily reset m_Top for InitMasterprocess and InitProcess
+ m_SMTop = m_Top
+ m_Top = m_HTop
+! will be restored in StartVegas
+
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,3,-1,-2/)
+      MasterProcess=4
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
+
+ELSEIF( PROCESS.EQ.45 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop + 5_Glu(in production)
+
+! temporarily reset m_Top for InitMasterprocess and InitProcess
+ m_SMTop = m_Top
+ m_Top = m_HTop
+! will be restored in StartVegas
+
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=3
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.46 ) THEN !   3_Str  + 4_AStr  --> 1_AHeavyTop + 2_HeavyTop + 5_Glu(in production)
+
+! temporarily reset m_Top for InitMasterprocess and InitProcess
+ m_SMTop = m_Top
+ m_Top = m_HTop
+! will be restored in StartVegas
+
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=4
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! st stbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      VegasNc0_default = 2000000
+      VegasNc1_default = 2000000
+
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 4
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/3,4,-1,-2/)
+      MasterProcess=2
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! shat integration
+      IF( XTOPDECAYS.NE.0 ) NDim = NDim + 4    ! Heavy top decays
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
 
 
 ELSEIF( PROCESS.EQ.47 .OR. PROCESS.EQ.48 ) THEN !   A/HTop -> BH/Bar + A/Top (HTop width)
+
+! temporarily reset m_Top for InitMasterprocess and InitProcess
+ m_SMTop = m_Top
+ m_Top = m_HTop
+! will be restored in StartVegas
+
   IF( CORRECTION.EQ.0 ) THEN
       NumExtParticles = 3
       allocate(Crossing(1:NumExtParticles))

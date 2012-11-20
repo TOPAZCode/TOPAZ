@@ -417,11 +417,14 @@ integer TheUnit
     write(TheUnit,"(A,F10.6,A)") "# Gamma_W(NLO)=",(Ga_W(0)+Ga_W(1))*100d0," GeV"
     if( XTOPDECAYS.eq.1 .or. XTOPDECAYS.eq.2 ) then
         write(TheUnit,'(A,F8.3,A)') "# m(Htop)=",m_HTop *100d0, " GeV"
+        if( XTOPDECAYS.eq.1) write(TheUnit,'(A,F8.3,A)') "# m(BH)=",m_BH *100d0, " GeV"
+        if( XTOPDECAYS.eq.2) write(TheUnit,'(A,F8.3,A)') "# m(A0)=",m_A0 *100d0, " GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(LO) =",Ga_HTop(0)*100d0," GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(NLO)=",(Ga_HTop(0)+Ga_HTop(1))*100d0," GeV"
     endif
     if( XTOPDECAYS.eq.3 ) then
         write(TheUnit,'(A,F8.3,A)') "# m(stop)=",m_STop *100d0, " GeV"
+        write(TheUnit,'(A,F8.3,A)') "# m(chi)=",m_Chi *100d0, " GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(LO) =",Ga_STop(0)*100d0," GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(NLO)=",(Ga_STop(0)+Ga_STop(1))*100d0," GeV"
     endif
@@ -568,7 +571,7 @@ ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.33 ) THEN
    call vegas1(EvalCS_DKJ_1L_ttbgg,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.41 ) THEN
-  m_Top = m_SMTop!   restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.41))
+!   m_Top = m_SMTop!   restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.41))
   call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -583,6 +586,14 @@ ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.5 ) THEN
    ncall= VegasNc1
    call InitHisto()
    call vegas1(EvalCS_1L_ttbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.45 ) THEN
+  call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.29 ) THEN
   call vegas(EvalCS_DKP_1L_ttbgg,VG_Result,VG_Error,VG_Chi2)
@@ -700,7 +711,7 @@ ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.34 ) THEN
         call vegas1(EvalCS_DKJ_1L_ttbqqb,VG_Result,VG_Error,VG_Chi2)
         endif
 ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.42 ) THEN
-  m_Top = m_SMTop!  restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.42))
+!   m_Top = m_SMTop!  restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.42))
   call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -715,6 +726,14 @@ ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.LE.6 ) THEN
    ncall= VegasNc1
    call InitHisto()
    call vegas1(EvalCS_1L_ttbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.3 .AND. (PROCESS.LE.43 .OR. PROCESS.LE.44 .OR. PROCESS.LE.46) ) THEN
+  call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.3 .AND. (PROCESS.EQ.25.OR.PROCESS.EQ.27.OR.PROCESS.EQ.31) ) THEN
   call vegas(EvalCS_DKP_1L_ttbqqb,VG_Result,VG_Error,VG_Chi2)
@@ -840,6 +859,14 @@ ELSEIF( CORRECTION.EQ.2 .AND. PROCESS.EQ.37) THEN
    call InitHisto()
    call vegas1(EvalCS_DKJ_Real_ttbggg,VG_Result,VG_Error,VG_Chi2)
   endif
+ELSEIF( CORRECTION.EQ.2 .AND. PROCESS.EQ.45) THEN
+  call vegas(EvalCS_Real_HtHtbggg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_Real_HtHtbggg,VG_Result,VG_Error,VG_Chi2)
+  endif
 ELSEIF( CORRECTION .EQ.3 ) THEN
   call vegas(EvalCS_1L_ttbggg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
@@ -894,6 +921,14 @@ ELSEIF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.35 .OR. PROCESS.EQ.36 .OR. PROCESS.EQ.
    ncall= VegasNc1
    call InitHisto()
    call vegas1(EvalCS_DKJ_Real_ttbqqbg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.43 .OR. PROCESS.EQ.44 .OR. PROCESS.EQ.46) ) THEN
+  call vegas(EvalCS_Real_HtHtbqqbg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_Real_HtHtbqqbg,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.1 ) THEN
   call vegas(EvalCS_1L_ttbqqbg,VG_Result,VG_Error,VG_Chi2)
@@ -1508,9 +1543,6 @@ ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
 !       call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
 !       call SetCtq6(200) !  updated CTEQ6.1M Standard MSbar scheme   0.118     326   226    cteq6m.tbl
      call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
-
-! print *, "SWITCHED TO CTEQ6M FOR CHINESE CHECK"
-
      PDFSetString = " CTEQ6.6M NLO (ctq66.00.pds)"
 !      call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
 !      PDFSetString = "CTEQ10 NLO (ct10.00.pds)"
