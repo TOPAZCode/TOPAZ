@@ -3097,7 +3097,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
           if(XTopDecays.ne.3  ) call Error("XTopDecays needs to be 3!")
-          NumHistograms = 5
+          NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3132,6 +3132,24 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
           Histo(5)%BinSize= 20d0*GeV
           Histo(5)%LowVal = 0d0
           Histo(5)%SetScale= 100d0
+
+          Histo(6)%Info   = "HT"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 50d0*GeV
+          Histo(6)%LowVal = 0d0
+          Histo(6)%SetScale= 100d0
+
+          Histo(7)%Info   = "MT(W)"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 40d0*GeV
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 100d0
+
+          Histo(8)%Info   = "MT^eff"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 50d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 100d0
 
 
 ELSEIF( ObsSet.EQ.43 .OR. ObsSet.EQ.45 ) THEN! set of observables for STSTbar + Chi production
@@ -3639,6 +3657,7 @@ real(8) :: PSWgt
 real(8) :: TopMom(1:4)
 real(8) :: MomDK(:,:)
 real(8) :: xRndPS(:)
+
 
 
    if( Topol.eq.T_B_W ) then
@@ -7740,8 +7759,8 @@ elseif( ObsSet.eq.41 .or. ObsSet.eq.42 .or. ObsSet.eq.43 .or. ObsSet.eq.44 .or. 
 endif
    zeros(3) = (Mom(1:4,X0bar).dot.Mom(1:4,X0bar)) - m_X0**2
    zeros(4) = (Mom(1:4,X0).dot.Mom(1:4,X0)) - m_X0**2
-   zeros(5) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
-   zeros(6) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
+   zeros(5) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_SMTop**2
+   zeros(6) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_SMTop**2
    zeros(7) = (Mom(1:4,bbar).dot.Mom(1:4,bbar))
    zeros(8) = (Mom(1:4,b).dot.Mom(1:4,b))
    zeros(9) = (Mom(1:4,lepm).dot.Mom(1:4,lepm))
@@ -7870,12 +7889,22 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     eta_lepM = get_ETA(Mom(1:4,lepM))
     eta_lepP = get_ETA(Mom(1:4,lepP))
 
-    pT_miss = get_ET( Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar) )! note that this is ET and not pT
+    MomMiss(1:4) = Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar)
+    pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
 
     phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
     if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
 
     m_ll = get_MInv(Mom(1:4,lepM)+Mom(1:4,lepP))
+
+
+    MTW = dsqrt(  2d0*pT_lepP*get_ET( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lepP),MomMiss(1:4))) )! let's define MTW with ET instead of pT in accordance with ATLAS
+
+    MTeff = pt_jet(1) + pt_jet(2) + pT_lepP + pT_lepM + pT_miss
+    if( NJet.eq.3 ) MTeff = MTeff + pt_jet(3)
+
+    H_T = pt_jet(1) + pt_jet(2) + MTW ! definition in accordance with ATLAS
+
 
 ! check cuts
     if( pT_jet(1).lt.pT_bjet_cut .or. pT_jet(2).lt.pT_bjet_cut ) then
@@ -7908,6 +7937,9 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     NBin(3)= WhichBin(3,pT_miss)
     NBin(4)= WhichBin(4,phi_ll)
     NBin(5)= WhichBin(5,m_ll)
+    NBin(6)= WhichBin(6,H_T)
+    NBin(7)= WhichBin(7,MTW)
+    NBin(8)= WhichBin(8,MTeff)
 
 
 

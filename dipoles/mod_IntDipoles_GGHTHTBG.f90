@@ -138,21 +138,22 @@ contains
       endif
 
 
-      if(emi.eq.1) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(2) = res(2) + (dipfini+dipplus)*mtrsq
-      endif
-      if(emi.eq.2) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(3) = res(3) + (dipfini+dipplus)*mtrsq
-      endif
-      if(emi.eq.3) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
-        res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
-      endif
+!       if(emi.eq.1) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(2) = res(2) + (dipfini+dipplus)*mtrsq
+!       endif
+!       if(emi.eq.2) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(3) = res(3) + (dipfini+dipplus)*mtrsq
+!       endif
+!       if(emi.eq.3) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
+!         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
+!       endif
+res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
 
-!res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
+
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 
@@ -171,14 +172,14 @@ contains
 !res(1) = res(1)+2*ap(1); print *, "eps check"
 
 ! 
-! print *, "LO ID", Tree_ij(0)
+print *, "LO ID", Tree_ij(0)
 ! print *, "ID check",res(1)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(2)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(3)/alpha_sOver2Pi/Tree_ij(0)
 ! pause
 
 
-  RETURN
+  RETURN 
   END SUBROUTINE
 
 

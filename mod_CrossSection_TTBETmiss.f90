@@ -59,9 +59,10 @@ ENDIF
    IF(XTOPDECAYS.EQ.1) THEN
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH top
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
-
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      m_Top = m_HTop
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1     
       nHel(1:2) = getHelicity(yrnd(17))
@@ -69,11 +70,11 @@ ENDIF
    ELSEIF(XTOPDECAYS.EQ.2) THEN
       call EvalPhasespace_HTopDK(HT_A0_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  A0 top
       call EvalPhasespace_HTopDK(HT_A0_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
-
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      m_Top = m_HTop
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
-     
       call HTopA0Decay(ExtParticle(1),DKX_HTA0_LO,MomExt(1:4,5:9))
       call HTopA0Decay(ExtParticle(2),DKX_HTA0_LO,MomExt(1:4,10:14))
       nHel(1:2) = getHelicity(yrnd(17))
@@ -83,7 +84,6 @@ ENDIF
    ENDIF
 
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
-print *, applyPSCut;pause
    if( applyPSCut ) then
       EvalCS_1L_HtHtbgg = 0d0
       return
@@ -294,12 +294,11 @@ xE=0.4d0
                      + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
                      + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
 
-print *, ( NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2) ) * PreFac
-print *, ( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac
-print *, "1L check",NLO_Res_UnPol(-2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-print *, "res1=", HOp(1)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-print *, "res2=", HOp(2)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
-print *, "res3=", HOp(3)/(alpha_sOver2Pi*RunFactor)/LO_Res_Unpol
+! print *, ( NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2) ) * PreFac
+print * , "LO CS",LO_Res_Unpol
+! print *, ( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac
+! print *, "1L check",NLO_Res_UnPol(-2) * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
+! print *, "res1=", HOp(1)/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
 pause
 
 ENDIF
@@ -1073,7 +1072,7 @@ include 'vegas_common.f'
    ELSE
       nHel(1:2) = getHelicity(yrnd(5))
    ENDIF
- 
+
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
    if( applyPSCut ) then
       EvalCS_1L_ststbgg = 0d0
@@ -1215,7 +1214,7 @@ ELSEIF( Correction.EQ.1 ) THEN
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-! print *, "------"
+! print *, "------",iPrimAmp
 ! print *, "LO", BornAmps(1)%Result
 ! print *, "NLO(-2)",PrimAmps(iPrimAmp)%Result(-2)
 ! print *, "NLO(-1)",PrimAmps(iPrimAmp)%Result(-1)
@@ -1253,10 +1252,10 @@ ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 !  CT contributions                           ! beta        !stop WFRC
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0   +  0d0  )*LO_Res_Unpol
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (+2d0/3d0*Nf_light+2d0/3d0)*LO_Res_Unpol! coupling renorm.
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (  -1d0/6d0          -2d0/3d0)*LO_Res_Unpol! gluon self energy (scalar,light fermion loops)
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (+2d0/3d0*Nf_light+2d0/3d0+1d0/6d0)*LO_Res_Unpol! coupling renorm.
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (-2d0/6d0         -2d0/3d0)*LO_Res_Unpol! gluon self energy
 
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_stop)*LO_Res_Unpol  ! finite log(mu) contrib. from  stop WFRC
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-1d0/6d0 )*2d0*dlog(MuRen/m_stop)*LO_Res_Unpol  ! finite log(mu) contrib. from  stop WFRC
 !    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-7d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from stop WFRC's   ! set to zero in MSBAR
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + 1d0*LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
 
@@ -1719,9 +1718,9 @@ ELSEIF( Correction.EQ.1 ) THEN
 !  CT contributions
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0   +  2d0*dZStop(-1) )*LO_Res_Unpol
                                                                                           ! the last term is from the scalar loop
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol; ! print *, "remove Nf_heavy for comparison"
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+  2d0/3d0*Nf_heavy + 1d0/6d0)*LO_Res_Unpol
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +            (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) +          (1d0/6d0)*2d0*dlog(MuRen/m_Stop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
 !    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + dZStop(0)*LO_Res_Unpol ! finite contribution from dZStop !  set to zero in MSBAR
 
 
@@ -6328,6 +6327,8 @@ include 'vegas_common.f'
 
 
    EvalCS_StopWidth = 0d0
+  
+! note: top decay is included but the results are independent of TopDK=1,2,3,4
 
    IF(XTOPDECAYS.EQ.3) THEN
       MomExt(1:4,3) = (/m_Stop,0d0,0d0,0d0/)
@@ -6414,6 +6415,7 @@ include 'vegas_common.f'
       enddo!helicity loop
 
       TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+!       TheDipole = - 4d0*Pi * CF * ( 1d0/pbDpg/ptDpg*( m_Stop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_STop/ptDpg)**2 - (m_Top/pbDpg)**2 )! alpha_s removed
 ! print *, LO_Res_Unpol * TheDipole * PreFac
 ! pause
 !     normalization

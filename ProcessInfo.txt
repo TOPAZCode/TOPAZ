@@ -65,7 +65,7 @@ ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr --> 1_ASTop + 2_STop
 ELSEIF( PROCESS.EQ.53 ) THEN !   3_Str  + 5_Glu  --> 1_ASTop + 2_STop + 4_Str
 ELSEIF( PROCESS.EQ.54 ) THEN !   4_AStr + 5_Glu  --> 1_ASTop + 2_STop + 3_AStr
 ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in production)
-ELSEIF( PROCESS.EQ.57 ) THEN !   Stop -> Chi + Top (Astop width)
+ELSEIF( PROCESS.EQ.57 ) THEN !  AStop -> ChiBar +ATop (Astop width)
 ELSEIF( PROCESS.EQ.58 ) THEN !   Stop -> Chi + Top ( stop width)
 
 

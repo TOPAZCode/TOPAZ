@@ -61,9 +61,9 @@ real(8), public            :: m_STop
 real(8), public            :: m_SBot
 real(8), public            :: Ga_STop(0:1)
 real(8), public            :: Ga_Stop_ChiTop(0:1)
-real(8), public, parameter :: m_A0    = 50d0*GeV! (scalar)
-real(8), public, parameter :: m_BH    = 50d0*GeV! (vector)
-real(8), public, parameter :: m_Chi   = 50d0*GeV! (Majorana)
+real(8), public, parameter :: m_A0    =50d0*GeV! (scalar)
+real(8), public, parameter :: m_BH    =50d0*GeV! (vector)
+real(8), public, parameter :: m_Chi   =50d0*GeV! (Majorana)
 real(8), public, parameter :: Vev  = 246d0*GeV
 
 !!! Zprime section !!!
@@ -455,10 +455,14 @@ ENDIF
 IF( Process.ge.51 .and. Process.le.59 ) then
    if( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.350d0*GeV ) then
       Ga_Stop_ChiTop(1) = (-0.00649d0 -0.00172d0) * GeV
+      call Error("remove alphas here")
+   elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.250d0*GeV ) then
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-0.0062804d0 -0.00063978d0) * GeV
    elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.300d0*GeV ) then
       Ga_Stop_ChiTop(1) = (-0.00300d0 - 0.000595d0) * GeV
+      call Error("remove alphas here")
    elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.100d0*GeV .and. m_stop.eq.500d0*GeV ) then
-      Ga_Stop_ChiTop(1) = (-0.01709-0.00662) * GeV
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-0.179269d0 -0.069456d0) * GeV
    else
       call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi couplings")
 !     ./TOPAZ Process=58 Collider=1 TopDK=4 XTopDK=3 NLOParam=2 Correction=4 ObsSet=43 VegasNc0=500000 VegasNc1=500000 MStop=3.00

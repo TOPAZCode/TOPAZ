@@ -41,7 +41,7 @@ integer,parameter :: A0=1,top=2,bot=3,lep=4,neu=5
    zeros(:) = 0d0
    zeros(1) = dble(HeavyTop%Mom(1:4).dot.HeavyTop%Mom(1:4)) - m_HTop**2
    zeros(2) = (Mom(1:4,A0).dot.Mom(1:4,A0)) - m_A0**2
-   zeros(3) = (Mom(1:4,top).dot.Mom(1:4,top)) - m_Top**2
+   zeros(3) = (Mom(1:4,top).dot.Mom(1:4,top)) - m_SMTop**2
    do i=3,NMom
       zeros(i+1)=  (Mom(1:4,i).dot.Mom(1:4,i))
    enddo
@@ -62,10 +62,12 @@ IF( Topol.eq.DKX_HTA0_LO ) THEN! leading order
 !-----------------------------------------------------------------------------
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2 = m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2 = m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IA0Tt(+1)*Chir(.true.,TopQuark%Pol(1:4)) + IA0Tt(-1)*Chir(.false.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
   
           HeavyTop%Pol(1:4) =( spb2_(HeavyTop%Pol(1:4),HeavyTop%Mom(1:4)) + M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -73,10 +75,12 @@ IF( Topol.eq.DKX_HTA0_LO ) THEN! leading order
 
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2 = m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2 = m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IA0Tt(+1)*Chir(.false.,TopQuark%Pol(1:4)) + IA0Tt(-1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
 
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -131,7 +135,7 @@ real(8),parameter :: CF=4d0/3d0
    zeros(:) = 0d0
    zeros(1) = dble(HeavyTop%Mom(1:4).dot.HeavyTop%Mom(1:4)) - m_HTop**2
    zeros(2) = (Mom(1:4,BH).dot.Mom(1:4,BH)) - m_BH**2
-   zeros(3) = (Mom(1:4,top).dot.Mom(1:4,top)) - m_Top**2
+   zeros(3) = (Mom(1:4,top).dot.Mom(1:4,top)) - m_SMTop**2
    do i=3,NMom
       zeros(i+1)=  (Mom(1:4,i).dot.Mom(1:4,i))
    enddo
@@ -154,14 +158,16 @@ IF( Topol.eq.DKX_HTBH_LO ) THEN! leading order
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call ubarSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
           else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
           endif
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
@@ -169,14 +175,16 @@ IF( Topol.eq.DKX_HTBH_LO ) THEN! leading order
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
           else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
           endif
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
@@ -191,14 +199,16 @@ ELSEIF( Topol.eq.DKX_HTBH_RE1 ) THEN! real emission from stop lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then ! HTop quark decay
         TopQuark%PartType = Top_
-        TopQuark%Mass = m_Top
-        TopQuark%Mass2= m_Top**2
+        TopQuark%Mass = m_SMTop
+        TopQuark%Mass2= m_SMTop**2
         TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
         if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call ubarSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
         else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
         endif
 
         call pol_mless(dcmplx(MomGlu(1:4)),GluHel,GluPol(1:4))        ! gluon
@@ -216,8 +226,8 @@ ELSEIF( Topol.eq.DKX_HTBH_RE1 ) THEN! real emission from stop lines
 !       adding diagram 2: photon emission off top quark
         BarSpi(1:4) = spb2_(TopQuark%Pol(1:4),GluPol(1:4))
         PropMom(1:4) = dcmplx( TopQuark%Mom(1:4)+MomGlu(1:4) )
-        TopProp = (PropMom(1:4).dot.PropMom(1:4)) - m_Top**2
-        BarSpi(1:4) = (0d0,1d0)*( spb2_(BarSpi(1:4),PropMom(1:4)) + m_Top*BarSpi(1:4) )/TopProp  ! top propagator
+        TopProp = (PropMom(1:4).dot.PropMom(1:4)) - m_SMTop**2
+        BarSpi(1:4) = (0d0,1d0)*( spb2_(BarSpi(1:4),PropMom(1:4)) + m_SMTop*BarSpi(1:4) )/TopProp  ! top propagator
         BarSpi(1:4) = spb2_(BarSpi(1:4),BHPol(1:4))
         BarSpi(1:4) = ( IBHTt(+1)*Chir(.true.,BarSpi(1:4)) + IBHTt(-1)*Chir(.false.,BarSpi(1:4)) ) * (0d0,1d0)
         HeavyTop%Pol(1:4) = HeavyTop%Pol(1:4) + ( spb2_(BarSpi(1:4),HeavyTop%Mom(1:4)) + m_HTop*BarSpi(1:4) )
@@ -225,14 +235,16 @@ ELSEIF( Topol.eq.DKX_HTBH_RE1 ) THEN! real emission from stop lines
 
     else  ! Anti-HTop quark decay
         TopQuark%PartType = ATop_
-        TopQuark%Mass = m_Top
-        TopQuark%Mass2= m_Top**2
+        TopQuark%Mass = m_SMTop
+        TopQuark%Mass2= m_SMTop**2
         TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
         if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
         else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
         endif
         call pol_mless(dcmplx(MomGlu(1:4)),GluHel,GluPol(1:4))      ! gluon
 !         GluPol(1:4) = dcmplx(MomGlu(1:4)); print *, "check gauge invariance"
@@ -252,8 +264,8 @@ ELSEIF( Topol.eq.DKX_HTBH_RE1 ) THEN! real emission from stop lines
 !       adding diagram 2: gluon emission off top quark
         Spi(1:4) = spi2_(GluPol(1:4),TopQuark%Pol(1:4))
         PropMom(1:4) = dcmplx( TopQuark%Mom(1:4)+MomGlu(1:4) )
-        TopProp = (PropMom(1:4).dot.PropMom(1:4)) - m_Top**2
-        Spi(1:4) = (0d0,1d0)*(-spi2_(PropMom(1:4),Spi(1:4)) + m_Top*Spi(1:4) )/TopProp  ! bot propagator
+        TopProp = (PropMom(1:4).dot.PropMom(1:4)) - m_SMTop**2
+        Spi(1:4) = (0d0,1d0)*(-spi2_(PropMom(1:4),Spi(1:4)) + m_SMTop*Spi(1:4) )/TopProp  ! bot propagator
         Spi(1:4) = ( IBHTt(+1)*Chir(.true.,Spi(1:4)) + IBHTt(-1)*Chir(.false.,Spi(1:4)) ) * (0d0,1d0)
         Spi(1:4) = spi2_(BHPol(1:4),Spi(1:4))
         HeavyTop%Pol(1:4) = HeavyTop%Pol(1:4) + ( spi2_(HeavyTop%Mom(1:4),Spi(1:4)) - m_HTop*Spi(1:4) )
@@ -276,20 +288,24 @@ ELSEIF( Topol.eq.DKX_HTBH_RE2 ) THEN! real emission from top lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_RE_T,Mom(1:4,bot:glu),GluonHel=GluHel)
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) =( spb2_(HeavyTop%Pol(1:4),HeavyTop%Mom(1:4)) + M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_RE_T,Mom(1:4,bot:glu),GluonHel=GluHel)
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -304,20 +320,24 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_RE_Q,Mom(1:4,bot:glu),GluonHel=GluHel)
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) =( spb2_(HeavyTop%Pol(1:4),HeavyTop%Mom(1:4)) + M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_RE_Q,Mom(1:4,bot:glu),GluonHel=GluHel)
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -333,9 +353,9 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
 ELSEIF( Topol.eq.DKX_HTBH_1L1 ) THEN! virtual correction on stop lines
 !-----------------------------------------------------------------------------
 
-    beta = m_top/m_Htop
+    beta = m_SMtop/m_Htop
     omega = m_BH/m_Htop
-    z = m_Top**2/m_Htop**2
+    z = m_SMTop**2/m_Htop**2
     P0 = 0.5d0*( 1d0 - omega**2 + z )
     P3 = 0.5d0*SqrtLambda(1d0,omega**2,z)
     W0 = 0.5d0*( 1d0+omega**2-z )
@@ -361,6 +381,8 @@ ELSEIF( Topol.eq.DKX_HTBH_1L1 ) THEN! virtual correction on stop lines
     C0L = C0L + ( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                   +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
 
+call error("here, the log(mu) term has to be added!")
+
 ! print *, c0l,c0r,c1l,c1r;pause
  C0L = C0L *1d0! 
  C0R = C0R *1d0! 
@@ -371,14 +393,16 @@ ELSEIF( Topol.eq.DKX_HTBH_1L1 ) THEN! virtual correction on stop lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call ubarSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
           else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
           endif
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( (0d0,1d0)*IBHTt(-1)*C0R*Chir(.true.,HeavyTop%Pol(1:4)) + (0d0,1d0)*IBHTt(-1)*C0L*Chir(.false.,HeavyTop%Pol(1:4)) ) & 
@@ -388,14 +412,16 @@ ELSEIF( Topol.eq.DKX_HTBH_1L1 ) THEN! virtual correction on stop lines
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           if( present(HelTop) ) then! stable top
               TopQuark%Helicity = HelTop
               call vSpi(TopQuark%Mom(1:4),TopQuark%Mass,TopQuark%Helicity,TopQuark%Pol(1:4))
           else
+              m_Top = m_SMTop
               call TopDecay(TopQuark,DK_LO,Mom(1:4,bot:neu))
+              m_Top = m_HTop
           endif
           HeavyTop%Pol(1:4) = ( (0d0,1d0)*IBHTt(-1)*C0R*Chir(.true.,TopQuark%Pol(1:4)) + (0d0,1d0)*IBHTt(-1)*C0L*Chir(.false.,TopQuark%Pol(1:4)) )
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4)) & 
@@ -416,20 +442,24 @@ ELSEIF( Topol.eq.DKX_HTBH_1L2 ) THEN! virtual correction on top lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_1L_T,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) =( spb2_(HeavyTop%Pol(1:4),HeavyTop%Mom(1:4)) + M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_1L_T,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -444,20 +474,24 @@ ELSEIF( Topol.eq.DKX_HTBH_1L3 ) THEN! virtual correction on W lines
     BHPol(1:4) = pol_mass(dcmplx(Mom(1:4,BH)),m_BH,BHHel)
     if( HeavyTop%PartType.gt.0 ) then! HTop quark decay, remember: PartType=Top and ATop for HTop and AHTop!!
           TopQuark%PartType = Top_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_1L_Q,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) =( spb2_(HeavyTop%Pol(1:4),HeavyTop%Mom(1:4)) + M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
           HeavyTop%Pol(5:16)= (0d0,0d0)
     else! anti HTop quark decay
           TopQuark%PartType = ATop_
-          TopQuark%Mass = m_Top
-          TopQuark%Mass2= m_Top**2
+          TopQuark%Mass = m_SMTop
+          TopQuark%Mass2= m_SMTop**2
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          m_Top = m_SMTop
           call TopDecay(TopQuark,DK_1L_Q,Mom(1:4,bot:neu))
+          m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
@@ -637,6 +671,7 @@ ELSEIF( Topol.eq.DKX_STChi0_RE1 ) THEN! gluon emission off (anti)stop
    endif
 
    StopQuark%Pol(1) = ( Diagram1 + Diagram2 ) * NWAFactor_STop * dsqrt( alpha_s4Pi*RunAlphaS(NLOParam,MuRen) * CF )
+!    StopQuark%Pol(1) = ( Diagram1 + Diagram2 ) * NWAFactor_STop * dsqrt( 4d0*Pi* CF )!  removed alpha_s (remember: also remove it in the dipole)
 
 
 ELSEIF( Topol.eq.DKX_STChi0_RE2 ) THEN! gluon emission off (anti)top
@@ -716,6 +751,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
 
 
       Norm = CF *  alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)! = CF * gs^2/(16pi^2) * 2*Re[..]
+!       Norm = CF *  1d0/(2d0*Pi)! removed alphas
       epMI = 0
 
       MI(1) = 1 * qlI2(M_Chi**2,M_Stop**2,M_top**2,MuRen**2,epMI) !MI(2,M_Chi**2,M_Stop**2,M_top**2)
@@ -746,6 +782,8 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       if(epMI.eq.0)  FF1 = FF1 - ( 4d0 +3d0*dlog(MuRen**2/m_Top**2) )
       Spi(1:4) = ( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) ) * Norm
 
+! print *, "eps",epMI
+! print *, "1",( FF1*SpiPlus(1:4) + FF2*SpiMinus(1:4) )
 
 
       ! integrated dipole
@@ -765,7 +803,10 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       ID(-1) = 1d0*( 2d0*(1d0-P0/P3*Yp) )
       ID(0)  = 1d0*( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
+      ID(0)  = ID(0) + dlog(MuRen**2/m_Stop**2)*ID(-1)
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
+
+
 
 ! spi=spiplus! this has to give the LO result
 ! print *, "spi=spiplus"
@@ -848,6 +889,7 @@ ELSEIF( Topol.eq.DKX_STChi0_1L1 ) THEN! virtual correction and integr.dipole on 
       ID(-1) = 1d0*( 2d0*(1d0-P0/P3*Yp) )
       ID(0)  = 1d0*( -4d0*dlog(4d0*P3**2/omega/beta) * (1d0-P0/P3*Yp) + 4d0 + 2d0/P3*( (1d0-omega**2)*Yp + (1d0-beta**2)*Yw )   & 
                      +P0/P3*( 2d0*Yp-6d0*Yp**2 + 4d0*Yw*dlog(beta) - 6d0*DLi2(1d0-Pmi/Ppl) - 2d0*DLi2(1d0-Ppl) + 2d0*DLi2(1d0-Pmi) ) )
+      ID(0)  = ID(0) + dlog(MuRen**2/m_Stop**2)*ID(-1)
       Spi(1:4) = Spi(1:4) + ID(epMI)*SpiPlus(1:4)*Norm
 
 ! spi=spiminus! this has to give the LO result
