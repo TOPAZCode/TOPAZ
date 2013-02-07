@@ -31,7 +31,7 @@ real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE
-integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),ParityFlip,BH1Hel,BH2Hel,BHMaxHel
+integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),ParityFlip,BH1Hel,BH2Hel,BHMaxHel,iQuark,iCut
 include 'misc/global_import'
 include 'vegas_common.f'
 
@@ -198,7 +198,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=7,10
+      do iPrimAmp=7,12
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -207,29 +207,9 @@ ELSEIF( Correction.EQ.1 ) THEN
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
       enddo
-      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
-      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)
-
-! ------------ add fermionic loop with m_bot=m_SMTop -------------- 
-      m_Bot = m_SMTop
-      do iPrimAmp=9,10
-          call SetKirill(PrimAmps(iPrimAmp))
-          call PentCut(PrimAmps(iPrimAmp))
-          call QuadCut(PrimAmps(iPrimAmp))
-          call TripCut(PrimAmps(iPrimAmp))
-          call DoubCut(PrimAmps(iPrimAmp))
-          call SingCut(PrimAmps(iPrimAmp))
-          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-          PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
-      enddo
-      FermionLoopPartAmp(7,-2:1) = FermionLoopPartAmp(7,-2:1) + PrimAmps(9)%Result(-2:1)
-      FermionLoopPartAmp(8,-2:1) = FermionLoopPartAmp(8,-2:1) + PrimAmps(10)%Result(-2:1)
-      m_Bot = m_Top
+      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)  + PrimAmps(11)%Result(-2:1)
+      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1) + PrimAmps(12)%Result(-2:1)
 
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
@@ -272,11 +252,10 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor
 
 
-
    EvalCS_1L_HtHtbgg = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
 
-! ELSEIF( Correction.EQ.3 ) THEN
+ELSEIF( Correction.EQ.3 ) THEN
 
    MomP(1:4,1) = MomExt(1:4,3)
    MomP(1:4,2) = MomExt(1:4,4)
@@ -285,7 +264,7 @@ ELSEIF( Correction.EQ.1 ) THEN
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
 
    xE = yRnd(13)
-xE=0.4d0
+! xE=0.4d0
 
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
    call EvalIntDipoles_GGHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
@@ -294,12 +273,10 @@ xE=0.4d0
                      + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
                      + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
 
-! print *, ( NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2) ) * PreFac
-print * , "LO CS",LO_Res_Unpol
-! print *, ( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac
 ! print *, "1L check",NLO_Res_UnPol(-2) * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
+! print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
 ! print *, "res1=", HOp(1)/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
-pause
+! pause
 
 ENDIF
 
@@ -694,6 +671,7 @@ integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),BHMaxHel,BH1Hel,BH2Hel
 !include 'misc/global_import'
 include 'vegas_common.f'
 
+
    EvalCS_Real_HtHtbggg = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_HTop ) then
@@ -710,6 +688,7 @@ include 'vegas_common.f'
    endif
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    ISFac = MomCrossing(MomExt)
+
    BHMaxHel = -1
    IF(XTOPDECAYS.EQ.1) THEN
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(8:9),MomExt(1:4,6:7),PSWgt2)!  BH top
@@ -717,18 +696,17 @@ include 'vegas_common.f'
 
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,7), yRnd(12:15),MomExt(1:4,8:10),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,12),yRnd(16:19),MomExt(1:4,13:15),PSWgt5)
+
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1
    ELSEIF(XTOPDECAYS.EQ.2) THEN
       call Error("XTOPDECAYS.EQ.2 is not yet supported")
    ENDIF
 
-
    call SetPDFs(eta1,eta2,MuFac,pdf)
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(2,MuRen)
-
    call Kinematics_TTbarETmiss(.true.,MomExt,(/4,5,6,11,7,12,8,9,10,13,14,15,3/),applyPSCut,NBin)
 
 ! applyPScut = .true.! this is for inverted check
@@ -740,19 +718,20 @@ else
    call SetPropagators()
    PreFac = PreFac
    LO_Res_Unpol = (0d0,0d0)
-   do iHel=nHel(1),nHel(2)
+   do iHel=1,NumHelicities
    do BH1Hel=-1,BHMaxHel
    do BH2Hel=-1,BHMaxHel
       IF( XTOPDECAYS.EQ.1 ) THEN
          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,6:10))
          call HTopBHDecay(ExtParticle(2),DKX_HTBH_LO,BH2Hel,MomExt(1:4,11:15))
       ENDIF
-
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
+      m_Top=m_HTop
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
+      m_Top=m_SMTop
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
       do iPrimAmp=1,NumBornAmps
@@ -790,13 +769,13 @@ else
 endif! applyPSCut
 
 
+!    cancellation checked for XTopDK=0 and (XTopDK=1,TopDK=4)
      call EvalDipoles_GGHtHtbG((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,3)/),(/0d0,0d0,m_HTop**2,m_HTop**2,0d0/),yRnd(8:19),PreFac,DipoleResult)
 
-
-!   s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
-!   s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
-!   write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_HtHtbggg,DipoleResult, (EvalCS_Real_HtHtbggg/(-DipoleResult)-1d0)
-!   pause
+  s12 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))
+  s13 = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+  write(* ,"(1PE23.16,3X,1PE23.16,3X,1PE23.16,3X,1PE23.16)") s13/s12,EvalCS_Real_HtHtbggg,DipoleResult, (EvalCS_Real_HtHtbggg/(-DipoleResult)-1d0)
+  pause
 
 
    if( IsNan(EvalCS_Real_HtHtbggg) .or. IsNan(DipoleResult) ) then
@@ -1449,8 +1428,6 @@ real(8),parameter :: Nc=3d0
 !include 'misc/global_import'
 include 'vegas_common.f'
 
-! yrnd(1)=0.8d0; yrnd(2)=0.65d0
-
    EvalCS_1L_ststbqqb = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_STop ) then
@@ -1519,6 +1496,9 @@ include 'vegas_common.f'
 !------------ LO ----------------
 IF( Correction.EQ.0 ) THEN
    do iHel=nHel(1),nHel(2)
+
+      if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
+
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -1540,8 +1520,8 @@ IF( Correction.EQ.0 ) THEN
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
     do iHel=nHel(1),nHel(2)  !; print *, "eval hel2 only"
-!     do iHel=2,2  ; print *, "eval hel2 only"
-!     do iHel=2,2  ; print *, "eval hel2 only"
+      if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
+
       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
 
@@ -1596,7 +1576,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 !               call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
               PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
               AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-              if( AccPoles.gt.5d-2 ) then
+              if( AccPoles.gt.1d-2 ) then
                   print *, "SKIP",AccPoles
                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
                   EvalCS_1L_ststbqqb = 0d0
@@ -2261,6 +2241,9 @@ integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
 !include 'misc/global_import'
 include 'vegas_common.f'
 
+! yrnd(1)= 0.1d0
+! yrnd(2)= 0.22d0
+! print *, "fixed yrnd"
 
    EvalCS_Real_ststbggg = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)

@@ -177,7 +177,7 @@ integer :: i,j,Order(1:6)
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom)
 ! pause
           elseif( IsAQuark(TreeProc%PartType(1)) .and. .not.Boson ) then
-             Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
+             Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) ) 
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
 !              Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )

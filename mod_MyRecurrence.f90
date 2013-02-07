@@ -2366,6 +2366,8 @@ END FUNCTION
            if (ng1 >0.or.m>0) sp2 = spb2_(sp2,k2)+mass*sp2
            tmp = vqg(sp2,e1)
 
+! print *, m,e1
+! pause
            if (m < ng2-1)  then
               if(abs(k1sq) > propcut) then
                   tmp = -(0d0,1d0)/k1sq*tmp
@@ -2382,6 +2384,7 @@ END FUNCTION
                endif
            endif
            res = res + tmp
+
         enddo
 
         do m=1,ng1
@@ -2419,6 +2422,7 @@ END FUNCTION
 
          endif
          endif ! endif for flavor consistency condition
+
       end function f
 
 

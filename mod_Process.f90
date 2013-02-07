@@ -1508,10 +1508,8 @@ ELSEIF( PROCESS.EQ.38 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + G
 
 ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
 
-! temporarily reset m_Top for InitMasterprocess and InitProcess
  m_SMTop = m_Top
- m_Top = m_HTop
-! will be restored in StartVegas
+ m_Top = m_HTop!  permanently overwriting m_Top
 
   IF( CORRECTION.EQ.0 ) THEN
       NumExtParticles = 4
@@ -1530,7 +1528,7 @@ ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=1
+      MasterProcess=31
       AvgFactor = SpinAvg * GluonColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -1570,10 +1568,8 @@ ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
 
 ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
 
-! temporarily reset m_Top for InitMasterprocess and InitProcess
  m_SMTop = m_Top
- m_Top = m_HTop
-! will be restored in StartVegas
+ m_Top = m_HTop!  permanently overwriting m_Top
 
   IF( CORRECTION.EQ.0 ) THEN
       NumExtParticles = 4
@@ -1592,7 +1588,7 @@ ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=2
+      MasterProcess=32
       AvgFactor = SpinAvg * QuarkColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -2479,7 +2475,7 @@ ELSEIF( MASTERPROCESS.EQ.1 ) THEN
         allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
     enddo
 
-    IF( TOPDECAYS.GE.1 ) THEN
+    IF( TOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.2 ) THEN
               NumHelicities = 4
               allocate(Helicities(1:NumHelicities,1:NumExtParticles))
               Helicities(1,1:4) = (/0,0,+1,+1/)
@@ -2542,7 +2538,7 @@ ELSEIF( MASTERPROCESS.EQ.2 ) THEN
         allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
     enddo
 
-    IF( TOPDECAYS.GE.1 ) THEN
+    IF( TOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.2 ) THEN
               NumHelicities = 4
               allocate(Helicities(1:NumHelicities,1:NumExtParticles))
               Helicities(1,1:4) = (/0,0,+1,+1/)
@@ -2604,7 +2600,7 @@ ELSEIF( MASTERPROCESS.EQ.3 ) THEN
         allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
     enddo
 
-    IF( TOPDECAYS.GE.1 ) THEN
+    IF( TOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.2 ) THEN
         NumHelicities = 8
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         Helicities(1,1:5) = (/0,0,+1,+1,+1/)
@@ -2686,7 +2682,7 @@ ELSEIF( MASTERPROCESS.EQ.4 ) THEN
         allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
     enddo
 
-    IF( TOPDECAYS.GE.1 ) THEN
+    IF( TOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.1 .OR. XTOPDECAYS.GE.2 ) THEN
         NumHelicities = 8
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         Helicities(1,1:5) = (/0,0,+1,+1,+1/)
@@ -3482,6 +3478,121 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
 
 
+ELSEIF( MASTERPROCESS.EQ.31 ) THEN!  this is a copy of Masterprocess 1 which is used for virtual T'T' production
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = Glu_
+    ExtParticle(4)%PartType = Glu_
+    IF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 12
+      NumBornAmps = 2
+    ELSE
+      call Error("Error in MASTERPROCESS.EQ.31")
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( XTOPDECAYS.GE.1 ) THEN
+              NumHelicities = 4
+              allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+              Helicities(1,1:4) = (/0,0,+1,+1/)
+              Helicities(2,1:4) = (/0,0,+1,-1/)
+              Helicities(3,1:4) = (/0,0,-1,+1/)
+              Helicities(4,1:4) = (/0,0,-1,-1/)
+    ELSE
+              NumHelicities = 8
+              allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+              sig_tb=+1; sig_t =+1;
+              Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+              Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+              sig_tb=+1; sig_t =-1;
+              Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+              Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+              sig_tb=-1; sig_t =+1;
+              Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+              Helicities(6,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+              sig_tb=-1; sig_t =-1;
+              Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+              Helicities(8,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+    !  additional helicities when parity inversion is not applied:    changes affect also EvalCS_ttb_NLODK_noSC
+    !         sig_tb=+1; sig_t =+1;
+    !         Helicities(9 ,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+    !         Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    !         sig_tb=+1; sig_t =-1;
+    !         Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+    !         Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    !         sig_tb=-1; sig_t =+1;
+    !         Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+    !         Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    !         sig_tb=-1; sig_t =-1;
+    !         Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+    !         Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    ENDIF
+
+
+
+ELSEIF( MASTERPROCESS.EQ.32 ) THEN!  this is a copy of Masterprocess 2 which is used for virtual T'T' production
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
+    IF( Correction.EQ.1 ) THEN
+      NumPrimAmps = 7
+      NumBornAmps = 1
+    ELSE
+      call Error("Error in MASTERPROCESS.EQ.32")
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( XTOPDECAYS.GE.1 ) THEN
+              NumHelicities = 4
+              allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+              Helicities(1,1:4) = (/0,0,+1,+1/)
+              Helicities(2,1:4) = (/0,0,+1,-1/)
+              Helicities(3,1:4) = (/0,0,-1,+1/)
+              Helicities(4,1:4) = (/0,0,-1,-1/)
+    ELSE
+      NumHelicities = 4
+      allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      sig_tb=+1; sig_t =+1;
+  !    Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)  ! the x,x,+1,+1 helicities lead to vanishing tree contribution
+      Helicities(1,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+      sig_tb=+1; sig_t =-1;
+  !    Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+      Helicities(2,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+      sig_tb=-1; sig_t =+1;
+  !    Helicities(5,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+      Helicities(3,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+      sig_tb=-1; sig_t =-1;
+  !    Helicities(7,1:NumExtParticles) = (/sig_tb,sig_t,+1,+1/)
+      Helicities(4,1:NumExtParticles) = (/sig_tb,sig_t,+1,-1/)
+  !   additional helicities when parity inversion is not applied: changes affect also EvalCS_ttb_NLODK_noSC
+  !     sig_tb=+1; sig_t =+1;
+  !     Helicities(9 ,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+  !     Helicities(10,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+  !     sig_tb=+1; sig_t =-1;
+  !     Helicities(11,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+  !     Helicities(12,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+  !     sig_tb=-1; sig_t =+1;
+  !     Helicities(13,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+  !     Helicities(14,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+  !     sig_tb=-1; sig_t =-1;
+  !     Helicities(15,1:NumExtParticles) = (/sig_tb,sig_t,-1,-1/)
+  !     Helicities(16,1:NumExtParticles) = (/sig_tb,sig_t,-1,+1/)
+    ENDIF
 
 
 
@@ -4829,6 +4940,124 @@ print *, "check this here"
 
 
 
+ELSEIF( MASTERPROCESS.EQ.31 ) THEN!  this is a copy of Masterprocess 1 which is used for T' production
+   IF ( Correction.EQ.1 ) THEN
+   BornAmps(1)%ExtLine = (/1,2,3,4/)
+   BornAmps(2)%ExtLine = (/1,2,4,3/)
+
+   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   PrimAmp1_1234 = 2
+   PrimAmps(1)%AmpType = 1
+
+   PrimAmps(2)%ExtLine = (/1,2,4,3/)
+   PrimAmp1_1243 = 1
+   PrimAmps(2)%AmpType = 1
+
+   PrimAmps(3)%ExtLine = (/1,3,2,4/)
+   PrimAmp1_1324 = 3
+   PrimAmps(3)%AmpType = 1
+
+   PrimAmps(4)%ExtLine = (/1,4,2,3/)
+   PrimAmp1_1423 = 4
+   PrimAmps(4)%AmpType = 1
+
+   PrimAmps(5)%ExtLine = (/1,3,4,2/)
+   PrimAmp1_1342 = 6
+   PrimAmps(5)%AmpType = 1
+
+   PrimAmps(6)%ExtLine = (/1,4,3,2/)
+   PrimAmp1_1432 = 5
+   PrimAmps(6)%AmpType = 1
+
+   PrimAmps(7)%ExtLine = (/1,2,3,4/)
+   PrimAmp2_1234 = 1
+   PrimAmps(7)%AmpType = 2
+   PrimAmps(7)%FermLoopPart = Chm_
+
+   PrimAmps(8)%ExtLine = (/1,2,4,3/)
+   PrimAmp2_1243 = 2
+   PrimAmps(8)%AmpType = 2
+   PrimAmps(8)%FermLoopPart = Chm_
+
+   PrimAmps(9)%ExtLine = (/1,2,3,4/)
+   PrimAmp2m_1234 = 1
+   PrimAmps(9)%AmpType = 2
+   PrimAmps(9)%FermLoopPart = Bot_
+
+   PrimAmps(10)%ExtLine = (/1,2,4,3/)
+   PrimAmp2m_1243 = 2
+   PrimAmps(10)%AmpType = 2
+   PrimAmps(10)%FermLoopPart = Bot_
+
+   PrimAmps(11)%ExtLine = (/1,2,3,4/)
+   PrimAmp2m_1234 = 1
+   PrimAmps(11)%AmpType = 2
+   PrimAmps(11)%FermLoopPart = HTop_  !   the label HTop is only used for closed T' loops
+
+   PrimAmps(12)%ExtLine = (/1,2,4,3/)
+   PrimAmp2m_1243 = 2
+   PrimAmps(12)%AmpType = 2
+   PrimAmps(12)%FermLoopPart = HTop_
+
+
+   ELSEIF( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
+   BornAmps(1)%ExtLine = (/1,2,3,4/)
+   BornAmps(2)%ExtLine = (/1,2,4,3/)
+
+   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   PrimAmps(2)%ExtLine = (/1,2,4,3/)
+   ENDIF
+
+
+ELSEIF( MasterProcess.EQ.32) THEN!  this is a copy of Masterprocess 2 which is used for T' production
+   IF( Correction.EQ.1 ) THEN
+   BornAmps(1)%ExtLine = (/1,2,3,4/)
+   BornAmps(2)%ExtLine = (/1,2,3,4/)
+   BornAmps(3)%ExtLine = (/1,4,3,2/)
+   BornAmps(4)%ExtLine = (/1,2,3,4/)
+   BornAmps(5)%ExtLine = (/1,2,3,4/)
+   BornAmps(6)%ExtLine = (/1,2,3,4/)
+
+   PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   PrimAmp1_1234 = 1
+   PrimAmps(1)%AmpType = 1
+
+   PrimAmps(2)%ExtLine = (/1,2,4,3/)
+   PrimAmp1_1243 = 2
+   PrimAmps(2)%AmpType = 1
+
+!    PrimAmps(3)%ExtLine = (/1,3,4,2/)
+   PrimAmps(3)%ExtLine = (/1,4,3,2/)
+   PrimAmp3_1432 = 3
+   PrimAmps(3)%AmpType = 3
+
+!    PrimAmps(4)%ExtLine = (/1,2,4,3/)
+   PrimAmps(4)%ExtLine = (/1,2,3,4/)
+   PrimAmp4_1234 = 4
+   PrimAmps(4)%AmpType = 4
+
+   PrimAmps(5)%ExtLine = (/1,2,3,4/)
+   PrimAmp2_1234 = 5
+   PrimAmps(5)%AmpType = 2
+   PrimAmps(5)%FermLoopPart = Chm_
+
+   PrimAmps(6)%ExtLine = (/1,2,3,4/)
+   PrimAmp2m_1234 = 6
+   PrimAmps(6)%AmpType = 2
+   PrimAmps(6)%FermLoopPart = Bot_
+
+   PrimAmps(7)%ExtLine = (/1,2,3,4/)
+   PrimAmp2m_1234 = 7
+   PrimAmps(7)%AmpType = 2
+   PrimAmps(7)%FermLoopPart = HTop_!   the label HTop is only used for closed T' loops
+
+   ELSEIF ( Correction.EQ.0 .OR. Correction.GE.4 ) THEN
+    BornAmps(1)%ExtLine = (/1,2,3,4/)
+    PrimAmps(1)%ExtLine = (/1,2,3,4/)
+   ENDIF
+
+
+
 
 ELSEIF( MasterProcess.EQ.41) THEN
 !   do nothing 
@@ -5375,7 +5604,7 @@ include 'misc/global_import'
       elseif(ExtPartType.eq.Glu_ ) then
          Lab_ex(Vertex)='glu'
       elseif(ExtPartType.eq.HTop_ .or. ExtPartType.eq.AHTop_ ) then! fix for HTop
-         Lab_ex(Vertex)='top'
+         Lab_ex(Vertex)='bot'! bot because the label HTop is only used in closed T' fermion loops
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
          Lab_ex(Vertex)='sto'
       else
@@ -5393,7 +5622,7 @@ include 'misc/global_import'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.Glu_ ) then
          Lab_in(Propa)='glu'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.HTop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.AHTop_ ) then
-         Lab_in(Propa)='top'
+         Lab_in(Propa)='bot'! bot because the label HTop is only used in closed T' fermion loops
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.STop_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASTop_ ) then
          Lab_in(Propa)='sto'
       elseif( ThePrimAmp%IntPart(Propa)%PartType.eq.SBot_ .or. ThePrimAmp%IntPart(Propa)%PartType.eq.ASBot_ ) then

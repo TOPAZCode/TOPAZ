@@ -1080,26 +1080,36 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
+            SecHel=2
+      elseif( XTopDecays.eq.1 ) then
             SecHel=1
       else
-            SecHel=-1
+          call Error("Error in dipole Tree_GG_TTb")
       endif
 
       SqAmp = (0d0,0d0)
-      do A0barHel=1,SecHel
-      do A0Hel=1,SecHel
-
-        IF(XTOPDECAYS.EQ.1) THEN
+      do A0barHel=-1,+1,SecHel
+      do A0Hel=-1,+1,SecHel
+        IF( XTOPDECAYS.EQ.1 ) THEN
+         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
+         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
+        ELSEIF(XTOPDECAYS.EQ.0 ) THEN
+         TopQuark(1)%Helicity = A0Hel
+         TopQuark(2)%Helicity = A0barHel
          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
         ENDIF
         Quarks(1)%Pol => TopQuark(1)%Pol
         Quarks(2)%Pol => TopQuark(2)%Pol
+        Quarks(1)%Helicity => TopQuark(1)%Helicity
+        Quarks(2)%Helicity => TopQuark(2)%Helicity
 
       do iHel=1,2
-      Gluons(ngl)%Pol => PolV(:,HelList(iHel,1),ngl)
-      Gluons(ngl)%Helicity => HelList(iHel,1)
+      Gluons(ngl)%Pol => Gluons(ngl)%Mom;   print *, "checking gauge inv in gg dipoles, fails for XtopDK=0"
+!       Gluons(ngl)%Pol => PolV(:,HelList(iHel,1),ngl)
 
+
+      Gluons(ngl)%Helicity => HelList(iHel,1)
 !      calc currents
       Res(0:3) = cur_g_2f( (/Gluons(ngl)/),(/Quarks(2),Quarks(1)/),(/2,1,0,0/) )
       Amp(3-ngl,plus)  = Res(0:3).dot.PolV(0:3,plus,3-ngl)
@@ -1126,7 +1136,7 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       enddo
       SqAmp = alpha_s4Pi**2 / SpinAvg / ColAvg *SqAmp
 
-
+print *, icorr,sqamp
 
       return
       END FUNCTION

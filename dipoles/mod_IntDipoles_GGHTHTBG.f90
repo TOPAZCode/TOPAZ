@@ -138,20 +138,20 @@ contains
       endif
 
 
-!       if(emi.eq.1) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(2) = res(2) + (dipfini+dipplus)*mtrsq
-!       endif
-!       if(emi.eq.2) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(3) = res(3) + (dipfini+dipplus)*mtrsq
-!       endif
-!       if(emi.eq.3) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
-!         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
-!       endif
-res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
+      if(emi.eq.1) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(2) = res(2) + (dipfini+dipplus)*mtrsq
+      endif
+      if(emi.eq.2) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(3) = res(3) + (dipfini+dipplus)*mtrsq
+      endif
+      if(emi.eq.3) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
+        res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
+      endif
+! res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
 
 
    enddo
@@ -160,7 +160,7 @@ res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
        mtrsq = Tree_ij(0)
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
        epcorr=epinv
-       AP(1)= (11.0_dp/6.0_dp*CA - 5d0/3.0_dp)  ! 5d0=nf
+       AP(1)= (11.0_dp/6.0_dp*CA -   5d0/3.0_dp)  ! 5d0=nf
        AP(2)= CA * two*(one/z+z*(one-z)-two)
        AP(3)= CA * two/(one-z)
        AP(1:3) = AP(1:3) * alpha_sOver2Pi * epcorr * mtrsq
@@ -168,11 +168,10 @@ res(1) = res(1) + dipsoft*mtrsq; print *, "eps check"
        res(1) = res(1) + 2d0*(AP(1)-AP(3))
        res(2) = res(2) + (AP(2) + AP(3))
        res(3) = res(3) + (AP(2) + AP(3))
-
-!res(1) = res(1)+2*ap(1); print *, "eps check"
+! res(1) = res(1)+2*ap(1); print *, "eps check"
 
 ! 
-print *, "LO ID", Tree_ij(0)
+! print *, "LO ID", Tree_ij(0)
 ! print *, "ID check",res(1)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(2)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(3)/alpha_sOver2Pi/Tree_ij(0)
@@ -193,7 +192,7 @@ print *, "LO ID", Tree_ij(0)
       implicit none
       double precision,parameter :: Split_A=1d0
       double complex SqAmp(0:6),Amp(2,0:1),Res(0:3)
-      integer col,colP,iHel,icorr,SecHel,A0barHel,A0Hel
+      integer col,colP,iHel,icorr,SecHel,A0barHel,A0Hel,HTHel,HTbarHel
       double complex,target :: MomTd(0:3,1:4)
       double precision,target :: Mass2Td(1:4),MassTd(1:4)
       double complex, target :: PolV(0:3,0:1,1:4)
@@ -257,7 +256,7 @@ print *, "LO ID", Tree_ij(0)
 
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
-            SecHel=1
+            SecHel= 1
       else
             SecHel=-1
       endif
@@ -274,14 +273,20 @@ do icorr=0,6
       if(icorr.eq.6) ColCorr(1:2,1:2)=ColCorr6(1:2,1:2)
 
 
-      do A0barHel=1,SecHel,-2
-      do A0Hel=1,SecHel,-2
+      do A0barHel=1,SecHel,-1
+      do A0Hel=1,SecHel,-1
+      do HTbarHel=-1,SecHel,2
+      do HTHel=-1,SecHel,2
 
-
-        IF(XTOPDECAYS.EQ.1) THEN
-         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
-         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
-        ENDIF
+        if( XTOPDECAYS.eq.0 ) then
+            TopQuark(1)%Helicity = HTbarHel
+            TopQuark(2)%Helicity = HTHel
+            call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
+            call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
+        else
+            call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
+            call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
+        endif
         Quarks(1)%Pol => TopQuark(1)%Pol
         Quarks(2)%Pol => TopQuark(2)%Pol
 
@@ -313,6 +318,9 @@ do icorr=0,6
       enddo
       enddo
 
+      enddo
+
+      enddo
       enddo
       enddo
       enddo

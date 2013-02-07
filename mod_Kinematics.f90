@@ -3105,7 +3105,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
 
           Histo(1)%Info   = "pT_LepP"
           Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 20d0*GeV
+          Histo(1)%BinSize= 40d0*GeV
           Histo(1)%LowVal = 20d0*GeV
           Histo(1)%SetScale= 100d0
 
@@ -3117,8 +3117,8 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
 
           Histo(3)%Info   = "ET_miss"
           Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 20d0*GeV
-          Histo(3)%LowVal = 20d0*GeV
+          Histo(3)%BinSize= 40d0*GeV
+          Histo(3)%LowVal = 40d0*GeV
           Histo(3)%SetScale= 100d0
 
           Histo(4)%Info   = "phi(l+,l-)"
@@ -3147,7 +3147,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
 
           Histo(8)%Info   = "MT^eff"
           Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 50d0*GeV
+          Histo(8)%BinSize= 100d0*GeV
           Histo(8)%LowVal = 0d0
           Histo(8)%SetScale= 100d0
 
@@ -3713,6 +3713,7 @@ logical,save :: flip=.true.
       call boost(MomDK(1:4,3),TopMom(1:4),m_Top)
       PSWgt = PSWgt2*PiWgt2 * PSWgt3*PiWgt2
 
+
     else! extra gluon emission
 !     MomDK(1:4,i): i=1:bottom, 2:lepton, 3:neutrino, 4: gluon
 !      call genps(3,m_Top,xRndPS(1:5),(/0d0,0d0,m_W/),MomDK(1:4,1:3),PSWgt2)! top decay with additional gluon
@@ -4167,12 +4168,12 @@ real(8) :: s13,s23
    call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Htop,m_Htop/),Mom(1:4,3:5),PSWgt)
    PSWgt = PSWgt*PiWgt3
 
-!     Pcol1= 2 -1
-!     Pcol2= 3 -1
-!     SingDepth = 1e-10
-!     Steps = 15
-!     PSWgt = 1d0
-!     call gensing(3,EHat,(/0d0,m_HTop,m_HTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
+    Pcol1= 1 -1
+    Pcol2= 3 -1
+    SingDepth = 1e-10
+    Steps = 15
+    PSWgt = 1d0
+    call gensing(3,EHat,(/0d0,m_HTop,m_HTop/),Mom(1:4,3:5),Pcol1,Pcol2,SingDepth,Steps); print *, "generating singular point"
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -4307,7 +4308,7 @@ real(8) :: s13,s23
    call genps(3,Ehat,xRndPS(1:5),(/0d0,m_Stop,m_Stop/),Mom(1:4,3:5),PSWgt)
    PSWgt = PSWgt*PiWgt3
 
-!     Pcol1= 2 -1
+!     Pcol1= 3 -1
 !     Pcol2= 3 -1
 !     SingDepth = 1e-10
 !     Steps = 15
@@ -7770,7 +7771,7 @@ endif
    if(NPlus1PS) zeros(13) = (Mom(1:4,realp).dot.Mom(1:4,realp))
 
    if( any(abs(zeros(1:13)/1d0).gt.1d-5) ) then
-      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:13)
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTbarETmiss: ",zeros(1:13),NPlus1PS
       print *, "momentum dump:"
       print *, Mom(:,:)
    endif
@@ -7892,6 +7893,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     MomMiss(1:4) = Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar)
     pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
 
+
     phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
     if( phi_ll.gt.Pi ) phi_ll=2d0*Pi-phi_ll
 
@@ -7947,7 +7949,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
 
 !-------------------------------------------------------
 elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then! set of observables for TTbar -> ttbar + ETmiss  in semi-hadr. top decays
-! request at least two b-jets
+! request at least two b-jets and 2 jets from hadronic W decay
     NObsJet_Tree = 4
     if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
         applyPSCut = .true.

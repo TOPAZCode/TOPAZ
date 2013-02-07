@@ -570,8 +570,7 @@ ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.33 ) THEN
    call InitHisto()
    call vegas1(EvalCS_DKJ_1L_ttbgg,VG_Result,VG_Error,VG_Chi2)
   endif
-ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.41 ) THEN
-!   m_Top = m_SMTop!   restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.41))
+ELSEIF( CORRECTION.EQ.0 .AND. PROCESS.EQ.41 ) THEN
   call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -710,8 +709,7 @@ ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.34 ) THEN
         call InitHisto()
         call vegas1(EvalCS_DKJ_1L_ttbqqb,VG_Result,VG_Error,VG_Chi2)
         endif
-ELSEIF( CORRECTION.LE.1 .AND. PROCESS.EQ.42 ) THEN
-!   m_Top = m_SMTop!  restore correct top mass value since initialization is done (see InitProcess(PROCESS.EQ.42))
+ELSEIF( CORRECTION.EQ.0 .AND. PROCESS.EQ.42 ) THEN
   call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -860,6 +858,7 @@ ELSEIF( CORRECTION.EQ.2 .AND. PROCESS.EQ.37) THEN
    call vegas1(EvalCS_DKJ_Real_ttbggg,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.2 .AND. PROCESS.EQ.45) THEN
+  m_Top = m_SMTop! restoring m_Top after reset in mod_Process.f90
   call vegas(EvalCS_Real_HtHtbggg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -923,6 +922,7 @@ ELSEIF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.35 .OR. PROCESS.EQ.36 .OR. PROCESS.EQ.
    call vegas1(EvalCS_DKJ_Real_ttbqqbg,VG_Result,VG_Error,VG_Chi2)
   endif
 ELSEIF( CORRECTION.EQ.2 .AND. (PROCESS.EQ.43 .OR. PROCESS.EQ.44 .OR. PROCESS.EQ.46) ) THEN
+  m_Top = m_SMTop! restoring m_Top after reset in mod_Process.f90
   call vegas(EvalCS_Real_HtHtbqqbg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
    itmx = VegasIt1
@@ -1252,6 +1252,33 @@ IF( CORRECTION.LE.1 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.59) ) THEN
 ENDIF
 ENDIF
 
+
+
+
+IF( MASTERPROCESS.EQ.31 ) THEN
+   IF( CORRECTION.EQ.1 .AND. PROCESS.EQ.41 ) THEN
+  call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+IF( MASTERPROCESS.EQ.32 ) THEN
+   IF( CORRECTION.EQ.1 .AND. PROCESS.EQ.42 ) THEN
+  call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
 
 
 IF( MASTERPROCESS.EQ.41 .OR. MASTERPROCESS.EQ.42 ) THEN
