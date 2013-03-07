@@ -6492,7 +6492,7 @@ include 'vegas_common.f'
       do iHel=-1,+1,1
       do jHel=-1,+1,2
       do kHel=-1,+1,2
-          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:6),HelTop=jHel)
           Spi(1:4) = ExtParticle(1)%Pol(1:4)
           IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
                 call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
@@ -6511,11 +6511,12 @@ include 'vegas_common.f'
 
    ELSEIF( CORRECTION.EQ.4 ) THEN
 
+
       LO_Res_Unpol = (0d0,0d0)
       do iHel=-1,+1,1
       do jHel=-1,+1,2
       do kHel=-1,+1,2
-          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExt(1:4,5:6),HelTop=jHel)
           Spi(1:4) = ExtParticle(1)%Pol(1:4)
           IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
                 call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
@@ -6524,7 +6525,7 @@ include 'vegas_common.f'
           ENDIF
           Amp = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
 
-          call HTopBHDecay(ExtParticle(1),DKX_HTBH_1L1,iHel,MomExt(1:4,5:9),HelTop=jHel)
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_1L1,iHel,MomExt(1:4,5:6),HelTop=jHel)
           Spi(1:4) = ExtParticle(1)%Pol(1:4)
           Amp2= psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_HTop)
 
@@ -6536,6 +6537,9 @@ include 'vegas_common.f'
 !  normalization
    EvalCS_HTopWidth = LO_Res_Unpol * PreFac
 
+
+
+
    ELSEIF( CORRECTION.EQ.5 ) THEN
 
       LO_Res_Unpol = (0d0,0d0)
@@ -6543,7 +6547,7 @@ include 'vegas_common.f'
       do jHel=-1,+1,2
       do kHel=-1,+1,2
       do lHel=-1,+1,2
-          call HTopBHDecay(ExtParticle(1),DKX_HTBH_RE1,iHel,MomExt(1:4,5:9),MomGlu=MomExt(1:4,15),GluHel=lHel,HelTop=jHel)
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_RE1,iHel,MomExt(1:4,5:6),MomGlu=MomExt(1:4,15),GluHel=lHel,HelTop=jHel)
           Spi(1:4) = ExtParticle(1)%Pol(1:4)
           IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
                 call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
@@ -6558,16 +6562,19 @@ include 'vegas_common.f'
       enddo!helicity loop
 !     normalization
       EvalCS_HTopWidth = LO_Res_Unpol * PreFac
-! print *, LO_Res_Unpol * PreFac
-! pause
+
 
       call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
-      call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(6:9),MomExtTd(1:4,7:9),PSWgt4)    
+      call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(6:9),MomExtTd(1:4,7:9),PSWgt4) 
+      if( dabs(ptDpg/m_HTop**2) .lt. 1d-6 )  then
+          EvalCS_HTopWidth = 0d0
+          return
+      endif
       LO_Res_Unpol = (0d0,0d0)
       do iHel=-1,+1,1
       do jHel=-1,+1,2
       do kHel=-1,+1,2
-          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExtTd(1:4,5:9),HelTop=jHel)
+          call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,iHel,MomExtTd(1:4,5:6),HelTop=jHel)
           Spi(1:4) = ExtParticle(1)%Pol(1:4)
           IF( ExtParticle(1)%PartType.lt.0d0 ) THEN
                 call vBarSpi(ExtParticle(1)%Mom(1:4),m_HTop,kHel,BarSpi(1:4))
@@ -6579,11 +6586,17 @@ include 'vegas_common.f'
       enddo!helicity loop
       enddo!helicity loop
       enddo!helicity loop
-      TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_HTop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
-! print *, LO_Res_Unpol * TheDipole * PreFac
+      TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_HTop**2+m_SMTop**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_SMTop/pbDpg)**2 )
+
+! print *, "Sing",ptDpg/m_HTop**2, pbDpg/m_HTop**2
+! print *, "Real",EvalCS_HTopWidth
+! print *, "Dipo",LO_Res_Unpol*TheDipole*PreFac
+! print *, "rati",(LO_Res_Unpol*TheDipole*PreFac)/EvalCS_HTopWidth + 1d0
 ! pause
+
 !     normalization
       EvalCS_HTopWidth = EvalCS_HTopWidth + LO_Res_Unpol * TheDipole * PreFac
+
 
 
    ENDIF

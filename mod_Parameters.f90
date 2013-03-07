@@ -61,9 +61,9 @@ real(8), public            :: m_STop
 real(8), public            :: m_SBot
 real(8), public            :: Ga_STop(0:1)
 real(8), public            :: Ga_Stop_ChiTop(0:1)
-real(8), public, parameter :: m_A0    =50d0*GeV! (scalar)
-real(8), public, parameter :: m_BH    =50d0*GeV! (vector)
-real(8), public, parameter :: m_Chi   =50d0*GeV! (Majorana)
+real(8), public, parameter :: m_A0    = 50d0*GeV! (scalar)
+real(8), public, parameter :: m_BH    = 50d0*GeV! (vector)
+real(8), public, parameter :: m_Chi   = 50d0*GeV! (Majorana)
 real(8), public, parameter :: Vev  = 246d0*GeV
 
 !!! Zprime section !!!
@@ -465,7 +465,7 @@ IF( Process.ge.51 .and. Process.le.59 ) then
    elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.100d0*GeV .and. m_stop.eq.500d0*GeV ) then
       Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-0.179269d0 -0.069456d0) * GeV
    else
-      call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi couplings")
+      call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi")
 !     ./TOPAZ Process=58 Collider=1 TopDK=4 XTopDK=3 NLOParam=2 Correction=4 ObsSet=43 VegasNc0=500000 VegasNc1=500000 MStop=3.00
    endif
 ENDIF
@@ -475,6 +475,9 @@ ENDIF
 IF( abs(XTOPDECAYS).EQ.3 .AND. NLOPARAM.EQ.2 .AND. CORRECTION.EQ.0 ) THEN
    WidthExpansion = WidthExpansion + StopWidthExpansion
 ENDIF
+
+
+
 
 IF( XTOPDECAYS.EQ.2 ) THEN
 !  chiral couplings for HTop-A0-top
@@ -489,87 +492,96 @@ IF( XTOPDECAYS.EQ.2 ) THEN
    Ga_Htop_A0Top(1) = 0d0
    Ga_HTop(:) = Ga_Htop_A0Top(:)! assuming no other decay channel
 
-ELSEIF( XTOPDECAYS.EQ.1 ) THEN
-!  chiral couplings for HTop-BH-top
-   IBHTt(+1) = 1d0/10d0  *0d0; print *, "setting RH coupling to zero!!"
-   IBHTt(-1) = 1d0/10d0  *1d0
-!  HTop-->BH + top partial width!
+ELSEIF( XTOPDECAYS.EQ.1 ) THEN! HTop-BH-top
+
+
+!  MY LO WIDTH for LH and RH couplings
+  IBHTt(+1) = 3d0/10d0
+  IBHTt(-1) = 1d0/10d0
+
+!  HTop-->BH + top LO partial width!
    Ga_Htop_BHTop(0) = SqrtLambda(m_Htop**2,m_top**2,m_BH**2)/(16d0*DblPi*m_Htop**3) * & 
                   1d0/2d0 *( (IBHTt(+1)**2+IBHTt(-1)**2)*( m_HTop**2+m_Top**2-2d0*m_BH**2+(m_HTop**2-m_top**2)**2/m_BH**2 ) - 12d0*(IBHTt(+1)*IBHTt(-1))*( m_Top*m_HTop ) )
-   Ga_Htop_BHTop(1) = 0d0
-   Ga_HTop(:) = Ga_Htop_BHTop(:)! assuming no other decay channel
 
-! print *, "xx",Ga_Htop_BHTop(0)
-
-
-
-    beta = m_top/m_Htop
-    omega = m_BH/m_Htop
-    omegasq = omega**2
-    z = m_Top**2/m_Htop**2
-    P0 = 0.5d0*( 1d0 - omegasq + z )
-    P3 = 0.5d0*SqrtLambda(1d0,omegasq,z)
-    f = (1d0-z)**2 + omegasq*(1d0+z) - 2d0*omegasq**2
-    W0 = 0.5d0*( 1d0+omegasq-z )
-    Ppl = P0 + P3
-    Pmi = P0 - P3
-    Wpl = W0 + P3
-    Wmi = W0 - P3
-    Yp = 0.5d0 * dlog(Ppl/Pmi)
-    Yw = 0.5d0 * dlog(Wpl/Wmi)
-
-
-! !  this is the MCFM result (actually Czarnecki)
-   Ga_Htop_BHTop(0) = 2d0 * P3 * f
-print *, "remember: this is only the LH part"
-   Ga_Htop_BHTop(0) = Ga_Htop_BHTop(0) * m_Htop**3/(8d0*DblPi*dsqrt(2d0)) * ( IBHTt(-1)**2/2d0/dsqrt(2d0)/m_BH**2 )! this corresponds to Gamma_0
-
-!    Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
-!                     ( 8d0*f*P0*( DLi2(1d0-Pmi) - DLi2(1d0-Ppl) - 2d0*DLi2(1d0-Pmi/Ppl) + Yp*dlog(4d0*P3**2/Ppl**2/Wpl) + Yw*dlog(Ppl))   &
-!                      +4d0*(1d0-z)*( (1d0-z)**2 + omegasq*(1d0+z) -4d0*omegasq )*Yw   &
-!                      +(3d0 -z + 11d0*z**2 - z**3 + omegasq*(6d0-12d0*z+2d0*z**2) -omegasq**2*(21d0+5d0*z) + 12d0*omegasq**3  )*Yp   &
-!                      +8d0*f*P3*dlog(omega/4d0/P3**2) + 6d0*(1d0 -4d0*z +3d0*z**2 +omegasq*(3d0+z) -4d0*omegasq**2)*P3*dlog(beta)   &
-!                      +(5d0 -22d0*z + 5d0*z**2 + 9d0*omegasq*(1d0+z) - 6d0*omegasq**2)*P3  &
-!                     )
-
-! print *, "masses",m_Htop,m_top,m_BH
-! print *, "xx",Ga_Htop_BHTop(0)
-! print *, "xx",Ga_Htop_BHTop(1)
-! print *, "yy",Ga_Htop_BHTop(1)/Ga_Htop_BHTop(0), -0.8d0*RunAlphaS(NLOParam,MuRen)*alpha_s
-! print *, "ra",Ga_Htop_BHTop(1)/Ga_Htop_BHTop(0)/( -0.8d0*RunAlphaS(NLOParam,MuRen)*alpha_s)
-
-
-! print *, "limit",RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
-!                     ( 4d0*(1d0-omegasq)**2*(1d0+2d0*omegasq)*( DLi2(1d0-omegasq)-DblPi**2/3d0 + 0.5d0*dlog(1d0-omegasq)*dlog(omegasq) )  & 
-!                      -2d0*omegasq*(1d0+omegasq)*(1d0-2d0*omegasq)*dlog(omegasq) - (1d0-omegasq)**2*(4d0*omegasq+5d0)*dlog(1d0-omegasq)  &
-!                      +0.5d0*(1d0-omegasq)*(5d0+9d0*omegasq-6d0*omegasq**2)   &
-!                     )
+IF( Process.ge.41 .and. Process.le.49 ) then
+   if( IBHTt(+1).eq.3d0/10d0 .and. IBHTt(-1).eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_BH.eq.50d0*GeV .and. m_HTop.eq.500d0*GeV ) then
+      Ga_Htop_BHTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (  -3.59519d0 -8.99473951d0  ) * GeV
+   else
+      call Error("Ga_Htop_BHTop(1) needs to be re-calcualted for the given IBHTt(+/-1),m_Htop,m_top,m_BH")
+!   ./TOPAZ Process=47 Collider=1 Correction=5 TopDK=1 ObsSet=32 XTopDK=1 MHTop=5.00 MTop=1.72 NLOParam=2 MuRen=5.00 MuFac=5.00 VegasNc0=1000000 VegasNc1=1000000
+   endif
+ENDIF
 
 
 
-!     this is stolen from MCFM code
-      term4=(log(Ppl)-log(beta))*dlog(4d0*P3**2*Wmi/(omegasq*Ppl**2))
-      term7=  &
-      +(3d0-z+11d0*z**2-z**3+omegasq*(6d0-12d0*z+2d0*z**2)   &
-      -omegasq**2*(21d0+5d0*z)+12d0*omegasq**3)*log(Ppl)   &
-      -(-z+11d0*z**2-z**3+omegasq*(-12d0*z+2d0*z**2)   &
-      -omegasq**2*(5d0*z))*log(beta)
-      term9=   &
-      +6d0*(1d0-4d0*z+3d0*z**2+omegasq*(3d0+z)-4d0*omegasq**2)   &
-      *(P3-0.5d0*(1d0-omegasq))*dlog(beta)   &
-      +3d0*(1d0-omegasq)*(-4d0*z+3d0*z**2+omegasq*(z))*dlog(beta)  
-      Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
-                        ( 8d0*f*P0*(DLi2(1d0-Pmi)-DLi2(1d0-Ppl)                &
-                            -2d0*DLi2(1d0-Pmi/Ppl)+term4    &
-                            +Yw*dlog(Ppl))   &
-                            +4d0*(1d0-z)*((1d0-z)**2+omegasq*(1d0+z)-4d0*omegasq**2)*Yw   &
-                            +term7    &
-                            +8d0*f*P3*dlog(omega/4d0/P3**2)+term9    &
-                            +(5d0-22d0*z+5d0*z**2+9d0*omegasq*(1d0+z)-6d0*omegasq**2)*P3  & 
-                        )
-! print *, "xx",Ga_Htop_BHTop(1)
-! pause
 
+
+
+
+! !  MCFM LO and NLO WIDTH for LH currents
+! !    IBHTt(+1) = 0d0; print *, "setting RH coupling to zero!!"
+! !    IBHTt(-1) = dsqrt(4d0*M_W**2*GF/dsqrt(2d0))
+! 
+!     beta = m_top/m_Htop
+!     omega = m_BH/m_Htop
+!     omegasq = omega**2
+!     z = m_Top**2/m_Htop**2
+!     P0 = 0.5d0*( 1d0 - omegasq + z )
+!     P3 = 0.5d0*SqrtLambda(1d0,omegasq,z)
+!     f = (1d0-z)**2 + omegasq*(1d0+z) - 2d0*omegasq**2
+!     W0 = 0.5d0*( 1d0+omegasq-z )
+!     Ppl = P0 + P3
+!     Pmi = P0 - P3
+!     Wpl = W0 + P3
+!     Wmi = W0 - P3
+!     Yp = 0.5d0 * dlog(Ppl/Pmi)
+!     Yw = 0.5d0 * dlog(Wpl/Wmi)
+! 
+! 
+! ! !  this is the MCFM result (actually Czarnecki)
+! !    Ga_Htop_BHTop(0) = 2d0 * P3 * f
+! ! print *, "remember: this is only the LH part"
+! !    Ga_Htop_BHTop(0) = Ga_Htop_BHTop(0) * m_Htop**3/(8d0*DblPi*dsqrt(2d0)) * ( (IBHTt(-1)**2+IBHTt(+1)**2)/2d0/dsqrt(2d0)/m_BH**2 )! this corresponds to Gamma_0
+! 
+! 
+! !    this is eq.(2.6) of the Campbell+Ellis paper,     seems to be in disagreement with the code below
+! !    Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+! !                     ( 8d0*f*P0*( DLi2(1d0-Pmi) - DLi2(1d0-Ppl) - 2d0*DLi2(1d0-Pmi/Ppl) + Yp*dlog(4d0*P3**2/Ppl**2/Wpl) + Yw*dlog(Ppl))   &
+! !                      +4d0*(1d0-z)*( (1d0-z)**2 + omegasq*(1d0+z) -4d0*omegasq )*Yw   &
+! !                      +(3d0 -z + 11d0*z**2 - z**3 + omegasq*(6d0-12d0*z+2d0*z**2) -omegasq**2*(21d0+5d0*z) + 12d0*omegasq**3  )*Yp   &
+! !                      +8d0*f*P3*dlog(omega/4d0/P3**2) + 6d0*(1d0 -4d0*z +3d0*z**2 +omegasq*(3d0+z) -4d0*omegasq**2)*P3*dlog(beta)   &
+! !                      +(5d0 -22d0*z + 5d0*z**2 + 9d0*omegasq*(1d0+z) - 6d0*omegasq**2)*P3  &
+! !                     )
+! 
+! !    this is eq.(2.7) of the Campbell+Ellis paper, gives the correct answer for mb-->0
+! !    print *, "limit",Ga_Htop_BHTop(0) + RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+! !                     ( 4d0*(1d0-omegasq)**2*(1d0+2d0*omegasq)*( DLi2(1d0-omegasq)-DblPi**2/3d0 + 0.5d0*dlog(1d0-omegasq)*dlog(omegasq) )  & 
+! !                      -2d0*omegasq*(1d0+omegasq)*(1d0-2d0*omegasq)*dlog(omegasq) - (1d0-omegasq)**2*(4d0*omegasq+5d0)*dlog(1d0-omegasq)  &
+! !                      +0.5d0*(1d0-omegasq)*(5d0+9d0*omegasq-6d0*omegasq**2)   &
+! !                     )
+! 
+! !     this code is stolen from MCFM, reproduces correct result for m_Htop-->m_Top, m_BH-->M_W, m_top-->m_b
+!       term4=(log(Ppl)-log(beta))*dlog(4d0*P3**2*Wmi/(omegasq*Ppl**2))
+!       term7=  &
+!       +(3d0-z+11d0*z**2-z**3+omegasq*(6d0-12d0*z+2d0*z**2)   &
+!       -omegasq**2*(21d0+5d0*z)+12d0*omegasq**3)*log(Ppl)   &
+!       -(-z+11d0*z**2-z**3+omegasq*(-12d0*z+2d0*z**2)   &
+!       -omegasq**2*(5d0*z))*log(beta)
+!       term9=   &
+!       +6d0*(1d0-4d0*z+3d0*z**2+omegasq*(3d0+z)-4d0*omegasq**2)   &
+!       *(P3-0.5d0*(1d0-omegasq))*dlog(beta)   &
+!       +3d0*(1d0-omegasq)*(-4d0*z+3d0*z**2+omegasq*(z))*dlog(beta) 
+!  
+!       Ga_Htop_BHTop(1) = RunAlphaS(NLOParam,MuRen)*alpha_sOver2Pi * 4d0/3d0 * (Ga_Htop_BHTop(0)/(2d0*P3*f)) *  &
+!                         ( 8d0*f*P0*(DLi2(1d0-Pmi)-DLi2(1d0-Ppl)                &
+!                             -2d0*DLi2(1d0-Pmi/Ppl)+term4    &
+!                             +Yw*dlog(Ppl))   &
+!                             +4d0*(1d0-z)*((1d0-z)**2+omegasq*(1d0+z)-4d0*omegasq**2)*Yw   &
+!                             +term7    &
+!                             +8d0*f*P3*dlog(omega/4d0/P3**2)+term9    &
+!                             +(5d0-22d0*z+5d0*z**2+9d0*omegasq*(1d0+z)-6d0*omegasq**2)*P3  & 
+!                         )
+!       if( IBHTt(-1)*IBHTt(+1).ne.0d0 ) call Error("MCFM formula for Ga_Htop_BHTop(1) cannot be used")! only pure LH or RH currents are allowed
 
 
 
