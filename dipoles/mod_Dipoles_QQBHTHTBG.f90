@@ -1012,24 +1012,39 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
 
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
+            SecHel=2
+      elseif( XTopDecays.eq.1 ) then
             SecHel=1
       else
-            SecHel=-1
+          call Error("Error in dipole Tree_GG_TTb")
       endif
 
 
       SqAmp = (0d0,0d0)
-      do A0barHel=1,SecHel,-2
-      do A0Hel=1,SecHel,-2
+      do A0barHel=-1,+1,SecHel
+      do A0Hel=-1,+1,SecHel
 
 
+        IF( XTOPDECAYS.EQ.1 ) THEN
+          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
+          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
+        ELSEIF(XTOPDECAYS.EQ.0 ) THEN
+          TopQuark(1)%Helicity = A0Hel
+          TopQuark(2)%Helicity = A0barHel
+          TopQuark(1)%Mass = MassTd(3)
+          TopQuark(2)%Mass = MassTd(4)
+          TopQuark(1)%Mass2= Mass2Td(3)
+          TopQuark(2)%Mass2= Mass2Td(4)
+          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
+          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
+        ENDIF
 
-         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
-         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
 
 
       Quarks(3)%Pol => TopQuark(1)%Pol
       Quarks(4)%Pol => TopQuark(2)%Pol
+      Quarks(3)%Helicity => TopQuark(1)%Helicity
+      Quarks(4)%Helicity => TopQuark(2)%Helicity
 
 
       do iHel=1,2

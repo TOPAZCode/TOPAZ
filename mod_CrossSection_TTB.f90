@@ -111,6 +111,7 @@ IF( TOPDECAYS.NE.0 ) THEN
       call vBarSpi(ExtParticle(1)%Mom(1:4),m_Top,+1,BarSpi(1:4))
       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
       Msq_T_BWENU = Msq_T_BWENU + M_T_BWENU*dconjg(M_T_BWENU)/2d0
+
       PSWgt = PSWgt * Msq_T_BWENU
 
 ! spherical decay of Top

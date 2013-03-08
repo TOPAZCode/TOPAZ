@@ -256,9 +256,11 @@ contains
 
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
-            SecHel= 1
+            SecHel=2
+      elseif( XTopDecays.eq.1 ) then
+            SecHel=1
       else
-            SecHel=-1
+          call Error("Error in dipole Tree_GG_TTb")
       endif
 
 
@@ -273,23 +275,26 @@ do icorr=0,6
       if(icorr.eq.6) ColCorr(1:2,1:2)=ColCorr6(1:2,1:2)
 
 
-      do A0barHel=1,SecHel,-1
-      do A0Hel=1,SecHel,-1
-      do HTbarHel=-1,SecHel,2
-      do HTHel=-1,SecHel,2
+      do A0barHel=-1,+1,SecHel
+      do A0Hel=-1,+1,SecHel
+        IF( XTOPDECAYS.EQ.1 ) THEN
+         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
+         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
+        ELSEIF(XTOPDECAYS.EQ.0 ) THEN
+         TopQuark(1)%Helicity = A0Hel
+         TopQuark(2)%Helicity = A0barHel
+         TopQuark(1)%Mass = MassTd(3)
+         TopQuark(2)%Mass = MassTd(4)
+         TopQuark(1)%Mass2= Mass2Td(3)
+         TopQuark(2)%Mass2= Mass2Td(4)
+         call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
+         call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
+        ENDIF
 
-        if( XTOPDECAYS.eq.0 ) then
-            TopQuark(1)%Helicity = HTbarHel
-            TopQuark(2)%Helicity = HTHel
-            call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
-            call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
-        else
-            call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomDK(1:4,5:9))
-            call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomDK(1:4,10:14))
-        endif
         Quarks(1)%Pol => TopQuark(1)%Pol
         Quarks(2)%Pol => TopQuark(2)%Pol
-
+        Quarks(1)%Helicity => TopQuark(1)%Helicity
+        Quarks(2)%Helicity => TopQuark(2)%Helicity
 
       do iHel=1,2
 
@@ -320,8 +325,6 @@ do icorr=0,6
 
       enddo
 
-      enddo
-      enddo
       enddo
       enddo
       SqAmp(icorr) = alpha_s4Pi**2 / SpinAvg / ColAvg *SqAmp(icorr)

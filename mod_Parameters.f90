@@ -742,6 +742,7 @@ END SUBROUTINE
 
 
 FUNCTION GetMass( PartType )
+use ModMisc
 implicit none
 real(8) :: GetMass
 integer PartType
@@ -775,7 +776,7 @@ integer PartType
    elseif( PartType .eq. 0 ) then
       GetMass = 0d0
    else
-      print *, "GetMass particle type not available."
+      call Error("GetMass particle type not available.")
    endif
 RETURN
 END FUNCTION

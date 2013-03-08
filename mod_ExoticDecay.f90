@@ -132,7 +132,7 @@ endif
 !DEC$ IF(_CheckMomenta .EQ.1)
    NMom = size(Mom(:,:),2)
    zeros(:) = 0d0
-   if( XTopDecays ) zeros(1:4) = dble(HeavyTop%Mom(1:4)) - Mom(1:4,BH) - Mom(1:4,top)
+   zeros(1:4) = dble(HeavyTop%Mom(1:4)) - Mom(1:4,BH) - Mom(1:4,top)
    if( present(MomGlu) ) zeros(1:4) = zeros(1:4) - MomGlu(1:4)
 
    if( any(abs(zeros(1:4)/dble(HeavyTop%Mom(1))).gt.1d-8) ) then

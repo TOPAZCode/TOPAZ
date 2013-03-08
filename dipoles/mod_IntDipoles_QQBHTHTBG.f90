@@ -42,13 +42,13 @@ contains
    TreeMom(1:4,3) = dcmplx( p(1:4,2) )
    TreeMom(1:4,4) = dcmplx( p(1:4,1) )
 
-    Tree_ij(0) = Tree_UUb_TTb_ij(0,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
-    Tree_12  =  0.5d0 * Tree_UUb_TTb_ij(1,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))! these assignments need to be checked
-    Tree_13  =  0.5d0 * Tree_UUb_TTb_ij(2,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
-    Tree_14  =  0.5d0 * Tree_UUb_TTb_ij(3,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
-    Tree_23  =  0.5d0 * Tree_UUb_TTb_ij(4,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
-    Tree_24  =  0.5d0 * Tree_UUb_TTb_ij(5,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
-    Tree_34  =  0.5d0 * Tree_UUb_TTb_ij(6,TreeMom,(/0d0,0d0,m_stop**2,m_stop**2/))
+    Tree_ij(0) = Tree_UUb_TTb_ij(0,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
+    Tree_12  =  0.5d0 * Tree_UUb_TTb_ij(1,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))! these assignments need to be checked
+    Tree_13  =  0.5d0 * Tree_UUb_TTb_ij(2,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
+    Tree_14  =  0.5d0 * Tree_UUb_TTb_ij(3,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
+    Tree_23  =  0.5d0 * Tree_UUb_TTb_ij(4,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
+    Tree_24  =  0.5d0 * Tree_UUb_TTb_ij(5,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
+    Tree_34  =  0.5d0 * Tree_UUb_TTb_ij(6,TreeMom,(/0d0,0d0,m_HTop**2,m_HTop**2/))
 
 !     print *, (Tree_12+Tree_13+Tree_14)/Tree_ij(0)  !=-CF
 !     print *, (Tree_12+Tree_23+Tree_24)/Tree_ij(0)  !=-CF
@@ -58,30 +58,30 @@ contains
 
    do n=1,12
       if(n.eq.1) then
-        dipsoft =if_qq(zero,m_stop,p,3,1,z,1)
-        dipfini =if_qq(zero,m_stop,p,3,1,z,2)
-        dipplus =if_qq(zero,m_stop,p,3,1,z,3)
+        dipsoft =if_qq(zero,m_HTop,p,3,1,z,1)
+        dipfini =if_qq(zero,m_HTop,p,3,1,z,2)
+        dipplus =if_qq(zero,m_HTop,p,3,1,z,3)
         emi = 1 ! mom #3 is emitting
         mtrsq = Tree_14   ! (1-4)-color corr. for (1-3)-dipole because t and tbar are exchanged
       endif
       if(n.eq.2) then
-        dipsoft =if_qq(zero,m_stop,p,3,2,z,1)
-        dipfini =if_qq(zero,m_stop,p,3,2,z,2)
-        dipplus =if_qq(zero,m_stop,p,3,2,z,3)
+        dipsoft =if_qq(zero,m_HTop,p,3,2,z,1)
+        dipfini =if_qq(zero,m_HTop,p,3,2,z,2)
+        dipplus =if_qq(zero,m_HTop,p,3,2,z,3)
         emi = 1 ! mom #3 is emitting
         mtrsq = Tree_13
       endif
       if(n.eq.3) then
-        dipsoft =if_qq(zero,m_stop,p,4,1,z,1)
-        dipfini =if_qq(zero,m_stop,p,4,1,z,2)
-        dipplus =if_qq(zero,m_stop,p,4,1,z,3)
+        dipsoft =if_qq(zero,m_HTop,p,4,1,z,1)
+        dipfini =if_qq(zero,m_HTop,p,4,1,z,2)
+        dipplus =if_qq(zero,m_HTop,p,4,1,z,3)
         emi = 2 ! mom #4 is emitting
         mtrsq = Tree_24
       endif
       if(n.eq.4) then
-        dipsoft =if_qq(zero,m_stop,p,4,2,z,1)
-        dipfini =if_qq(zero,m_stop,p,4,2,z,2)
-        dipplus =if_qq(zero,m_stop,p,4,2,z,3)
+        dipsoft =if_qq(zero,m_HTop,p,4,2,z,1)
+        dipfini =if_qq(zero,m_HTop,p,4,2,z,2)
+        dipplus =if_qq(zero,m_HTop,p,4,2,z,3)
         emi = 2 ! mom #4 is emitting
         mtrsq = Tree_23
       endif
@@ -100,63 +100,63 @@ contains
         mtrsq = Tree_34
       endif
       if(n.eq.7) then
-        dipsoft =fi_qq(m_stop,zero,p,1,3,z,1)
-        dipfini =fi_qq(m_stop,zero,p,1,3,z,2)
-        dipplus =fi_qq(m_stop,zero,p,1,3,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,1,3,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,1,3,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,1,3,z,3)
         emi = 1
         mtrsq = Tree_14
       endif
       if(n.eq.8) then
-        dipsoft =fi_qq(m_stop,zero,p,1,4,z,1)
-        dipfini =fi_qq(m_stop,zero,p,1,4,z,2)
-        dipplus =fi_qq(m_stop,zero,p,1,4,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,1,4,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,1,4,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,1,4,z,3)
         emi = 2
         mtrsq = Tree_24
       endif
       if(n.eq.9) then
-        dipsoft =fi_qq(m_stop,zero,p,2,3,z,1)
-        dipfini =fi_qq(m_stop,zero,p,2,3,z,2)
-        dipplus =fi_qq(m_stop,zero,p,2,3,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,2,3,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,2,3,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,2,3,z,3)
         emi = 1
         mtrsq = Tree_13
       endif
       if(n.eq.10) then
-        dipsoft =fi_qq(m_stop,zero,p,2,4,z,1)
-        dipfini =fi_qq(m_stop,zero,p,2,4,z,2)
-        dipplus =fi_qq(m_stop,zero,p,2,4,z,3)
+        dipsoft =fi_qq(m_HTop,zero,p,2,4,z,1)
+        dipfini =fi_qq(m_HTop,zero,p,2,4,z,2)
+        dipplus =fi_qq(m_HTop,zero,p,2,4,z,3)
         emi = 2
         mtrsq = Tree_23
       endif
       if(n.eq.11) then
-        dipsoft =ff_qq(m_stop,m_stop,p,1,2,z,1)
-        dipfini =ff_qq(m_stop,m_stop,p,1,2,z,2)
-        dipplus =ff_qq(m_stop,m_stop,p,1,2,z,3)
+        dipsoft =ff_qq(m_HTop,m_HTop,p,1,2,z,1)
+        dipfini =ff_qq(m_HTop,m_HTop,p,1,2,z,2)
+        dipplus =ff_qq(m_HTop,m_HTop,p,1,2,z,3)
         emi = 3
         mtrsq = Tree_12
       endif
       if(n.eq.12) then
-        dipsoft =ff_qq(m_stop,m_stop,p,2,1,z,1)
-        dipfini =ff_qq(m_stop,m_stop,p,2,1,z,2)
-        dipplus =ff_qq(m_stop,m_stop,p,2,1,z,3)
+        dipsoft =ff_qq(m_HTop,m_HTop,p,2,1,z,1)
+        dipfini =ff_qq(m_HTop,m_HTop,p,2,1,z,2)
+        dipplus =ff_qq(m_HTop,m_HTop,p,2,1,z,3)
         emi = 3
         mtrsq = Tree_12
       endif
 
 
-      if(emi.eq.1) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(2) = res(2) + (dipfini+dipplus)*mtrsq
-      endif
-      if(emi.eq.2) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(3) = res(3) + (dipfini+dipplus)*mtrsq
-      endif
-      if(emi.eq.3) then
-        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-        res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
-        res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
-      endif
-! res(1) = res(1) +  dipsoft*mtrsq  ! for delta-fct. check
+!       if(emi.eq.1) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(2) = res(2) + (dipfini+dipplus)*mtrsq
+!       endif
+!       if(emi.eq.2) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(3) = res(3) + (dipfini+dipplus)*mtrsq
+!       endif
+!       if(emi.eq.3) then
+!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+!         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
+!         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
+!       endif
+res(1) = res(1) +  dipsoft*mtrsq ; print *, "eps check" ! for delta-fct. check
 
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
@@ -169,10 +169,10 @@ contains
        AP(3)= 2d0*CF/(1d0-z)
        AP(1:3) = AP(1:3) * alpha_sOver2Pi *epcorr * mtrsq
 
-       res(1) = res(1) + 2d0*(AP(1)-AP(3))
-       res(2) = res(2) + (AP(2) + AP(3))
-       res(3) = res(3) + (AP(2) + AP(3))
-! res(1) = res(1) + 2d0*AP(1)  ! for delta-fct. check
+!        res(1) = res(1) + 2d0*(AP(1)-AP(3))
+!        res(2) = res(2) + (AP(2) + AP(3))
+!        res(3) = res(3) + (AP(2) + AP(3))
+res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
 
   RETURN
   END SUBROUTINE
@@ -231,9 +231,9 @@ contains
       MomExt(1:4,3)=MomTd(0:3,4)
       MomExt(1:4,4)=MomTd(0:3,3)
 
-      TopQuark(1)%PartType = STop_
+      TopQuark(1)%PartType = Top_
       TopQuark(1)%Mom(1:4) = MomTd(0:3,3)
-      TopQuark(2)%PartType = ASTop_
+      TopQuark(2)%PartType = ATop_
       TopQuark(2)%Mom(1:4) = MomTd(0:3,4)
 
 
@@ -262,37 +262,53 @@ contains
       Quarks(2)%Mass  => MassTd(2)
 
       Quarks(3)%Mom => MomTd(:,3)
-      Quarks(3)%PartType => STop_
+      Quarks(3)%PartType => Top_
       Quarks(3)%ExtRef => ExtRef
       Quarks(3)%Mass2 => Mass2Td(3)
       Quarks(3)%Mass  => MassTd(3)
 
       Quarks(4)%Mom => MomTd(:,4)
-      Quarks(4)%PartType => ASTop_
+      Quarks(4)%PartType => ATop_
       Quarks(4)%ExtRef => ExtRef
       Quarks(4)%Mass2 => Mass2Td(4)
       Quarks(4)%Mass  => MassTd(4)
 
 
+
+
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
+            SecHel=2
+      elseif( XTopDecays.eq.1 ) then
             SecHel=1
       else
-            SecHel=-1
+          call Error("Error in dipole Tree_GG_TTb")
       endif
 
 
       SqAmp = (0d0,0d0)
-      do A0barHel=1,SecHel,-2
-      do A0Hel=1,SecHel,-2
+      do A0barHel=-1,+1,SecHel
+      do A0Hel=-1,+1,SecHel
 
 
-      call STopDecay(TopQuark(2),DKX_STChi0_LO,A0barHel,MomExt(1:4,5:9))
-      call STopDecay(TopQuark(1),DKX_STChi0_LO,A0Hel,MomExt(1:4,10:14))
-
+        IF( XTOPDECAYS.EQ.1 ) THEN
+          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
+          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
+        ELSEIF(XTOPDECAYS.EQ.0 ) THEN
+          TopQuark(1)%Helicity = A0Hel
+          TopQuark(2)%Helicity = A0barHel
+          TopQuark(1)%Mass = MassTd(3)
+          TopQuark(2)%Mass = MassTd(4)
+          TopQuark(1)%Mass2= Mass2Td(3)
+          TopQuark(2)%Mass2= Mass2Td(4)
+          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
+          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
+        ENDIF
 
       Quarks(3)%Pol => TopQuark(1)%Pol
       Quarks(4)%Pol => TopQuark(2)%Pol
+      Quarks(3)%Helicity => TopQuark(1)%Helicity
+      Quarks(4)%Helicity => TopQuark(2)%Helicity
 
 
       do iHel=1,2
@@ -301,9 +317,10 @@ contains
 
 
 !      calc currents
-      Res(0:3) = cur_f_ffss((/Gluons(1)/),Quarks(3:4),Quarks(2:2),(/0,0,0,0,0/))
+      Res(0:3) = cur_f_4f((/Gluons(1)/),(/Quarks(2),Quarks(3),Quarks(4)/),Quarks(1)%PartType,(/0,0,0,0,0/),0)
       Amp(1,plus)  = psp1_(Res(0:3),PolV(0:3,plus,1))
       Amp(1,minus) = psp1_(Res(0:3),PolV(0:3,minus,1))
+
 
 
 

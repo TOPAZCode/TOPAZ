@@ -1077,7 +1077,6 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       Quarks(2)%Mass2 => Mass2Td(4)
       Quarks(2)%Mass  => MassTd(4)
 
-
 !      sum over helicities
       if( XTopDecays.eq.0 ) then
             SecHel=2
@@ -1096,6 +1095,10 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
         ELSEIF(XTOPDECAYS.EQ.0 ) THEN
          TopQuark(1)%Helicity = A0Hel
          TopQuark(2)%Helicity = A0barHel
+         TopQuark(1)%Mass = MassTd(3)
+         TopQuark(2)%Mass = MassTd(4)
+         TopQuark(1)%Mass2= Mass2Td(3)
+         TopQuark(2)%Mass2= Mass2Td(4)
          call HTopBHDecay(TopQuark(2),DKX_HTBH_LO,A0barHel,MomExt(1:4,5:9))
          call HTopBHDecay(TopQuark(1),DKX_HTBH_LO,A0Hel,MomExt(1:4,10:14))
         ENDIF
@@ -1105,8 +1108,8 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
         Quarks(2)%Helicity => TopQuark(2)%Helicity
 
       do iHel=1,2
-      Gluons(ngl)%Pol => Gluons(ngl)%Mom;   print *, "checking gauge inv in gg dipoles, fails for XtopDK=0"
-!       Gluons(ngl)%Pol => PolV(:,HelList(iHel,1),ngl)
+!       Gluons(ngl)%Pol => Gluons(ngl)%Mom;   print *, "checking gauge inv in gg dipoles "
+      Gluons(ngl)%Pol => PolV(:,HelList(iHel,1),ngl)
 
 
       Gluons(ngl)%Helicity => HelList(iHel,1)
@@ -1136,7 +1139,6 @@ if(alpha_ff.ne.1d0) call Error("alpha_ff.ne.1d0 is not yet implemented")
       enddo
       SqAmp = alpha_s4Pi**2 / SpinAvg / ColAvg *SqAmp
 
-print *, icorr,sqamp
 
       return
       END FUNCTION
