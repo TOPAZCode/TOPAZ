@@ -1651,7 +1651,7 @@ ELSEIF( PROCESS.EQ.43 ) THEN !   3_Str  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop + 
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=1
+      MasterProcess=2
       AvgFactor = SpinAvg * QuarkColAvg*GluonColAvg
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -1731,7 +1731,7 @@ ELSEIF( PROCESS.EQ.45 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop + 
       allocate(Crossing(1:NumExtParticles))
       allocate(ExtParticle(1:NumExtParticles))
       Crossing(:) = (/3,4,-1,-2/)
-      MasterProcess=2
+      MasterProcess=1
       AvgFactor = SpinAvg * GluonColAvg**2
       NDim = NDim + 2    ! t tbar PS integration
       NDim = NDim + 2    ! shat integration
@@ -4990,12 +4990,12 @@ ELSEIF( MASTERPROCESS.EQ.31 ) THEN!  this is a copy of Masterprocess 1 which is 
    PrimAmps(10)%FermLoopPart = Bot_
 
    PrimAmps(11)%ExtLine = (/1,2,3,4/)
-   PrimAmp2m_1234 = 1
+!    PrimAmp2m_1234 = 1
    PrimAmps(11)%AmpType = 2
    PrimAmps(11)%FermLoopPart = HTop_  !   the label HTop is only used for closed T' loops
 
    PrimAmps(12)%ExtLine = (/1,2,4,3/)
-   PrimAmp2m_1243 = 2
+!    PrimAmp2m_1243 = 2
    PrimAmps(12)%AmpType = 2
    PrimAmps(12)%FermLoopPart = HTop_
 
@@ -5047,7 +5047,7 @@ ELSEIF( MasterProcess.EQ.32) THEN!  this is a copy of Masterprocess 2 which is u
    PrimAmps(6)%FermLoopPart = Bot_
 
    PrimAmps(7)%ExtLine = (/1,2,3,4/)
-   PrimAmp2m_1234 = 7
+!    PrimAmp2m_1234 = 7
    PrimAmps(7)%AmpType = 2
    PrimAmps(7)%FermLoopPart = HTop_!   the label HTop is only used for closed T' loops
 

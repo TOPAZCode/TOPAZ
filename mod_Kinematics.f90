@@ -3085,8 +3085,8 @@ ELSEIF( ObsSet.EQ.41 ) THEN! set of observables for STSTbar (stable stops)
           endif
 
           Histo(1)%Info   = "pT"
-          Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 20d0*GeV
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
           Histo(1)%LowVal =  0d0*GeV
           Histo(1)%SetScale= 100d0
 

@@ -20,14 +20,13 @@ public :: ii_mgg, if_mgg, fi_mqq, ff_mqq, ii_mgq, ii_mqg, ii_mqq
 integer, parameter,private  :: dp = selected_real_kind(15)
 real(dp),parameter,private :: pisqo6=pi**2/6d0
 !real(dp),private :: MuRen**2   = MuRen**2  ! assumes that MuRes==MuFac!!
-real(dp),public,parameter :: epinv2 = 2d0    ! R(eps2,eps)=A/eps2 + B/eps+C  --> A=R(2,1)-R(1,1),  B=R(0,2)-R(0,1)
-real(dp),public,parameter :: epinv  = 1d0
+real(dp),public,parameter :: epinv2 = 0d0    ! R(eps2,eps)=A/eps2 + B/eps+C  --> A=R(2,1)-R(1,1),  B=R(0,2)-R(0,1)
+real(dp),public,parameter :: epinv  = 0d0
 character,private,parameter :: scheme*(4)='fdh'  ! this parameter should match the scheme of the virtual corrections
 !  character,parameter :: scheme*(4)='fdh', 'tH-V'
 
 
 contains
-
 
 
 

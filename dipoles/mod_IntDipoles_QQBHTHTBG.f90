@@ -143,23 +143,24 @@ contains
       endif
 
 
-!       if(emi.eq.1) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(2) = res(2) + (dipfini+dipplus)*mtrsq
-!       endif
-!       if(emi.eq.2) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(3) = res(3) + (dipfini+dipplus)*mtrsq
-!       endif
-!       if(emi.eq.3) then
-!         res(1) = res(1) + (dipsoft-dipplus)*mtrsq
-!         res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
-!         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
-!       endif
-res(1) = res(1) +  dipsoft*mtrsq ; print *, "eps check" ! for delta-fct. check
-
+      if(emi.eq.1) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(2) = res(2) + (dipfini+dipplus)*mtrsq
+      endif
+      if(emi.eq.2) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(3) = res(3) + (dipfini+dipplus)*mtrsq
+      endif
+      if(emi.eq.3) then
+        res(1) = res(1) + (dipsoft-dipplus)*mtrsq
+        res(2) = res(2) + (dipfini+dipplus)*0.5_dp*mtrsq
+        res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
+      endif
+! res(1) = res(1) +  dipsoft*mtrsq ; print *, "eps check" ! for delta-fct. check
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
+
+! print *,"1", res(2:3)
 
        mtrsq  =  Tree_ij(0) 
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
@@ -169,10 +170,14 @@ res(1) = res(1) +  dipsoft*mtrsq ; print *, "eps check" ! for delta-fct. check
        AP(3)= 2d0*CF/(1d0-z)
        AP(1:3) = AP(1:3) * alpha_sOver2Pi *epcorr * mtrsq
 
-!        res(1) = res(1) + 2d0*(AP(1)-AP(3))
-!        res(2) = res(2) + (AP(2) + AP(3))
-!        res(3) = res(3) + (AP(2) + AP(3))
-res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
+       res(1) = res(1) + 2d0*(AP(1)-AP(3))
+       res(2) = res(2) + (AP(2) + AP(3))
+       res(3) = res(3) + (AP(2) + AP(3))
+! res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
+
+! print *,"2", res(2:3)
+! pause
+
 
   RETURN
   END SUBROUTINE
@@ -282,7 +287,7 @@ res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
       elseif( XTopDecays.eq.1 ) then
             SecHel=1
       else
-          call Error("Error in dipole Tree_GG_TTb")
+          call Error("Error in dipole Tree_QQB_TTb")
       endif
 
 
@@ -306,22 +311,21 @@ res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
         ENDIF
 
       Quarks(3)%Pol => TopQuark(1)%Pol
-      Quarks(4)%Pol => TopQuark(2)%Pol
       Quarks(3)%Helicity => TopQuark(1)%Helicity
+      Quarks(4)%Pol => TopQuark(2)%Pol
       Quarks(4)%Helicity => TopQuark(2)%Helicity
+
+
 
 
       do iHel=1,2
       Quarks(2)%Pol => PolV(:,HelList(iHel,2),2)
       Quarks(2)%Helicity => HelList(iHel,2)
 
-
 !      calc currents
       Res(0:3) = cur_f_4f((/Gluons(1)/),(/Quarks(2),Quarks(3),Quarks(4)/),Quarks(1)%PartType,(/0,0,0,0,0/),0)
       Amp(1,plus)  = psp1_(Res(0:3),PolV(0:3,plus,1))
       Amp(1,minus) = psp1_(Res(0:3),PolV(0:3,minus,1))
-
-
 
 
       do col =1,1
@@ -337,6 +341,9 @@ res(1) = res(1) + 2d0*AP(1) ; print *, "eps check" ! for delta-fct. check
       SqAmp = alpha_s4Pi**2 / SpinAvg / ColAvg * SqAmp
 
 
+!      momentum crossing backwards
+      MomTd(0:3,1) = -MomTd(0:3,1)
+      MomTd(0:3,2) = -MomTd(0:3,2)
 
       return
       END FUNCTION

@@ -146,7 +146,7 @@ contains
         res(3) = res(3) + (dipfini+dipplus)*0.5_dp*mtrsq
       endif
 
-! res(1) = res(1) +  dipsoft*mtrsq  ! for delta-fct. check
+! res(1) = res(1) +  dipsoft*mtrsq  ; print *, "for delta-fct. check
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 

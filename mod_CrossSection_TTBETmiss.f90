@@ -256,13 +256,14 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 ELSEIF( Correction.EQ.3 ) THEN
 
-   MomP(1:4,1) = MomExt(1:4,3)
-   MomP(1:4,2) = MomExt(1:4,4)
-   MomP(1:4,3) =-MomExt(1:4,1)
-   MomP(1:4,4) =-MomExt(1:4,2)
+
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
 
-   xE = yRnd(13)
+   if( XTopDecays.eq.0 ) then
+      xE = yRnd(5)
+   else
+      xE = yRnd(17)
+   endif
 ! xE=0.4d0
 
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
@@ -412,6 +413,7 @@ IF( CORRECTION.EQ.0 ) THEN
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
+        if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         IF(XTOPDECAYS.eq.1) THEN
           call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,5:9))
@@ -439,6 +441,7 @@ IF( CORRECTION.EQ.0 ) THEN
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
   do npdf=1,2
+!   do npdf=2,2; print *, "npdf=2"
     if(npdf.eq.1) then
         PDFFac = PDFFac_a
     elseif(npdf.eq.2) then
@@ -451,6 +454,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
+      if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       IF(XTOPDECAYS.eq.1) THEN
         call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,5:9))
@@ -460,7 +464,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
         call HTopA0Decay(ExtParticle(2),DKX_HTA0_LO,MomExt(1:4,10:14))
       ENDIF
       call SetPolarizations()
-      do iPrimAmp=1,6
+      do iPrimAmp=1,7
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 
@@ -471,6 +475,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       enddo
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+
 
 ! ------------ bosonic loops --------------
       do iPrimAmp=1,4
@@ -484,8 +489,9 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+!           pause
       enddo
       BosonicPartAmp(1,-2:1) =  &
                              + Nc * PrimAmps(PrimAmp1_1234)%Result(-2:1) &
@@ -506,7 +512,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
 
 ! ------------ fermionic loops --------------
-      do iPrimAmp=5,6
+      do iPrimAmp=5,7
           call SetKirill(PrimAmps(iPrimAmp))
           call PentCut(PrimAmps(iPrimAmp))
           call QuadCut(PrimAmps(iPrimAmp))
@@ -515,12 +521,12 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus if from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv)
+!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
       enddo
 
-      FermionPartAmp(1,-2:1) = ( Nf_light*PrimAmps(PrimAmp2_1234)%Result(-2:1) +  PrimAmps(PrimAmp2m_1234)%Result(-2:1) )
-      FermionPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(PrimAmp2_1234)%Result(-2:1) + PrimAmps(PrimAmp2_1234)%Result(-2:1) )
+      FermionPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(6)%Result(-2:1) )
+      FermionPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(6)%Result(-2:1) )
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,2
@@ -534,8 +540,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
    enddo!helicity loop
   enddo! npdf loop
   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+! print *, "mom swp disabled"
 ENDIF
-
 
 
 
@@ -546,13 +552,13 @@ IF( CORRECTION.EQ.0 ) THEN
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
-!  CT contributions                           ! beta           !top WFRC
+!  CT contributions                           ! beta        !Htop WFRC
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0)*LO_Res_Unpol
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from  top WFRC
-
+   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol  ! finite log(mu2) contrib. from  Htop WFRC
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (                 2d0/3d0         ) *LO_Res_Unpol! this is from the closed HTop loop
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_SMtop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0)         *2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol   ! finite log(mu2) contrib. from HTop in alpha_s ren.
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
 
@@ -568,58 +574,55 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
    EvalCS_1L_HtHtbqqb = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
-! ELSEIF( CORRECTION.EQ.3 ) THEN
+ELSEIF( CORRECTION.EQ.3 ) THEN
 
 
-   MomP(1:4,1) = MomExt(1:4,3)
-   MomP(1:4,2) = MomExt(1:4,4)
-   MomP(1:4,3) =-MomExt(1:4,1)
-   MomP(1:4,4) =-MomExt(1:4,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    ISFac = MomCrossing(MomExt)
+   if( XTopDecays.eq.0 ) then
+      xE = yRnd(5)
+   else
+      xE = yRnd(17)
+   endif
 
-IF( PROCESS.EQ.46                        .OR. PROCESS.eq.42) THEN
-      xE = yRnd(13)
-xE=0.3d0
-      call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-      call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
 
+IF( PROCESS.EQ.46 ) THEN
+! xE=0.3d0
+   call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
+   call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-mydummy(1) = HOp(1)
    EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(Up_,1)*pdf(AUp_,2)+pdf(Dn_,1)*pdf(ADn_,2)+pdf(Chm_,1)*pdf(AChm_,2)+pdf(Str_,1)*pdf(AStr_,2)+pdf(Bot_,1)*pdf(ABot_,2) ) &
-                    + HOp(2)/xE * (pdf_z(Up_,1)*pdf(AUp_,2)+pdf_z(Dn_,1)*pdf(ADn_,2)+pdf_z(Chm_,1)*pdf(AChm_,2)+pdf_z(Str_,1)*pdf(AStr_,2)+pdf_z(Bot_,1)*pdf(ABot_,2) ) &
-                    + HOp(3)/xE * (pdf(Up_,1)*pdf_z(AUp_,2)+pdf(Dn_,1)*pdf_z(ADn_,2)+pdf(Chm_,1)*pdf_z(AChm_,2)+pdf(Str_,1)*pdf_z(AStr_,2)+pdf(Bot_,1)*pdf_z(ABot_,2) )
+                      + HOp(2)/xE * (pdf_z(Up_,1)*pdf(AUp_,2)+pdf_z(Dn_,1)*pdf(ADn_,2)+pdf_z(Chm_,1)*pdf(AChm_,2)+pdf_z(Str_,1)*pdf(AStr_,2)+pdf_z(Bot_,1)*pdf(ABot_,2) ) &
+                      + HOp(3)/xE * (pdf(Up_,1)*pdf_z(AUp_,2)+pdf(Dn_,1)*pdf_z(ADn_,2)+pdf(Chm_,1)*pdf_z(AChm_,2)+pdf(Str_,1)*pdf_z(AStr_,2)+pdf(Bot_,1)*pdf_z(ABot_,2) )
 
-    call swapMom(MomP(1:4,3),MomP(1:4,4))
-    call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
 
+    call EvalIntDipoles_QQBHTHTBG((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
     HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
     EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb  &
                      + HOp(1)    * (pdf(Up_,2)*pdf(AUp_,1)+pdf(Dn_,2)*pdf(ADn_,1)+pdf(Chm_,2)*pdf(AChm_,1)+pdf(Str_,2)*pdf(AStr_,1)+pdf(Bot_,2)*pdf(ABot_,1) ) &
                      + HOp(2)/xE * (pdf_z(Up_,2)*pdf(AUp_,1)+pdf_z(Dn_,2)*pdf(ADn_,1)+pdf_z(Chm_,2)*pdf(AChm_,1)+pdf_z(Str_,2)*pdf(AStr_,1)+pdf_z(Bot_,2)*pdf(ABot_,1) ) &
                      + HOp(3)/xE * (pdf(Up_,2)*pdf_z(AUp_,1)+pdf(Dn_,2)*pdf_z(ADn_,1)+pdf(Chm_,2)*pdf_z(AChm_,1)+pdf(Str_,2)*pdf_z(AStr_,1)+pdf(Bot_,2)*pdf_z(ABot_,1) )
 
-! checked for  xxxxxxxxxxxxxxx             XTopDK=1 TopDK=1 and two mu-scales and for XTopDK=TopDK=0
-print *, "1L check",NLO_Res_UnPol(-2)                            * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
-print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
-print *, "res1=", (HOp(1)+mydummy(1))/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
-pause
+
+! checked for    XTopDK=1 TopDK=1 and two mu-scales and for XTopDK=TopDK=0
+! print *, "1L check",NLO_Res_UnPol(-2)                            * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
+! print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) ) * PreFac/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
+! print *, "res1=", (EvalCS_1L_HtHtbqqb)/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol*PreFac)
+! pause
 
 
 ELSEIF( PROCESS.EQ.43 ) THEN
-      xE = yRnd(13)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
-      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
 
+! checked for    XTopDK=1 TopDK=1 and two mu-scales and for XTopDK=TopDK=0
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
       EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(Up_,1)*pdf(0,2)+pdf(Dn_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2)+pdf(Str_,1)*pdf(0,2)+pdf(Bot_,1)*pdf(0,2) ) &
-                     + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
-                     + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
+                         + HOp(2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(Up_,1)*pdf_z(0,2)+pdf(Dn_,1)*pdf_z(0,2)+pdf(Chm_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
+ 
 
-
-      call swapMom(MomP(1:4,3),MomP(1:4,4))
-      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
-
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
       EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb  &
                       + HOp(1)    * (pdf(Up_,2)*pdf(0,1)+pdf(Dn_,2)*pdf(0,1)+pdf(Chm_,2)*pdf(0,1)+pdf(Str_,2)*pdf(0,1)+pdf(Bot_,2)*pdf(0,1) ) &
@@ -628,17 +631,17 @@ ELSEIF( PROCESS.EQ.43 ) THEN
 
 
 ELSEIF( PROCESS.EQ.44 ) THEN
-      xE = yRnd(13)
       call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
+
+! checked for    XTopDK=1 TopDK=1 and two mu-scales and for XTopDK=TopDK=0
       call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
-      EvalCS_1L_HtHtbqqb =HOp(1)    * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
-                    +HOp(2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
-                    +HOp(3)/xE * (pdf(AUp_,1)*pdf_z(0,2)+pdf(ADn_,1)*pdf_z(0,2)+pdf(AChm_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
+      EvalCS_1L_HtHtbqqb = HOp(1)    * (pdf(AUp_,1)*pdf(0,2)+pdf(ADn_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2)+pdf(AStr_,1)*pdf(0,2)+pdf(ABot_,1)*pdf(0,2) ) &
+                         + HOp(2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
+                         + HOp(3)/xE * (pdf(AUp_,1)*pdf_z(0,2)+pdf(ADn_,1)*pdf_z(0,2)+pdf(AChm_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
+ 
 
-
-      call swapMom(MomP(1:4,3),MomP(1:4,4))
-      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,5:14),xE,HOp(1:3))
+      call EvalIntDipoles_QGHTHTBQ((/MomExt(1:4,3),MomExt(1:4,4),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,5:14),xE,HOp(1:3))
       HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
       EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb &
                         + HOp(1)    * (pdf(AUp_,2)*pdf(0,1)+pdf(ADn_,2)*pdf(0,1)+pdf(AChm_,2)*pdf(0,1)+pdf(AStr_,2)*pdf(0,1)+pdf(ABot_,2)*pdf(0,1) ) &
@@ -1023,16 +1026,19 @@ use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
 use ModIntDipoles_GGSTSTBG
+use ModTopdecay
 implicit none
 real(8) ::  EvalCS_1L_ststbgg,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(7:8,-2:1),CataniRes(-2:-1)
-integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+complex(8) :: LO_Decay_UnPol,Spi(1:4),BarSpi(1:4),M_T_BWENU,Msq_T_BWENU
+integer :: iHel,jHel,kHel,lHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
 logical :: applyPSCut
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2)
+type(Particle) :: TopQuark(1:2)
 !include 'misc/global_import'
 include 'vegas_common.f'
 
@@ -1096,9 +1102,41 @@ include 'vegas_common.f'
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 !------------ LO ----------------
 IF( Correction.EQ.0 ) THEN
-   do iHel=nHel(1),nHel(2)
-      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
-      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+
+
+!    do iHel=nHel(1),nHel(2)
+!       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+!       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+!       call HelCrossing(Helicities(iHel,1:4))
+!       call SetPolarizations()
+!       do iPrimAmp=1,NumBornAmps
+!           call EvalTree(BornAmps(iPrimAmp))
+!       enddo
+! 
+!       LO_Res_Pol = (0d0,0d0)
+!       do jPrimAmp=1,NumBornAmps
+!       do iPrimAmp=1,NumBornAmps
+!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!       enddo
+!       enddo
+!       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+!    enddo!helicity loop
+
+
+
+
+
+! ! !  this LO code block is equivalent to the above but it is 4 times faster
+   LO_Res_Unpol = (0d0,0d0)
+   if( XTopDecays.eq.0 ) then
+      jHel=1
+   else
+      jHel=4
+   endif
+
+   do iHel=nHel(1),nHel(2),jHel  ! ,4 because we jump over stop polarizations which are summed over outside
+      ExtParticle(1)%Pol(1)=(1d0,0d0)
+      ExtParticle(2)%Pol(1)=(1d0,0d0)
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,NumBornAmps
@@ -1114,6 +1152,73 @@ IF( Correction.EQ.0 ) THEN
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
 
+
+!  spin correlated top quarks
+   if( XTopDecays.ne.0) then
+      LO_Decay_UnPol = (0d0,0d0)
+      do jHel=-1,1,2
+      do kHel=-1,1,2
+          call STopDecay(ExtParticle(1),DKX_STChi0_LO,jHel,MomExt(1:4,5:9))
+          call STopDecay(ExtParticle(2),DKX_STChi0_LO,kHel,MomExt(1:4,10:14))
+          LO_Decay_UnPol = LO_Decay_UnPol + ExtParticle(1)%Pol(1)*dconjg(ExtParticle(1)%Pol(1)) * ExtParticle(2)%Pol(1)*dconjg(ExtParticle(2)%Pol(1))
+      enddo
+      enddo
+
+      LO_Res_UnPol = LO_Res_UnPol * LO_Decay_UnPol
+   endif
+
+! ! ! !  spin uncorrelated top quarks
+!    LO_Decay_UnPol = (0d0,0d0)
+!    do iHel=-1,1,2
+!    do jHel=-1,1,2
+!    do kHel=-1,1,2
+!    do lHel=-1,1,2
+!       call STopDecay(ExtParticle(1),DKX_STChi0_LO,jHel,MomExt(1:4,5:9),HelTop=iHel)
+!       call STopDecay(ExtParticle(2),DKX_STChi0_LO,kHel,MomExt(1:4,10:14),HelTop=lHel)
+!       LO_Decay_UnPol = LO_Decay_UnPol + ExtParticle(1)%Pol(1)*dconjg(ExtParticle(1)%Pol(1)) * ExtParticle(2)%Pol(1)*dconjg(ExtParticle(2)%Pol(1))
+!    enddo
+!    enddo
+!    enddo
+!    enddo
+! 
+! ! spherical decay of ATop
+!       TopQuark(1)%Mom(1:4) = MomExt(1:4,6)
+!       TopQuark(1)%PartType = ATop_
+!       TopQuark(1)%Mass = m_Top
+!       TopQuark(1)%Mass2 = m_Top**2
+! 
+!       TopQuark(2)%Mom(1:4) = MomExt(1:4,11)
+!       TopQuark(2)%PartType = Top_
+!       TopQuark(2)%Mass = m_Top
+!       TopQuark(2)%Mass2 = m_Top**2
+! 
+!       call TopDecay(TopQuark(1),DK_LO,MomExt(1:4,7:9))
+!       Spi(1:4) = TopQuark(1)%Pol(1:4)
+!       call vBarSpi(TopQuark(1)%Mom(1:4),m_Top,-1,BarSpi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       call vBarSpi(TopQuark(1)%Mom(1:4),m_Top,+1,BarSpi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = Msq_T_BWENU + M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       LO_Decay_UnPol = LO_Decay_UnPol * Msq_T_BWENU
+! 
+! ! spherical decay of Top
+!       call TopDecay(TopQuark(2),DK_LO,MomExt(1:4,12:14))
+!       BarSpi(1:4) = TopQuark(2)%Pol(1:4)
+!       call uSpi(TopQuark(2)%Mom(1:4),m_Top,-1,Spi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       call uSpi(TopQuark(2)%Mom(1:4),m_Top,+1,Spi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = Msq_T_BWENU + M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       LO_Decay_UnPol = LO_Decay_UnPol * Msq_T_BWENU
+! 
+! 
+!       LO_Res_UnPol = LO_Res_UnPol * LO_Decay_UnPol
 
 
 !------------ 1 LOOP --------------
@@ -1433,7 +1538,8 @@ use ModIntDipoles_QGSTSTBQ
 implicit none
 real(8) ::  EvalCS_1L_ststbqqb,yRnd(1:VegasMxDim),VgsWgt,HOp(1:3)
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:2,-2:1)
-integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+complex(8) :: LO_Decay_UnPol,Spi(1:4),BarSpi(1:4),M_T_BWENU,Msq_T_BWENU
+integer :: iHel,jHel,kHel,lHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),CataniRes(-2:-1),dZStop(-1:0)
 real(8) :: MomExt(1:4,1:15),MomP(1:4,1:4),MomBoost(1:4)
@@ -1442,6 +1548,7 @@ real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a,PDFFac_b,PDFFac,AccPoles
 real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,sigmaTot,beta
 integer :: NBin(1:NumMaxHisto),NHisto,nHel(1:2),npdf
 real(8),parameter :: Nc=3d0
+type(Particle) :: TopQuark(1:2)
 !include 'misc/global_import'
 include 'vegas_common.f'
 
@@ -1512,13 +1619,113 @@ include 'vegas_common.f'
 
 !------------ LO ----------------
 IF( Correction.EQ.0 ) THEN
-   do iHel=nHel(1),nHel(2)
 
+
+!    do iHel=nHel(1),nHel(2)
+! 
+!       if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
+! 
+!       call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+!       call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
+! 
+!       call HelCrossing(Helicities(iHel,1:4))
+!       call SetPolarizations()
+!       do iPrimAmp=1,NumBornAmps
+!           call EvalTree(BornAmps(iPrimAmp))
+!       enddo
+! 
+!       LO_Res_Pol = (0d0,0d0)
+!       do jPrimAmp=1,NumBornAmps
+!       do iPrimAmp=1,NumBornAmps
+!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!       enddo
+!       enddo
+!       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+!    enddo!helicity loop
+
+
+
+
+
+! ! !  this LO code block is equivalent to the above but it is 4 times faster
+!  spin correlated top quarks
+   if( XTopDecays.ne.0 ) then
+        LO_Decay_UnPol = (0d0,0d0)
+        do jHel=-1,1,2
+        do kHel=-1,1,2
+            call STopDecay(ExtParticle(1),DKX_STChi0_LO,jHel,MomExt(1:4,5:9))
+            call STopDecay(ExtParticle(2),DKX_STChi0_LO,kHel,MomExt(1:4,10:14))
+            LO_Decay_UnPol = LO_Decay_UnPol + ExtParticle(1)%Pol(1)*dconjg(ExtParticle(1)%Pol(1)) * ExtParticle(2)%Pol(1)*dconjg(ExtParticle(2)%Pol(1))
+        enddo
+        enddo
+   else
+        LO_Decay_UnPol = (1d0,0d0)
+   endif
+
+
+! ! ! !  spin uncorrelated top quarks
+!    LO_Decay_UnPol = (0d0,0d0)
+!    do iHel=-1,1,2
+!    do jHel=-1,1,2
+!    do kHel=-1,1,2
+!    do lHel=-1,1,2
+!       call STopDecay(ExtParticle(1),DKX_STChi0_LO,jHel,MomExt(1:4,5:9),HelTop=iHel)
+!       call STopDecay(ExtParticle(2),DKX_STChi0_LO,kHel,MomExt(1:4,10:14),HelTop=lHel)
+!       LO_Decay_UnPol = LO_Decay_UnPol + ExtParticle(1)%Pol(1)*dconjg(ExtParticle(1)%Pol(1)) * ExtParticle(2)%Pol(1)*dconjg(ExtParticle(2)%Pol(1))
+!    enddo
+!    enddo
+!    enddo
+!    enddo
+! 
+! ! spherical decay of ATop
+!       TopQuark(1)%Mom(1:4) = MomExt(1:4,6)
+!       TopQuark(1)%PartType = ATop_
+!       TopQuark(1)%Mass = m_Top
+!       TopQuark(1)%Mass2 = m_Top**2
+! 
+!       TopQuark(2)%Mom(1:4) = MomExt(1:4,11)
+!       TopQuark(2)%PartType = Top_
+!       TopQuark(2)%Mass = m_Top
+!       TopQuark(2)%Mass2 = m_Top**2
+! 
+!       call TopDecay(TopQuark(1),DK_LO,MomExt(1:4,7:9))
+!       Spi(1:4) = TopQuark(1)%Pol(1:4)
+!       call vBarSpi(TopQuark(1)%Mom(1:4),m_Top,-1,BarSpi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       call vBarSpi(TopQuark(1)%Mom(1:4),m_Top,+1,BarSpi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = Msq_T_BWENU + M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       LO_Decay_UnPol = LO_Decay_UnPol * Msq_T_BWENU
+! 
+! ! spherical decay of Top
+!       call TopDecay(TopQuark(2),DK_LO,MomExt(1:4,12:14))
+!       BarSpi(1:4) = TopQuark(2)%Pol(1:4)
+!       call uSpi(TopQuark(2)%Mom(1:4),m_Top,-1,Spi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       call uSpi(TopQuark(2)%Mom(1:4),m_Top,+1,Spi(1:4))
+!       M_T_BWENU = psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top)
+!       Msq_T_BWENU = Msq_T_BWENU + M_T_BWENU*dconjg(M_T_BWENU)/2d0
+! 
+!       LO_Decay_UnPol = LO_Decay_UnPol * Msq_T_BWENU
+
+
+! !  production process
+   if( XTopDecays.eq.0 ) then
+      jHel=1
+   else
+      jHel=4
+   endif
+
+   do iHel=nHel(1),nHel(2),jHel! ,4 because we jump over stop polarizations which are summed over outside
       if( Helicities(iHel,3).eq.Helicities(iHel,4) ) cycle ! remove helicities where IS quarks have ++ / -- helicities because tree vanishes
 
-      call STopDecay(ExtParticle(1),DKX_STChi0_LO,Helicities(iHel,5),MomExt(1:4,5:9))
-      call STopDecay(ExtParticle(2),DKX_STChi0_LO,Helicities(iHel,6),MomExt(1:4,10:14))
-
+      ExtParticle(1)%Pol(1)=(1d0,0d0)
+      ExtParticle(2)%Pol(1)=(1d0,0d0)
       call HelCrossing(Helicities(iHel,1:4))
       call SetPolarizations()
       do iPrimAmp=1,NumBornAmps
@@ -1531,8 +1738,12 @@ IF( Correction.EQ.0 ) THEN
           LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
       enddo
-      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol*PDFFac
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol * LO_Decay_UnPol * PDFFac
+
+
    enddo!helicity loop
+
+
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN

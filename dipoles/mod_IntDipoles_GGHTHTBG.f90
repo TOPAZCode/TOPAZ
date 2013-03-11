@@ -157,6 +157,9 @@ contains
    enddo
    res(1:3) = -alpha_sOver2Pi * res(1:3)
 
+! print *,"1", res(2:3)
+
+
        mtrsq = Tree_ij(0)
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
        epcorr=epinv
@@ -170,12 +173,16 @@ contains
        res(3) = res(3) + (AP(2) + AP(3))
 ! res(1) = res(1)+2*ap(1); print *, "eps check"
 
+! print *,"2", res(2:3)
+! pause
+
 ! 
 ! print *, "LO ID", Tree_ij(0)
 ! print *, "ID check",res(1)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(2)/alpha_sOver2Pi/Tree_ij(0)
 ! print *, "ID check",res(3)/alpha_sOver2Pi/Tree_ij(0)
 ! pause
+
 
 
   RETURN 
