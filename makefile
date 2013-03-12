@@ -310,7 +310,7 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 
 
 # the order of these object files corresponds to their mutual dependency
-allObjects =   $(ObjectDir)/mod_Misc.o \
+allObjects =   				$(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_Parameters.o \
 					$(ObjectDir)/mod_Process.o \
 					$(ObjectDir)/mod_Permutations.o \
@@ -348,6 +348,7 @@ allObjects =   $(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_CrossSection_TTBP.o \
 					$(ObjectDir)/mod_CrossSection_TTBETmiss.o \
 					$(ObjectDir)/mod_CrossSection_ZprimeTTB.o \
+					$(ObjectDir)/mod_CrossSection_TTBZ.o \
 					$(ObjectDir)/main.o
 
 
@@ -451,7 +452,13 @@ $(ObjectDir)/mod_CrossSection_TTBETmiss.o: mod_CrossSection_TTBETmiss.f90 $(make
 	@echo " compiling" $<
 	$(fcomp) -c $< -o $@
 
+
 $(ObjectDir)/mod_CrossSection_ZprimeTTB.o: mod_CrossSection_ZprimeTTB.f90 $(makeDep)
+	@echo " compiling" $<
+	$(fcomp) -c $< -o $@
+
+
+$(ObjectDir)/mod_CrossSection_TTBZ.o: mod_CrossSection_TTBZ.f90 $(makeDep)
 	@echo " compiling" $<
 	$(fcomp) -c $< -o $@
 

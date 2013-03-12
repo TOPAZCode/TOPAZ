@@ -82,6 +82,10 @@ real(8), public            :: Q_top
 real(8), public, parameter :: Q_Wp    =+1d0
 real(8), public, parameter :: Q_Wm    =-1d0
 real(8), public            :: Q_in
+
+real(8), public, parameter :: couplVQQ_left  = 1d0
+real(8), public, parameter :: couplVQQ_right = 1d0
+
 real(8), public :: WidthExpansion
 real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
 

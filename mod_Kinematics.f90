@@ -4403,6 +4403,52 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 return
 END SUBROUTINE
 
+
+
+SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: xRndPS(1:5)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+! real(8) :: MomDK(1:4,1:6)
+! integer :: NPart,i
+! real(8) :: vel,parx,theta ! for checks
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+
+!  generate PS: massless + massless --> massive(M) + massive(anti-top) + massive(top)
+  call genps(3,Ehat,xRndPS(1:5),(/Mass,m_Top,m_Top/),Mom(1:4,3:5),PSWgt)
+  PSWgt = PSWgt*PiWgtPr
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
+!   TmpMom(1:4) = Mom(1:4,3)
+!   Mom(1:4,3)  = Mom(1:4,5)
+!   Mom(1:4,5)  = TmpMom(1:4)
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
+
+
+
 !!! Zprime section !!!
 
 SUBROUTINE EvalPhasespaceBWMapp(EHat,Masses,xRndPS,Mom,PSWgt)                                                                                                
@@ -6427,6 +6473,189 @@ endif
 
 return
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_TTBARZ(NPlus1PS,Mom,MomOrder,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+integer :: NumHadr,NPlus1PS,MomOrder(1:12)
+real(8) :: Mom(1:4,1:12),zeros(1:12)
+real(8) :: MomJet(1:4,1:7),MomJet_CHECK(1:4,1:7)
+real(8) :: MomHadr(1:4,0:8)
+real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
+logical :: applyPSCut,isolated
+integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree,NJet_CHECK
+real(8) :: pT_lepM,pT_lepP,ET_miss,pT_ATop,pT_Top,HT,ET_bjet
+real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb,m_jj,mTblP,m_jjb,mT_lp
+real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,pt_Pho,eta_Pho,Rphobjet,mT_bln(1:2),mT_blnp(1:2)
+real(8) :: R_Pj(1:5),R_lj(1:5),R_PlepP,R_PlepM,pT_lept,ET_lept,mT,MInvPb1jj,mTb2lP,MInvPb2jj,mTb1lP,Phi_LP,Phi_LL
+integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N
+
+
+
+
+! momentum ordering
+  tbar    = MomOrder(1)
+  t       = MomOrder(2)
+  Zbos    = MomOrder(3)
+  inLeft  = MomOrder(4)
+  inRight = MomOrder(5)
+  realp   = MomOrder(6)
+  bbar    = MomOrder(7)
+  lepM    = MomOrder(8)
+  nubar   = MomOrder(9)
+  b       = MomOrder(10)
+  lepP    = MomOrder(11)
+  nu      = MomOrder(12)
+
+  qdn    = lepM
+  qbup   = nubar
+  qbdn   = lepP
+  qup    = nu
+
+
+!DEC$ IF(_CheckMomenta .EQ.1)
+   if(TopDecays.eq.0) then
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,ZBos)
+   else
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,ZBos) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
+   endif
+   if( NPlus1PS.eq.1 ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
+   if( any(abs(zeros(1:4)/Mom(1,inLeft)).gt.1d-8) ) then
+      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:4)
+      print *, "momenta dump:"
+      print *, Mom(1:4,1:12)
+   endif
+   zeros(1) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
+   zeros(2) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
+   zeros(3) =  Mom(1:4,ZBos).dot.Mom(1:4,ZBos) - M_Z**2
+   zeros(4) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
+   zeros(5) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
+   zeros(6) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
+   zeros(7) =  Mom(1:4,b).dot.Mom(1:4,b)
+   zeros(8) =  Mom(1:4,lepP).dot.Mom(1:4,lepP)
+   zeros(9) =  Mom(1:4,nu).dot.Mom(1:4,nu)
+   if( NPlus1PS.eq.1 ) zeros(10)=  Mom(1:4,realp).dot.Mom(1:4,realp)
+   if( TopDecays.eq.0 .and. any(abs(zeros(1:10)/Mom(1,inLeft)**2).gt.1d-8) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
+      print *, Mom(1:4,1:2)
+   endif
+   if( TopDecays.ne.0 .and. any(abs(zeros(1:10)/Mom(1,inLeft)**2).gt.1d-8) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
+      print *, "momenta dump:"
+      print *, Mom(1:4,1:12)
+   endif
+!DEC$ ENDIF
+
+
+applyPSCut = .false.
+NBin(1:NumHistograms) = 0
+
+
+MomHadr(1:4,1:7) = 0d0
+PartList(1:7)=(/1,2,3,4,5,6,7/)
+
+MomMiss(1:4) = 0d0
+MomObs(1:4)  = 0d0
+
+! separating momenta into hadron momenta and lepton momenta to which various procedures can be applied
+!-------------------------------------------------------
+
+IF( TOPDECAYS.EQ.0 ) THEN  ! no top decays
+    if(NPlus1PS.eq.0) then
+        NumHadr = 0
+    else
+        NumHadr = 1
+        MomHadr(1:4,NumHadr) = Mom(1:4,realp)
+    endif
+
+ELSEIF( TOPDECAYS.EQ.1 ) THEN  ! di-leptonic decay
+    MomHadr(1:4,1) = Mom(1:4,bbar)
+    MomHadr(1:4,2) = Mom(1:4,b)     ! Bot
+    if(NPlus1PS.eq.0) then
+        NumHadr = 2
+    else
+        NumHadr = 3
+        MomHadr(1:4,NumHadr) = Mom(1:4,realp)
+    endif
+
+ELSEIF( TOPDECAYS.EQ.3 ) THEN  ! lept. Atop, hadr. top decay
+   MomHadr(1:4,1) = Mom(1:4,bbar)
+   MomHadr(1:4,2) = Mom(1:4,b)
+   MomHadr(1:4,3) = Mom(1:4,qbdn)
+   MomHadr(1:4,4) = Mom(1:4,qup)
+   L = LepM
+   N = nubar
+   if(NPlus1PS.eq.0) then
+        NumHadr = 4
+   else
+        NumHadr = 5
+        MomHadr(1:4,NumHadr) = Mom(1:4,realp)   ! q/qbar/glu
+   endif
+
+ELSEIF( TOPDECAYS.EQ.4 ) THEN  ! hadr. Atop, lept. top decay
+   MomHadr(1:4,1) = Mom(1:4,bbar)
+   MomHadr(1:4,2) = Mom(1:4,b)
+   MomHadr(1:4,3) = Mom(1:4,qbup)
+   MomHadr(1:4,4) = Mom(1:4,qdn)
+   L = LepP
+   N = nu
+   if(NPlus1PS.eq.0) then
+        NumHadr = 4
+   else
+        NumHadr = 5
+        MomHadr(1:4,NumHadr) = Mom(1:4,realp)
+   endif
+
+ELSE
+  call Error("this decay is not yet implemented")
+ENDIF
+
+
+
+
+
+!---------------------- kT jet algorithm ---------------------------------
+! important: b-quarks need to be at the first two positions of MomHadr(:,:)
+! recombination of MomHadr(1:4,i) and MomHadr(1:4,j) results in MomJet(1:4,i) with i<j.
+! but take care: some MomJet(1:4,i) can be zero, this is why we apply pt_order
+
+    NJet=0
+    MomJet(1:4,1:7) = MomHadr(1:4,1:7)
+    call JetAlgo_kt(Rsep_jet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr)) ! hard protojets in beam pipe are counted as jets
+    call pT_order(2,MomJet(1:4,1:2))
+    call pT_order(NumHadr-2,MomJet(1:4,3:NumHadr))
+
+
+! call SwitchEnergyComponent(MomHadr(1:4,1:NumHadr))
+! call fastjetppgenkt(MomHadr(1:4,1:NumHadr),NumHadr,Rsep_jet,-1d0,MomJet(1:4,1:NumHadr),NJet)! 4th argument:  +1d0=kT,  -1d0=anti-kT,   0d0=CA
+! call SwitchEnergyComponentBack(MomJet_CHECK(1:4,1:NumHadr))
+
+
+!------------------------ cuts and binning --------------------------------
+if( ObsSet.eq.60 .or. ObsSet.eq.61) then! ttb+photon production without top decays at Tevatron & LHC
+
+    pT_ATop = get_PT(Mom(1:4,tbar))
+    pT_Top  = get_PT(Mom(1:4,t))
+
+    eta_ATop = get_ETA(Mom(1:4,tbar))
+    eta_Top  = get_ETA(Mom(1:4,t))
+
+
+!-------------------------------------------------------
+else
+  print *, "ObsSet not implemented",ObsSet
+  stop
+endif
+
+
+return
+END SUBROUTINE
+
 
 
 

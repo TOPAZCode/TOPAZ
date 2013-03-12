@@ -63,6 +63,8 @@ private    :: Cache_cur_g_2f_Dv4,Cache_cur_g_2f_Dv6,Cache_cur_g_2f_Dv8,Cache_cur
 
 
 public  :: cur_g,cur_f_2f,cur_g_2f,cur_f_4f,cur_g_4f,cur_f_6f,cur_f_2f_massCT,cur_f_4f_massCT
+public  :: cur_f_2fW
+public  :: cur_f_2fV
 public  :: cur_g_2s,cur_g_ssff,cur_g_ffss,  cur_s_2s,cur_s_ssffss,cur_s_sffsss,cur_s_sssffs,cur_s_4s,cur_s_ssff,cur_s_sffs,  cur_f_ffss,cur_f_fssf,cur_f_fffssf,cur_f_fssfff,  cur_s_2s_massCT
 public  :: cur_s_sssffs_CLOSEDLOOPCONTRIB,cur_s_sffsss_CLOSEDLOOPCONTRIB
 public  :: SetDim,InitCurrCache
@@ -2773,14 +2775,14 @@ END FUNCTION
 
 
 ! ---------------------------- currents with a W boson coupling to a top-bot-line -----------------------------------------
-
+!------------------------------           works only in 4D because of Chir        -----------------------------------------
 
 
 FUNCTION cur_f_2fW(Gluons,Quarks,Boson,NumGlu) result(Res)           ! Quarks(:) DOES include the OFF-shell quark, in contrast to all other routines!
 implicit none
 complex(8) :: Res(1:Ds)
 integer :: NumGlu(0:2),i,rIn,rOut,Quark1PartType
-type(PtrToParticle) :: Gluons(1:),Boson,Quarks(1:2)      ! off-shell quark is not included in Quarks(:)
+type(PtrToParticle) :: Gluons(1:),Boson,Quarks(1:2) 
 complex(8) :: GluMom(1:Dv,NumGlu(0)), QuarkMom(1:Dv)
 complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
 character :: FerFla1*3,FerFla2*3
@@ -3063,6 +3065,292 @@ endif
 
       end function bfW
 
+
+
+
+
+! ---------------------------- currents with a vector boson coupling to a quark-line -----------------------------------------
+!------------------------------           works only in 4D because of Chir        -----------------------------------------
+
+
+FUNCTION cur_f_2fV(Gluons,Quarks,Boson,NumGlu) result(Res)           ! Quarks(:) DOES include the OFF-shell quark, in contrast to all other routines!
+implicit none
+complex(8) :: Res(1:Ds)
+integer :: NumGlu(0:2),i,rIn,rOut,Quark1PartType
+type(PtrToParticle) :: Gluons(1:),Boson,Quarks(1:2) 
+complex(8) :: GluMom(1:Dv,NumGlu(0)), QuarkMom(1:Dv)
+complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
+
+
+
+   do i=1,NumGlu(0)
+    GluMom(1:Dv,i) = Gluons(i)%Mom(1:Dv)
+    GluPol(1:Dv,i) = Gluons(i)%Pol(1:Dv)
+   enddo
+   QuarkMom(1:Dv) = Quarks(2)%Mom(1:Dv)
+   QuarkPol(1:Ds) = Quarks(2)%Pol(1:Ds)
+
+   if( Quarks(1)%PartType.ne.-Quarks(2)%PartType ) then
+      call Error("Wrong quark flavors in cur_f_2fV")
+   endif
+
+   rIn =1
+   rOut=NumGlu(0)
+   if( Quarks(2)%PartType .gt.0 ) then      !    X----->----
+      Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quarks(1)%Mass,Quarks(1)%PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
+   else                                     !    X-----<----
+      Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quarks(1)%Mass,Quarks(1)%PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
+   endif
+
+
+return
+END FUNCTION
+
+
+
+
+
+
+
+      recursive function fV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
+      use ModParameters
+      implicit none
+      complex(8), intent(in) :: e(:,:), k(:,:)
+      complex(8), intent(in) :: sp(:), p(:)
+      complex(8), intent(in) :: eV(:), kV(:)
+      integer, intent(in) ::  ms,QuarkFlavor
+      integer             :: ms1,m,ng1, ng2
+      integer :: ngluon
+      complex(8)             :: res(size(sp))
+      complex(8)             :: tmp(size(sp))
+      complex(8)             :: k1(size(p))
+      complex(8)             :: k2(size(p))
+      complex(8)             :: sp2(size(sp))
+      complex(8)             :: sp3(size(sp))
+      complex(8)             :: e1(size(e,dim=1))
+      complex(8)             :: e2(size(e,dim=1))
+      complex(8)  :: k1sq,k2sq,k3sq
+      real(8) :: mass
+      character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
+
+
+      ngluon = size(e,dim=2)
+      ng1 = ms   !#gluons to the left of a f-line
+      ng2 = ngluon - ms  !#gluons to the right of the f-line
+
+
+      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fW'
+
+if (ngluon == 0) then
+         res = vbqV(sp,eV,couplVQQ_left,couplVQQ_right)
+else
+
+       res = (0d0,0d0)
+       do m=0,ng2-1
+           k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
+           e1=g(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon))
+           k1sq=sc_(k1,k1)
+
+           k2 = sum(k(:,1:ng1+m),dim=2)
+           k2 = k2 + p + kV
+           k2sq = sc_(k2,k2)-mass**2
+           sp2 = fV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1)
+           sp2 = spb2_(sp2,k2)+mass*sp2
+
+           tmp = vqg(sp2,e1)
+           if (m < ng2-1)  then
+              if(abs(k1sq) > propcut) then
+                  tmp = -(0d0,1d0)/k1sq*tmp
+              else
+                  tmp = (0d0,0d0)
+              endif
+           endif
+
+           if (abs(k2sq) > propcut) then
+                  tmp =  (0d0,1d0)/k2sq*tmp
+           else
+                  tmp = (0d0,0d0)
+           endif
+           res = res + tmp
+        enddo
+
+
+
+
+        do m=1,ng1
+           k1 = sum(k(:,1:m),dim=2)
+           e1=g(e(:,1:m),k(:,1:m))
+           k1sq = sc_(k1,k1)
+
+           k2 = sum(k(:,m+1:ngluon),dim=2)
+           k2 = k2 + p + kV
+           k2sq = sc_(k2,k2) - mass**2
+           ms1 = ng1 - m
+           sp2=fV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1)
+
+           sp2 = spb2_(sp2,k2)+mass*sp2
+
+           tmp = vgq(e1,sp2)
+           if (m > 1) then
+              if (abs(k1sq) > propcut) then
+                  tmp=-(0d0,1d0)/k1sq*tmp
+              else
+                  tmp = (0d0,0d0)
+              endif
+           endif
+
+           if (abs(k2sq) > propcut) then
+              tmp=(0d0,1d0)/k2sq*tmp
+           else
+              tmp = (0d0,0d0)
+           endif
+
+           res = res + tmp
+        enddo
+
+
+
+        sp2 = f(e,k,sp,p,mass,FerFla,FerFla,ms)
+        k2 = sum(k(:,1:ngluon),dim=2)
+        k2 = k2 + p
+        k2sq = sc_(k2,k2)  - mass**2
+
+        sp2 = spb2_(sp2,k2)+ mass*sp2
+
+        tmp = vbqV(sp2,eV,couplVQQ_left,couplVQQ_right)
+        if (abs(k2sq) > propcut) then
+               tmp = (0d0,1d0)/k2sq*tmp
+        else
+                tmp = (0d0,0d0)
+        endif
+        res = res + tmp
+
+endif
+
+end function fV
+
+
+
+
+      recursive function bfV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
+      use ModParameters
+      implicit none
+      complex(8), intent(in) :: e(:,:), k(:,:)
+      complex(8), intent(in) :: sp(:), p(:)
+      complex(8), intent(in) :: eV(:), kV(:)
+      integer, intent(in) ::  ms,QuarkFlavor
+      integer             :: ms1,m,ng1, ng2
+      integer :: ngluon
+      complex(8)             :: res(size(sp))
+      complex(8)             :: tmp(size(sp))
+      complex(8)             :: k1(size(p))
+      complex(8)             :: k2(size(p))
+      complex(8)             :: sp2(size(sp))
+      complex(8)             :: sp3(size(sp))
+      complex(8)             :: e1(size(e,dim=1))
+      complex(8)             :: e2(size(e,dim=1))
+      complex(8)  :: k1sq,k2sq,k3sq
+      real(8) :: mass
+      character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
+
+
+      ngluon = size(e,dim=2)
+      ng1 = ms   !#gluons to the left of a f-line
+      ng2 = ngluon - ms  !#gluons to the right of the f-line
+
+      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fbW'
+
+if (ngluon == 0) then
+         res = vVq(eV,sp,couplVQQ_left,couplVQQ_right)
+else
+
+       res = (0d0,0d0)
+       do m=0,ng2-1
+           k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
+           e1=g(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon))
+           k1sq=sc_(k1,k1)
+
+           k2 = sum(k(:,1:ng1+m),dim=2)
+           k2 = -k2 - p - kV
+           k2sq = sc_(k2,k2)-mass**2
+
+           sp2 = bfV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1)
+           sp2 = spi2_(k2,sp2)+mass*sp2
+
+           tmp = vbqg(sp2,e1)
+
+           if (m < ng2-1) then
+            if (abs(k1sq) > propcut) then
+                tmp = -(0d0,1d0)/k1sq*tmp
+            else
+                tmp = (0d0,0d0)
+            endif
+           endif
+
+           if (abs(k2sq) > propcut) then
+              tmp =  (0d0,1d0)/k2sq*tmp
+           else
+               tmp = (0d0,0d0)
+           endif
+
+           res = res + tmp
+        enddo
+
+
+        do m=1,ng1
+
+           k1 = sum(k(:,1:m),dim=2)
+           e1=g(e(:,1:m),k(:,1:m))
+           k1sq = sc_(k1,k1)
+
+           k2 = sum(k(:,m+1:ngluon),dim=2)
+           k2 = -k2 - p - kV
+           k2sq = sc_(k2,k2) - mass**2
+           ms1 = ng1 - m
+           sp2=bfV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1)
+
+           sp2 = spi2_(k2,sp2)+mass*sp2
+
+           tmp = vgbq(e1,sp2)
+
+           if (m > 1) then
+              if (abs(k1sq) > propcut) then
+                  tmp=-(0d0,1d0)/k1sq*tmp
+              else
+                  tmp = (0d0,0d0)
+              endif
+           endif
+
+           if (abs(k2sq) > propcut) then
+                 tmp=(0d0,1d0)/k2sq*tmp
+              else
+                 tmp = (0d0,0d0)
+           endif
+
+           res = res + tmp
+
+        enddo
+
+
+
+        sp2 = bf(e,k,sp,p,mass,FerFla,FerFla,ms)
+        k2 = sum(k(:,1:ngluon),dim=2)
+        k2 = -k2 - p
+        k2sq = sc_(k2,k2)   -mass**2
+
+        sp2 = spb2_(sp2,k2) +mass*sp2
+
+        tmp = vVq(eV,sp2,couplVQQ_left,couplVQQ_right)
+        if (abs(k2sq) > propcut) then
+               tmp = (0d0,1d0)/k2sq*tmp
+        else 
+               tmp = (0d0,0d0)
+        endif
+        res = res + tmp
+
+endif
+
+      end function bfV
 
 
 
