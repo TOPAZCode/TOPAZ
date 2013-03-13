@@ -368,7 +368,7 @@ all: $(allObjects)
 	@echo " executable file is " $(Exec)
 	@echo " "
 # 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) 
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 
@@ -550,7 +550,7 @@ $(ObjectDir)/mod_TTBJ_NLODKW.o: mod_TTBJ_NLODKW.f90 $(makeDep)
 
 $(ObjectDir)/mod_TTBP_NLODK.o: mod_TTBP_NLODK.f90 $(makeDep)
 	@echo " compiling" $<
-	$(fcomp) -c -80 -I$(Here)/includes_DKP $< -o $@
+	$(fcomp) -c -fixed -80 -I$(Here)/includes_DKP $< -o $@
 
 
 

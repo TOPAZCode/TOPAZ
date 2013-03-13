@@ -2810,6 +2810,8 @@ real(8) :: Quark1Mass
       call Error("This Flavor is not allowed in cur_f_2fW",Quarks(2)%PartType)
    endif
 
+   if( NumGlu(0)-NumGlu(1)-NumGlu(2).ne.0 ) call Error("Wrong NumGlu in cur_f_2fV",NumGlu(0)-NumGlu(1)-NumGlu(2))
+
    rIn =1
    rOut=NumGlu(0)
    if( Quarks(2)%PartType .gt.0 ) then      !    X----->----
@@ -3090,9 +3092,8 @@ complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
    QuarkMom(1:Dv) = Quarks(2)%Mom(1:Dv)
    QuarkPol(1:Ds) = Quarks(2)%Pol(1:Ds)
 
-   if( Quarks(1)%PartType.ne.-Quarks(2)%PartType ) then
-      call Error("Wrong quark flavors in cur_f_2fV")
-   endif
+   if( Quarks(1)%PartType.ne.-Quarks(2)%PartType ) call Error("Wrong quark flavors in cur_f_2fV")
+   if( NumGlu(0)-NumGlu(1)-NumGlu(2).ne.0 ) call Error("Wrong NumGlu in cur_f_2fV",NumGlu(0)-NumGlu(1)-NumGlu(2))
 
    rIn =1
    rOut=NumGlu(0)
@@ -3137,7 +3138,6 @@ END FUNCTION
       ngluon = size(e,dim=2)
       ng1 = ms   !#gluons to the left of a f-line
       ng2 = ngluon - ms  !#gluons to the right of the f-line
-
 
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
 

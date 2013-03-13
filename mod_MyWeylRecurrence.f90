@@ -51,6 +51,9 @@ real(8) :: Quark1Mass
       call Error("This Flavor is not allowed in cur_f_2fW_Weyl",Quarks(2)%PartType)
    endif
 
+   if( NumGlu(0)-NumGlu(1)-NumGlu(2).ne.0 ) call Error("Wrong NumGlu in cur_f_2fV",NumGlu(0)-NumGlu(1)-NumGlu(2))
+
+
    rIn =1
    rOut=NumGlu(0)
    if( Quarks(2)%PartType .gt.0 ) then      !    X----->----

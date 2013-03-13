@@ -5480,23 +5480,27 @@ ENDIF
             TheTree%NumW = 0
             TheTree%NumV = 0
             counterQ = 0
+            counterG = 0
 
             do NPart=1,TheTree%NumPart
                   TheTree%PartType(NPart) = ExtParticle( TheBornAmp%ExtLine(NPart) )%PartType
                   if( IsAQuark(TheTree%PartType(NPart)) ) then
                      TheTree%NumQua = TheTree%NumQua + 1
                      counterQ = counterQ + 1
-                     QuarkPos(counterQ) = NPart
+                     QuarkPos(counterQ) = counterQ + counterG
                   elseif( IsAScalar(TheTree%PartType(NPart)) ) then
                      TheTree%NumSca = TheTree%NumSca + 1
                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
-                     QuarkPos(counterQ) = NPart
+                     QuarkPos(counterQ) = counterQ + counterG
+                  elseif( TheTree%PartType(NPart).eq.Glu_ ) then
+                     counterG = counterG + 1
                   elseif( IsABoson(TheTree%PartType(NPart)) ) then
                      if( abs(TheTree%PartType(NPart)).eq.abs(Wp_) ) TheTree%NumW = TheTree%NumW + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Z0_) ) TheTree%NumV = TheTree%NumV + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Pho_)) TheTree%NumV = TheTree%NumV + 1
                   endif
             enddo
+
 
             if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
                allocate( TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca), stat=AllocStatus )
@@ -5518,13 +5522,15 @@ ENDIF
             if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
               if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
                     TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-                    TheTree%NumGlu(2) = TheTree%NumPart - QuarkPos(2)
+                    TheTree%NumGlu(2) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(2)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
               if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
                     TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
                     TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
                     TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-                    TheTree%NumGlu(4) = TheTree%NumPart - QuarkPos(4)
+                    TheTree%NumGlu(4) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(4)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3)-TheTree%NumGlu(4).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
               if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
                     TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
@@ -5532,21 +5538,24 @@ ENDIF
                     TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
                     TheTree%NumGlu(4) = QuarkPos(5) - QuarkPos(4) - 1
                     TheTree%NumGlu(5) = QuarkPos(6) - QuarkPos(5) - 1
-                    TheTree%NumGlu(6) = TheTree%NumPart - QuarkPos(6)
+                    TheTree%NumGlu(6) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(6)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3)-TheTree%NumGlu(4)-TheTree%NumGlu(5)-TheTree%NumGlu(6).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
 
             elseif( TheTree%PartType(1).eq.Glu_ ) then
               if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
                     TheTree%NumGlu(1) = QuarkPos(1) - 2
                     TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-                    TheTree%NumGlu(3) = TheTree%NumPart - QuarkPos(2)
+                    TheTree%NumGlu(3) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(2)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
               if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
                     TheTree%NumGlu(1) = QuarkPos(1) - 2
                     TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                     TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
                     TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-                    TheTree%NumGlu(5) = TheTree%NumPart - QuarkPos(4)
+                    TheTree%NumGlu(5) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(4)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3)-TheTree%NumGlu(4)-TheTree%NumGlu(5).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
               if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
                     TheTree%NumGlu(1) = QuarkPos(1) - 2
@@ -5555,7 +5564,8 @@ ENDIF
                     TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
                     TheTree%NumGlu(5) = QuarkPos(5) - QuarkPos(4) - 1
                     TheTree%NumGlu(6) = QuarkPos(6) - QuarkPos(5) - 1
-                    TheTree%NumGlu(7) = TheTree%NumPart - QuarkPos(6)
+                    TheTree%NumGlu(7) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(6)
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3)-TheTree%NumGlu(4)-TheTree%NumGlu(5)-TheTree%NumGlu(6)-TheTree%NumGlu(7).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
             else
                 call Error("Invalid first particle",TheTree%PartType(1))

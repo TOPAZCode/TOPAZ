@@ -2432,7 +2432,7 @@ END SUBROUTINE
       real(8), intent(in) :: coupl_left,coupl_right
       complex(8) :: vbqV(size(sp))
 
-            vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) )
+            vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) ) 
 
       end function vbqV
 

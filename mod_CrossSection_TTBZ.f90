@@ -328,19 +328,22 @@ ENDIF
 
 
 
+
+!      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
-       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-       MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
-       MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
-       MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-       call coupsm(0)
-       call SGG_TTBZ(MG_MOM,MadGraph_tree)
-       print *, ""
-       print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
-       print *, "MadGraph hel.amp:", MadGraph_tree
-       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
-       pause
+!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!        MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
+!        MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
+!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+!        call coupsm(0)
+!        call SGG_TTBZ(MG_MOM,MadGraph_tree)
+!        print *, ""
+!        print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
+!        print *, "MadGraph hel.amp:", MadGraph_tree
+!        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+!        pause
+
 
 
    if( IsNan(EvalCS_1L_ttbggZ) ) then
