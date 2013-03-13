@@ -384,6 +384,8 @@ complex(8) :: Amp_tbtgg(1:2),LO_Res_Unpol,LO_Res_Pol
           call InitProcess_TbTGG(ExtParticles_tbtgg(1:4))
           TreeAmps_tbtgg(1)%PartRef(1:4) = (/1,2,3,4/)
           TreeAmps_tbtgg(2)%PartRef(1:4) = (/1,2,4,3/)
+          TreeAmps_tbtgg(1)%NumQua = 2
+          TreeAmps_tbtgg(2)%NumQua = 2
 
           do iTree=1,2
                call LinkTreeParticles(TreeAmps_tbtgg(iTree),ExtParticles_tbtgg(1:4))
@@ -570,6 +572,8 @@ complex(8) :: Spi(1:4),BarSpi(1:4),Msq_T_BW,Msq_W_ENU,Msq_DK,M_T_BW
           call InitTrees(4,0,1,TreeAmps_tbtqbq)
           call InitProcess_TbTQbQ(ExtParticles_tbtqbq(1:4))
           TreeAmps_tbtqbq(1)%PartRef(1:4) = (/1,2,3,4/)
+          TreeAmps_tbtqbq(1)%NumQua = 4
+
           do iTree=1,1
                call LinkTreeParticles(TreeAmps_tbtqbq(iTree),ExtParticles_tbtqbq(1:4))
           enddo

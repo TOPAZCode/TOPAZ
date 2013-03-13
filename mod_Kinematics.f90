@@ -3242,6 +3242,24 @@ ELSEIF( ObsSet.EQ.48 ) THEN! set of observables for STOP width
 !           endif
 
 
+
+ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
+          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.0)  call Error("TopDecays needs to be 0")
+          NumHistograms = 1
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal =  0d0*GeV
+          Histo(1)%SetScale= 100d0
+
+
+
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
@@ -6532,7 +6550,7 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
    endif
    zeros(1) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
    zeros(2) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
-   zeros(3) =  Mom(1:4,ZBos).dot.Mom(1:4,ZBos) - M_Z**2
+   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
    zeros(4) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
    zeros(5) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
    zeros(6) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
@@ -6637,13 +6655,11 @@ ENDIF
 
 
 !------------------------ cuts and binning --------------------------------
-if( ObsSet.eq.60 .or. ObsSet.eq.61) then! ttb+photon production without top decays at Tevatron & LHC
+if( ObsSet.eq.51) then! ttb+Z production without top decays at Tevatron & LHC
 
     pT_ATop = get_PT(Mom(1:4,tbar))
     pT_Top  = get_PT(Mom(1:4,t))
 
-    eta_ATop = get_ETA(Mom(1:4,tbar))
-    eta_Top  = get_ETA(Mom(1:4,t))
 
 
 !-------------------------------------------------------
@@ -9219,6 +9235,12 @@ implicit none
 integer :: NPart
 
    do NPart=1,NumExtParticles
+      
+      if( IsABoson(ExtParticle(NPart)%PartType) ) then
+         call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+         cycle
+      endif
       if(abs(ExtParticle(NPart)%Helicity).ne.1) cycle ! this prevents overriding of top decay spinors,  (ExtParticle(NPart)%Helicity=0)
       if( ExtParticle(NPart)%PartType .eq. Glu_ ) then
          call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
@@ -9233,7 +9255,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!         ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!        ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

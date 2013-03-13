@@ -3130,7 +3130,7 @@ END FUNCTION
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
       complex(8)  :: k1sq,k2sq,k3sq
-      real(8) :: mass
+      real(8) :: mass,couplVQQ_left,couplVQQ_right
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
 
@@ -3139,8 +3139,18 @@ END FUNCTION
       ng2 = ngluon - ms  !#gluons to the right of the f-line
 
 
-      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fW'
+      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
 
+      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
+          couplVQQ_left  = couplZUU_left
+          couplVQQ_right = couplZUU_right
+      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
+          couplVQQ_left  = couplZUU_left
+          couplVQQ_right = couplZUU_right
+      elseif( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) then!   note that Bot_ is treated as top quark in TOPAZ!
+          couplVQQ_left  = couplZTT_left
+          couplVQQ_right = couplZTT_right
+      endif
 if (ngluon == 0) then
          res = vbqV(sp,eV,couplVQQ_left,couplVQQ_right)
 else
@@ -3209,7 +3219,6 @@ else
         enddo
 
 
-
         sp2 = f(e,k,sp,p,mass,FerFla,FerFla,ms)
         k2 = sum(k(:,1:ngluon),dim=2)
         k2 = k2 + p
@@ -3250,7 +3259,7 @@ end function fV
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
       complex(8)  :: k1sq,k2sq,k3sq
-      real(8) :: mass
+      real(8) :: mass,couplVQQ_left,couplVQQ_right
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
 
@@ -3258,7 +3267,18 @@ end function fV
       ng1 = ms   !#gluons to the left of a f-line
       ng2 = ngluon - ms  !#gluons to the right of the f-line
 
-      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fbW'
+      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fbV'
+
+      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
+          couplVQQ_left  = couplZUU_left
+          couplVQQ_right = couplZUU_right
+      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
+          couplVQQ_left  = couplZUU_left
+          couplVQQ_right = couplZUU_right
+      elseif( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) then!   note that Bot_ is treated as top quark in TOPAZ!
+          couplVQQ_left  = couplZTT_left
+          couplVQQ_right = couplZTT_right
+      endif
 
 if (ngluon == 0) then
          res = vVq(eV,sp,couplVQQ_left,couplVQQ_right)

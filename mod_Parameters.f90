@@ -2,7 +2,7 @@ MODULE ModParameters
 implicit none
 
 
-integer, public :: Collider, Process, PDFSet, NLOParam, TopDecays, XTopDecays
+integer, public :: Collider, Process, PDFSet, NLOParam, TopDecays, XTopDecays, ZDecays
 integer, public :: MasterProcess, Correction, ObsSet
 integer, public :: VegasIt0,VegasIt1,VegasNc0,VegasNc1,VegasMxDim,VegasSeed
 integer, public :: VegasIt0_default,VegasIt1_default,VegasNc0_default,VegasNc1_default
@@ -39,7 +39,7 @@ real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-real(8), public, parameter :: m_Z     = 91.188d0*GeV
+real(8), public, parameter :: m_Z     = 91.19d0*GeV
 real(8), public, parameter :: m_W     = 80.419d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
@@ -78,13 +78,31 @@ real(8), public :: gL_Zpr(6), gR_Zpr(6)
 real(8), public, parameter :: Q_up    = 2d0/3d0
 real(8), public, parameter :: Q_dn    =-1d0/3d0
 real(8), public, parameter :: Q_el    =-1d0
+real(8), public, parameter :: Q_nu    = 0d0
 real(8), public            :: Q_top
 real(8), public, parameter :: Q_Wp    =+1d0
 real(8), public, parameter :: Q_Wm    =-1d0
 real(8), public            :: Q_in
 
-real(8), public, parameter :: couplVQQ_left  = 1d0
-real(8), public, parameter :: couplVQQ_right = 1d0
+real(8), public, parameter :: T3_up    =+1d0/2d0
+real(8), public, parameter :: T3_dn    =-1d0/2d0
+real(8), public, parameter :: T3_nu    =+1d0/2d0
+real(8), public, parameter :: T3_el    =-1d0/2d0
+
+real(8), public, parameter :: couplZUU_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up
+real(8), public, parameter :: couplZUU_right = -sw/cw*Q_up
+
+real(8), public, parameter :: couplZDD_left  = -sw/cw*Q_dn + 1d0/sw/cw * T3_dn
+real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
+
+real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
+real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
+
+real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
+real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
+
+real(8), public, parameter :: couplZNN_left  = -sw/cw*Q_nu + 1d0/sw/cw * T3_nu
+real(8), public, parameter :: couplZNN_right = -sw/cw*Q_nu
 
 real(8), public :: WidthExpansion
 real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2

@@ -1,4 +1,4 @@
-PROGRAM ttbarjets
+PROGRAM TOPAZ
 use ModParameters
 use ModProcess
 use ModKinematics
@@ -31,8 +31,8 @@ real(8) :: VG_Result,VG_Error
    call cpu_time(time_start)
    call StartVegas(VG_Result,VG_Error)
    call cpu_time(time_end)
-!    call WriteHisto(6,it,VG_Result,VG_Error,time_end-time_start)   ! stdout
-   call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file
+!    call WriteHisto(6,it,VG_Result,VG_Error,time_end-time_start)   ! stdout (unit=6)
+   call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
    call PlotVegas()
    call CloseFiles()
    print *, "Done (",(time_end-time_start)/60d0,") minutes"
@@ -65,6 +65,7 @@ logical :: dirresult
    NLOParam=1
    TopDecays=-100
    XTopDecays=-100
+   ZDecays=-100
    HelSampling=.false.
    m_Top=172d0*GeV
    m_STop=350d0*GeV
@@ -154,6 +155,8 @@ logical :: dirresult
         read(arg(7:9),*) TopDecays
     elseif( arg(1:7).eq."XTopDK=" ) then
         read(arg(8:10),*) XTopDecays
+    elseif( arg(1:4).eq."ZDK=" ) then
+        read(arg(5:7),*) ZDecays
     elseif( arg(1:9).eq."VegasIt0=" ) then
         read(arg(10:11),*) VegasIt0
     elseif( arg(1:9).eq."VegasIt1=" ) then
@@ -236,6 +239,13 @@ logical :: dirresult
               print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
           endif
     endif
+    if( Process.ge.71 .and. Process.le.79 ) then
+          if( ZDecays.eq.-100 ) then 
+              print *, "not enough input parameter"
+              print *, "required: ZDK:      0=stable, 1=Z-->l+ l-, 2=Z-->nu nubar"
+          endif
+    endif
+
 
     if((Correction.eq.3 .or. TopDecays.eq.5 .or. TopDecays.eq.6) .and. HelSampling) then
           print *, "Helicity sampling is not allowed here. This is simpliy due to assignments of random numbers in mod_CrossSection.f90"
@@ -493,6 +503,7 @@ use ModMisc
 use ModCrossSection_TTB
 use ModCrossSection_TTBJ
 use ModCrossSection_TTBP
+use ModCrossSection_TTBZ
 use ModCrossSection_TTBETmiss
 use ModCrossSection_ZprimeTTB
 use ModKinematics
@@ -1248,6 +1259,83 @@ IF( CORRECTION.LE.1 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.59) ) THEN
     ncall= VegasNc1
     call InitHisto()
     call vegas1(EvalCS_1L_ststbgggg,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+IF( MASTERPROCESS.EQ.17 ) THEN
+IF( CORRECTION   .LE.1 ) THEN
+  call vegas(EvalCS_1L_ttbggZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_ttbggZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.3 ) THEN
+  call vegas(EvalCS_1L_ttbggZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_ttbggZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.4 ) THEN
+  call vegas(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.5 ) THEN
+  call vegas(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSE
+  call Error("this correction is not available")
+ENDIF
+ENDIF
+
+
+IF( MASTERPROCESS.EQ.18 ) THEN
+IF( CORRECTION   .LE.1 ) THEN
+  call vegas(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.3 ) THEN
+  call vegas(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.4 ) THEN
+  call vegas(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ELSEIF( CORRECTION.EQ.5 ) THEN
+  call vegas(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_NLODK_ttbZ,VG_Result,VG_Error,VG_Chi2)
   endif
 ENDIF
 ENDIF

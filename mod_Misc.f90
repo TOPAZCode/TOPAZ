@@ -834,7 +834,7 @@ END FUNCTION
 
 
 
-FUNCTION IsABoson(Type)
+FUNCTION IsABoson(Type)! only counts photon,Z,W as bosons, and not the gluon
 implicit none
 logical IsABoson
 integer :: Type

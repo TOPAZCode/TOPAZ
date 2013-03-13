@@ -42,6 +42,8 @@ type :: TreeProcess
    integer :: NumPart
    integer :: NumQua
    integer :: NumSca
+   integer :: NumW
+   integer :: NumV
    integer,allocatable :: NumGlu(:)
    integer,allocatable :: PartRef(:)
    integer,allocatable :: PartType(:)
@@ -2158,7 +2160,6 @@ ELSEIF( PROCESS.EQ.59 ) THEN !   test process
       call Error("Correction to this process is not available")
   ENDIF
 
-!!! Zprime section !!!
 
 ELSEIF( PROCESS.EQ.62 ) THEN !   3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top
   IF( CORRECTION.EQ.0 ) THEN
@@ -2400,7 +2401,111 @@ ELSEIF( PROCESS.EQ.68 ) THEN ! 4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
       call Error("Correction to this process is not available")
    ENDIF
 
-!!! End Zprime section !!!
+
+ELSEIF( PROCESS.EQ.71 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Z
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      NDim = NDim + 5    ! PS integration
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 3  ! additional gluons in the top decay
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 10000000
+      VegasNc1_default = 10000000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.4 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.5 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 3  ! additional gluons in the top decay
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
 
 ELSE
     call Error("Process not available")
@@ -3478,6 +3583,218 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
 
 
+
+
+
+
+ELSEIF( MASTERPROCESS.EQ.17 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = Glu_
+    ExtParticle(4)%PartType = Glu_
+    ExtParticle(5)%PartType = Z0_
+
+    IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
+      NumPrimAmps = 2
+      NumBornAmps = 2
+    ELSEIF( Correction.EQ.1 ) THEN
+!       NumPrimAmps = 28
+!       NumBornAmps = 2
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( TOPDECAYS.GE.1 ) THEN
+        NumHelicities = 12
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+        Helicities(1,1:5) = (/0,0,+1,+1,+1/)
+        Helicities(2,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(3,1:5) = (/0,0,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(4,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(5,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(6,1:5) = (/0,0,+1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(7,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(8,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(9,1:5) = (/0,0,-1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(10,1:5)= (/0,0,-1,-1,+1/)
+        Helicities(11,1:5)= (/0,0,-1,-1,-1/)
+        Helicities(12,1:5)= (/0,0,-1,-1, 0/)! longitudinal polarization of massive V boson
+    ELSE
+        NumHelicities = 48
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+        sig_tb=+1; sig_t =+1;
+        Helicities( 1,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities( 2,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities( 3,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities( 4,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities( 5,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities( 6,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =-1;
+        Helicities( 7,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities( 8,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities( 9,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(10,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(11,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(12,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =+1;
+        Helicities(13,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities(14,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities(15,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(16,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(17,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(18,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =-1;
+        Helicities(19,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities(20,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities(21,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(22,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(23,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(24,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+
+
+    !   additional helicities when parity inversion is not applied:
+        sig_tb=-1; sig_t =-1;
+        Helicities(25,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(26,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(27,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(28,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(29,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(30,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =+1;
+        Helicities(31,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(32,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(33,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(34,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(35,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(36,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =-1;
+        Helicities(37,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(38,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(39,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(40,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(41,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(42,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =+1;
+        Helicities(43,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(44,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(45,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(46,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(47,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(48,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+    ENDIF
+
+
+ELSEIF( MASTERPROCESS.EQ.18 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
+    ExtParticle(5)%PartType = Z0_
+
+    IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5) THEN
+      NumPrimAmps = 2
+      NumBornAmps = 2
+    ELSEIF( Correction.EQ.1 ) THEN
+!       NumPrimAmps = 14
+!       NumBornAmps = 2
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( TOPDECAYS.GE.1 ) THEN
+        NumHelicities = 12
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+        Helicities(1,1:5) = (/0,0,+1,+1,+1/)
+        Helicities(2,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(3,1:5) = (/0,0,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(4,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(5,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(6,1:5) = (/0,0,+1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(7,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(8,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(9,1:5) = (/0,0,-1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(10,1:5)= (/0,0,-1,-1,+1/)
+        Helicities(11,1:5)= (/0,0,-1,-1,-1/)
+        Helicities(12,1:5)= (/0,0,-1,-1, 0/)! longitudinal polarization of massive V boson
+    ELSE
+        NumHelicities = 48
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+        sig_tb=+1; sig_t =+1;
+        Helicities( 1,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities( 2,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities( 3,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities( 4,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities( 5,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities( 6,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =-1;
+        Helicities( 7,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities( 8,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities( 9,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(10,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(11,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(12,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =+1;
+        Helicities(13,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities(14,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities(15,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(16,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(17,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(18,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =-1;
+        Helicities(19,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+        Helicities(20,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+        Helicities(21,1:5) = (/sig_tb,sig_t,+1,+1, 0/)! longitudinal polarization of massive V boson
+        Helicities(22,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+        Helicities(23,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+        Helicities(24,1:5) = (/sig_tb,sig_t,+1,-1, 0/)! longitudinal polarization of massive V boson
+
+    !   additional helicities when parity inversion is not applied:
+        sig_tb=-1; sig_t =-1;
+        Helicities(25,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(26,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(27,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(28,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(29,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(30,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=-1; sig_t =+1;
+        Helicities(31,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(32,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(33,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(34,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(35,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(36,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =-1;
+        Helicities(37,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(38,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(39,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(40,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(41,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(42,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+        sig_tb=+1; sig_t =+1;
+        Helicities(43,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+        Helicities(44,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+        Helicities(45,1:5) = (/sig_tb,sig_t,-1,-1, 0/)! longitudinal polarization of massive V boson
+        Helicities(46,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+        Helicities(47,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+        Helicities(48,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+    ENDIF
+
+
+
+
+
 ELSEIF( MASTERPROCESS.EQ.31 ) THEN!  this is a copy of Masterprocess 1 which is used for virtual T'T' production
 
     ExtParticle(1)%PartType = ATop_
@@ -3792,7 +4109,7 @@ use ModMisc
 use ModParameters
 implicit none
 integer :: Vertex,Propa,PropaMinus1,ExtPartType,NPrimAmp,k
-integer :: AllocStatus,counterS,counterQ,counterG,QuarkPos(1:6),Scalarpos(1:6),NPart
+integer :: AllocStatus,counterS,counterQ,counterG,counterV,QuarkPos(1:6),Scalarpos(1:6),NPart
 logical :: ColorLessParticles
 type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(BornAmplitude),pointer :: TheBornAmp
@@ -4940,6 +5257,43 @@ print *, "check this here"
 
 
 
+
+ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0
+
+   IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,5,2,4,3/)
+
+      PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
+      PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
+   ELSEIF( Correction.EQ.1 ) THEN
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,5,2,4,3/)
+
+      call Error("need more work here:MasterProcess.EQ.17 ")
+
+   ENDIF
+
+
+ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0
+
+   IF( Correction.EQ.0  .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,2,3,5,4/)
+
+      PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
+      PrimAmps(2)%ExtLine = (/1,2,3,5,4/)
+   ELSEIF( Correction.EQ.1 ) THEN
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(2)%ExtLine = (/1,2,3,5,4/)
+
+      call Error("need more work here:MasterProcess.EQ.18 ")
+
+   ENDIF
+
+
+
+
 ELSEIF( MASTERPROCESS.EQ.31 ) THEN!  this is a copy of Masterprocess 1 which is used for T' production
    IF ( Correction.EQ.1 ) THEN
    BornAmps(1)%ExtLine = (/1,2,3,4/)
@@ -5111,7 +5465,7 @@ ENDIF
    do NPrimAmp=1,NumPrimAmps
 !!!!!! overwriting bornamps initializations  !!!!
             BornAmps(NPrimAmp)%ExtLine = PrimAmps(NPrimAmp)%ExtLine
-!!!!!!c
+!!!!!!
             TheBornAmp => BornAmps(NPrimAmp)
             TheTree => TheBornAmp%TreeProc
             TheTree%NumPart = NumExtParticles
@@ -5120,9 +5474,11 @@ ENDIF
             allocate( TheTree%PartRef(1:NumExtParticles), stat=AllocStatus )
             if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartRef for Born")
             TheTree%PartRef(1:NumExtParticles) = BornAmps(NPrimAmp)%ExtLine(1:NumExtParticles)
-!           set number of quarks and gluons and scalars
+!           set number of quarks and gluons and scalars and vector bosons
             TheTree%NumQua = 0
             TheTree%NumSca = 0
+            TheTree%NumW = 0
+            TheTree%NumV = 0
             counterQ = 0
 
             do NPart=1,TheTree%NumPart
@@ -5133,8 +5489,12 @@ ENDIF
                      QuarkPos(counterQ) = NPart
                   elseif( IsAScalar(TheTree%PartType(NPart)) ) then
                      TheTree%NumSca = TheTree%NumSca + 1
-                     counterQ = counterQ + 1!     treat the scalar like a quark here because
-                     QuarkPos(counterQ) = NPart!  this is only to determine NumGlu 
+                     counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
+                     QuarkPos(counterQ) = NPart
+                  elseif( IsABoson(TheTree%PartType(NPart)) ) then
+                     if( abs(TheTree%PartType(NPart)).eq.abs(Wp_) ) TheTree%NumW = TheTree%NumW + 1
+                     if( abs(TheTree%PartType(NPart)).eq.abs(Z0_) ) TheTree%NumV = TheTree%NumV + 1
+                     if( abs(TheTree%PartType(NPart)).eq.abs(Pho_)) TheTree%NumV = TheTree%NumV + 1
                   endif
             enddo
 
@@ -5150,53 +5510,55 @@ ENDIF
             if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%NumGlu")
             do NPart=1,TheTree%NumPart
                   if( TheTree%PartType(NPart) .eq. Glu_ ) then
-                     TheTree%NumGlu(0) = TheTree%NumGlu(0) + 1
+                     TheTree%NumGlu(0) = TheTree%NumGlu(0) + 1!  total numbers of gluons
                   endif
             enddo
 
 !           set number of gluons between quark or scalar lines
             if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
-            if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
-                  TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(2) = TheTree%NumPart - QuarkPos(2)
-            endif
-            if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
-                  TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
-                  TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-                  TheTree%NumGlu(4) = TheTree%NumPart - QuarkPos(4)
-            endif
-            if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
-                  TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
-                  TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-                  TheTree%NumGlu(4) = QuarkPos(5) - QuarkPos(4) - 1
-                  TheTree%NumGlu(5) = QuarkPos(6) - QuarkPos(5) - 1
-                  TheTree%NumGlu(6) = TheTree%NumPart - QuarkPos(6)
-            endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
+                    TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(2) = TheTree%NumPart - QuarkPos(2)
+              endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
+                    TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
+                    TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
+                    TheTree%NumGlu(4) = TheTree%NumPart - QuarkPos(4)
+              endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
+                    TheTree%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
+                    TheTree%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
+                    TheTree%NumGlu(4) = QuarkPos(5) - QuarkPos(4) - 1
+                    TheTree%NumGlu(5) = QuarkPos(6) - QuarkPos(5) - 1
+                    TheTree%NumGlu(6) = TheTree%NumPart - QuarkPos(6)
+              endif
 
             elseif( TheTree%PartType(1).eq.Glu_ ) then
-            if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
-                  TheTree%NumGlu(1) = QuarkPos(1) - 2
-                  TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(3) = TheTree%NumPart - QuarkPos(2)
-            endif
-            if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
-                  TheTree%NumGlu(1) = QuarkPos(1) - 2
-                  TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
-                  TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-                  TheTree%NumGlu(5) = TheTree%NumPart - QuarkPos(4)
-            endif
-            if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
-                  TheTree%NumGlu(1) = QuarkPos(1) - 2
-                  TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-                  TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
-                  TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-                  TheTree%NumGlu(5) = QuarkPos(5) - QuarkPos(4) - 1
-                  TheTree%NumGlu(6) = QuarkPos(6) - QuarkPos(5) - 1
-                  TheTree%NumGlu(7) = TheTree%NumPart - QuarkPos(6)
-            endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
+                    TheTree%NumGlu(1) = QuarkPos(1) - 2
+                    TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(3) = TheTree%NumPart - QuarkPos(2)
+              endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
+                    TheTree%NumGlu(1) = QuarkPos(1) - 2
+                    TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
+                    TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
+                    TheTree%NumGlu(5) = TheTree%NumPart - QuarkPos(4)
+              endif
+              if( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
+                    TheTree%NumGlu(1) = QuarkPos(1) - 2
+                    TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
+                    TheTree%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
+                    TheTree%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
+                    TheTree%NumGlu(5) = QuarkPos(5) - QuarkPos(4) - 1
+                    TheTree%NumGlu(6) = QuarkPos(6) - QuarkPos(5) - 1
+                    TheTree%NumGlu(7) = TheTree%NumPart - QuarkPos(6)
+              endif
+            else
+                call Error("Invalid first particle",TheTree%PartType(1))
             endif
 
 
@@ -5215,6 +5577,7 @@ ENDIF
            counterQ = 0
            counterG = 0
            counterS = 0
+           counterV = 0
 
            do NPart=1,TheTree%NumPart
                if( IsAQuark(TheTree%PartType(NPart)) ) then
@@ -5247,6 +5610,19 @@ ENDIF
                      TheTree%Scalars(counterS)%Mom => ExtParticle( TheBornAmp%ExtLine(NPart) )%Mom
                      TheTree%Scalars(counterS)%Pol => ExtParticle( TheBornAmp%ExtLine(NPart) )%Pol
                endif
+
+               if( IsABoson(TheTree%PartType(NPart)) ) then
+                     counterV = counterV + 1
+                     if( counterV.ge.2 ) call Error("only one vector boson allowed",counterV)
+                     TheTree%Boson%PartType => ExtParticle( TheBornAmp%ExtLine(NPart) )%PartType
+                     TheTree%Boson%ExtRef => ExtParticle( TheBornAmp%ExtLine(NPart) )%ExtRef
+                     TheTree%Boson%Mass => ExtParticle( TheBornAmp%ExtLine(NPart) )%Mass
+                     TheTree%Boson%Mass2 => ExtParticle( TheBornAmp%ExtLine(NPart) )%Mass2
+                     TheTree%Boson%Helicity => ExtParticle( TheBornAmp%ExtLine(NPart) )%Helicity
+                     TheTree%Boson%Mom => ExtParticle( TheBornAmp%ExtLine(NPart) )%Mom
+                     TheTree%Boson%Pol => ExtParticle( TheBornAmp%ExtLine(NPart) )%Pol
+               endif
+
            enddo
    enddo
 
@@ -5377,7 +5753,7 @@ IF( Correction.EQ.1 ) THEN
                                 ThePrimAmp%IntPart(k)%PartType = ExtPartType
                             enddo
                        endif
-                       print *, "remember: check again this code, int/ext particles and trees"
+!                        print *, "remember: check again this code, int/ext particles and trees"
                endif
 
             elseif( (ExtPartType .eq. Glu_) ) then

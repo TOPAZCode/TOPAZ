@@ -245,7 +245,8 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(HOME)/lib/HELAS-3.0/iovxxx.o \
 				  $(HOME)/lib/HELAS-3.0/fvoxxx.o \
 				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
-				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
+				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a \
+				  $(Here)/MadGraph/gg_ttbz.o
 #				  $(Here)/MadGraph/gg_ttb.o \
 #				  $(Here)/MadGraph/gg_ttba.o \
 #				  $(Here)/MadGraph/gg_tbtga.o \
@@ -367,7 +368,7 @@ all: $(allObjects)
 	@echo " executable file is " $(Exec)
 	@echo " "
 # 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj)
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 

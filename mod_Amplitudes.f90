@@ -40,6 +40,7 @@ END SUBROUTINE InitTrees
 SUBROUTINE LinkTreeParticles(TheTreeAmp,TheParticles) ! NEW
 use ModProcess
 use ModMisc
+use ModParameters
 implicit none
 type(TreeProcess) :: TheTreeAmp
 type(Particle),target :: TheParticles(:)
@@ -51,7 +52,7 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counter,QuarkPos(1:6)
            do NPart=1,TheTreeAmp%NumPart
                  TheTreeAmp%PartType(NPart) = TheParticles( TheTreeAmp%PartRef(NPart) )%PartType
                  if( IsAQuark( TheTreeAmp%PartType(NPart) ) ) then  ! not a gluon and not a boson
-!                      TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1
+!                      TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1    ! this is suppoed to be done outside this subroutine
                     counter = counter + 1
                     QuarkPos(counter) = NPart
                  endif
@@ -129,6 +130,10 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counter,QuarkPos(1:6)
            if( PartType.ne.TheParticles(PartRef)%PartType ) print *,"Error2 in LinkTreeParticles"
      elseif( IsABoson(PartType) ) then  ! PartType==Boson
            ib=ib+1
+           if( ib.ge.2 ) call Error("Too many bosons in LinkTreeParticles")
+           if( abs(PartType).eq.abs(Wp_) ) TheTreeAmp%NumW = TheTreeAmp%NumW + 1
+           if( abs(PartType).eq.abs(Z0_) ) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
+           if( abs(PartType).eq.abs(Pho_)) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
            TheTreeAmp%Boson%PartType => TheParticles(PartRef)%PartType
            TheTreeAmp%Boson%ExtRef   => TheParticles(PartRef)%ExtRef
            TheTreeAmp%Boson%Mass     => TheParticles(PartRef)%Mass
@@ -180,8 +185,14 @@ integer :: i,j,Order(1:6)
              Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) ) 
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
-!              Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
-             Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
+             if( TreeProc%NumV.eq.1 ) then
+                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2))
+             elseif( TreeProc%NumW.eq.1 ) then!  this should only be used in top quark decay (because it is a Weyl current)
+!                 Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
+                Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
+             else
+                call Error("requested current with a boson is not available")
+             endif
           else
              call Error("requested current is not available 2q")
           endif
@@ -340,7 +351,6 @@ integer :: i,j,Order(1:6)
               call Error("requested current is not available 6q")
           endif
       else
-
            call Error("requested current is not available xx")
       endif
 
