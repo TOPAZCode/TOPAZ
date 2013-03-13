@@ -186,7 +186,7 @@ integer :: i,j,Order(1:6)
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
              if( TreeProc%NumV.eq.1 ) then
-                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2))
+                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))
              elseif( TreeProc%NumW.eq.1 ) then!  this should only be used in top quark decay (because it is a Weyl current)
 !                 Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
                 Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
