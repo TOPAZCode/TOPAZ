@@ -2461,10 +2461,10 @@ ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
       Crossing(:) = (/4,5,-1,-2,3/)
       MasterProcess=18
       AvgFactor = SpinAvg * QuarkColAvg**2
-      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 5    !  PS integration
       NDim = NDim + 2    ! shat integration
-      VegasNc0_default = 10000000
-      VegasNc1_default = 10000000
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
   ELSEIF( CORRECTION.EQ.1 ) THEN
       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
@@ -2472,7 +2472,7 @@ ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
       Crossing(:) = (/4,5,-1,-2,3/)
       MasterProcess=18
       AvgFactor = SpinAvg * QuarkColAvg**2
-      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 5    ! PS integration
       NDim = NDim + 2    ! shat integration
       VegasNc0_default = 100000
       VegasNc1_default = 100000
@@ -2483,7 +2483,7 @@ ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
       Crossing(:) = (/4,5,-1,-2,3/)
       MasterProcess=18
       AvgFactor = SpinAvg * QuarkColAvg**2
-      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 5    ! PS integration
       NDim = NDim + 2    ! shat integration
       VegasNc0_default = 1000000
       VegasNc1_default = 1000000
@@ -2494,7 +2494,7 @@ ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
       Crossing(:) = (/4,5,-1,-2,3/)
       MasterProcess=18
       AvgFactor = SpinAvg * QuarkColAvg**2
-      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 5    !  PS integration
       NDim = NDim + 2    ! shat integration
       NDim = NDim + 3  ! additional gluons in the top decay
       VegasNc0_default = 1000000
