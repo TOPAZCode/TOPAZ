@@ -44,6 +44,7 @@ type :: TreeProcess
    integer :: NumSca
    integer :: NumW
    integer :: NumV
+   integer :: BosonVertex
    integer,allocatable :: NumGlu(:)
    integer,allocatable :: PartRef(:)
    integer,allocatable :: PartType(:)
@@ -4108,7 +4109,7 @@ SUBROUTINE InitAmps()
 use ModMisc
 use ModParameters
 implicit none
-integer :: Vertex,Propa,PropaMinus1,ExtPartType,NPrimAmp,k
+integer :: Vertex,Propa,PropaMinus1,ExtPartType,NPrimAmp,k,LastQuark
 integer :: AllocStatus,counterS,counterQ,counterG,counterV,QuarkPos(1:6),Scalarpos(1:6),NPart
 logical :: ColorLessParticles
 type(PrimitiveAmplitude),pointer :: ThePrimAmp
@@ -5488,19 +5489,21 @@ ENDIF
                      TheTree%NumQua = TheTree%NumQua + 1
                      counterQ = counterQ + 1
                      QuarkPos(counterQ) = counterQ + counterG
+                     LastQuark = NPart! only required for BosonVertex below
                   elseif( IsAScalar(TheTree%PartType(NPart)) ) then
                      TheTree%NumSca = TheTree%NumSca + 1
                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
                      QuarkPos(counterQ) = counterQ + counterG
                   elseif( TheTree%PartType(NPart).eq.Glu_ ) then
                      counterG = counterG + 1
-                  elseif( IsABoson(TheTree%PartType(NPart)) ) then
+                  elseif( IsABoson(TheTree%PartType(NPart)) ) then! careful: bosons should only be places *between* same flavor quark lines
+                     if( NPart.eq.1 ) call Error("Vector boson should not be the first particle.")
                      if( abs(TheTree%PartType(NPart)).eq.abs(Wp_) ) TheTree%NumW = TheTree%NumW + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Z0_) ) TheTree%NumV = TheTree%NumV + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Pho_)) TheTree%NumV = TheTree%NumV + 1
+                     TheTree%BosonVertex = TheTree%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
                   endif
             enddo
-
 
             if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
                allocate( TheTree%NumGlu(0:TheTree%NumQua+TheTree%NumSca), stat=AllocStatus )

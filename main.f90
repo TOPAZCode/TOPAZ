@@ -237,12 +237,14 @@ logical :: dirresult
           if( XTopDecays.eq.-100 ) then 
               print *, "not enough input parameter"
               print *, "required: XTopDK:      0=stable, 1=Htop-->vector+top, 2=HTop-->scalar+top, 3=Stop-->Chi0+top"
+              stop
           endif
     endif
     if( Process.ge.71 .and. Process.le.79 ) then
           if( ZDecays.eq.-100 ) then 
               print *, "not enough input parameter"
               print *, "required: ZDK:      0=stable, 1=Z-->l+ l-, 2=Z-->nu nubar"
+              stop
           endif
     endif
 

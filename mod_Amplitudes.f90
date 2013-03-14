@@ -274,10 +274,12 @@ integer :: i,j,Order(1:6)
 ! print *, "CHECK POINT cur_g_4f"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Quarks(3)%Mom+ TreeProc%Quarks(4)%Mom)
 ! pause
-!                       print *, "calling cur_g_4f"
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
-              Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
-!                       print *, "calling cur_f_4f"
+             if( TreeProc%NumV.eq.0 ) then
+                Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
+             elseif( TreeProc%NumV.eq.1 ) then
+                Res(1:Ds) = cur_f_4fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:4),tag_f )
+             endif
           else
              call Error("requested current is not available 4q")
           endif
