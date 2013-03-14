@@ -447,13 +447,13 @@ ENDIF
 !------------ LO --------------
 IF( CORRECTION.EQ.0 ) THEN
 
+    ISFac = MomCrossing(MomExt)
     do iHel=nHel(1),nHel(2)
         call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
         enddo
-
 
         LO_Res_Pol = (0d0,0d0)
         do jPrimAmp=1,NumBornAmps
