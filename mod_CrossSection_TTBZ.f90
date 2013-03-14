@@ -448,22 +448,34 @@ ENDIF
 IF( CORRECTION.EQ.0 ) THEN
 
     ISFac = MomCrossing(MomExt)
-    do iHel=nHel(1),nHel(2)
-        call HelCrossing(Helicities(iHel,1:NumExtParticles))
+!    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
+!       write(*,*) 'hel', iHel
+       call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
         enddo
 
         LO_Res_Pol = (0d0,0d0)
-        do jPrimAmp=1,NumBornAmps
-           do iPrimAmp=1,NumBornAmps
-              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-      enddo
-      enddo
-      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
-   enddo!helicity loop
 
+!! This does not work, because of the ambiguity with color/flavor structures and the mislabeling of primitive amplitudes
+!        do jPrimAmp=1,NumBornAmps
+!           do iPrimAmp=1,NumBornAmps
+!              write(*,*) BornAmps(jPrimAmp)%Result, 
+!              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!      enddo
+!      enddo
+
+! This hack will work, in principle, but it might be better (but more time-consuming) to use parents, cf. gg->gWW calculation...
+        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result 
+        LO_Res_Pol =  ColLO_ttbqqb(1,1) * BornAmps(1)%Result*dconjg(BornAmps(1)%Result)
+
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+!      write(*,*) 'msq', LO_Res_Pol
+   enddo!helicity loop
+!      write(*,*) 'msq', LO_Res_UnPol
+!      pause
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
    stop " This correction not yet implemented for this process"
