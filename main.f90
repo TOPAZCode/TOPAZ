@@ -376,6 +376,7 @@ integer TheUnit
 
    write(TheUnit,"(A)") "# Program parameters:"
    write(TheUnit,"(A,I2,A,F8.3,A)") "# Collider=",Collider," (",Collider_Energy*1d-1," TeV)"
+   write(TheUnit,"(A,I2)") "# ObsSet=",ObsSet
    write(TheUnit,"(A,I2)") "# Process=",Process
    write(TheUnit,"(A,I2)") "# Master Process=",MasterProcess
    write(TheUnit,"(A,I2)") "# Correction=",Correction

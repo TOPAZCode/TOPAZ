@@ -64,7 +64,7 @@ private    :: Cache_cur_g_2f_Dv4,Cache_cur_g_2f_Dv6,Cache_cur_g_2f_Dv8,Cache_cur
 
 public  :: cur_g,cur_f_2f,cur_g_2f,cur_f_4f,cur_g_4f,cur_f_6f,cur_f_2f_massCT,cur_f_4f_massCT
 public  :: cur_f_2fW
-public  :: cur_f_2fV
+public  :: cur_f_2fV,cur_g_2fV,cur_f_4fV
 public  :: cur_g_2s,cur_g_ssff,cur_g_ffss,  cur_s_2s,cur_s_ssffss,cur_s_sffsss,cur_s_sssffs,cur_s_4s,cur_s_ssff,cur_s_sffs,  cur_f_ffss,cur_f_fssf,cur_f_fffssf,cur_f_fssfff,  cur_s_2s_massCT
 public  :: cur_s_sssffs_CLOSEDLOOPCONTRIB,cur_s_sffsss_CLOSEDLOOPCONTRIB
 public  :: SetDim,InitCurrCache
@@ -3372,7 +3372,6 @@ else
 endif
 
       end function bfV
-
 
 
 

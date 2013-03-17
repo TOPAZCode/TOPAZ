@@ -5279,8 +5279,8 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0
 ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0
 
    IF( Correction.EQ.0  .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
-      BornAmps(1)%ExtLine = (/1,5,2,3,4/)
-      BornAmps(2)%ExtLine = (/1,2,3,5,4/)
+      BornAmps(1)%ExtLine = (/1,5,2,3,4/)!  Z coupling to top quark line
+      BornAmps(2)%ExtLine = (/1,2,3,5,4/)!  Z coupling to massless quark line
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(2)%ExtLine = (/1,2,3,5,4/)

@@ -4,7 +4,7 @@ implicit none
 
 integer,private,parameter :: NumMaxHisto=45
 
-
+integer,private,parameter :: RemoveHTopClosedLoop = 1
 
 
  contains
@@ -207,8 +207,8 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
       enddo
-      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)  + PrimAmps(11)%Result(-2:1)
-      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1) + PrimAmps(12)%Result(-2:1)
+      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)  + PrimAmps(11)%Result(-2:1)*RemoveHTopClosedLoop
+      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1) + PrimAmps(12)%Result(-2:1)*RemoveHTopClosedLoop
 
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
@@ -525,8 +525,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
       enddo
 
-      FermionPartAmp(1,-2:1) =           ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(6)%Result(-2:1) )
-      FermionPartAmp(2,-2:1) = -1d0/Nc * ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(6)%Result(-2:1) )
+      FermionPartAmp(1,-2:1) =          ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*RemoveHTopClosedLoop )
+      FermionPartAmp(2,-2:1) = -1d0/Nc *( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*RemoveHTopClosedLoop )
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,2
@@ -556,9 +556,9 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0)*LO_Res_Unpol
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol  ! finite log(mu2) contrib. from  Htop WFRC
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (                 2d0/3d0         ) *LO_Res_Unpol! this is from the closed HTop loop
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*RemoveHTopClosedLoop     )*LO_Res_Unpol! this is from the closed HTop loop
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_SMtop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0)         *2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol   ! finite log(mu2) contrib. from HTop in alpha_s ren.
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*RemoveHTopClosedLoop)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol   ! finite log(mu2) contrib. from HTop in alpha_s ren.
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
 
