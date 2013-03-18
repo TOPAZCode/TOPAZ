@@ -434,6 +434,16 @@ include "vegas_common.f"
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
+
+  if( ZDecays.le.10 ) then  ! decaying on-shell Z
+      MZ_Inv = m_Z
+   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+!MGremove: uncomment when not doing MG check
+!      call Error("need to implement phase space for off-shell Z's")
+   endif
+  call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
+  call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+
   write(*,*) 'MADGRAPH CHECK'
   write(*,*) 'PARAMETERS:'
   write(*,*) 'm_Z=', m_Z*100d0
@@ -442,44 +452,19 @@ include "vegas_common.f"
   write(*,*) 'sin theta_w =',sw
   write(*,*) 'cos theta_w =',cw
 
-   if( ZDecays.le.10 ) then ! decaying on-shell Z
-      MZ_Inv = m_Z
-   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
-      call Error("need to implement phase space for off-shell Z's")
-   endif
-
-  call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
-  call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-!    call EvalPhaseSpace_2to4ZDK(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! MARKUS: removed this again because for decaying Z the PS is generated in  EvalPhasespace_ZDecay (below)
-!    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
-
-
-! MG check:: MGremove
-   MomExt(1:4,1)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00, 0.100000000000000d+04/)
-   MomExt(1:4,2)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00,-0.100000000000000d+04/)
-   MomExt(1:4,5)=(/0.242389902772977d+03,-0.420396005185953d+02, 0.762402447565711d+02,-0.144195950130328d+03/)
-   MomExt(1:4,6)=(/0.648409438348076d+03,-0.197541169111057d+03,-0.574333846338076d+03, 0.145507488452024d+03/)
-   MomExt(1:4,3)=(/0.289813303313282d+03,-0.201405168298672d+03,-0.185861803799425d+03, 0.942501928293190d+02/)
-   MomExt(1:4,4)=(/0.819387355565666d+03, 0.440985937928325d+03, 0.683955405380929d+03,-0.955617311510147d+02/)
-
-   MomExt=MomExt/100d0
-
-!! end MGremove
    NRndHel=8
 IF( TOPDECAYS.NE.0 ) THEN
-! no Z decay
   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
-!    call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)!  MARKUS: removed this again, see above
-!    call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
    PSWgt = PSWgt * PSWgt2*PSWgt3
+   call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,6:8))
+   call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
    NRndHel=16
 ENDIF
 IF( ZDECAYS.NE.0 ) THEN
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
    PSWgt = PSWgt * PSWgt4
 ENDIF
-
 
 ! no Z decay  
    call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
@@ -489,19 +474,29 @@ ENDIF
       return
    endif
 
-!! Now we revert to Z,t,tbar in momentum, but keep the lepton momenta for Z polarization
-   MomZl(1:4)=MomExt(1:4,3)
-   MomZa(1:4)=MomExt(1:4,4)
-   MomExt(1:4,3)=MomExt(1:4,3)+MomExt(1:4,4)   ! p_Z = p_l +p_a
-   MomExt(1:4,4)=MomExt(1:4,5)                 ! antitop
-   MomExt(1:4,5)=MomExt(1:4,6)                 ! top
-!!
+if (ZDecays .ne. 0) then
+! MG check:: MGremove
+   MomExt(1:4,1)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00, 0.100000000000000d+04/)
+   MomExt(1:4,2)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00,-0.100000000000000d+04/)
+   MomExt(1:4,4)=(/0.242389902772977d+03,-0.420396005185953d+02, 0.762402447565711d+02,-0.144195950130328d+03/)
+   MomExt(1:4,5)=(/0.648409438348076d+03,-0.197541169111057d+03,-0.574333846338076d+03, 0.145507488452024d+03/)
+   MomExt(1:4,12)=(/0.289813303313282d+03,-0.201405168298672d+03,-0.185861803799425d+03, 0.942501928293190d+02/)
+   MomExt(1:4,13)=(/0.819387355565666d+03, 0.440985937928325d+03, 0.683955405380929d+03,-0.955617311510147d+02/)
+
+   MomExt(1:4,3)=MomExt(1:4,12)+MomExt(1:4,13)   ! p_Z = p_l +p_a
+   MomExt=MomExt/100d0
+endif
+
+!! end MGremove
+
+! we still need this for the massless qqZ couplings
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
    propZ=pZsq/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
 
    call SetPropagators()
    call setPDFs(eta1,eta2,MuFac,pdf)
 
+! fixme
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
@@ -521,8 +516,8 @@ IF( CORRECTION.EQ.0 ) THEN
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
         if( ZDecays.ne.0 ) then    
-! Z polarization not set above, so do it now, with Helicity(5) = lepton hel
-           ExtParticle(5)%Pol(1:4)=ZGamPolVec(dcmplx(MomZl),dcmplx(MomZa),Helicities(iHel,5))
+           if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
 ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
            call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
@@ -809,26 +804,30 @@ ENDIF
 
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: uub->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
-!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!        MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
-!        MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
-!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-!        call coupsm(0)
-!        call SUUB_TTBZ(MG_MOM,MadGraph_tree)
-!        call SDDB_TTBZ(MG_MOM,MadGraph_tree)
-!        print *, "MadGraph hel.amp uub:", MadGraph_tree
-!        print *, "MadGraph hel.amp ddb:", MadGraph_tree
-!        print *, "My tree uub:         ", LO_Res_Unpol/(100d0)**2
-        print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
-        print *, "MG/ME ratio uub: ", 0.287320393640445d-12/(LO_Res_Unpol/(100d0)**4)
-        print *, "MG/ME ratio ddb: ", 0.189323066770051d-12/(LO_Res_Unpol/(100d0)**4)
-!        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+if (ZDecays .eq. 0) then 
+   MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+   MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+   MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
+   MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
+   MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+   call coupsm(0)
+   print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
+   call SUUB_TTBZ(MG_MOM,MadGraph_tree)
+   print *, "MadGraph hel.amp uub:", MadGraph_tree
+   print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+   call SDDB_TTBZ(MG_MOM,MadGraph_tree)
+   print *, "MadGraph hel.amp ddb:", MadGraph_tree
+   print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+else
+   print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+   print *, "MG/ME ratio uub: ", 0.287320393640445d-12/(LO_Res_Unpol/(100d0)**4)
+   print *, "MG/ME ratio ddb: ", 0.189323066770051d-12/(LO_Res_Unpol/(100d0)**4)
+   !        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+   
 
-
-        print *, ""
-
-        stop
+   print *, ""
+endif
+   stop
 
    if( IsNan(EvalCS_1L_ttbqqbZ) ) then
         print *, "NAN:",EvalCS_1L_ttbqqbZ
