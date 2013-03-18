@@ -6689,7 +6689,11 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
    endif
    zeros(1) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
    zeros(2) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
-   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
+   if (ZDecays .le. 10) then   ! Z onshell
+      zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
+   else ! Z off shell, so this check is meaningless
+      zeros(3)=0d0
+   endif
    zeros(4) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
    zeros(5) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
    zeros(6) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
