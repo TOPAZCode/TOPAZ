@@ -16,9 +16,10 @@ use ModProcess
 implicit none
 type(Particle) :: ZBoson
 integer :: Topol
+integer :: LepHel
 real(8) :: MomDK(1:4,1:2),PropZ,PropPhoton
 real(8) :: zeros(1:4)
-
+real(8) :: couplZFF_right,couplZFF_left,couplZFF
 
 
 !DEC$ IF(_CheckMomenta .EQ.1)
@@ -46,12 +47,27 @@ real(8) :: zeros(1:4)
    PropZ=sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))/( sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))-m_Z**2 + ci*Ga_Zexp*m_Z )! the kV^2 factor in the numerator will cancel against a 1/kV^2 term in the decay matrix element
    PropPhoton = 1d0                                       ! the photon propagator is included as 1/kV^2 term in the decay matrix element
 
+    if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
+        couplZFF_right = couplZEE_right 
+        couplZFF_left  = couplZEE_left
+    elseif( ZDecays.eq.2 .or. ZDecays.eq.12 ) then 
+        couplZFF_right = couplZNN_right
+        couplZFF_left  = couplZNN_left
+    else
+        call Error("ZDecay not yet implemented",ZDecays)
+    endif
+    LepHel=ZBoson%Helicity
+    
+    if( LepHel.eq.+1 ) couplZFF = couplZFF_right 
+    if( LepHel.eq.-1 ) couplZFF = couplZFF_left  
+
+
    if( ZDecays.lt.10  ) then  ! Z is on-shell
-      couplZTT_left_dyn  = couplZTT_left *PropZ
-      couplZTT_right_dyn = couplZTT_right*PropZ
+      couplZTT_left_dyn  = couplZTT_left *PropZ *couplZFF
+      couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF
    elseif( ZDecays.gt.10 ) then  ! Z is off-shell
-      couplZTT_left_dyn  = couplZTT_left *PropZ + Q_Top*PropPhoton
-      couplZTT_right_dyn = couplZTT_right*PropZ + Q_Top*PropPhoton
+      couplZTT_left_dyn  = couplZTT_left *PropZ *couplZFF + Q_Top*PropPhoton*Q_el
+      couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF + Q_Top*PropPhoton*Q_el
    endif
 
 
@@ -93,19 +109,21 @@ END SUBROUTINE
 
 ! NB: note factor 1/pZ^2 in here:
     ZGamPolVec=ZGamPolVec/(sc_(pZ,pZ))
+    ZGamPolVec=ZGamPolVec*dsqrt(alpha4Pi)
 
-    if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
-        couplZFF_right = couplZEE_right 
-        couplZFF_left  = couplZEE_left
-    elseif( ZDecays.eq.2 .or. ZDecays.eq.12 ) then 
-        couplZFF_right = couplZNN_right
-        couplZFF_left  = couplZNN_left
-    else
-        call Error("ZDecay not yet implemented",ZDecays)
-    endif
-    
-    if( -LepHel.eq.+1 ) ZGamPolVec = ZGamPolVec * couplZFF_right * dsqrt(alpha4Pi)
-    if( -LepHel.eq.-1 ) ZGamPolVec = ZGamPolVec * couplZFF_left  * dsqrt(alpha4Pi)
+! RR -- these are all set in the ZDecay routine
+!    if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
+!        couplZFF_right = couplZEE_right 
+!        couplZFF_left  = couplZEE_left
+!    elseif( ZDecays.eq.2 .or. ZDecays.eq.12 ) then 
+!        couplZFF_right = couplZNN_right
+!        couplZFF_left  = couplZNN_left
+!    else
+!        call Error("ZDecay not yet implemented",ZDecays)
+!    endif
+!    
+!    if( -LepHel.eq.+1 ) ZGamPolVec = ZGamPolVec * couplZFF_right * dsqrt(alpha4Pi)
+!    if( -LepHel.eq.-1 ) ZGamPolVec = ZGamPolVec * couplZFF_left  * dsqrt(alpha4Pi)
 
 
   end function ZGamPolVec
