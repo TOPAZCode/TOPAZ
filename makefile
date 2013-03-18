@@ -185,6 +185,24 @@ DipoleObjTTBP = $(ObjectDir)/mod_Dipoles_GGTTBGP.o \
 
 
 
+DipoleDepTTBZ = $(Here)/dipoles/mod_Dipoles_GGTTBGZ.f90 \
+            $(Here)/dipoles/mod_Dipoles_QQBTTBGZ.f90 \
+            $(Here)/dipoles/mod_Dipoles_QGTTBQZ.f90 \
+            $(Here)/dipoles/mod_Dipoles_QBGTTBQBZ.f90 \
+            $(Here)/dipoles/mod_IntDipoles_GGTTBGZ.f90 \
+            $(Here)/dipoles/mod_IntDipoles_QQBTTBGZ.f90 \
+            $(Here)/dipoles/mod_IntDipoles_QGTTBQZ.f90 \
+            $(Here)/dipoles/mod_IntDipoles_QBGTTBQBZ.f90
+
+DipoleObjTTBZ = $(ObjectDir)/mod_Dipoles_GGTTBGZ.o \
+                $(ObjectDir)/mod_Dipoles_QQBTTBGZ.o \
+                $(ObjectDir)/mod_Dipoles_QGTTBQZ.o \
+                $(ObjectDir)/mod_Dipoles_QBGTTBQBZ.o \
+                $(ObjectDir)/mod_IntDipoles_GGTTBGZ.o \
+                $(ObjectDir)/mod_IntDipoles_QQBTTBGZ.o \
+                $(ObjectDir)/mod_IntDipoles_QGTTBQZ.o \
+                $(ObjectDir)/mod_IntDipoles_QBGTTBQBZ.o
+
 
 DipoleDepSTSTB = $(Here)/dipoles/mod_Dipoles_GGSTSTBG.f90 \
 		 $(Here)/dipoles/mod_IntDipoles_GGSTSTBG.f90 \
@@ -340,6 +358,7 @@ allObjects =   				$(ObjectDir)/mod_Misc.o \
 					$(DipoleObjTTB) \
 					$(DipoleObjTTBJ) \
 					$(DipoleObjTTBP) \
+					$(DipoleObjTTBZ) \
 					$(DipoleObjSTSTB) \
 					$(DipoleObjHTHTB) \
 					$(DipoleObjZprime) \

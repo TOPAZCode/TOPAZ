@@ -27,6 +27,7 @@ integer :: NumParticles,iTree
       allocate( TreeAmpsDip(iTree)%PartType(1:NumParticles))
       allocate( TreeAmpsDip(iTree)%Quarks(1:NumQuarks)     )
       allocate( TreeAmpsDip(iTree)%Gluons(1:NumGluons)     )
+!     TreeAmpsDip(iTree)%Boson doesn't need to be allocated
       TreeAmpsDip(iTree)%NumGlu(0) = NumGluons
   enddo
 
@@ -44,19 +45,46 @@ use ModParameters
 implicit none
 type(TreeProcess) :: TheTreeAmp
 type(Particle),target :: TheParticles(:)
-integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counter,QuarkPos(1:6)
+integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,QuarkPos(1:6)
 
 
 
-           counter = 0
-           do NPart=1,TheTreeAmp%NumPart
-                 TheTreeAmp%PartType(NPart) = TheParticles( TheTreeAmp%PartRef(NPart) )%PartType
-                 if( IsAQuark( TheTreeAmp%PartType(NPart) ) ) then  ! not a gluon and not a boson
-!                      TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1    ! this is suppoed to be done outside this subroutine
-                    counter = counter + 1
-                    QuarkPos(counter) = NPart
-                 endif
-           enddo
+!!           counter = 0
+!!           do NPart=1,TheTreeAmp%NumPart
+!!                 TheTreeAmp%PartType(NPart) = TheParticles( TheTreeAmp%PartRef(NPart) )%PartType
+!!                 if( IsAQuark( TheTreeAmp%PartType(NPart) ) ) then  ! not a gluon and not a boson
+!! !                      TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1    ! this is suppoed to be done outside this subroutine
+!!                    counter = counter + 1
+!!                    QuarkPos(counter) = NPart
+!!                 endif
+!!           enddo
+
+
+!   this one replaces the old code above, newly introduced for ttb+Z calculation
+            do NPart=1,TheTreeAmp%NumPart
+                  TheTreeAmp%PartType(NPart) = ExtParticle( TheTreeAmp%PartRef(NPart) )%PartType
+                  if( IsAQuark(TheTreeAmp%PartType(NPart)) ) then
+                     !TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1   ! this is suppoed to be done outside this subroutine
+                     counterQ = counterQ + 1
+                     QuarkPos(counterQ) = counterQ + counterG
+                     LastQuark = NPart! only required for BosonVertex below
+                  elseif( IsAScalar(TheTreeAmp%PartType(NPart)) ) then
+                     TheTreeAmp%NumSca = TheTreeAmp%NumSca + 1
+                     counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
+                     QuarkPos(counterQ) = counterQ + counterG
+                  elseif( TheTreeAmp%PartType(NPart).eq.Glu_ ) then
+                     counterG = counterG + 1
+                  elseif( IsABoson(TheTreeAmp%PartType(NPart)) ) then! careful: bosons should only be places *between* same flavor quark lines
+                     if( NPart.eq.1 ) call Error("Vector boson should not be the first particle.")
+                     if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Wp_) ) TheTreeAmp%NumW = TheTreeAmp%NumW + 1
+                     if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Z0_) ) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
+                     if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Pho_)) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
+                     TheTreeAmp%BosonVertex = TheTreeAmp%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
+                  endif
+            enddo
+
+
+
 
 !           set number of gluons between quark lines
            if( IsAQuark( TheTreeAmp%PartType(1) ) ) then ! not a gluon and not a boson

@@ -4467,6 +4467,50 @@ END SUBROUTINE
 
 
 
+SUBROUTINE EvalPhasespace_2to4M(EHat,Mass,xRndPS,Mom,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: xRndPS(1:5)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+! real(8) :: MomDK(1:4,1:6)
+! integer :: NPart,i
+! real(8) :: vel,parx,theta ! for checks
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+
+!  generate PS: massless + massless --> massless + massive(M) + massive(anti-top) + massive(top)
+  call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
+  PSWgt = PSWgt*PiWgtPr
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
+!   TmpMom(1:4) = Mom(1:4,3)
+!   Mom(1:4,3)  = Mom(1:4,5)
+!   Mom(1:4,5)  = TmpMom(1:4)
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
+
+
+
 !!! Zprime section !!!
 
 SUBROUTINE EvalPhasespaceBWMapp(EHat,Masses,xRndPS,Mom,PSWgt)                                                                                                

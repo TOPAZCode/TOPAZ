@@ -762,7 +762,7 @@ use ModKinematics
 use ModAmplitudes
 use ModMisc
 use ModProcess
-use ModDipoles_GGTTBGP
+use ModDipoles_GGTTBGZ
 implicit none
 real(8) ::  EvalCS_Real_ttbgggZ,yRnd(1:VegasMxDim),VgsWgt,DipoleResult
 complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
@@ -773,22 +773,22 @@ real(8) :: MomExt(1:4,1:12),pdf(-6:6,1:2)
 real(8) :: MG_MOM(0:3,1:6)
 real(8) :: MadGraph_tree
 logical :: applyPSCut,applySingCut
-real(8),parameter :: PhotonCouplCorr=2d0
 include "vegas_common.f"
 
 
   EvalCS_Real_ttbgggZ= 0d0
   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-  if( EHat.le.2d0*m_Top+pT_pho_cut ) then
+  if( EHat.le.2d0*m_Top+M_Z) then
       EvalCS_Real_ttbgggZ = 0d0
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
 
 
-   call EvalPhaseSpace_2to4(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)
+
+   call EvalPhaseSpace_2to4M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
-   ISFac = MomCrossing(MomExt(1:4,1:6))
+   ISFac = MomCrossing(MomExt)
 
    PSWgt2 = 1d0
    PSWgt3 = 1d0
@@ -806,8 +806,7 @@ ENDIF
        return
    endif
 
-   call Kinematics_TTBARPHOTON(1,MomExt(1:4,1:12),(/5,6,4,1,2,3,7,8,9,10,11,12/),applyPSCut,NBin)
-
+   call Kinematics_TTBARZ(1,MomExt(1:4,1:12),(/5,6,4,1,2,3,7,8,9,10,11,12/),applyPSCut,NBin)
    call setPDFs(eta1,eta2,MuFac,pdf)
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
@@ -834,7 +833,7 @@ ENDIF
           LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
         enddo!helicity loop
 
-        LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi  *PhotonCouplCorr
+        LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi
         EvalCS_Real_ttbgggZ = LO_Res_Unpol * PreFac
 
         do NHisto=1,NumHistograms
@@ -843,8 +842,9 @@ ENDIF
 endif!applyPSCut
 
 
-    PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi*PhotonCouplCorr /PSWgt2/PSWgt3
-    call EvalDipoles_GGTTBGP((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:18),PreFac,DipoleResult)
+
+    PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3
+    call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:18),PreFac,DipoleResult)
 
 !      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
 !      sij = MomExt(1,3)**2
