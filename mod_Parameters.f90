@@ -54,6 +54,7 @@ real(8), public            :: Ga_Top(0:1)
 real(8), public            :: Ga_W(0:1)
 real(8), public            :: Ga_TopExp = 1.99d0*GeV
 real(8), public            :: Ga_WExp   = 2.14d0*GeV
+real(8), public            :: Ga_ZExp = 2.4952d0*GeV
 real(8), public            :: Ga_HTop(0:1)
 real(8), public            :: Ga_Htop_A0Top(0:1)
 real(8), public            :: Ga_Htop_BHTop(0:1)
@@ -203,6 +204,7 @@ integer, public, parameter :: WDK_LepPho=2
 integer, public, parameter :: WDK_Had=3
 integer, public, parameter :: WDK_HadPho=4
 integer, public, parameter :: WDK_LO=0
+logical, public, parameter :: ZDK=.true.
 
 integer, public, parameter :: T_B_W=1
 integer, public, parameter :: T_BG_W=2
