@@ -20,7 +20,7 @@ contains
     
     call ubarSpi_Weyl(pl,LepHel,leppol)
     call vSpi_Weyl(pa,-LepHel,aleppol)
-    ZGamPolVec(1:4)=vbqq_Weyl(4,leppol,aleppol)
+    ZGamPolVec(1:4)=vbqq_Weyl(4,leppol,aleppol)*sqrt2
 
 ! NB: note factor 1/pZ^2 in here:
     ZGamPolVec=ZGamPolVec/(sc_(pZ,pZ))
