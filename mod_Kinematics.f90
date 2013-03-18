@@ -4764,6 +4764,36 @@ END SUBROUTINE
 
 
 
+SUBROUTINE EvalPhasespace_2to4ZDK(EHat,xRndPS,Mom,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3
+real(8) :: xRndPS(1:8)
+real(8) :: Mom(1:4,1:6),MomDK(1:4,1:6)
+integer :: NPart,i
+
+!  generate PS: massless + massless --> massless +  massless +  massive(anti-top) +  massive(Top)
+   call genps(4,Ehat,xRndPS(1:8),(/0d0,0d0,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE EvalPhasespace_2to4ZDK
+
+
+
 
 
 
@@ -6545,7 +6575,7 @@ use ModMisc
 use ModParameters
 implicit none
 integer :: NumHadr,NPlus1PS,MomOrder(1:12)
-real(8) :: Mom(1:4,1:12),zeros(1:12)
+real(8) :: Mom(1:4,1:12),zeros(1:13)
 real(8) :: MomJet(1:4,1:7),MomJet_CHECK(1:4,1:7)
 real(8) :: MomHadr(1:4,0:8)
 real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
@@ -6555,24 +6585,39 @@ real(8) :: pT_lepM,pT_lepP,ET_miss,pT_ATop,pT_Top,HT,ET_bjet
 real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb,m_jj,mTblP,m_jjb,mT_lp
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,pt_Pho,eta_Pho,Rphobjet,mT_bln(1:2),mT_blnp(1:2)
 real(8) :: R_Pj(1:5),R_lj(1:5),R_PlepP,R_PlepM,pT_lept,ET_lept,mT,MInvPb1jj,mTb2lP,MInvPb2jj,mTb1lP,Phi_LP,Phi_LL
-integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N
+integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za 
 
 
 
 
 ! momentum ordering
+! no Z decay
+!  tbar    = MomOrder(1)
+!  t       = MomOrder(2)
+!  Zbos    = MomOrder(3)
+!  inLeft  = MomOrder(4)
+!  inRight = MomOrder(5)
+!  realp   = MomOrder(6)
+!  bbar    = MomOrder(7)
+!  lepM    = MomOrder(8)
+!  nubar   = MomOrder(9)
+!  b       = MomOrder(10)
+!  lepP    = MomOrder(11)
+!  nu      = MomOrder(12)
+
   tbar    = MomOrder(1)
   t       = MomOrder(2)
-  Zbos    = MomOrder(3)
-  inLeft  = MomOrder(4)
-  inRight = MomOrder(5)
-  realp   = MomOrder(6)
-  bbar    = MomOrder(7)
-  lepM    = MomOrder(8)
-  nubar   = MomOrder(9)
-  b       = MomOrder(10)
-  lepP    = MomOrder(11)
-  nu      = MomOrder(12)
+  Zl      = MomOrder(3)
+  Za      = MomOrder(4)
+  inLeft  = MomOrder(5)
+  inRight = MomOrder(6)
+  realp   = MomOrder(7)
+  bbar    = MomOrder(8)
+  lepM    = MomOrder(9)
+  nubar   = MomOrder(10)
+  b       = MomOrder(11)
+  lepP    = MomOrder(12)
+  nu      = MomOrder(13)
 
   qdn    = lepM
   qbup   = nubar
@@ -6582,37 +6627,46 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
 
 !DEC$ IF(_CheckMomenta .EQ.1)
    if(TopDecays.eq.0) then
-      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,ZBos)
+!Zundk      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,ZBos)
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,Zl)-Mom(1:4,Za)
    else
-      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,ZBos) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
+!Zundk      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,ZBos) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,Zl) - Mom(1:4,Za) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
    endif
    if( NPlus1PS.eq.1 ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
    if( any(abs(zeros(1:4)/Mom(1,inLeft)).gt.1d-8) ) then
       print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:4)
       print *, "momenta dump:"
-      print *, Mom(1:4,1:12)
+      do k=1,12
+         print *,k, Mom(1:4,k)
+      enddo
    endif
    zeros(1) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
    zeros(2) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
-   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
-   zeros(4) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
-   zeros(5) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
-   zeros(6) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
-   zeros(7) =  Mom(1:4,b).dot.Mom(1:4,b)
-   zeros(8) =  Mom(1:4,lepP).dot.Mom(1:4,lepP)
-   zeros(9) =  Mom(1:4,nu).dot.Mom(1:4,nu)
-   if( NPlus1PS.eq.1 ) zeros(10)=  Mom(1:4,realp).dot.Mom(1:4,realp)
-   if( TopDecays.eq.0 .and. any(abs(zeros(1:10)/Mom(1,inLeft)**2).gt.1d-8) ) then
+!Zundk   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
+   zeros(3) = (Mom(1:4,Zl).dot.Mom(1:4,Zl))
+   zeros(4) = (Mom(1:4,Za).dot.Mom(1:4,Za))
+   zeros(5) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
+   zeros(6) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
+   zeros(7) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
+   zeros(8) =  Mom(1:4,b).dot.Mom(1:4,b)
+   zeros(9) =  Mom(1:4,lepP).dot.Mom(1:4,lepP)
+   zeros(10) =  Mom(1:4,nu).dot.Mom(1:4,nu)
+
+   if( NPlus1PS.eq.1 ) zeros(11)=  Mom(1:4,realp).dot.Mom(1:4,realp)
+   if( TopDecays.eq.0 .and. any(abs(zeros(1:11)/Mom(1,inLeft)**2).gt.1d-8) ) then
       print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
       print *, Mom(1:4,1:2)
    endif
-   if( TopDecays.ne.0 .and. any(abs(zeros(1:10)/Mom(1,inLeft)**2).gt.1d-8) ) then
+   if( TopDecays.ne.0 .and. any(abs(zeros(1:11)/Mom(1,inLeft)**2).gt.1d-8) ) then
       print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
       print *, "momenta dump:"
       print *, Mom(1:4,1:12)
    endif
 !DEC$ ENDIF
 
+
+!!! RR 2013/03/16 : havent made any changes for Z decay from here on - it looks like it shoul just be top decay though (other than some cuts on Z leptons -- much later)
 
 applyPSCut = .false.
 NBin(1:NumHistograms) = 0
@@ -9281,7 +9335,11 @@ integer :: NPart
    do NPart=1,NumExtParticles
       
       if( IsABoson(ExtParticle(NPart)%PartType) ) then
-         call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         if ( ExtParticle(NPart)%PartType .eq. Z0_ .and. ZDK .eq. .true.) then
+! we set this elsewhere
+         else
+            call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         endif
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
          cycle
       endif
