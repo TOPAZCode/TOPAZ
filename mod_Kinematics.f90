@@ -9335,7 +9335,7 @@ integer :: NPart
    do NPart=1,NumExtParticles
       
       if( IsABoson(ExtParticle(NPart)%PartType) ) then
-         if ( ExtParticle(NPart)%PartType .eq. Z0_ .and. ZDK .eq. .true.) then
+         if ( ExtParticle(NPart)%PartType .eq. Z0_ .and. ZDecays .eq. 1) then
 ! we set this elsewhere
          else
             call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))

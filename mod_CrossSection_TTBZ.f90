@@ -492,7 +492,7 @@ IF( CORRECTION.EQ.0 ) THEN
 !       write(*,*) 'hel', iHel
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
-        if (ZDK .eq. .true.) then    
+        if (ZDecays .eq. 1) then    
 ! Z polarization not set above, so do it now, with Helicity(5) = lepton hel
            ExtParticle(5)%Pol(1:4)=ZGamPolVec(dcmplx(MomZl),dcmplx(MomZa),Helicities(iHel,5))
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)

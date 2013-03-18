@@ -30,7 +30,9 @@ real(8), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 real(8), public, parameter :: GeV=0.01d0
 
 
-real(8), public, parameter :: alpha = 1d0/(137d0)
+!orig real(8), public, parameter :: alpha = 1d0/(137d0)
+!MGremove
+real(8), public, parameter :: alpha = 0.0948355370740407d0/(4d0*DblPi)
 real(8), public, parameter :: alpha4Pi = alpha*4d0*DblPi
 real(8), public, parameter :: GF = (1.16639d-5)/GeV**2
 real(8), public            :: m_Top, m_SMTop
@@ -39,22 +41,31 @@ real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-real(8), public, parameter :: m_Z     = 91.19d0*GeV
+!orig real(8), public, parameter :: m_Z     = 91.19d0*GeV
+! MGremove
+real(8), public, parameter :: m_Z     =  91.188d0*GeV
 real(8), public, parameter :: m_W     = 80.419d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
 real(8), public            :: m_HTop
 real(8), public, parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8), public, parameter :: g_weak = dsqrt(g2_weak)
-real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
+!orig real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
+! MGremove
+real(8), public, parameter :: sw = 0.471430305382811d0
 real(8), public, parameter :: sw2 = sw**2 
-real(8), public, parameter :: cw = dsqrt(1d0-sw2)
+! orig real(8), public, parameter :: cw = dsqrt(1d0-sw2)
+! MGremove
+real(8), public, parameter :: cw = 0.88190332075952d0
 real(8), public, parameter :: EL = dsqrt(4.d0*DblPi*alpha)
 real(8), public            :: Ga_Top(0:1)
 real(8), public            :: Ga_W(0:1)
 real(8), public            :: Ga_TopExp = 1.99d0*GeV
 real(8), public            :: Ga_WExp   = 2.14d0*GeV
-real(8), public            :: Ga_ZExp = 2.4952d0*GeV
+! orig real(8), public            :: Ga_ZExp = 2.4952d0*GeV
+! MGremove
+!real(8), public            :: Ga_ZExp = 2.44140351d0*GeV
+real(8), public            :: Ga_ZExp = 0d0
 real(8), public            :: Ga_HTop(0:1)
 real(8), public            :: Ga_Htop_A0Top(0:1)
 real(8), public            :: Ga_Htop_BHTop(0:1)
@@ -204,7 +215,6 @@ integer, public, parameter :: WDK_LepPho=2
 integer, public, parameter :: WDK_Had=3
 integer, public, parameter :: WDK_HadPho=4
 integer, public, parameter :: WDK_LO=0
-logical, public, parameter :: ZDK=.true.
 
 integer, public, parameter :: T_B_W=1
 integer, public, parameter :: T_BG_W=2

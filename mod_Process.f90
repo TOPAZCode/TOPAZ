@@ -3715,7 +3715,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     enddo
 
     IF( TOPDECAYS.GE.1 ) THEN
-       if (ZDK .eq. .true.) then
+       if (ZDecays .eq. 1) then
        NumHelicities = 16
         allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
         Helicities(1,1:6) = (/0,0,+1,+1,+1,+1/)
@@ -3751,7 +3751,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
         Helicities(12,1:5)= (/0,0,-1,-1, 0/)! longitudinal polarization of massive V boson
      endif
     ELSE
-       if (ZDK .eq. .true.) then
+       if (ZDecays .eq. 1) then
           NumHelicities = 64
           allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
           ! for now, use all helicities. might be able to use some clever tricks later though...
