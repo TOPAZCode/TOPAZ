@@ -386,6 +386,7 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModZDecay
 !use ModIntDipoles_QQBTTBGP
 !use ModIntDipoles_QGTTBQP
 !use ModIntDipoles_QBGTTBQBP
@@ -395,8 +396,9 @@ complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
 integer :: iHel,iPrimAmp,jPrimAmp
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
-real(8) :: MomExt(1:4,1:12)
+real(8) :: MomExt(1:4,1:12),MomZl(1:4), MomZa(1:4),propZ,pZsq
 logical :: applyPSCut
+real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
 real(8) :: MadGraph_tree
 real(8),parameter :: Nc=3d0
@@ -414,24 +416,61 @@ include "vegas_common.f"
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
+  write(*,*) 'MADGRAPH CHECK'
+  write(*,*) 'PARAMETERS:'
+  write(*,*) 'm_Z=', m_Z*100d0
+  write(*,*) 'Gamma_Z=', Ga_ZExp*100d0
+  write(*,*) 'm_T=', m_Top*100d0
+  write(*,*) 'sin theta_w =',sw
+  write(*,*) 'cos theta_w =',cw
+! no Z decay
+!   call EvalPhaseSpace_2to3M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
+!   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+   call EvalPhaseSpace_2to4ZDK(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)
+   call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
-   call EvalPhaseSpace_2to3M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
-   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
+! MG check:: MGremove
+   MomExt(1:4,1)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00, 0.100000000000000d+04/)
+   MomExt(1:4,2)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00,-0.100000000000000d+04/)
+   MomExt(1:4,5)=(/0.242389902772977d+03,-0.420396005185953d+02, 0.762402447565711d+02,-0.144195950130328d+03/)
+   MomExt(1:4,6)=(/0.648409438348076d+03,-0.197541169111057d+03,-0.574333846338076d+03, 0.145507488452024d+03/)
+   MomExt(1:4,3)=(/0.289813303313282d+03,-0.201405168298672d+03,-0.185861803799425d+03, 0.942501928293190d+02/)
+   MomExt(1:4,4)=(/0.819387355565666d+03, 0.440985937928325d+03, 0.683955405380929d+03,-0.955617311510147d+02/)
+
+   MomExt=MomExt/100d0
+
+!! end MGremove
    NRndHel=8
 IF( TOPDECAYS.NE.0 ) THEN
-   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
-   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
+! no Z decay
+!   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
+!   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
+   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)
+   call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
    PSWgt = PSWgt * PSWgt2*PSWgt3
    NRndHel=16
 ENDIF
-   
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/4,5,3,1,2,0,6,7,8,9,10,11/),applyPSCut,NBin)
-   
+ 
+! no Z decay  
+!   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/4,5,3,1,2,0,6,7,8,9,10,11/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/5,6,3,4,1,2,0,7,8,9,10,11,12/),applyPSCut,NBin)
+
    if( applyPSCut ) then
       EvalCS_1L_ttbqqbZ = 0d0
       return
    endif
+
+!! Now we revert to Z,t,tbar in momentum, but keep the lepton momenta for Z polarization
+   MomZl(1:4)=MomExt(1:4,3)
+   MomZa(1:4)=MomExt(1:4,4)
+   MomExt(1:4,3)=MomExt(1:4,3)+MomExt(1:4,4)   ! p_Z = p_l +p_a
+   MomExt(1:4,4)=MomExt(1:4,5)                 ! antitop
+   MomExt(1:4,5)=MomExt(1:4,6)                 ! top
+!!
+   pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
+   propZ=pZsq/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
+
    call SetPropagators()
    call setPDFs(eta1,eta2,MuFac,pdf)
 
@@ -453,29 +492,35 @@ IF( CORRECTION.EQ.0 ) THEN
 !       write(*,*) 'hel', iHel
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
+        if (ZDK .eq. .true.) then    
+! Z polarization not set above, so do it now, with Helicity(5) = lepton hel
+           ExtParticle(5)%Pol(1:4)=ZGamPolVec(dcmplx(MomZl),dcmplx(MomZa),Helicities(iHel,5))
+           call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
+! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
+           call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+           call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
+        endif
+         
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
         enddo
 
         LO_Res_Pol = (0d0,0d0)
 
-!! This does not work, because of the ambiguity with color/flavor structures and the mislabeling of primitive amplitudes
-!        do jPrimAmp=1,NumBornAmps
-!           do iPrimAmp=1,NumBornAmps
-!              write(*,*) BornAmps(jPrimAmp)%Result, 
-!              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqb(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-!      enddo
-!      enddo
+! Amp 1 has the Z coupl in the currents
+! Amp 2 has the Z/gamma attached to the massless line, which could be up or down
+        BornAmps(2)%Result=BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
+!        BornAmps(2)%Result=BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL)
 
-! This hack will work, in principle, but it might be better (but more time-consuming) to use parents, cf. gg->gWW calculation...
-        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result 
+! these are actually just different flavor structures, same color structure, so
+! add them
+        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result
+
         LO_Res_Pol =  ColLO_ttbqqb(1,1) * BornAmps(1)%Result*dconjg(BornAmps(1)%Result)
 
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
-!      write(*,*) 'msq', LO_Res_Pol
    enddo!helicity loop
-!      write(*,*) 'msq', LO_Res_UnPol
-!      pause
+
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
    stop " This correction not yet implemented for this process"
@@ -592,8 +637,19 @@ ENDIF
 
 
 IF( CORRECTION.EQ.0 ) THEN
+! MG check:: MGremove
+   RunFactor=1d0
+   alpha_s4Pi=1.48283173249438d0
+   WidthExpansion=1d0
+   write(*,*) 'alpha*4*Pi = e^2 = ', alpha4Pi
+   write(*,*) 'alpha_s*4*Pi=g_s^2= ',alpha_s4Pi
+! MGremove end
 !  normalization
-   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
+
+!   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
+
+! ZDK:
+LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * (alpha4Pi)**2 * WidthExpansion
    EvalCS_1L_ttbqqbZ = LO_Res_Unpol * PreFac
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
@@ -723,6 +779,28 @@ ENDIF
 !        print *, "MG/ME ratio: ", MadGraph_tree/dble(LO_Res_Unpol/PDFFac(up)/1d4)
 !        pause
 
+!      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
+!      MADGRAPH CHECK: uub->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
+!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!        MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
+!        MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
+!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+!        call coupsm(0)
+!        call SUUB_TTBZ(MG_MOM,MadGraph_tree)
+!        call SDDB_TTBZ(MG_MOM,MadGraph_tree)
+!        print *, "MadGraph hel.amp uub:", MadGraph_tree
+!        print *, "MadGraph hel.amp ddb:", MadGraph_tree
+!        print *, "My tree uub:         ", LO_Res_Unpol/(100d0)**2
+        print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+        print *, "MG/ME ratio uub: ", 0.287320393640445d-12/(LO_Res_Unpol/(100d0)**4)
+        print *, "MG/ME ratio ddb: ", 0.189323066770051d-12/(LO_Res_Unpol/(100d0)**4)
+!        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+
+
+        print *, ""
+
+        stop
 
    if( IsNan(EvalCS_1L_ttbqqbZ) ) then
         print *, "NAN:",EvalCS_1L_ttbqqbZ
