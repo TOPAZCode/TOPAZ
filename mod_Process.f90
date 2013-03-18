@@ -3880,7 +3880,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
      endif
     ELSE
        if (ZDecays .ne. 0 ) then
-          NumHelicities = 64
+          NumHelicities = 16
           allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
           ! for now, use all helicities. might be able to use some clever tricks later though...
           sig_tb=+1;sig_t=+1;
