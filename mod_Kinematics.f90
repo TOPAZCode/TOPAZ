@@ -513,6 +513,12 @@ ELSEIF( ObsSet.EQ.48 ) THEN! set of observables for STOP width
 
 
 
+ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
+
+ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+
+
+
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
 
    Mttbar_cut = 500d0*GeV
@@ -3252,12 +3258,30 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
-          Histo(1)%Info   = "pT"
+          Histo(1)%Info   = "pT(top)"
           Histo(1)%NBins  = 50
           Histo(1)%BinSize= 50d0*GeV
           Histo(1)%LowVal =  0d0*GeV
           Histo(1)%SetScale= 100d0
 
+
+
+
+
+ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+          if(TopDecays.ne.1)  call Error("TopDecays needs to be 1")
+          if(ZDecays.ne.1)    call Error("ZDecays needs to be 1")
+          NumHistograms = 1
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT(lep+)"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal =  0d0*GeV
+          Histo(1)%SetScale= 100d0
 
 
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
@@ -4030,6 +4054,42 @@ real(8) :: SingDepth,soft,coll
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+
+
+SUBROUTINE EvalPhasespace_ZDecay(mZ_inv,ZMom,xRndPS,MomDK,PSWgt)
+use ModProcess
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: PSWgt
+real(8) :: ZMom(1:4)
+real(8) :: MomDK(1:4,1:2)
+real(8) :: xRndPS(1:2),mZ_inv
+real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+
+
+        call genps(2,mZ_inv,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt)! top decay
+
+!       boost leptons to the Z frame:
+        call boost(MomDK(1:4,1),ZMom(1:4),mZ_inv)
+        call boost(MomDK(1:4,2),ZMom(1:4),mZ_inv)
+        PSWgt = PSWgt*PiWgt2
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
 
 
 
@@ -6574,8 +6634,8 @@ SUBROUTINE Kinematics_TTBARZ(NPlus1PS,Mom,MomOrder,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-integer :: NumHadr,NPlus1PS,MomOrder(1:12)
-real(8) :: Mom(1:4,1:12),zeros(1:13)
+integer :: NumHadr,NPlus1PS,MomOrder(1:14)
+real(8) :: Mom(1:4,1:14),zeros(1:14)
 real(8) :: MomJet(1:4,1:7),MomJet_CHECK(1:4,1:7)
 real(8) :: MomHadr(1:4,0:8)
 real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
@@ -6585,39 +6645,26 @@ real(8) :: pT_lepM,pT_lepP,ET_miss,pT_ATop,pT_Top,HT,ET_bjet
 real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb,m_jj,mTblP,m_jjb,mT_lp
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,pt_Pho,eta_Pho,Rphobjet,mT_bln(1:2),mT_blnp(1:2)
 real(8) :: R_Pj(1:5),R_lj(1:5),R_PlepP,R_PlepM,pT_lept,ET_lept,mT,MInvPb1jj,mTb2lP,MInvPb2jj,mTb1lP,Phi_LP,Phi_LL
-integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za 
+integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z
 
 
 
 
 ! momentum ordering
-! no Z decay
-!  tbar    = MomOrder(1)
-!  t       = MomOrder(2)
-!  Zbos    = MomOrder(3)
-!  inLeft  = MomOrder(4)
-!  inRight = MomOrder(5)
-!  realp   = MomOrder(6)
-!  bbar    = MomOrder(7)
-!  lepM    = MomOrder(8)
-!  nubar   = MomOrder(9)
-!  b       = MomOrder(10)
-!  lepP    = MomOrder(11)
-!  nu      = MomOrder(12)
-
   tbar    = MomOrder(1)
   t       = MomOrder(2)
-  Zl      = MomOrder(3)
-  Za      = MomOrder(4)
-  inLeft  = MomOrder(5)
-  inRight = MomOrder(6)
-  realp   = MomOrder(7)
-  bbar    = MomOrder(8)
-  lepM    = MomOrder(9)
-  nubar   = MomOrder(10)
-  b       = MomOrder(11)
-  lepP    = MomOrder(12)
-  nu      = MomOrder(13)
+  Zbos    = MomOrder(3)
+  inLeft  = MomOrder(4)
+  inRight = MomOrder(5)
+  realp   = MomOrder(6)
+  bbar    = MomOrder(7)
+  lepM    = MomOrder(8)
+  nubar   = MomOrder(9)
+  b       = MomOrder(10)
+  lepP    = MomOrder(11)
+  nu      = MomOrder(12)
+  ferm_Z  = MomOrder(13)!      fermion from Z decay (lep-, q, nu)
+  Aferm_Z = MomOrder(14)! anti-fermion from Z decay (lep+, qbar, nubar)
 
   qdn    = lepM
   qbup   = nubar
@@ -6626,12 +6673,11 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
 
 
 !DEC$ IF(_CheckMomenta .EQ.1)
+   zeros(:) = 0d0
    if(TopDecays.eq.0) then
-!Zundk      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,ZBos)
-      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,Zl)-Mom(1:4,Za)
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,tbar) - Mom(1:4,t) - Mom(1:4,ZBos)
    else
-!Zundk      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,ZBos) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
-      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,Zl) - Mom(1:4,Za) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
+      zeros(1:4) = Mom(1:4,inLeft)+Mom(1:4,inRight) - Mom(1:4,ferm_Z) - Mom(1:4,Aferm_Z) - Mom(1:4,bbar)-Mom(1:4,lepM)-Mom(1:4,nubar)-Mom(1:4,b)-Mom(1:4,lepP)-Mom(1:4,nu)
    endif
    if( NPlus1PS.eq.1 ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
    if( any(abs(zeros(1:4)/Mom(1,inLeft)).gt.1d-8) ) then
@@ -6643,23 +6689,24 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
    endif
    zeros(1) = (Mom(1:4,tbar).dot.Mom(1:4,tbar)) - m_Top**2
    zeros(2) = (Mom(1:4,t).dot.Mom(1:4,t)) - m_Top**2
-!Zundk   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
-   zeros(3) = (Mom(1:4,Zl).dot.Mom(1:4,Zl))
-   zeros(4) = (Mom(1:4,Za).dot.Mom(1:4,Za))
-   zeros(5) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
-   zeros(6) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
-   zeros(7) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
-   zeros(8) =  Mom(1:4,b).dot.Mom(1:4,b)
-   zeros(9) =  Mom(1:4,lepP).dot.Mom(1:4,lepP)
-   zeros(10) =  Mom(1:4,nu).dot.Mom(1:4,nu)
+   zeros(3) = (Mom(1:4,ZBos).dot.Mom(1:4,ZBos)) - M_Z**2
+   zeros(4) =  Mom(1:4,bbar).dot.Mom(1:4,bbar)
+   zeros(5) =  Mom(1:4,lepM).dot.Mom(1:4,lepM)
+   zeros(6) =  Mom(1:4,nubar).dot.Mom(1:4,nubar)
+   zeros(7) =  Mom(1:4,b).dot.Mom(1:4,b)
+   zeros(8) =  Mom(1:4,lepP).dot.Mom(1:4,lepP)
+   zeros(9) =  Mom(1:4,nu).dot.Mom(1:4,nu)
+   zeros(10) = (Mom(1:4,ferm_Z).dot.Mom(1:4,ferm_Z))
+   zeros(11) = (Mom(1:4,Aferm_Z).dot.Mom(1:4,Aferm_Z))
 
-   if( NPlus1PS.eq.1 ) zeros(11)=  Mom(1:4,realp).dot.Mom(1:4,realp)
-   if( TopDecays.eq.0 .and. any(abs(zeros(1:11)/Mom(1,inLeft)**2).gt.1d-8) ) then
-      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
-      print *, Mom(1:4,1:2)
+
+   if( NPlus1PS.eq.1 ) zeros(12)=  Mom(1:4,realp).dot.Mom(1:4,realp)
+   if( TopDecays.eq.0 .and. any(abs(zeros(1:3)/Mom(1,inLeft)**2).gt.1d-8) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:3)
+      print *, Mom(1:4,1:3)
    endif
-   if( TopDecays.ne.0 .and. any(abs(zeros(1:11)/Mom(1,inLeft)**2).gt.1d-8) ) then
-      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:10)
+   if( TopDecays.ne.0 .and. any(abs(zeros(1:12)/Mom(1,inLeft)**2).gt.1d-8) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:12)
       print *, "momenta dump:"
       print *, Mom(1:4,1:12)
    endif
@@ -6752,11 +6799,28 @@ ENDIF
 ! call SwitchEnergyComponentBack(MomJet_CHECK(1:4,1:NumHadr))
 
 
+
+
+
 !------------------------ cuts and binning --------------------------------
 if( ObsSet.eq.51) then! ttb+Z production without top decays at Tevatron & LHC
 
     pT_ATop = get_PT(Mom(1:4,tbar))
     pT_Top  = get_PT(Mom(1:4,t))
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_Top)
+
+
+
+
+elseif( ObsSet.eq.52) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+
+    pT_LepP  = get_PT(Mom(1:4,ferm_Z))
+
+! binning
+    NBin(1) = WhichBin(1,pT_LepP)
 
 
 
@@ -9329,16 +9393,15 @@ use ModProcess
 use ModMisc
 use ModParameters
 implicit none
-! complex(8) e(1:NumExtParticles,1:4), tmp(1:4)
 integer :: NPart
 
    do NPart=1,NumExtParticles
       
       if( IsABoson(ExtParticle(NPart)%PartType) ) then
-         if ( ExtParticle(NPart)%PartType .eq. Z0_ .and. ZDecays .eq. 1) then
-! we set this elsewhere
+         if ( ExtParticle(NPart)%PartType.eq.Z0_ .and. ZDecays.ne.0) then
+            ! done somewhere else
          else
-            call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+            call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))! on-shell Z-boson polarization
          endif
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
          cycle

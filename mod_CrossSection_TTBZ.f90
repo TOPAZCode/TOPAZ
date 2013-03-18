@@ -18,22 +18,22 @@ use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
+use ModZDecay
 !use ModIntDipoles_GGTTBGZ
 implicit none
 real(8) ::  EvalCS_1L_ttbggZ,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:3,-2:1)
 complex(8) :: BosonicPartAmp(1:3,-2:1),mydummy
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac
-real(8) :: MomExt(1:4,1:12)
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac
+real(8) :: MomExt(1:4,1:14)
 logical :: applyPSCut
 real(8) :: MG_MOM(0:3,1:5)
 real(8) :: MadGraph_tree
 real(8),parameter :: Nc=3d0
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
-real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,HOp(1:3)
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,HOp(1:3),MZ_Inv
 integer :: NBin(1:NumMaxHisto),NHisto,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
-! real(8) :: ThresholdCutOff = 1.0d0
 include 'misc/global_import'
 include 'vegas_common.f'
 
@@ -47,7 +47,13 @@ EvalCS_1L_ttbggZ = 0d0
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-   call EvalPhaseSpace_2to3M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
+
+   if( ZDecays.le.10 ) then  ! decaying on-shell Z
+      MZ_Inv = m_Z
+   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+      call Error("need to implement phase space for off-shell Z's")
+   endif
+   call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    ISFac = MomCrossing(MomExt)
 
@@ -60,12 +66,18 @@ IF( TOPDECAYS.NE.0 ) THEN
    call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
    NRndHel=16
 ENDIF
+IF( ZDECAYS.NE.0 ) THEN
+   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
+   PSWgt = PSWgt * PSWgt4
+ENDIF
 
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/4,5,3,1,2,0,6,7,8,9,10,11/),applyPSCut,NBin)
+
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
    if( applyPSCut ) then
       EvalCS_1L_ttbggZ = 0d0
       return
    endif
+
 
 
    call SetPropagators()
@@ -84,6 +96,11 @@ IF( Correction.EQ.0 ) THEN
    do iHel=nHel(1),nHel(2)
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
+      if( ZDecays.ne.0 ) then
+          if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+          call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+      endif
+
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
@@ -339,6 +356,7 @@ ENDIF
        call coupsm(0)
        call SGG_TTBZ(MG_MOM,MadGraph_tree)
        print *, ""
+       print *, alpha_s*RunFactor,m_top,m_z
        print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
        print *, "MadGraph hel.amp:", MadGraph_tree
        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
@@ -395,8 +413,8 @@ real(8) ::  EvalCS_1L_ttbqqbZ,yRnd(1:VegasMxDim),VgsWgt,xE
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1)
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
 integer :: iHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
-real(8) :: MomExt(1:4,1:12),MomZl(1:4), MomZa(1:4),propZ,pZsq
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
+real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),propZ,pZsq,MZ_Inv
 logical :: applyPSCut
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
@@ -423,11 +441,17 @@ include "vegas_common.f"
   write(*,*) 'm_T=', m_Top*100d0
   write(*,*) 'sin theta_w =',sw
   write(*,*) 'cos theta_w =',cw
-! no Z decay
-!   call EvalPhaseSpace_2to3M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
-!   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-   call EvalPhaseSpace_2to4ZDK(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)
-   call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
+
+   if( ZDecays.le.10 ) then ! decaying on-shell Z
+      MZ_Inv = m_Z
+   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+      call Error("need to implement phase space for off-shell Z's")
+   endif
+
+  call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
+  call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+!    call EvalPhaseSpace_2to4ZDK(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! MARKUS: removed this again because for decaying Z the PS is generated in  EvalPhasespace_ZDecay (below)
+!    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
 
 ! MG check:: MGremove
@@ -444,17 +468,21 @@ include "vegas_common.f"
    NRndHel=8
 IF( TOPDECAYS.NE.0 ) THEN
 ! no Z decay
-!   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
-!   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
-   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)
-   call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
+  call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
+  call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
+!    call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)!  MARKUS: removed this again, see above
+!    call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
    PSWgt = PSWgt * PSWgt2*PSWgt3
    NRndHel=16
 ENDIF
- 
+IF( ZDECAYS.NE.0 ) THEN
+   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
+   PSWgt = PSWgt * PSWgt4
+ENDIF
+
+
 ! no Z decay  
-!   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/4,5,3,1,2,0,6,7,8,9,10,11/),applyPSCut,NBin)
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:12),(/5,6,3,4,1,2,0,7,8,9,10,11,12/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
 
    if( applyPSCut ) then
       EvalCS_1L_ttbqqbZ = 0d0
@@ -492,7 +520,7 @@ IF( CORRECTION.EQ.0 ) THEN
 !       write(*,*) 'hel', iHel
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
         call SetPolarizations()
-        if (ZDecays .eq. 1) then    
+        if( ZDecays.ne.0 ) then    
 ! Z polarization not set above, so do it now, with Helicity(5) = lepton hel
            ExtParticle(5)%Pol(1:4)=ZGamPolVec(dcmplx(MomZl),dcmplx(MomZa),Helicities(iHel,5))
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
@@ -646,10 +674,10 @@ IF( CORRECTION.EQ.0 ) THEN
 ! MGremove end
 !  normalization
 
-!   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
+  LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
 
 ! ZDK:
-LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * (alpha4Pi)**2 * WidthExpansion
+! LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * (alpha4Pi)**2 * WidthExpansion ! MARKUS: removed this again because if Z decays one power of alpha4Pi is included in mod_ZDecay
    EvalCS_1L_ttbqqbZ = LO_Res_Unpol * PreFac
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
@@ -847,7 +875,7 @@ complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto)
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ISFac,RunFactor,PreFac,sij
 real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac
-real(8) :: MomExt(1:4,1:12),pdf(-6:6,1:2)
+real(8) :: MomExt(1:4,1:14),pdf(-6:6,1:2)
 real(8) :: MG_MOM(0:3,1:6)
 real(8) :: MadGraph_tree
 logical :: applyPSCut,applySingCut
@@ -861,7 +889,6 @@ include "vegas_common.f"
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
-
 
 
    call EvalPhaseSpace_2to4M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
@@ -884,11 +911,12 @@ ENDIF
        return
    endif
 
-   call Kinematics_TTBARZ(1,MomExt(1:4,1:12),(/5,6,4,1,2,3,7,8,9,10,11,12/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin)
    call setPDFs(eta1,eta2,MuFac,pdf)
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
+
 
    if( applyPSCut ) then
        EvalCS_Real_ttbgggZ = 0d0
@@ -900,6 +928,10 @@ ENDIF
 
           do iPrimAmp=1,NumBornAmps
               call EvalTree(BornAmps(iPrimAmp))
+
+print *, "checker",Helicities(iHel,1:NumExtParticles)
+print *, "",iPrimAmp,BornAmps(iPrimAmp)%Result
+pause
           enddo
 
           LO_Res_Pol = (0d0,0d0)

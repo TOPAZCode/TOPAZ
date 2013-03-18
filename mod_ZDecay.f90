@@ -1,7 +1,75 @@
 MODULE ModZDecay
 implicit none
 
+
+private
+public :: ZDecay
+public :: ZGamPolVec,ZGamQcoupl,ZGamLcoupl
+
 contains 
+
+
+SUBROUTINE ZDecay(ZBoson,Topol,MomDK)
+use ModParameters
+use ModMisc
+use ModProcess
+implicit none
+type(Particle) :: ZBoson
+integer :: Topol
+real(8) :: MomDK(1:4,1:2),PropZ,PropPhoton
+real(8) :: zeros(1:4)
+
+
+
+!DEC$ IF(_CheckMomenta .EQ.1)
+   zeros(:) = 0d0
+   zeros(1:4) = dble(ZBoson%Mom(1:4))
+   zeros(1:4) = zeros(1:4) - MomDK(1:4,1) - MomDK(1:4,2)
+   if( ZDecays.lt.10 .and. any(abs(zeros(1:4)/dble(ZBoson%Mom(1))).gt.1d-8) ) then! only check if Z boson is on-shell
+      print *, "ERROR: energy-momentum violation in SUBROUTINE ZDecay(): ",zeros(1:4)
+      print *, "momentum dump:"
+      print *, MomDK(:,:)
+   endif
+
+   if( ZDecays.lt.10 ) zeros(1) = dble(ZBoson%Mom(1:4).dot.ZBoson%Mom(1:4)) - m_Z**2! only check if Z boson is on-shell
+   zeros(2)=  MomDK(1:4,1).dot.MomDK(1:4,1)
+   zeros(3)=  MomDK(1:4,2).dot.MomDK(1:4,2)
+   if( any(abs(zeros(1:3)/dble(ZBoson%Mom(1))**2).gt.1d-5) ) then
+      print *, "ERROR: onshell-ness violation in SUBROUTINE ZDecay(): ",zeros(1:3)
+      print *, "momentum dump:"
+      print *, MomDK(:,:)
+   endif
+!DEC$ ENDIF
+
+
+
+   PropZ=sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))/( sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))-m_Z**2 + ci*Ga_Zexp*m_Z )! the kV^2 factor in the numerator will cancel against a 1/kV^2 term in the decay matrix element
+   PropPhoton = 1d0                                       ! the photon propagator is included as 1/kV^2 term in the decay matrix element
+
+   if( ZDecays.lt.10  ) then  ! Z is on-shell
+      couplZTT_left_dyn  = couplZTT_left *PropZ
+      couplZTT_right_dyn = couplZTT_right*PropZ
+   elseif( ZDecays.gt.10 ) then  ! Z is off-shell
+      couplZTT_left_dyn  = couplZTT_left *PropZ + Q_Top*PropPhoton
+      couplZTT_right_dyn = couplZTT_right*PropZ + Q_Top*PropPhoton
+   endif
+
+
+    if( Topol.eq.DK_LO ) then 
+        if( abs(ZBoson%Helicity).ne.1 ) call Error("invalid Z boson polarization in ZDecay",ZBoson%Helicity)
+
+        ZBoson%Pol(1:4)  = ZGamPolVec(dcmplx(MomDK(1:4,1)),dcmplx(MomDK(1:4,2)),ZBoson%Helicity)
+        ZBoson%Pol(5:16) = 0d0
+        
+    else
+        call Error("Wrong topology in ZDecay",Topol)
+    endif
+
+
+END SUBROUTINE
+
+
+
 
   function ZGamPolVec(pl,pa,LepHel)
 ! Polarization vector for Z/gamma decay to leptons
@@ -15,6 +83,7 @@ contains
     integer     :: LepHel
     complex(8)  :: ZGamPolVec(4)
     complex(8)  :: pZ(4),leppol(4),aleppol(4)
+    real(8) :: couplZFF_right,couplZFF_left
     
     pZ=pl+pa
     
@@ -25,8 +94,23 @@ contains
 ! NB: note factor 1/pZ^2 in here:
     ZGamPolVec=ZGamPolVec/(sc_(pZ,pZ))
 
+    if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
+        couplZFF_right = couplZEE_right 
+        couplZFF_left  = couplZEE_left
+    elseif( ZDecays.eq.2 .or. ZDecays.eq.12 ) then 
+        couplZFF_right = couplZNN_right
+        couplZFF_left  = couplZNN_left
+    else
+        call Error("ZDecay not yet implemented",ZDecays)
+    endif
+    
+    if( -LepHel.eq.+1 ) ZGamPolVec = ZGamPolVec * couplZFF_right * dsqrt(alpha4Pi)
+    if( -LepHel.eq.-1 ) ZGamPolVec = ZGamPolVec * couplZFF_left  * dsqrt(alpha4Pi)
+
 
   end function ZGamPolVec
+
+
 
 
   subroutine ZGamQcoupl(QType,QHel,couplZQQ,couplGQQ)

@@ -246,6 +246,10 @@ logical :: dirresult
               print *, "required: ZDK:      0=stable, 1=Z-->l+ l-, 2=Z-->nu nubar"
               stop
           endif
+          if( (ZDecays.ne.0 .and. TopDecays.eq.0) .OR. (ZDecays.eq.0 .and. TopDecays.ne.0) ) then
+              print *, "if the Z boson decays then the tops also have to decay (and vice versa)"
+              stop
+          endif
     endif
 
 
@@ -1342,6 +1346,37 @@ ELSEIF( CORRECTION.EQ.5 ) THEN
   endif
 ENDIF
 ENDIF
+
+
+
+
+IF( MASTERPROCESS.EQ.19 ) THEN
+IF( CORRECTION.EQ.2 ) THEN
+  call vegas(EvalCS_Real_ttbgggZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_Real_ttbgggZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+
+IF( MASTERPROCESS.EQ.20 ) THEN
+IF( CORRECTION.EQ.2 ) THEN
+  call vegas(EvalCS_Real_ttbqqbgZ,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+   itmx = VegasIt1
+   ncall= VegasNc1
+   call InitHisto()
+   call vegas1(EvalCS_Real_ttbqqbgZ,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
 
 
 

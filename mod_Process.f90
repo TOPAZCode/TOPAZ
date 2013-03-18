@@ -122,6 +122,10 @@ IF( abs(TOPDECAYS).GE.1 ) THEN
   NDim = NDim + 4+4
 ENDIF
 
+IF( abs(ZDECAYS).GE.1 ) THEN
+  NDim = NDim + 2
+ENDIF
+
 IF( TOPDECAYS.EQ.5 .OR. TOPDECAYS.EQ.6 ) THEN
   NDim = NDim + 1
   IF(CORRECTION.EQ.4) THEN
@@ -2508,6 +2512,130 @@ ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z ! ttbZ
 
 
 
+
+ELSEIF( PROCESS.EQ.73 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top + 6_Z
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 6
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/5,6,-1,3,-2,4/)
+      MasterProcess=20
+      AvgFactor = SpinAvg * QuarkColAvg * GluonColAvg
+      NDim = NDim + 8    ! t tbar glu PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg * GluonColAvg
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.74 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top + 6_Z
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 6
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/5,6,3,-1,-2,4/)
+      MasterProcess=20
+      AvgFactor = SpinAvg * QuarkColAvg * GluonColAvg
+      NDim = NDim + 8    ! t tbar glu photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg * GluonColAvg
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
+ELSEIF( PROCESS.EQ.75 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top + 6_Z
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 6
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/5,6,-1,-2,3,4/)
+      MasterProcess=19
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 8    ! t tbar glu photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+ELSEIF( PROCESS.EQ.76 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Z
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 6
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/5,6,-1,-2,3,4/)
+      MasterProcess=20
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 8    ! t tbar glu photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
+
+
+
 ELSE
     call Error("Process not available")
 ENDIF
@@ -3715,7 +3843,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     enddo
 
     IF( TOPDECAYS.GE.1 ) THEN
-       if (ZDecays .eq. 1) then
+       if (ZDecays .ne. 0) then
        NumHelicities = 16
         allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
         Helicities(1,1:6) = (/0,0,+1,+1,+1,+1/)
@@ -3751,9 +3879,9 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
         Helicities(12,1:5)= (/0,0,-1,-1, 0/)! longitudinal polarization of massive V boson
      endif
     ELSE
-       if (ZDecays .eq. 1) then
-          NumHelicities = 16
-          allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
+       if (ZDecays .ne. 0 ) then
+          NumHelicities = 64
+          allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
           ! for now, use all helicities. might be able to use some clever tricks later though...
           sig_tb=+1;sig_t=+1;
           Helicities(1,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
@@ -3841,6 +3969,133 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
         Helicities(48,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
      endif
     ENDIF
+
+
+
+
+ELSEIF( MASTERPROCESS.EQ.19 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = Glu_
+    ExtParticle(4)%PartType = Glu_
+    ExtParticle(5)%PartType = Glu_
+    ExtParticle(6)%PartType = Z0_
+
+    IF( Correction.EQ.2 ) THEN
+      NumPrimAmps = 6
+      NumBornAmps = 6
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+
+
+    IF( TOPDECAYS.GE.1 ) THEN
+    NumHelicities = 16
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,1! Z boson hel
+          if( ih.ge.17 ) cycle
+          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+    ELSEIF( TOPDECAYS.EQ.0 ) then
+    NumHelicities = 64
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h1=-1,1,2
+      do h2=-1,1,2
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,1! Z boson hel
+          if( ih.ge.65 ) cycle
+          Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+    ENDIF
+
+
+
+
+
+
+ELSEIF( MASTERPROCESS.EQ.20 ) THEN
+
+    ExtParticle(1)%PartType = ATop_
+    ExtParticle(2)%PartType = Top_
+    ExtParticle(3)%PartType = AChm_
+    ExtParticle(4)%PartType = Chm_
+    ExtParticle(5)%PartType = Glu_
+    ExtParticle(6)%PartType = Z0_
+
+    IF( Correction.EQ.2 ) THEN
+      NumPrimAmps = 10
+      NumBornAmps = 10
+    ENDIF
+    allocate(PrimAmps(1:NumPrimAmps))
+    allocate(BornAmps(1:NumPrimAmps))
+    do NAmp=1,NumPrimAmps
+        allocate(BornAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%ExtLine(1:NumExtParticles))
+        allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
+    enddo
+
+    IF( TOPDECAYS.GE.1 ) THEN
+    NumHelicities = 16
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,1! Z boson hel
+          if( ih.ge.17 ) cycle
+          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+    ELSEIF( TOPDECAYS.EQ.0 ) then
+    NumHelicities = 64
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h1=-1,1,2
+      do h2=-1,1,2
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,1! Z boson hel
+          if( ih.ge.65 ) cycle
+          Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+    ENDIF
+
+
+
 
 
 
@@ -5341,6 +5596,72 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0  ! ttbZ
       call Error("need more work here:MasterProcess.EQ.18 ")
 
    ENDIF
+
+
+
+ELSEIF( MasterProcess.EQ.19 ) THEN
+
+   IF( Correction.EQ.2 ) THEN
+      PrimAmps(1)%ExtLine = (/1,6,2,3,4,5/)
+      BornAmps(1)%ExtLine = (/1,6,2,3,4,5/)
+
+      PrimAmps(2)%ExtLine = (/1,6,2,3,5,4/)
+      BornAmps(2)%ExtLine = (/1,6,2,3,5,4/)
+
+      PrimAmps(3)%ExtLine = (/1,6,2,4,3,5/)
+      BornAmps(3)%ExtLine = (/1,6,2,4,3,5/)
+
+      PrimAmps(4)%ExtLine = (/1,6,2,4,5,3/)
+      BornAmps(4)%ExtLine = (/1,6,2,4,5,3/)
+
+      PrimAmps(5)%ExtLine = (/1,6,2,5,3,4/)
+      BornAmps(5)%ExtLine = (/1,6,2,5,3,4/)
+
+      PrimAmps(6)%ExtLine = (/1,6,2,5,4,3/)
+      BornAmps(6)%ExtLine = (/1,6,2,5,4,3/)
+   ENDIF
+
+
+
+ELSEIF( MasterProcess.EQ.20 ) THEN
+
+   IF( Correction.EQ.2 ) THEN
+      PrimAmps( 1)%ExtLine = (/1,6,2,3,4,5/)
+      BornAmps( 1)%ExtLine = (/1,6,2,3,4,5/)
+      PrimAmp1_162345 = 1
+
+      PrimAmps( 2)%ExtLine = (/1,2,3,6,4,5/)
+      BornAmps( 2)%ExtLine = (/1,2,3,6,4,5/)
+      PrimAmp1_123645 = 2
+
+      PrimAmps( 3)%ExtLine = (/1,6,2,5,3,4/)
+      BornAmps( 3)%ExtLine = (/1,6,2,5,3,4/)
+      PrimAmp1_162534 = 3
+
+      PrimAmps( 4)%ExtLine = (/1,2,5,3,6,4/)
+      BornAmps( 4)%ExtLine = (/1,2,5,3,6,4/)
+      PrimAmp1_125364 = 4
+
+      PrimAmps( 5)%ExtLine = (/1,6,5,2,3,4/)
+      BornAmps( 5)%ExtLine = (/1,6,5,2,3,4/)
+      PrimAmp1_165234 = 5
+
+      PrimAmps( 6)%ExtLine = (/1,5,2,3,6,4/)
+      BornAmps( 6)%ExtLine = (/1,5,2,3,6,4/)
+      PrimAmp1_152364 = 6
+
+      PrimAmps( 7)%ExtLine = (/1,6,2,3,5,4/)
+      BornAmps( 7)%ExtLine = (/1,6,2,3,5,4/)
+      PrimAmp1_162354 = 7
+
+      PrimAmps(8)%ExtLine = (/1,2,3,6,5,4/)
+      BornAmps(8)%ExtLine = (/1,2,3,6,5,4/)
+      PrimAmp1_123654 = 8
+   ENDIF
+
+
+
+
 
 
 

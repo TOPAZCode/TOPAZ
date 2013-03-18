@@ -136,7 +136,7 @@
        real(dp) ::  pjetout(4,5), weight
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms)
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
        integer :: Njet, Nmax(5), Nhisto
        logical, save :: first_time = .true.
 
@@ -255,7 +255,7 @@
 !----------------- ini   ini     final   top   top, real
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:6)/), (/4,5,3,1,2,0,7,8,9,10,11,12/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
 
 
@@ -482,7 +482,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
 
        res = zero
        cres = (0d0,0d0)
@@ -578,7 +578,7 @@
 !-----------------     initial   initial       final  top      top
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:6)/), (/4,5,3,1,2,0,7,8,9,10,11,12/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
 
      if(Not_Passed_Cuts.eq..false.) then
@@ -798,7 +798,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
 
 
        res = zero
@@ -895,7 +895,7 @@
 
 !----------------- initial   initial        final top      top
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:6)/), (/4,5,3,1,2,0,7,8,9,10,11,12/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
 
 
@@ -1120,7 +1120,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
 
 
        res = zero
@@ -1214,7 +1214,7 @@
 !-----------------     initial   initial       final  top      top
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:6)/), (/4,5,3,1,2,0,7,8,9,10,11,12/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
 
      if(Not_Passed_Cuts.eq..false.) then

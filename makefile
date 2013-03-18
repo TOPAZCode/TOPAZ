@@ -334,6 +334,7 @@ allObjects =   				$(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_Process.o \
 					$(ObjectDir)/mod_Permutations.o \
 					$(ObjectDir)/mod_IntegerPartition.o \
+					$(ObjectDir)/mod_ZDecay.o \
 					$(ObjectDir)/mod_MyRecurrence.o \
 					$(ObjectDir)/mod_MyWeylRecurrence.o \
 					$(ObjectDir)/mod_Amplitudes.o \
@@ -574,6 +575,12 @@ $(ObjectDir)/mod_TTBP_NLODK.o: mod_TTBP_NLODK.f90 $(makeDep)
 
 
 $(ObjectDir)/mod_WDecay.o: mod_WDecay.f90 $(makeDep)
+	@echo " compiling" $<
+	$(fcomp) -c $< -o $@
+
+
+
+$(ObjectDir)/mod_ZDecay.o: mod_ZDecay.f90 $(makeDep)
 	@echo " compiling" $<
 	$(fcomp) -c $< -o $@
 

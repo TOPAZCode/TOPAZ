@@ -41,9 +41,9 @@ real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-!orig real(8), public, parameter :: m_Z     = 91.19d0*GeV
+! orig real(8), public, parameter :: m_Z     = 91.19d0*GeV
 ! MGremove
-real(8), public, parameter :: m_Z     =  91.188d0*GeV
+real(8), public, parameter :: m_Z     = 91.188d0*GeV
 real(8), public, parameter :: m_W     = 80.419d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
@@ -109,6 +109,7 @@ real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
 real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
 real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
+real(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
@@ -475,6 +476,12 @@ ELSE
   WidthExpansion = 1d0
 ENDIF
 
+
+!   top quark-Z-boson coupling
+!   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
+    couplZTT_left_dyn  = couplZTT_left
+    couplZTT_right_dyn = couplZTT_right
+    
 
 
 !  chiral couplings for stop-Chi^0-top
