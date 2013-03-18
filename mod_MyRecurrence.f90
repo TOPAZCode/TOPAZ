@@ -3099,9 +3099,9 @@ complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
    rIn =1
    rOut=NumGlu(0)
    if( Quark(2)%PartType .gt.0 ) then      !    X----->----
-      Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
+      Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),Boson%Helicity,Boson%PartType,NumGlu(1))
    else                                     !    X-----<----
-      Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
+      Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),Boson%Helicity,Boson%PartType,NumGlu(1))
    endif
 
 
@@ -3114,13 +3114,14 @@ END FUNCTION
 
 
 
-      recursive function fV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
+      recursive function fV(e,k,sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ms) result(res)
       use ModParameters
+      use ModZdecay
       implicit none
       complex(8), intent(in) :: e(:,:), k(:,:)
       complex(8), intent(in) :: sp(:), p(:)
       complex(8), intent(in) :: eV(:), kV(:)
-      integer, intent(in) ::  ms,QuarkFlavor
+      integer, intent(in) ::  ms,QuarkFlavor,lephel,bosontype
       integer             :: ms1,m,ng1, ng2
       integer :: ngluon
       complex(8)             :: res(size(sp))
@@ -3131,26 +3132,30 @@ END FUNCTION
       complex(8)             :: sp3(size(sp))
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
-      complex(8)  :: k1sq,k2sq,k3sq
-      real(8) :: mass,couplVQQ_left,couplVQQ_right
+      complex(8)  :: k1sq,k2sq,k3sq,propZ
+      real(8) :: mass,couplVQQ_left,couplVQQ_right,couplZLL,couplGLL
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
 
       ngluon = size(e,dim=2)
       ng1 = ms   !#gluons to the left of a f-line
       ng2 = ngluon - ms  !#gluons to the right of the f-line
-
+      call ZGamLCoupl(1,lephel,couplZLL,couplGLL)  ! charged lept
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
-
-      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
-          couplVQQ_left  = couplZUU_left
-          couplVQQ_right = couplZUU_right
-      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
-          couplVQQ_left  = couplZUU_left
-          couplVQQ_right = couplZUU_right
-      elseif( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) then!   note that Bot_ is treated as top quark in TOPAZ!
-          couplVQQ_left  = couplZTT_left
-          couplVQQ_right = couplZTT_right
+      !! RR changed -- coupling is done in overall amplitude UNLESS the coupling is ttZ
+      couplVQQ_left  = one
+      couplVQQ_right = one
+! I'd really rather have this elsewhere -- this'll do for now
+      propZ=sc_(kV,kV)/(sc_(kV,kV)-m_Z**2+ci*Ga_Zexp*m_Z)
+!      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
+!          couplVQQ_left  = couplZUU_left
+!          couplVQQ_right = couplZUU_right
+!      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
+!          couplVQQ_left  = couplZDD_left
+!          couplVQQ_right = couplZDD_right
+      if(  (bosontype .eq. Z0_) .and.  (abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) ) then!   note that Bot_ is treated as top quark in TOPAZ!
+          couplVQQ_left  = couplZTT_left*propZ*couplZLL +Q_Top*couplGLL
+          couplVQQ_right = couplZTT_right*propZ*couplZLL+Q_Top*couplGLL
       endif
 if (ngluon == 0) then
          res = vbqV(sp,eV,couplVQQ_left,couplVQQ_right)
@@ -3165,7 +3170,7 @@ else
            k2 = sum(k(:,1:ng1+m),dim=2)
            k2 = k2 + p + kV
            k2sq = sc_(k2,k2)-mass**2
-           sp2 = fV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1)
+           sp2 = fV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ng1)
            sp2 = spb2_(sp2,k2)+mass*sp2
 
            tmp = vqg(sp2,e1)
@@ -3197,7 +3202,7 @@ else
            k2 = k2 + p + kV
            k2sq = sc_(k2,k2) - mass**2
            ms1 = ng1 - m
-           sp2=fV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1)
+           sp2=fV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ms1)
 
            sp2 = spb2_(sp2,k2)+mass*sp2
 
@@ -3242,13 +3247,14 @@ end function fV
 
 
 
-      recursive function bfV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
+      recursive function bfV(e,k,sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ms) result(res)
       use ModParameters
+      use ModZDecay
       implicit none
       complex(8), intent(in) :: e(:,:), k(:,:)
       complex(8), intent(in) :: sp(:), p(:)
       complex(8), intent(in) :: eV(:), kV(:)
-      integer, intent(in) ::  ms,QuarkFlavor
+      integer, intent(in) ::  ms,QuarkFlavor,lephel,bosontype
       integer             :: ms1,m,ng1, ng2
       integer :: ngluon
       complex(8)             :: res(size(sp))
@@ -3259,7 +3265,7 @@ end function fV
       complex(8)             :: sp3(size(sp))
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
-      complex(8)  :: k1sq,k2sq,k3sq
+      complex(8)  :: k1sq,k2sq,k3sq,propZ
       real(8) :: mass,couplVQQ_left,couplVQQ_right
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
@@ -3269,14 +3275,18 @@ end function fV
       ng2 = ngluon - ms  !#gluons to the right of the f-line
 
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fbV'
-
-      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
-          couplVQQ_left  = couplZUU_left
-          couplVQQ_right = couplZUU_right
-      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
-          couplVQQ_left  = couplZUU_left
-          couplVQQ_right = couplZUU_right
-      elseif( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) then!   note that Bot_ is treated as top quark in TOPAZ!
+    !! RR changed -- coupling is done in overall amplitude UNLESS the coupling is ttZ
+      ! I'd really rather have this elsewhere -- this'll do for now
+      propZ=sc_(kV,kV)/(sc_(kV,kV)-m_Z**2+ci*Ga_Zexp*m_Z)
+      couplVQQ_left  = one
+      couplVQQ_right = one
+!      if( abs(QuarkFlavor).eq.Up_ .or. abs(QuarkFlavor).eq.Chm_ ) then 
+!          couplVQQ_left  = couplZUU_left
+!          couplVQQ_right = couplZUU_right
+!      elseif( abs(QuarkFlavor).eq.Dn_ .or. abs(QuarkFlavor).eq.Str_  ) then 
+!          couplVQQ_left  = couplZDD_left
+!          couplVQQ_right = couplZDD_right
+      if( (bosontype .eq. Z0_) .and. (abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_) ) then!   note that Bot_ is treated as top quark in TOPAZ!
           couplVQQ_left  = couplZTT_left
           couplVQQ_right = couplZTT_right
       endif
@@ -3295,7 +3305,7 @@ else
            k2 = -k2 - p - kV
            k2sq = sc_(k2,k2)-mass**2
 
-           sp2 = bfV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1)
+           sp2 = bfV(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ng1)
            sp2 = spi2_(k2,sp2)+mass*sp2
 
            tmp = vbqg(sp2,e1)
@@ -3328,7 +3338,7 @@ else
            k2 = -k2 - p - kV
            k2sq = sc_(k2,k2) - mass**2
            ms1 = ng1 - m
-           sp2=bfV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1)
+           sp2=bfV(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,lephel,bosontype,ms1)
 
            sp2 = spi2_(k2,sp2)+mass*sp2
 
