@@ -646,10 +646,7 @@ ENDIF
 
 IF( CORRECTION.EQ.0 ) THEN
 !  normalization
-  LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
-
-! ZDK:
-! LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * (alpha4Pi)**2 * WidthExpansion ! MARKUS: removed this again because if Z decays one power of alpha4Pi is included in mod_ZDecay
+   LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
    EvalCS_1L_ttbqqbZ = LO_Res_Unpol * PreFac
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
