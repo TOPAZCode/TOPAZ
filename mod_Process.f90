@@ -2407,7 +2407,7 @@ ELSEIF( PROCESS.EQ.68 ) THEN ! 4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
    ENDIF
 
 
-ELSEIF( PROCESS.EQ.71 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Z
+ELSEIF( PROCESS.EQ.71 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Z ! ttbZ
   IF( CORRECTION.EQ.0 ) THEN
       NumExtParticles = 5
       allocate(Crossing(1:NumExtParticles))
@@ -3716,7 +3716,7 @@ ELSEIF( MASTERPROCESS.EQ.16 ) THEN
 
 
 
-ELSEIF( MASTERPROCESS.EQ.17 ) THEN
+ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
 
     ExtParticle(1)%PartType = ATop_
     ExtParticle(2)%PartType = Top_
@@ -3740,6 +3740,7 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN
     enddo
 
     IF( TOPDECAYS.GE.1 ) THEN
+       if (Zdecays .eq. 0) then
         NumHelicities = 12
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         Helicities(1,1:5) = (/0,0,+1,+1,+1/)
@@ -3754,7 +3755,20 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN
         Helicities(10,1:5)= (/0,0,-1,-1,+1/)
         Helicities(11,1:5)= (/0,0,-1,-1,-1/)
         Helicities(12,1:5)= (/0,0,-1,-1, 0/)! longitudinal polarization of massive V boson
+     else
+         NumHelicities = 8
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
+        Helicities(1,1:5) = (/0,0,+1,+1,+1/)
+        Helicities(2,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(3,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(4,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(5,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(6,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(7,1:5) = (/0,0,-1,-1,+1/)
+        Helicities(8,1:5) = (/0,0,-1,-1,-1/)
+     endif
     ELSE
+       if (Zdecays .eq. 0) then
         NumHelicities = 48
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         sig_tb=+1; sig_t =+1;
@@ -3816,6 +3830,50 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN
         Helicities(46,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
         Helicities(47,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
         Helicities(48,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
+     else
+        NumHelicities = 32
+          allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
+          ! for now, use all helicities. might be able to use some clever tricks later though...
+          sig_tb=+1;sig_t=+1;
+          Helicities(1,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+          Helicities(2,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+          Helicities(3,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+          Helicities(4,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(5,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+          Helicities(6,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+          Helicities(7,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+          Helicities(8,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+
+          sig_tb=+1;sig_t=-1;
+          Helicities(9,1:5) =  (/sig_tb,sig_t,+1,+1,+1/)
+          Helicities(10,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+          Helicities(11,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+          Helicities(12,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(13,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+          Helicities(14,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+          Helicities(15,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+          Helicities(16,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+
+          sig_tb=-1;sig_t=+1;
+          Helicities(17,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+          Helicities(18,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(19,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+          Helicities(20,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+          Helicities(21,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+          Helicities(22,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+          Helicities(23,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+          Helicities(24,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+
+          sig_tb=-1;sig_t=-1;
+          Helicities(25,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
+          Helicities(26,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(27,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
+          Helicities(28,1:5) = (/sig_tb,sig_t,+1,+1,-1/)
+          Helicities(29,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
+          Helicities(30,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
+          Helicities(31,1:5) = (/sig_tb,sig_t,-1,-1,+1/)
+          Helicities(32,1:5) = (/sig_tb,sig_t,-1,-1,-1/)
+     endif
     ENDIF
 
 
@@ -3845,23 +3903,23 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     IF( TOPDECAYS.GE.1 ) THEN
        if (ZDecays .ne. 0) then
        NumHelicities = 16
-        allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
-        Helicities(1,1:6) = (/0,0,+1,+1,+1,+1/)
-        Helicities(2,1:6) = (/0,0,+1,+1,+1,-1/)
-        Helicities(3,1:6) = (/0,0,+1,+1,-1,+1/)
-        Helicities(4,1:6) = (/0,0,+1,+1,-1,-1/)
-        Helicities(5,1:6) = (/0,0,+1,-1,+1,+1/)
-        Helicities(6,1:6) = (/0,0,+1,-1,+1,-1/)
-        Helicities(7,1:6) = (/0,0,+1,-1,-1,+1/)
-        Helicities(8,1:6) = (/0,0,+1,-1,-1,-1/)
-        Helicities(9,1:6) = (/0,0,-1,+1,+1,+1/)
-        Helicities(10,1:6) = (/0,0,-1,+1,+1,-1/)
-        Helicities(11,1:6) = (/0,0,-1,+1,-1,+1/)
-        Helicities(12,1:6) = (/0,0,-1,+1,-1,-1/)
-        Helicities(13,1:6) = (/0,0,-1,-1,+1,+1/)
-        Helicities(14,1:6) = (/0,0,-1,-1,+1,-1/)
-        Helicities(15,1:6) = (/0,0,-1,-1,-1,+1/)
-        Helicities(16,1:6) = (/0,0,-1,-1,-1,-1/)
+        allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
+        Helicities(1,1:5) = (/0,0,+1,+1,+1/)
+        Helicities(2,1:5) = (/0,0,+1,+1,+1/)
+        Helicities(3,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(4,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(5,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(6,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(7,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(8,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(9,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(10,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(11,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(12,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(13,1:5) = (/0,0,-1,-1,+1/)
+        Helicities(14,1:5) = (/0,0,-1,-1,+1/)
+        Helicities(15,1:5) = (/0,0,-1,-1,-1/)
+        Helicities(16,1:5) = (/0,0,-1,-1,-1/)
      else
         NumHelicities=12
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
@@ -3881,7 +3939,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     ELSE
        if (ZDecays .ne. 0 ) then
           NumHelicities = 16
-          allocate(Helicities(1:NumHelicities,1:NumExtParticles+1))  ! extra for Z decay
+          allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
           ! for now, use all helicities. might be able to use some clever tricks later though...
           sig_tb=+1;sig_t=+1;
           Helicities(1,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
@@ -5564,7 +5622,7 @@ print *, "check this here"
 
 
 
-ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0
+ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
 
    IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
