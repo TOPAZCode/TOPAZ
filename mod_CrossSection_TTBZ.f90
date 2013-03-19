@@ -47,37 +47,64 @@ EvalCS_1L_ttbggZ = 0d0
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-
    if( ZDecays.le.10 ) then  ! decaying on-shell Z
       MZ_Inv = m_Z
    elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
-      call Error("need to implement phase space for off-shell Z's")
+! MGremove
+!      call Error("need to implement phase space for off-shell Z's")
    endif
+
    call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    ISFac = MomCrossing(MomExt)
-
+  write(*,*) 'MADGRAPH CHECK'
+  write(*,*) 'PARAMETERS:'
+  write(*,*) 'm_Z=', m_Z*100d0
+  write(*,*) 'Gamma_Z=', Ga_ZExp*100d0
+  write(*,*) 'm_T=', m_Top*100d0
+  write(*,*) 'sin theta_w =',sw
+  write(*,*) 'cos theta_w =',cw
    NRndHel=8
-IF( TOPDECAYS.NE.0 ) THEN
-   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
-   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
-   PSWgt = PSWgt * PSWgt2*PSWgt3
-   call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,6:8))
-   call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
-   NRndHel=16
-ENDIF
-IF( ZDECAYS.NE.0 ) THEN
-   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
-   PSWgt = PSWgt * PSWgt4
-ENDIF
 
 
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
-   if( applyPSCut ) then
-      EvalCS_1L_ttbggZ = 0d0
-      return
-   endif
+!MGremoveIF( TOPDECAYS.NE.0 ) THEN
+!MGremove   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
+!MGremove   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
+!MGremove   PSWgt = PSWgt * PSWgt2*PSWgt3
+!MGremove   call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,6:8))
+!MGremove   call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
+!MGremove   NRndHel=16
+!MGremoveENDIF
+!MGremoveIF( ZDECAYS.NE.0 ) THEN
+!MGremove   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
+!MGremove   PSWgt = PSWgt * PSWgt4
+!MGremoveENDIF
+!MGremove
+!MGremove
+!MGremove   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+!MGremove
+!MGremove   if( applyPSCut ) then
+!MGremove      EvalCS_1L_ttbggZ = 0d0
+!MGremove      return
+!MGremove   endif
 
+! MG check:: MGremove
+   if (ZDecays .ne. 0) then
+      print *, 'picking MG momenta'
+      MomExt=0d0
+   MomExt(1:4,1)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00, 0.100000000000000d+04/)
+   MomExt(1:4,2)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00,-0.100000000000000d+04/)
+   MomExt(1:4,4)=(/0.242389902772977d+03,-0.420396005185953d+02, 0.762402447565711d+02,-0.144195950130328d+03/)
+   MomExt(1:4,5)=(/0.648409438348076d+03,-0.197541169111057d+03,-0.574333846338076d+03, 0.145507488452024d+03/)
+   MomExt(1:4,12)=(/0.289813303313282d+03,-0.201405168298672d+03,-0.185861803799425d+03, 0.942501928293190d+02/)
+   MomExt(1:4,13)=(/0.819387355565666d+03, 0.440985937928325d+03, 0.683955405380929d+03,-0.955617311510147d+02/)
+
+   MomExt(1:4,3)=MomExt(1:4,12)+MomExt(1:4,13)   ! p_Z = p_l +p_a
+   MomExt=MomExt/100d0
+   ISFac = MomCrossing(MomExt)
+endif
+
+!! end MGremove
 
 
    call SetPropagators()
@@ -93,9 +120,11 @@ ENDIF
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 !------------ LO --------------
 IF( Correction.EQ.0 ) THEN
-   do iHel=nHel(1),nHel(2)
+!   do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
+
       if( ZDecays.ne.0 ) then
           if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
@@ -107,6 +136,7 @@ IF( Correction.EQ.0 ) THEN
 
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
+
       do iPrimAmp=1,NumBornAmps
           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
@@ -297,6 +327,13 @@ ENDIF
 
 
 IF( Correction.EQ.0 ) THEN
+! MG check:: MGremove
+   RunFactor=1d0
+   alpha_s4Pi=1.48283173249438d0
+   WidthExpansion=1d0
+   write(*,*) 'alpha*4*Pi = e^2 = ', alpha4Pi
+   write(*,*) 'alpha_s*4*Pi=g_s^2= ',alpha_s4Pi
+! MGremove end
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
    EvalCS_1L_ttbggZ = LO_Res_Unpol * PreFac
@@ -348,6 +385,7 @@ ENDIF
 
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
+if (ZDecays .eq. 0) then
        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
        MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
@@ -361,6 +399,12 @@ ENDIF
        print *, "MadGraph hel.amp:", MadGraph_tree
        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
        pause
+    else
+       print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+       print *, "MG/ME ratio: ", 0.872680470745814d-13/(LO_Res_Unpol/(100d0)**4)
+    endif
+    stop
+       
 
 
 
@@ -461,6 +505,7 @@ IF( TOPDECAYS.NE.0 ) THEN
    call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
    NRndHel=16
 ENDIF
+
 IF( ZDECAYS.NE.0 ) THEN
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
    PSWgt = PSWgt * PSWgt4
@@ -475,6 +520,8 @@ ENDIF
    endif
 
 if (ZDecays .ne. 0) then
+   print *, 'picking MG momenta'
+   pause
 ! MG check:: MGremove
    MomExt(1:4,1)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00, 0.100000000000000d+04/)
    MomExt(1:4,2)=(/0.100000000000000d+04, 0.000000000000000d+00, 0.000000000000000d+00,-0.100000000000000d+04/)
