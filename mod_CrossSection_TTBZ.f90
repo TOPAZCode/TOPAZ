@@ -86,15 +86,15 @@ ENDIF
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
    nHel(1:2) = getHelicity(yrnd(NRndHel))
-   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+ !  PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 !------------ LO --------------
 IF( Correction.EQ.0 ) THEN
-   do iHel=nHel(1),nHel(2)
-!    do iHel=1,NumHelicities
+!   do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
 
@@ -106,7 +106,6 @@ IF( Correction.EQ.0 ) THEN
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
-
       LO_Res_Pol = (0d0,0d0)
       do jPrimAmp=1,NumBornAmps
 
@@ -422,7 +421,7 @@ implicit none
 real(8) ::  EvalCS_1L_ttbqqbZ,yRnd(1:VegasMxDim),VgsWgt,xE
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1)
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
-integer :: iHel,iPrimAmp,jPrimAmp
+integer :: iHel,iPrimAmp,jPrimAmp,tmphel
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
 real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),propZ,pZsq,MZ_Inv
 logical :: applyPSCut
@@ -430,7 +429,7 @@ real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplG
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
 real(8) :: MadGraph_tree
 real(8),parameter :: Nc=3d0
-real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),PDFFac,pdf(-6:6,1:2)
+real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),PDFFac(1:2),pdf(-6:6,1:2)
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,ParityFlip=1,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
 integer,parameter :: up=1,dn=2
 include 'misc/global_import'
@@ -452,7 +451,6 @@ include "vegas_common.f"
    endif
   call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-
    NRndHel=8
 IF( TOPDECAYS.NE.0 ) THEN
   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
@@ -479,35 +477,59 @@ ENDIF
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
    propZ=pZsq/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
 
-   call SetPropagators()
    call setPDFs(eta1,eta2,MuFac,pdf)
 
-! fixme
-   PDFFac = pdf(0,1) * pdf(0,2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
+IF( PROCESS.EQ.72 ) THEN
+      PDFFac_a(up) = pdf(Up_,1)*pdf(AUp_,2) + pdf(Chm_,1)*pdf(AChm_,2)
+      PDFFac_a(dn) = pdf(Dn_,1)*pdf(ADn_,2) + pdf(Str_,1)*pdf(AStr_,2) + pdf(Bot_,1)*pdf(ABot_,2)
+      PDFFac_b(up) = pdf(Up_,2)*pdf(AUp_,1) + pdf(Chm_,2)*pdf(AChm_,1)
+      PDFFac_b(dn) = pdf(Dn_,2)*pdf(ADn_,1) + pdf(Str_,2)*pdf(AStr_,1) + pdf(Bot_,2)*pdf(ABot_,1)
+   ENDIF
+
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
    nHel(1:2) = getHelicity(yrnd(NRndHel))
-   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+
+!   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
 !------------ LO --------------
 IF( CORRECTION.EQ.0 ) THEN
-
+   do npdf=1,2
+      if (npdf .eq. 1) then
+         PDFFac(1:2)=PDFFac_a(1:2)
+      elseif (npdf .eq. 2) then
+         PDFFac(1:2)=PDFFac_b(1:2)
+         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+     endif
+         
     ISFac = MomCrossing(MomExt)
+    call SetPropagators()
+
 !    do iHel=nHel(1),nHel(2)
     do iHel=1,NumHelicities
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
+
         call SetPolarizations()
         if( ZDecays.ne.0 ) then    
            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+           call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
+        endif
+
+
+       if (npdf .eq. 2) then
+! change helicities of the massless quarks for the couplings to Z          
+          Helicities(iHel,3)=-Helicities(iHel,3)
+          Helicities(iHel,4)=-Helicities(iHel,4)
+       endif
+
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
 ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
            call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
-           call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
-        endif
+           
          
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
@@ -517,17 +539,26 @@ IF( CORRECTION.EQ.0 ) THEN
 
 ! Amp 1 has the Z coupl in the currents
 ! Amp 2 has the Z/gamma attached to the massless line, which could be up or down
-        BornAmps(2)%Result=BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
+!        BornAmps(2)%Result=BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
 !        BornAmps(2)%Result=BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL)
 
 ! these are actually just different flavor structures, same color structure, so
 ! add them
-        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result
+!        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result
 
-        LO_Res_Pol =  ColLO_ttbqqb(1,1) * BornAmps(1)%Result*dconjg(BornAmps(1)%Result)
+        if (Zdecays .eq. 0) then
+           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU)
+           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD)
+        else   
+           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
+           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL)
+        endif
+        LO_Res_Pol =  ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
 
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
+ enddo! npdf loop
+  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
 
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
@@ -796,6 +827,8 @@ ENDIF
 !   print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
 !   print *, "MG/ME ratio uub: ", 0.287320393640445d-12/(LO_Res_Unpol/(100d0)**4)
 !   print *, "MG/ME ratio ddb: ", 0.189323066770051d-12/(LO_Res_Unpol/(100d0)**4)
+!   print *, "MG/ME ratio ubu: ", 0.184639487297707d-12/(LO_Res_Unpol/(100d0)**4)
+!   print *, "MG/ME ratio dbd: ", 0.819198133023360d-13/(LO_Res_Unpol/(100d0)**4)
 !   !        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
 !   
 !
