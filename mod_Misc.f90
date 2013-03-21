@@ -2429,7 +2429,7 @@ END SUBROUTINE
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
-      real(8), intent(in) :: coupl_left,coupl_right
+      complex(8), intent(in) :: coupl_left,coupl_right
       complex(8) :: vbqV(size(sp))
 
             vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) ) 
@@ -2442,7 +2442,7 @@ END SUBROUTINE
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
-      real(8), intent(in) :: coupl_left,coupl_right
+      complex(8), intent(in) :: coupl_left,coupl_right
       complex(8) :: vVq(size(sp))
 
             vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )
