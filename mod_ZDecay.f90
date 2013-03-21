@@ -45,7 +45,7 @@ real(8) :: couplZFF_right,couplZFF_left,couplZFF
 
 
    PropZ=sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))/( sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))-m_Z**2 + ci*Ga_Zexp*m_Z )! the kV^2 factor in the numerator will cancel against a 1/kV^2 term in the decay matrix element
-   PropPhoton = 1d0                                       ! the photon propagator is included as 1/kV^2 term in the decay matrix element
+   PropPhoton = 1d0! the photon propagator is included as 1/kV^2 term in the decay matrix element
 
     if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
         couplZFF_right = couplZEE_right 

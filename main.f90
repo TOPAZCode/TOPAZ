@@ -432,18 +432,22 @@ integer TheUnit
     write(TheUnit,"(A,F10.6,A)") "# Gamma_Top(NLO)=",(Ga_Top(0)+Ga_Top(1))*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_W(LO) =",Ga_W(0)*100d0," GeV"
     write(TheUnit,"(A,F10.6,A)") "# Gamma_W(NLO)=",(Ga_W(0)+Ga_W(1))*100d0," GeV"
-    if( XTOPDECAYS.eq.1 .or. XTOPDECAYS.eq.2 ) then
+    if( ObsSet.ge.31 .and. ObsSet.le.39) then
         write(TheUnit,'(A,F8.3,A)') "# m(Htop)=",m_HTop *100d0, " GeV"
+      if( XTOPDECAYS.eq.1 .or. XTOPDECAYS.eq.2 ) then
         if( XTOPDECAYS.eq.1) write(TheUnit,'(A,F8.3,A)') "# m(BH)=",m_BH *100d0, " GeV"
         if( XTOPDECAYS.eq.2) write(TheUnit,'(A,F8.3,A)') "# m(A0)=",m_A0 *100d0, " GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(LO) =",Ga_HTop(0)*100d0," GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_HTop(NLO)=",(Ga_HTop(0)+Ga_HTop(1))*100d0," GeV"
+      endif
     endif
-    if( XTOPDECAYS.eq.3 ) then
+    if( ObsSet.ge.41 .and. ObsSet.le.49) then
         write(TheUnit,'(A,F8.3,A)') "# m(stop)=",m_STop *100d0, " GeV"
+      if( XTOPDECAYS.eq.3 ) then
         write(TheUnit,'(A,F8.3,A)') "# m(chi)=",m_Chi *100d0, " GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(LO) =",Ga_STop(0)*100d0," GeV"
         write(TheUnit,"(A,F10.6,A)") "# Gamma_STop(NLO)=",(Ga_STop(0)+Ga_STop(1))*100d0," GeV"
+      endif
     endif
     if( AlgoType.eq.1 ) then
         write(TheUnit,"(A,A)") "# Jet Algorithm= kT"

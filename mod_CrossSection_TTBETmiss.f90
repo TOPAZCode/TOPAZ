@@ -285,6 +285,7 @@ ENDIF
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_HtHtbgg)
    enddo
+   EvalCounter = EvalCounter + 1
 
    EvalCS_1L_HtHtbgg = EvalCS_1L_HtHtbgg/VgsWgt
 
@@ -535,6 +536,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       enddo
       enddo
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)*PDFFac
+
    enddo!helicity loop
    enddo!helicity loop
    enddo!helicity loop
@@ -654,6 +656,7 @@ ENDIF
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_HtHtbqqb)
    enddo
+   EvalCounter = EvalCounter + 1
 
 
    EvalCS_1L_HtHtbqqb = EvalCS_1L_HtHtbqqb/VgsWgt

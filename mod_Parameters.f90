@@ -333,7 +333,8 @@ END SUBROUTINE
 SUBROUTINE InitParameters
 use ModMisc
 implicit none
-real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice,StopWidthExpansion,HTWidthExpansion
+real(8) :: r2, TopWidthExpansion,WWidthExpansion,WWidthChoice,StopWidthExpansion,HTopWidthExpansion
+real(8) :: ZWidth,BrZtoEE
 real(8) :: cL,cR,omegasq,f,z
 real(8) :: beta,omega,P0,P3,W0,Ppl,Pmi,Wpl,Wmi,Yp,Yw
 real(8) :: term4,term7,term9
@@ -466,11 +467,27 @@ ELSE
 ENDIF
 
 
+
+
 !   top quark-Z-boson coupling
 !   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
     couplZTT_left_dyn  = couplZTT_left
     couplZTT_right_dyn = couplZTT_right
     
+
+    r2 = (M_Z/(2*4.6d0*GeV))**2! mass correction for bottom quark
+    ZWidth = alpha/12d0*M_Z * (  +((couplZUU_left+couplZUU_right)**2 + (couplZUU_left-couplZUU_right)**2 *1d0 )*3d0 &! up
+                                +((couplZDD_left+couplZDD_right)**2 + (couplZDD_left-couplZDD_right)**2 *1d0 )*3d0 &! dn
+                                +((couplZUU_left+couplZUU_right)**2 + (couplZUU_left-couplZUU_right)**2 *1d0 )*3d0 &! chm
+                                +((couplZDD_left+couplZDD_right)**2 + (couplZDD_left-couplZDD_right)**2 *1d0 )*3d0 &! str
+                                +((couplZDD_left+couplZDD_right)**2 + (couplZDD_left-couplZDD_right)**2 *(1d0-3d0/2d0/r2) )*3d0 &! bot
+                                +((couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 *1d0 )*3d0 &! el+mu+tau
+                                +((couplZNN_left+couplZNN_right)**2 + (couplZNN_left-couplZNN_right)**2 *1d0 )*3d0 &! 3nu                      
+                             )
+    BrZtoEE = alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/ZWidth
+!     print *, "Z->ee branching using calculated LO total width",BrZtoEE
+!     print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
+!     pause
 
 
 !  chiral couplings for stop-Chi^0-top
@@ -616,6 +633,13 @@ ENDIF
 
 
    Ga_HTop(:) = Ga_Htop_BHTop(:)! assuming no other decay channel
+
+   HTopWidthExpansion   = -2d0*Ga_HTop(1)/Ga_HTop(0)
+IF( abs(XTOPDECAYS).EQ.1 .AND. NLOPARAM.EQ.2 .AND. CORRECTION.EQ.0 ) THEN
+   WidthExpansion = WidthExpansion + HTopWidthExpansion
+ENDIF
+
+
 ENDIF
 
 

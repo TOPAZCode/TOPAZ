@@ -3116,7 +3116,6 @@ END FUNCTION
 
       recursive function fV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
       use ModParameters
-      use ModZdecay
       implicit none
       complex(8), intent(in) :: e(:,:), k(:,:)
       complex(8), intent(in) :: sp(:), p(:)
@@ -3246,7 +3245,6 @@ end function fV
 
       recursive function bfV(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms) result(res)
       use ModParameters
-      use ModZDecay
       implicit none
       complex(8), intent(in) :: e(:,:), k(:,:)
       complex(8), intent(in) :: sp(:), p(:)

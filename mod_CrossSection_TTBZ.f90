@@ -97,12 +97,10 @@ IF( Correction.EQ.0 ) THEN
     do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
-
       if( ZDecays.ne.0 ) then
           if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
       endif
-
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
@@ -115,6 +113,7 @@ IF( Correction.EQ.0 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
+
 
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
@@ -679,6 +678,7 @@ IF( CORRECTION.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
    EvalCS_1L_ttbqqbZ = LO_Res_Unpol * PreFac
+
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)

@@ -334,7 +334,6 @@ allObjects =   				$(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_Process.o \
 					$(ObjectDir)/mod_Permutations.o \
 					$(ObjectDir)/mod_IntegerPartition.o \
-					$(ObjectDir)/mod_ZDecay.o \
 					$(ObjectDir)/mod_MyRecurrence.o \
 					$(ObjectDir)/mod_MyWeylRecurrence.o \
 					$(ObjectDir)/mod_Amplitudes.o \
@@ -350,6 +349,7 @@ allObjects =   				$(ObjectDir)/mod_Misc.o \
 					$(ObjectDir)/mod_TTBJ_NLODK.o \
 					$(ObjectDir)/mod_TTBJ_NLODKW.o \
 					$(ObjectDir)/mod_WDecay.o \
+					$(ObjectDir)/mod_ZDecay.o \
 					$(ObjectDir)/mod_TopDecay.o \
 					$(ObjectDir)/mod_ExoticDecay.o \
 					$(ObjectDir)/mod_IntDipoles.o \
