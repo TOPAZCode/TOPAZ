@@ -51,6 +51,7 @@ EvalCS_1L_ttbggZ = 0d0
       MZ_Inv = m_Z
    elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
       call Error("need to implement phase space for off-shell Z's")
+      ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
    endif
 
    call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
@@ -113,6 +114,8 @@ IF( Correction.EQ.0 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
+
+
 
 
 !------------ 1 LOOP --------------

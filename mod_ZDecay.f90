@@ -20,7 +20,7 @@ integer :: LepHel
 real(8) :: MomDK(1:4,1:2),PropPhoton
 complex(8) :: propZ
 real(8) :: zeros(1:4)
-real(8) :: couplZFF_right,couplZFF_left,couplZFF
+complex(8) :: couplZFF_right,couplZFF_left,couplZFF
 
 
 !DEC$ IF(_CheckMomenta .EQ.1)
@@ -44,9 +44,14 @@ real(8) :: couplZFF_right,couplZFF_left,couplZFF
 !DEC$ ENDIF
 
 
+   if( ZDecays.lt.10 ) then! on-shell Z boson
+       PropZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
+   elseif( ZDecays.gt.10 ) then! off-shell Z boson
+       PropZ = (1d0,0d0)/( sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))-m_Z**2 + ci*Ga_Zexp*m_Z )
+   endif
+   PropZ = PropZ * sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))! this factor will cancel against a 1/kV^2 term in the decay matrix element
 
-   PropZ=sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))/( sc_(ZBoson%Mom(1:4),ZBoson%Mom(1:4))-m_Z**2 + ci*Ga_Zexp*m_Z )! the kV^2 factor in the numerator will cancel against a 1/kV^2 term in the decay matrix element
-   PropPhoton = 1d0! the photon propagator is included as 1/kV^2 term in the decay matrix element
+   PropPhoton = (1d0,0d0)! the photon propagator is included as 1/kV^2 term in the decay matrix element
 
     if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
         couplZFF_right = couplZEE_right 

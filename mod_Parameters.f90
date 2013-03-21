@@ -98,7 +98,6 @@ real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
 real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
 real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
-!real(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
 complex(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
@@ -486,9 +485,9 @@ ENDIF
                                 +((couplZNN_left+couplZNN_right)**2 + (couplZNN_left-couplZNN_right)**2 *1d0 )*3d0 &! 3nu                      
                              )
     BrZtoEE = alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/ZWidth
-!     print *, "Z->ee branching using calculated LO total width",BrZtoEE
-!     print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
-!     pause
+     print *, "Z->ee branching using calculated LO total width",BrZtoEE
+     print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
+     pause
 
 
 !  chiral couplings for stop-Chi^0-top
