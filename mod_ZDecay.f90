@@ -17,7 +17,8 @@ implicit none
 type(Particle) :: ZBoson
 integer :: Topol
 integer :: LepHel
-real(8) :: MomDK(1:4,1:2),PropZ,PropPhoton
+real(8) :: MomDK(1:4,1:2),PropPhoton
+complex(8) :: propZ
 real(8) :: zeros(1:4)
 real(8) :: couplZFF_right,couplZFF_left,couplZFF
 

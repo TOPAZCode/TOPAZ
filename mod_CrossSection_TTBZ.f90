@@ -422,7 +422,8 @@ complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
 integer :: iHel,iPrimAmp,jPrimAmp,tmphel
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
-real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),propZ,pZsq,MZ_Inv
+real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv
+complex(8) :: propZ
 logical :: applyPSCut
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)

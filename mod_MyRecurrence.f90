@@ -3132,7 +3132,8 @@ END FUNCTION
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
       complex(8)  :: k1sq,k2sq,k3sq
-      real(8) :: mass,couplVQQ_left,couplVQQ_right
+      real(8) :: mass
+      complex(8) :: couplVQQ_left,couplVQQ_right
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
 
@@ -3261,7 +3262,8 @@ end function fV
       complex(8)             :: e1(size(e,dim=1))
       complex(8)             :: e2(size(e,dim=1))
       complex(8)  :: k1sq,k2sq,k3sq
-      real(8) :: mass,couplVQQ_left,couplVQQ_right
+      real(8) :: mass
+      complex(8) :: couplVQQ_left,couplVQQ_right
       character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
 
 
