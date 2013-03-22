@@ -454,6 +454,7 @@ include "vegas_common.f"
    endif
   call EvalPhaseSpace_2to3M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
   call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+      ISFac = MomCrossing(MomExt)
    NRndHel=8
 IF( TOPDECAYS.NE.0 ) THEN
   call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
@@ -478,7 +479,12 @@ ENDIF
 
 ! we still need this for the massless qqZ couplings
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
-   propZ=pZsq/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
+   if ( ZDecays .lt. 10) then
+      propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
+   elseif (ZDecays .gt. 10) then 
+      propZ=cone/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
+   endif
+   propZ=pZsq*propZ
 
    call setPDFs(eta1,eta2,MuFac,pdf)
 
