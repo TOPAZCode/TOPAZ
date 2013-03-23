@@ -3902,24 +3902,16 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
 
     IF( TOPDECAYS.GE.1 ) THEN
        if (ZDecays .ne. 0) then
-       NumHelicities = 16
+       NumHelicities = 8 
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
         Helicities(1,1:5) = (/0,0,+1,+1,+1/)
-        Helicities(2,1:5) = (/0,0,+1,+1,+1/)
-        Helicities(3,1:5) = (/0,0,+1,+1,-1/)
-        Helicities(4,1:5) = (/0,0,+1,+1,-1/)
-        Helicities(5,1:5) = (/0,0,+1,-1,+1/)
-        Helicities(6,1:5) = (/0,0,+1,-1,+1/)
-        Helicities(7,1:5) = (/0,0,+1,-1,-1/)
-        Helicities(8,1:5) = (/0,0,+1,-1,-1/)
-        Helicities(9,1:5) = (/0,0,-1,+1,+1/)
-        Helicities(10,1:5) = (/0,0,-1,+1,+1/)
-        Helicities(11,1:5) = (/0,0,-1,+1,-1/)
-        Helicities(12,1:5) = (/0,0,-1,+1,-1/)
-        Helicities(13,1:5) = (/0,0,-1,-1,+1/)
-        Helicities(14,1:5) = (/0,0,-1,-1,+1/)
-        Helicities(15,1:5) = (/0,0,-1,-1,-1/)
-        Helicities(16,1:5) = (/0,0,-1,-1,-1/)
+        Helicities(2,1:5) = (/0,0,+1,+1,-1/)
+        Helicities(3,1:5) = (/0,0,+1,-1,+1/)
+        Helicities(4,1:5) = (/0,0,+1,-1,-1/)
+        Helicities(5,1:5) = (/0,0,-1,+1,+1/)
+        Helicities(6,1:5) = (/0,0,-1,+1,-1/)
+        Helicities(7,1:5) = (/0,0,-1,-1,+1/)
+        Helicities(8,1:5) = (/0,0,-1,-1,-1/)
      else
         NumHelicities=12
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))

@@ -471,7 +471,6 @@ IF( ZDECAYS.NE.0 ) THEN
 ENDIF
 
    call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
-
    if( applyPSCut ) then
       EvalCS_1L_ttbqqbZ = 0d0
       return
@@ -539,8 +538,7 @@ IF( CORRECTION.EQ.0 ) THEN
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
 ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
            call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
-           
-         
+                  
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
         enddo
@@ -557,15 +555,14 @@ IF( CORRECTION.EQ.0 ) THEN
 !        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result
 
         if (Zdecays .eq. 0) then
-           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU)
-           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD)
-        elseif ( ZDecays .lt. 10) then   
+           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU )
+           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD )
+        elseif( Zdecays.lt.10 ) then
            LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL )
            LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
-
-        else   
-           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
-           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL)
+        elseif( Zdecays.gt.10 ) then
+           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
         endif
 
         LO_Res_Pol =  ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
