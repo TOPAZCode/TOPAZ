@@ -525,18 +525,19 @@ ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
 
 ELSEIF ( ObsSet.EQ.61 ) THEN ! Zprime, top decay to dileptons
 
-   Rsep_jet = 0.5d0
+   Rsep_jet = 0.5d0             !*0d0 !this removes all cuts for fact.checks
 
-   pT_lep_cut  = 20d0*GeV
-   eta_lep_cut = 2.5d0
+   pT_lep_cut  = 20d0*GeV       !*0d0
+   eta_lep_cut = 2.5d0          !*1d6
 
-   pT_bjet_cut = 30d0*GeV
-   eta_bjet_cut = 2.5d0
+   pT_bjet_cut = 30d0*GeV       !*0d0
+   eta_bjet_cut = 2.5d0         !*1d6
    
 ELSEIF ( ObsSet.EQ.62 ) THEN ! Zprime, fully hadronic top decay
 
 
 
+ELSEIF ( ObsSet.EQ.64 ) THEN ! Zprime, semi-hadronic top decay (for factorization checks)
    
 ELSEIF ( ObsSet.EQ.65 ) THEN ! Zprime, semi-hadronic top decay (for ATLAS analysis: James Ferrando)
    
@@ -3537,9 +3538,9 @@ ELSEIF( ObsSet.EQ.62 ) THEN! set of observables for Zprime, fully hadronic top d
           Histo(8)%SetScale= 1d0
 
 
-ELSEIF( ObsSet.EQ.65 ) THEN ! Zprime, semi-hadronic top decay (for ATLAS analysis: James Ferrando)
-          if(Collider.ne.12)  call Error("Collider needs to be LHC!")
-          if(TopDecays.ne.4  ) call Error("TopDecays needs to be 2!")
+ELSEIF( ObsSet.EQ.64 .OR. ObsSet.EQ.65 ) THEN ! Zprime, semi-hadronic top decay (for ATLAS analysis: James Ferrando)
+          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.4 .and. TopDecays.ne.3 ) call Error("TopDecays needs to be 3 or 4!")
           NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -8697,8 +8698,10 @@ real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), pT_miss, ET_miss, pT_jet1, p
    else
         if(TopDecays.eq.0) then
             zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomExt(1:4,3) - MomExt(1:4,4) - MomExt(1:4,5)
-        else
+        elseif( TopDecays.ne.0 .and. Correction.eq.2 ) then 
             zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomExt(1:4,3) - MomDK(1:4,1)-MomDK(1:4,2)-MomDK(1:4,3)-MomDK(1:4,4)-MomDK(1:4,5)-MomDK(1:4,6)
+        elseif( TopDecays.ne.0 .and. Correction.eq.5 ) then 
+            zeros(1:4) = MomExt(1:4,1)+MomExt(1:4,2) - MomDK(1:4,1)-MomDK(1:4,2)-MomDK(1:4,3)-MomDK(1:4,4)-MomDK(1:4,5)-MomDK(1:4,6) - MomDK(1:4,7)
         endif
    endif
    if( any(abs(zeros(1:4)/MomExt(1,1)).gt.1d-6) ) then
@@ -8711,10 +8714,14 @@ real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), pT_miss, ET_miss, pT_jet1, p
         zeros(1) = (MomExt(1:4,3).dot.MomExt(1:4,3)) - m_Top**2
         zeros(2) = (MomExt(1:4,4).dot.MomExt(1:4,4)) - m_Top**2
         zeros(3) = 0d0
-   else
+   elseif( NPlus1PS .and. Correction.eq.2 ) then 
         zeros(1) = (MomExt(1:4,4).dot.MomExt(1:4,4)) - m_Top**2
         zeros(2) = (MomExt(1:4,5).dot.MomExt(1:4,5)) - m_Top**2
         zeros(3)=  MomExt(1:4,3).dot.MomExt(1:4,3)
+   elseif( NPlus1PS .and. Correction.eq.5 ) then 
+        zeros(1) = (MomExt(1:4,3).dot.MomExt(1:4,3)) - m_Top**2
+        zeros(2) = (MomExt(1:4,4).dot.MomExt(1:4,4)) - m_Top**2
+        zeros(3)=  MomDK(1:4,7).dot.MomDK(1:4,7)
    endif
    zeros(4) =  MomDK(1:4,1).dot.MomDK(1:4,1)
    zeros(5) =  MomDK(1:4,2).dot.MomDK(1:4,2)
@@ -8732,7 +8739,7 @@ real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), pT_miss, ET_miss, pT_jet1, p
       print *, "ERROR: onshell-ness violation in SUBROUTINE Kinematics_TTBARZprime(",NPlus1PS,"): ",zeros(1:9)
       print *, "momenta dump:"
       print *, MomExt(1:4,1:4+NPlus1PS)
-      print *, MomDK(1:4,1:6)
+      print *, MomDK(1:4,1:7)
    endif
 !DEC$ ENDIF
  
@@ -9134,6 +9141,10 @@ elseif( ObsSet.eq.62 ) then! set of observables for ttb production with hadr. At
     NBin(8) = WhichBin(8,CosTheta_star)
 
 
+
+elseif( ObsSet.eq.64 ) then ! Zprime, semi-hadronic top decay (for factorization checks)
+
+   NBin(:) = 1
 
 elseif( ObsSet.eq.65 ) then ! Zprime, semi-hadronic top decay (for ATLAS analysis: James Ferrando)
 

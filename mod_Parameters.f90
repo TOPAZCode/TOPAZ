@@ -468,7 +468,6 @@ ENDIF
 
 
 
-
 !   top quark-Z-boson coupling
 !   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
     couplZTT_left_dyn  = couplZTT_left
