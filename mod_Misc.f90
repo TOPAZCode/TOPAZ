@@ -2818,7 +2818,7 @@ END SUBROUTINE
               pol_mass(3)= dcmplx(p0/m/pv*py,0.0d0)
               pol_mass(4)= dcmplx(p0/m/pv*pz,0.0d0)
           else
-              call Error("wrong helicity setting in pol_mass")
+              call Error("wrong helicity setting in pol_mass",pol)
           endif
 
         end function pol_mass

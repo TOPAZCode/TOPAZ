@@ -456,7 +456,6 @@ ELSE
     Ga_W(1) = 0d0
 ENDIF
 
-
 TopWidthExpansion = -2d0*Ga_Top(1)/Ga_Top(0) 
 WWidthExpansion   = -2d0*Ga_W(1)/Ga_W(0)
 

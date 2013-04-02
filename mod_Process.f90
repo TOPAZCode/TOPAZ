@@ -4046,14 +4046,29 @@ ELSEIF( MASTERPROCESS.EQ.19 ) THEN
 
 
 
-    IF( TOPDECAYS.GE.1 ) THEN
-    NumHelicities = 16
+    IF( TOPDECAYS.GE.1 .AND. ZDECAYS.EQ.0 ) THEN
+    NumHelicities = 24
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
       do h3=-1,1,2
       do h4=-1,1,2
       do h5=-1,1,2
       do h6=-1,1,1! Z boson hel
+          if( ih.ge.25 ) cycle
+          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.0 ) THEN
+    NumHelicities = 16
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,2! Z boson hel
           if( ih.ge.17 ) cycle
           Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
           ih=ih+1
@@ -4061,8 +4076,8 @@ ELSEIF( MASTERPROCESS.EQ.19 ) THEN
       enddo
       enddo
       enddo
-    ELSEIF( TOPDECAYS.EQ.0 ) then
-    NumHelicities = 64
+    ELSEIF( TOPDECAYS.EQ.0 .AND. ZDECAYS.EQ.0 ) then
+    NumHelicities = 96
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
       do h1=-1,1,2
@@ -4071,7 +4086,7 @@ ELSEIF( MASTERPROCESS.EQ.19 ) THEN
       do h4=-1,1,2
       do h5=-1,1,2
       do h6=-1,1,1! Z boson hel
-          if( ih.ge.65 ) cycle
+          if( ih.ge.97 ) cycle
           Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
           ih=ih+1
       enddo
@@ -4108,14 +4123,29 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
         allocate(PrimAmps(NAmp)%IntPart(1:NumExtParticles))
     enddo
 
-    IF( TOPDECAYS.GE.1 ) THEN
-    NumHelicities = 16
+    IF( TOPDECAYS.GE.1 .AND. ZDECAYS.EQ.0 ) THEN
+    NumHelicities = 24
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
       do h3=-1,1,2
       do h4=-1,1,2
       do h5=-1,1,2
       do h6=-1,1,1! Z boson hel
+          if( ih.ge.25 ) cycle
+          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.0 ) THEN
+    NumHelicities = 16
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,2! Z boson hel
           if( ih.ge.17 ) cycle
           Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
           ih=ih+1
@@ -4123,8 +4153,8 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
       enddo
       enddo
       enddo
-    ELSEIF( TOPDECAYS.EQ.0 ) then
-    NumHelicities = 64
+    ELSEIF( TOPDECAYS.EQ.0 .AND. ZDECAYS.EQ.0 ) then
+    NumHelicities = 96
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
       do h1=-1,1,2
@@ -4133,7 +4163,7 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
       do h4=-1,1,2
       do h5=-1,1,2
       do h6=-1,1,1! Z boson hel
-          if( ih.ge.65 ) cycle
+          if( ih.ge.97 ) cycle
           Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
           ih=ih+1
       enddo
@@ -4143,7 +4173,6 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
       enddo
       enddo
     ENDIF
-
 
 
 
@@ -4445,12 +4474,15 @@ ELSE
 ENDIF
 
 
+
    do NPart=1,NumExtParticles
          ExtParticle(NPart)%ExtRef = NPart
          ExtParticle(NPart)%Mass = GetMass( ExtParticle(NPart)%PartType )
          ExtParticle(NPart)%Mass2 = (ExtParticle(NPart)%Mass)**2
          ExtParticle(NPart)%Mom(1:8) = (0d0,0d0)
    enddo
+
+
 END SUBROUTINE
 
 

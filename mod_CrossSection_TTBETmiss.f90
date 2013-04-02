@@ -4,7 +4,7 @@ implicit none
 
 integer,private,parameter :: NumMaxHisto=45
 
-integer,private,parameter :: RemoveHTopClosedLoop = 1
+integer,private,parameter :: RemoveHTopClosedLoop = 1!   0=remove, 1=include   closed heavy HT loop
 
 
  contains
@@ -4662,12 +4662,11 @@ include 'vegas_common.f'
 
 ! ------------------- for checks --------------------------
 !    print *, "fixing nJetRad"
-!    nJetRad1=1
-!    nJetRad2=-1
+!    nJetRad1=2
+!    nJetRad2=2
 !    nJetRad3=2
 !    nJetRad4=2
 ! ---------------------------------------------
-
 
 
 !----------------------------------
@@ -4679,18 +4678,26 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    if( nJetRad.eq.1 ) then
       call EvalPhasespace_HTopDK(HT_BH_T_G,MomExt(1:4,3),yRnd(5:9),MomExt(1:4,5:7),PSWgt2)!  BH(5) top(6) glu(7->15)
       MomExt(1:4,15) = MomExt(1:4,7)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(10:13),MomExt(1:4,7:9),PSWgt3)!  b(7) el(8) nu(9)
+      m_Top = m_HTop
    elseif( nJetRad.eq.2 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH(5) top(6)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      m_Top = m_HTop
       MomExt(1:4,15) = MomExt(1:4,10)
    elseif( nJetRad.eq.3 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH(5) top(6)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      m_Top = m_HTop
       MomExt(1:4,15) = MomExt(1:4,10)
    endif
    call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(14:15),MomExt(1:4,10:11),PSWgt4)!  BH(10) top(11)
+   m_Top = m_SMTop
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
+      m_Top = m_HTop
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
 
@@ -4755,15 +4762,16 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
 2000 continue!! dipoles for gluon emission off anti-stop
 
 
-
    if( nJetRad.eq.1 ) then
 
         call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+        m_Top=m_SMTop
         call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(10:13),MomExtTd(1:4,7:9),PSWgt3)
+        m_Top=m_HTop
         MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
         MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
         
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_SMTop**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_SMTop/pbDpg)**2 )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -4814,13 +4822,13 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
         MomExtTdIn(1:4,1:3) = MomExt(1:4,7:9)
         MomExtTdIn(1:4,4)  = MomExt(1:4,15)
         call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),pbDpg,ptDpg,ptDpb)
-        
+       
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
-        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        rsq = 1d0 - 2d0/m_SMtop**2*(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
-        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+        y=pbDpg*2d0/m_SMtop**2/(1d0-dsqrt(rsq))**2
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_SMTop/ptDpg)**2 )
         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
 
@@ -4828,7 +4836,6 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
         if( applyPSCut .or. TheDipole.eq.0d0) then
             cycle
         endif
-
 
         LO_Res_Unpol = (0d0,0d0)
         do iHel=1,NumHelicities! helicity summation
@@ -4931,27 +4938,34 @@ enddo! nJetRad loop
 
 
 
-
 !----------------------------------
 !  gluon  emission off HT        |
 !----------------------------------
 do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
 
    EvalCS_DKJ_Real_HtHtbgg = 0d0
-   IF(XTOPDECAYS.EQ.3) THEN
+   IF(XTOPDECAYS.EQ.1) THEN
    if( nJetRad.eq.1 ) then
       call EvalPhasespace_HTopDK(HT_BH_T_G,MomExt(1:4,4),yRnd(11:15),MomExt(1:4,10:12),PSWgt2)!  BH(10) top(11) glu(12->15)
       MomExt(1:4,15) = MomExt(1:4,12)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt3)!  b(12) el(13) nu(14)
+      m_Top = m_HTop
    elseif( nJetRad.eq.2 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  BH(10) top(11)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+      m_Top = m_HTop
    elseif( nJetRad.eq.3 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  BH(10) top(11)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+      m_Top = m_HTop
    endif   
    call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt4)! BH(5) top(6)
+   m_Top = m_SMTop
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
+   m_Top = m_HTop
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
    PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
@@ -4974,15 +4988,14 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    do BH2Hel=-1,1
       call HelCrossing(Helicities(iHel,1:6))
       call SetPolarizations()
-      call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+      call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,5:9))
       if( nJetRad.eq.1 ) then
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE1,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE2,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       else
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE3,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       endif
-
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
       enddo
@@ -5016,13 +5029,16 @@ mydummy(3) = EvalCS_DKJ_Real_HtHtbgg
 
 
 
+
    if( nJetRad.eq.1 ) then
 
         call WTransform3(MomExt(1:4,10:11),MomExt(1:4,15),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+        m_Top=m_SMTop
         call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,11),yRnd(16:19),MomExtTd(1:4,12:14),PSWgt3)
+        m_Top=m_HTop
         MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_Top**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_SMTop**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_HTop/ptDpg)**2 - (m_SMTop/pbDpg)**2 )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -5076,11 +5092,11 @@ mydummy(3) = EvalCS_DKJ_Real_HtHtbgg
         call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),pbDpg,ptDpg,ptDpb)
         
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
-        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        rsq = 1d0 - 2d0/m_SMtop**2*(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
-        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+        y=pbDpg*2d0/m_SMtop**2/(1d0-dsqrt(rsq))**2
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_SMTop/ptDpg)**2 )
         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
 
@@ -5309,18 +5325,26 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
    if( nJetRad.eq.1 ) then
       call EvalPhasespace_HTopDK(HT_BH_T_G,MomExt(1:4,3),yRnd(5:9),MomExt(1:4,5:7),PSWgt2)!  BH(5) top(6) glu(7->15)
       MomExt(1:4,15) = MomExt(1:4,7)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(10:13),MomExt(1:4,7:9),PSWgt3)!  b(7) el(8) nu(9)
+      m_Top = m_HTop
    elseif( nJetRad.eq.2 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH(5) top(6)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      m_Top = m_HTop
       MomExt(1:4,15) = MomExt(1:4,10)
    elseif( nJetRad.eq.3 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH(5) top(6)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,6),yRnd(7:13),MomExt(1:4,7:10),PSWgt3)!  b(7) el(8) nu(9) glu(10->15)
+      m_Top = m_HTop
       MomExt(1:4,15) = MomExt(1:4,10)
    endif
    call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(14:15),MomExt(1:4,10:11),PSWgt4)!  BH(10) top(11)
+   m_Top = m_SMTop
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt5)! b(12) el(13) nu(14)
+   m_Top = m_HTop
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
 
@@ -5389,11 +5413,13 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbqqb
    if( nJetRad.eq.1 ) then
 
         call WTransform3(MomExt(1:4,5:6),MomExt(1:4,15),MomExtTd(1:4,5:6),pbDpg,ptDpg,ptDpb)
+        m_Top=m_SMTop
         call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,6),yRnd(10:13),MomExtTd(1:4,7:9),PSWgt3)
+        m_Top=m_HTop
         MomExtTd(1:4,1:4) = MomExt(1:4,1:4)
         MomExtTd(1:4,10:14) = MomExt(1:4,10:14)
         
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_Top**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_SMTop**2-(MomExt(1:4,5).dot.MomExt(1:4,5)) ) - (m_HTop/ptDpg)**2 - (m_SMTop/pbDpg)**2 )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -5446,11 +5472,11 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbqqb
         call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,7:9),pbDpg,ptDpg,ptDpb)
         
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
-        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        rsq = 1d0 - 2d0/m_SMtop**2*(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
-        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+        y=pbDpg*2d0/m_SMtop**2/(1d0-dsqrt(rsq))**2
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_SMTop/ptDpg)**2 )
         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
 
@@ -5561,27 +5587,34 @@ enddo! nJetRad loop
 
 
 
-
 !----------------------------------
 !  gluon  emission off HT        |
 !----------------------------------
 do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad=2: gluon radiation off top line,nJetRad=3: gluon radiation off W line
 
    EvalCS_DKJ_Real_HtHtbqqb = 0d0
-   IF(XTOPDECAYS.EQ.3) THEN
+   IF(XTOPDECAYS.EQ.1) THEN
    if( nJetRad.eq.1 ) then
       call EvalPhasespace_HTopDK(HT_BH_T_G,MomExt(1:4,4),yRnd(11:15),MomExt(1:4,10:12),PSWgt2)!  BH(10) top(11) glu(12->15)
       MomExt(1:4,15) = MomExt(1:4,12)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(16:19),MomExt(1:4,12:14),PSWgt3)!  b(12) el(13) nu(14)
+      m_Top = m_HTop
    elseif( nJetRad.eq.2 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  BH(10) top(11)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_BG_W,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+      m_Top = m_HTop
    elseif( nJetRad.eq.3 ) then
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(11:12),MomExt(1:4,10:11),PSWgt2)!  BH(10) top(11)
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_WG,MomExt(1:4,11),yRnd(13:19),MomExt(1:4,12:15),PSWgt3)!  b(12) el(13) nu(14) glu(15)
+      m_Top = m_HTop
    endif   
    call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt4)! BH(5) top(6)
+   m_Top = m_SMTop
    call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd(7:10),MomExt(1:4,7:9),PSWgt5)! b(7) el(8) nu(9)
+   m_Top = m_HTop
    ENDIF
    call Kinematics_TTbarETmiss(.true.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,15/),applyPSCut,NBin)
    PSWgt = PSWgt0 * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
@@ -5604,14 +5637,15 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
    do BH2Hel=-1,1
       call HelCrossing(Helicities(iHel,1:6))
       call SetPolarizations()
-      call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,Helicities(iHel,5),MomExt(1:4,5:9))
+      call HTopBHDecay(ExtParticle(1),DKX_HTBH_LO,BH1Hel,MomExt(1:4,5:9))
       if( nJetRad.eq.1 ) then
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE1,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE1,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       elseif( nJetRad.eq.2 ) then
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE2,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE2,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       else
-          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE3,Helicities(iHel,6),MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
+          call HTopBHDecay(ExtParticle(2),DKX_HTBH_RE3,BH2Hel,MomExt(1:4,10:14),MomExt(1:4,15),GluHel)
       endif
+
 
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
@@ -5649,10 +5683,12 @@ mydummy(3) = EvalCS_DKJ_Real_HtHtbqqb
    if( nJetRad.eq.1 ) then
 
         call WTransform3(MomExt(1:4,10:11),MomExt(1:4,15),MomExtTd(1:4,10:11),pbDpg,ptDpg,ptDpb)
+        m_Top=m_SMTop
         call EvalPhasespace_TopDK(T_B_W,MomExtTd(1:4,11),yRnd(16:19),MomExtTd(1:4,12:14),PSWgt3)
+        m_Top=m_HTop
         MomExtTd(1:4,1:9) = MomExt(1:4,1:9)
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_Top**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_HTop/ptDpg)**2 - (m_Top/pbDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg/ptDpg*( m_Htop**2+m_SMTop**2-(MomExt(1:4,10).dot.MomExt(1:4,10)) ) - (m_HTop/ptDpg)**2 - (m_SMTop/pbDpg)**2 )
 
         call Kinematics_TTbarETmiss(.false.,MomExtTd,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
         if( applyPSCut .or. TheDipole.eq.0d0 ) then
@@ -5706,11 +5742,11 @@ mydummy(3) = EvalCS_DKJ_Real_HtHtbqqb
         call WTransform(MomExtTdIn(1:4,1:4),MomExtTd(1:4,12:14),pbDpg,ptDpg,ptDpb)
         
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)  !  for some reason this is not (1-z) as defined in the paper...
-        rsq = 1d0 - 2d0/m_top**2*(ptDpb+ptDpg-pbDpg)
+        rsq = 1d0 - 2d0/m_SMtop**2*(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
-        y=pbDpg*2d0/m_top**2/(1d0-dsqrt(rsq))**2
+        y=pbDpg*2d0/m_SMtop**2/(1d0-dsqrt(rsq))**2
 
-        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_Top/ptDpg)**2 )
+        TheDipole = - alpha_s4Pi*RunFactor * CF * ( 1d0/pbDpg*(2d0/omz-1d0-z) - (m_SMTop/ptDpg)**2 )
         TheDipole = TheDipole * (1d0 - StepFunc(1d0-alpha_DKTfi-z) * StepFunc(y-alpha_DKTfi*(1d0+dsqrt(rsq))**2*z*omz/(z+rsq*omz)) )
 
 
@@ -5871,13 +5907,18 @@ include 'vegas_common.f'
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH top
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
 
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      m_Top = m_HTop
+
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1     
    ELSEIF(XTOPDECAYS.EQ.2) THEN
       call Error("XTOPDECAYS.EQ.2 is not supported")
    ENDIF
+
+
 
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
    if( applyPSCut ) then
@@ -5979,7 +6020,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction to W- decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.4 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel
@@ -6108,7 +6149,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction on W+ decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.3 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel
@@ -6213,8 +6254,11 @@ include 'vegas_common.f'
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,3),yRnd(5:6),MomExt(1:4,5:6),PSWgt2)!  BH top
       call EvalPhasespace_HTopDK(HT_BH_T,MomExt(1:4,4),yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
 
+      m_Top = m_SMTop
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,6),yRnd( 9:12),MomExt(1:4,7:9),PSWgt4)! bot lep neu
       call EvalPhasespace_TopDK(T_B_W,MomExt(1:4,11),yRnd(13:16),MomExt(1:4,12:14),PSWgt5)
+      m_Top = m_HTop
+
       PSWgt = PSWgt * PSWgt2*PSWgt3 * PSWgt4*PSWgt5
       BHMaxHel = +1     
    ELSEIF(XTOPDECAYS.EQ.2) THEN
@@ -6327,7 +6371,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction to W- decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.4 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel
@@ -6456,7 +6500,7 @@ include 'vegas_common.f'
 !----------------------------------------
 ! one loop correction on W+ decay       |
 !----------------------------------------
-  IF( TOPDECAYS.GE.2 ) THEN
+  IF( TOPDECAYS.EQ.3 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
     do iHel=nHel(1),nHel(2)
     do BH1Hel=-1,BHMaxHel

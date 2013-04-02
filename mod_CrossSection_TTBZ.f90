@@ -352,7 +352,7 @@ ENDIF
 
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
-!if (ZDecays .eq. 0) then
+! if (ZDecays .eq. 0) then
 !       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
 !       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
 !       MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
@@ -888,17 +888,32 @@ use ModAmplitudes
 use ModMisc
 use ModProcess
 use ModDipoles_GGTTBGZ
+use ModZDecay
 implicit none
 real(8) ::  EvalCS_Real_ttbgggZ,yRnd(1:VegasMxDim),VgsWgt,DipoleResult
 complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto)
-real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ISFac,RunFactor,PreFac,sij
-real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,RunFactor,PreFac,sij
+real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac,MZ_Inv
 real(8) :: MomExt(1:4,1:14),pdf(-6:6,1:2)
 real(8) :: MG_MOM(0:3,1:6)
 real(8) :: MadGraph_tree
 logical :: applyPSCut,applySingCut
 include "vegas_common.f"
+
+
+
+! yRnd( 1)=  0.3385585941088194d0
+! yRnd( 2)=  0.2799513116385563d0
+! yRnd( 3)=  0.012473622342792d0
+! yRnd( 4)=  0.2879364093709448d0
+! yRnd( 5)=  0.1334328211068331d0
+! yRnd( 6)=  0.7829718273519412d0
+! yRnd( 7)=  0.3479862101366653d0
+! yRnd( 8)=  0.1332233664734401d0
+! yRnd( 9)=  0.2332185946559626d0
+! yRnd(10)=  0.7471774192280964d0
+! print *, "fixing yrnds"
 
 
   EvalCS_Real_ttbgggZ= 0d0
@@ -909,19 +924,30 @@ include "vegas_common.f"
   endif
   FluxFac = 1d0/(2d0*EHat**2)
 
+   if( ZDecays.le.10 ) then  ! decaying on-shell Z
+      MZ_Inv = m_Z
+   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+      call Error("need to implement phase space for off-shell Z's")
+      ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
+   endif
 
-   call EvalPhaseSpace_2to4M(EHat,M_Z,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
+   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
    ISFac = MomCrossing(MomExt)
 
    PSWgt2 = 1d0
    PSWgt3 = 1d0
+   PSWgt4 = 1d0
 IF( TopDecays.GE.1 ) THEN
    call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)
    call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
    PSWgt = PSWgt * PSWgt2*PSWgt3
    call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,7:9))
    call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,10:12))
+ENDIF
+IF( ZDECAYS.NE.0 ) THEN
+   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,4),yRnd(19:20),MomExt(1:4,13:14),PSWgt4)
+   PSWgt = PSWgt * PSWgt4
 ENDIF
 
    call CheckSing(MomExt,applySingCut)
@@ -944,14 +970,15 @@ ENDIF
         do iHel=1,NumHelicities
           call HelCrossing(Helicities(iHel,1:NumExtParticles))
           call SetPolarizations()
+          if( ZDecays.ne.0 ) then
+              if( ExtParticle(6)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+              call ZDecay(ExtParticle(6),DK_LO,MomExt(1:4,13:14))
+          endif
 
           do iPrimAmp=1,NumBornAmps
               call EvalTree(BornAmps(iPrimAmp))
-
-print *, "checker",Helicities(iHel,1:NumExtParticles)
-print *, "",iPrimAmp,BornAmps(iPrimAmp)%Result
-pause
           enddo
+
 
           LO_Res_Pol = (0d0,0d0)
           do jPrimAmp=1,6
@@ -972,29 +999,40 @@ endif!applyPSCut
 
 
 
-    PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3
-    call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:18),PreFac,DipoleResult)
-
-!      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
-!      sij = MomExt(1,3)**2
-!      print *,  sij/EHat**2,EvalCS_Real_ttbgggZ,DipoleResult,(1d0+EvalCS_Real_ttbgggZ/(DipoleResult))
+    PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
+    call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),PreFac,DipoleResult)
+!      sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
+! !      sij = MomExt(1,3)**2
+!      print *,  sij/EHat**2,EvalCS_Real_ttbgggZ,DipoleResult,(1d0+EvalCS_Real_ttbgggZ/DipoleResult)
 !      pause
 
-! !      MADGRAPH CHECK: gg->tbtgp
-!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!        MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
-!        MG_MOM(0:3,4) = MomExt(1:4,6)*100d0
-!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-!        MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
-!        call coupsm(0)
-!        call SGG_TBTGA(MG_MOM,MadGraph_tree)
-!        LO_Res_Unpol = LO_Res_Unpol * 100d0**(-4)
-!        print *, ""
-!        print *, "My tree:         ", LO_Res_Unpol
-!        print *, "MadGraph hel.amp:", MadGraph_tree
-!        print *, "MG/ME ratios: ", MadGraph_tree/dble(LO_Res_Unpol)
-!        pause
+
+
+
+!      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
+!      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
+! if (ZDecays .eq. 0) then
+!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!       MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
+!       MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
+!       MG_MOM(0:3,5) = MomExt(1:4,4)*100d0
+!       MG_MOM(0:3,6) = MomExt(1:4,3)*100d0
+!       call coupsm(0)
+!       call SGG_TTBZG(MG_MOM,MadGraph_tree)
+!       print *, ""
+!       print *, alpha_s*RunFactor,m_top,m_z
+!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
+!       print *, "MadGraph hel.amp:", MadGraph_tree
+!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
+!       pause
+!    else
+!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+!       print *, "MG/ME ratio: ", 0.872680470745814d-13/(LO_Res_Unpol/(100d0)**4)
+!    endif
+!    stop
+       
+
 
     EvalCS_Real_ttbgggZ = (EvalCS_Real_ttbgggZ + DipoleResult)/VgsWgt
 RETURN

@@ -1,4 +1,4 @@
-! this is the file to subtract dipoles for ttggg+Z amplitudes
+! ! this is the file to subtract dipoles for ttggg+Z amplitudes
       module ModDipoles_GGTTBGZ
       use ModAmplitudes
       use ModProcess
@@ -11,7 +11,7 @@
 
       public :: EvalDipoles_GGTTBGZ
       integer, parameter, private   :: dp = selected_real_kind(15)
-      real(dp), private :: yRnDK(1:8), Wgt_ext
+      real(dp), private :: yRnDK(1:10), Wgt_ext
 
       logical, parameter, private  :: invert_alphaCut = .false.
       real(dp), parameter, private  :: MomZero(1:4)=0d0
@@ -26,24 +26,24 @@
       subroutine EvalDipoles_GGTTBGZ(p,yRnDk1,Wgt,sum_dip)
       real(dp), intent(out) ::  sum_dip
       real(dp), intent(in) :: p(4,6)
-      real(dp), intent(in) :: yRnDK1(1:8), Wgt
+      real(dp), intent(in) :: yRnDK1(1:10), Wgt
       integer, parameter :: ndip = 12
       integer, parameter :: in1 = 4
       integer, parameter :: in2 = 5
       real(dp) :: res
       integer ::  dip(ndip,3)
-      data dip(1,1)/6/, dip(1,2)/1/, dip(1,3)/3/
-      data dip(2,1)/6/, dip(2,2)/1/, dip(2,3)/4/
-      data dip(3,1)/6/, dip(3,2)/1/, dip(3,3)/5/
-      data dip(4,1)/6/, dip(4,2)/3/, dip(4,3)/1/
-      data dip(5,1)/6/, dip(5,2)/3/, dip(5,3)/4/
-      data dip(6,1)/6/, dip(6,2)/3/, dip(6,3)/5/
-      data dip(7,1)/6/, dip(7,2)/4/, dip(7,3)/1/
-      data dip(8,1)/6/, dip(8,2)/4/, dip(8,3)/3/
-      data dip(9,1)/6/, dip(9,2)/4/, dip(9,3)/5/
-      data dip(10,1)/6/, dip(10,2)/5/, dip(10,3)/1/
-      data dip(11,1)/6/, dip(11,2)/5/, dip(11,3)/3/
-      data dip(12,1)/6/, dip(12,2)/5/, dip(12,3)/4/
+      data dip(1,1)/6/, dip(1,2)/1/,  dip(1,3)/3/     ! D(ff)_16,3
+      data dip(2,1)/6/, dip(2,2)/1/,  dip(2,3)/4/     ! D(fi)_16,4
+      data dip(3,1)/6/, dip(3,2)/1/,  dip(3,3)/5/     ! D(fi)_16,5
+      data dip(4,1)/6/, dip(4,2)/3/,  dip(4,3)/1/     ! D(ff)_36,1
+      data dip(5,1)/6/, dip(5,2)/3/,  dip(5,3)/4/     ! D(fi)_36,4
+      data dip(6,1)/6/, dip(6,2)/3/,  dip(6,3)/5/     ! D(fi)_36,5
+      data dip(7,1)/6/, dip(7,2)/4/,  dip(7,3)/1/     ! D(if)_46,1
+      data dip(8,1)/6/, dip(8,2)/4/,  dip(8,3)/3/     ! D(if)_46,3
+      data dip(9,1)/6/, dip(9,2)/4/,  dip(9,3)/5/     ! D(ii)_46,5
+      data dip(10,1)/6/, dip(10,2)/5/, dip(10,3)/1/   ! D(if)_56,1
+      data dip(11,1)/6/, dip(11,2)/5/, dip(11,3)/3/   ! D(if)_56,3
+      data dip(12,1)/6/, dip(12,2)/5/, dip(12,3)/4/   ! D(ii)_56,4
       real(dp) :: mass(6)
 !-----flavor list qm -- massive quark, qu -- massless quark
 !----- gl -- gluon
@@ -56,7 +56,7 @@
 
         fl =    'gl'
         fl(1) = 'qm'
-        fl(2) = 'gm'  ! gm is the photon
+        fl(2) = 'gm'  ! gm is the z boson
         fl(3) = 'qm'
 
 
@@ -68,6 +68,7 @@
       sum_dip = zero
 
             do n=1,ndip
+!             do n=7,9; print *, "constraint dipole sum"
 
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor
@@ -95,6 +96,7 @@
         sum_dip = sum_dip + res
 
         enddo
+
 
       end subroutine
 
@@ -136,8 +138,8 @@
        real(dp) ::  pjetout(4,5), weight
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms)
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
-       integer :: Njet, Nmax(5), Nhisto
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       integer :: Njet, Nmax(5), Nhisto,N2jump
        logical, save :: first_time = .true.
 
 
@@ -148,7 +150,7 @@
                         ! jet cuts
 
        if( first_time ) then
-             call InitTrees(2,2,2,TreeAmpsDip)
+             call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
@@ -160,7 +162,6 @@
 
 
 !       momentum mapping
-
         pi=p(:,i)
         pj=p(:,j)
         pk=p(:,k)
@@ -218,7 +219,7 @@
           q(:,1) = p(:,1)
           fl(1) = 'qm'
           q(:,2) = p(:,2)
-          fl(2) = 'gm'
+          fl(2) = 'gm'   ! z boson
           q(:,3) = p(:,3)
           fl(3) = 'qm'
           q(:,4) = p(:,4)
@@ -251,13 +252,22 @@
           pause
        endif
 
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
+
 
 !----------------- ini   ini     final   top   top, real
 
 
   call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
-
-
 
      if(Not_Passed_Cuts.eq..false.) then
 
@@ -267,16 +277,33 @@
         Nmax = 1
 
         if (TopDecays.ge.1) then ! Top decays
-               Nmax(3) = -1
-               Nmax(1) = -1
-       if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1               ! helicity index below
-               Nmax(1) = 1
-       endif
-       endif
+              Nmax(3) = -1
+              Nmax(1) = -1
+              if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1               ! helicity index below
+                  Nmax(1) = 1
+              endif
+        endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
+        endif
+
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4).dot.TreeAmpsDip(1)%boson%Mom(1:4)
+
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4)
+
 
        do i1=-1,Nmax(1),2
-         do i2 = -1,Nmax(2),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
            do i3 = -1,Nmax(3),2
              do i4 = -1,Nmax(4),2
                do i5 = -1,Nmax(5),2
@@ -313,19 +340,15 @@
               hel(1) = i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
-
-
-
+    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
    endif
 
-   if (pos.eq.2) then    ! photons
-      print *, 'error, pos = 2, photon'
+   if (pos.eq.2) then    ! Z boson
+      print *, 'error, pos = 2, z boson'
       stop
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.3) then
@@ -334,11 +357,11 @@
 
 
    if (pos.eq.4) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.5) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(3)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
    endif
 
 
@@ -361,13 +384,12 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
 
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -435,6 +457,7 @@
           res = one/(pij2 -mij**2)*real(cres,dp)
 
 !-------- account for all the weights, change the sign
+
           res = (-1d0)*res*PSWgt1*PSwgt2*Wgt_ext
 
 !------- fill in histograms
@@ -446,6 +469,9 @@
          endif   ! endif for passed cuts
 
        end subroutine dipff
+
+
+
 
 
        subroutine dipfi(n,i,j,a,mi,mj,ma,fl1,fl2,p,res)
@@ -481,8 +507,8 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto, n2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
        res = zero
        cres = (0d0,0d0)
@@ -490,9 +516,8 @@
        weight = zero
 
 
-
        if( first_time ) then
-             call InitTrees(2,2,2,TreeAmpsDip)
+             call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
@@ -501,7 +526,6 @@
              enddo
              first_time=.false.
       endif
-
 
 !       momentum mapping
         pi=p(:,i)
@@ -537,7 +561,7 @@
         endif
 
           fl(1) = 'qm'
-          fl(2) = 'gm'   ! photon
+          fl(2) = 'gm'   ! z boson
           fl(3) = 'qm'
           fl(4) = 'gl'
           fl(5) = 'gl'
@@ -574,12 +598,22 @@
           pause
        endif
 
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
+
 
 !-----------------     initial   initial       final  top      top
 
 
   call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
-
 
      if(Not_Passed_Cuts.eq..false.) then
 
@@ -595,11 +629,15 @@
                Nmax(1) = 1
        endif
        endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
+        endif
 
 !--- after momentum mapping -- sum over colors and polarizations
 
        do i1=-1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
+          do i2 = -1,Nmax(2),N2Jump! Z boson
              do i3 = -1,Nmax(3),2
                do i4 = -1,Nmax(4),2
                  do i5=-1,Nmax(5),2
@@ -634,16 +672,15 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
    endif
 
-   if (pos.eq.2) then    ! photons
-      print *, 'error, pos = 2, photon'
+   if (pos.eq.2) then    ! Z boson
+      print *, 'error, pos = 2, z boson'
       stop
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.3) then
@@ -652,11 +689,11 @@
 
 
    if (pos.eq.4) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.5) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(3)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
    endif
 
 
@@ -677,7 +714,7 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
@@ -764,6 +801,8 @@
         end subroutine dipfi
 
 
+
+
        subroutine dipif(n,i,a,j,mi,ma,mj,fl1,fl2,p,res)
        implicit none
        integer, intent(in) :: n,i,j,a
@@ -797,8 +836,8 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
 
        res = zero
@@ -806,9 +845,8 @@
        Bm = (0d0,0d0)
        weight = zero
 
-
        if( first_time ) then
-             call InitTrees(2,2,2,TreeAmpsDip)
+             call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
@@ -855,7 +893,7 @@
 
 
           fl(1) = 'qm'
-          fl(2) = 'gm'
+          fl(2) = 'gm'!   z boson
           fl(3) = 'qm'
           fl(4) = 'gl'
           fl(5) = 'gl'
@@ -881,10 +919,8 @@
 !     if(weight.eq.one) then
 
        if (TopDecays.ge.1) then
-         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false., &
-  MomDK(1:4,1:3),PSWgt1)
-         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false., &
-  MomDK(1:4,4:6),PSWgt2)
+         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
+         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
        elseif(TopDecays.eq.0) then
          PSWgt1 = one
          PSWgt2 = one
@@ -893,7 +929,20 @@
           pause
        endif
 
-!----------------- initial   initial        final top      top
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
+
+
+
+!----------------- initial   initial        final bartop      top
 
   call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
@@ -910,14 +959,31 @@
         if (TopDecays.ge.1) then ! Top decays
                Nmax(3) = -1
                Nmax(1) = -1
-        if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+             if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
                Nmax(pos) = -1               ! helicity index below
                Nmax(1) = 1
+             endif
        endif
-       endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
+        endif
+
+! print *, "if dipole"
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4).dot.TreeAmpsDip(1)%boson%Mom(1:4)
+
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4)
 
        do i1 = -1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
+          do i2 = -1,Nmax(2),N2jump! Zboson
              do i3 = -1,Nmax(3),2
                 do i4 = -1,Nmax(4),2
                    do i5 = -1,Nmax(5),2
@@ -928,6 +994,7 @@
            hel(3) = i3
            hel(4) = i4
            hel(5) = i5
+
 
            if (pos.eq.1) then
              hel(1) = i1
@@ -951,29 +1018,18 @@
 
            if (pos.eq.5) then
               hel(5) = i1
-              hel(1) =i5
+              hel(1) = i5
            endif
 
-
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
-
-
-!       print *, "if dipole"
-!       print *, ExtParticles(1)%Mom(1:4).dot.ExtParticles(1)%Mom(1:4)
-!       print *, ExtParticles(2)%Mom(1:4).dot.ExtParticles(2)%Mom(1:4)
-!       print *, ExtParticles(3)%Mom(1:4).dot.ExtParticles(3)%Mom(1:4)
-!       print *, ExtParticles(4)%Mom(1:4).dot.ExtParticles(4)%Mom(1:4)
-!       print *, ExtParticles(5)%Mom(1:4).dot.ExtParticles(5)%Mom(1:4)
-
+   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
    endif
 
-   if (pos.eq.2) then    ! photons
-      print *, 'error, pos = 2, photon'
+   if (pos.eq.2) then    ! Z boson
+      print *, 'error, pos = 2, Z boson'
       stop
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.3) then
@@ -982,14 +1038,17 @@
 
 
    if (pos.eq.4) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.5) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(3)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
    endif
 
-
+! print *, "pol check1",TreeAmpsDip(1)%quarks(1)%Pol(1:4)
+! print *, "pol check2",TreeAmpsDip(1)%quarks(2)%Pol(1:4)
+! print *, "pol check4",TreeAmpsDip(1)%gluons(2)%Pol(1:4)
+! print *, "pol check5",TreeAmpsDip(1)%boson%Pol(1:4)
 
       do i6 = 1,2
       call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
@@ -1010,13 +1069,12 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
 
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -1042,7 +1100,7 @@
       offdiag = two*(one-xija)/xija*zi*zj/scr(pi,pj)
 
        xm = scc(POL1(-1,:),paux)
-       xp = scc(POL1(1,:),paux)
+       xp = scc(POL1(+1,:),paux)
 
       HH(-1,1)=offdiag*conjg(xm)*xp
       HH(1,-1)=offdiag*conjg(xp)*xm
@@ -1119,17 +1177,16 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
 
        res = zero
        cres = (0d0,0d0)
        Bm = (0d0,0d0)
 
-
        if( first_time ) then
-             call InitTrees(2,2,2,TreeAmpsDip)
+             call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
@@ -1138,7 +1195,6 @@
              enddo
              first_time=.false.
       endif
-
 
 
 !       momentum mapping
@@ -1165,7 +1221,7 @@
         endif
 
           fl(1) = 'qm'
-          fl(2) = 'gm'
+          fl(2) = 'gm'!   z boson
           fl(3) = 'qm'
           fl(4) = 'gl'
           fl(5) = 'gl'
@@ -1211,6 +1267,17 @@
           pause
        endif
 
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
+
 !-----------------     initial   initial       final  top      top
 
 
@@ -1234,9 +1301,29 @@
        endif
        endif
 
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
+        endif
+
+
+! print *, "ii dipole"
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4).dot.TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4).dot.TreeAmpsDip(1)%boson%Mom(1:4)
+
+! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4)
+! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4)
+! print *, "mom check3",TreeAmpsDip(1)%gluons(1)%Mom(1:4)
+! print *, "mom check4",TreeAmpsDip(1)%gluons(2)%Mom(1:4)
+! print *, "mom check5",TreeAmpsDip(1)%boson%Mom(1:4)
+
+
 
        do i1=-1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
+          do i2 = -1,Nmax(2),N2jump!  Z boson
              do i3 = -1,Nmax(3),2
                 do i4 = -1,Nmax(4),2
                      do i5=-1,Nmax(5),2
@@ -1272,17 +1359,20 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
+! print *, "pol check1",TreeAmpsDip(1)%quarks(1)%Pol(1:4)
+! print *, "pol check2",TreeAmpsDip(1)%quarks(2)%Pol(1:4)
+! print *, "pol check4",TreeAmpsDip(1)%gluons(2)%Pol(1:4)
+! print *, "pol check5",TreeAmpsDip(1)%boson%Pol(1:4)
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
    endif
 
-   if (pos.eq.2) then    ! photons
-      print *, 'error, pos = 2, photon'
+   if (pos.eq.2) then    ! z boson
+      print *, 'error, pos = 2, z boson'
       stop
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.3) then
@@ -1291,11 +1381,11 @@
 
 
    if (pos.eq.4) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.5) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(3)%pol(1:4)
+   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(2)%pol(1:4)
    endif
 
 
@@ -1317,13 +1407,12 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
 
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) +   Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -1511,9 +1600,10 @@ SUBROUTINE SetPolarization(Mom,MomDK,Hel,ExtParticles)
 use ModMisc
 use ModProcess
 use ModTopDecay
+use ModZDecay
 implicit none
-type(Particle) :: ExtParticles(:)
-real(8) :: Mom(1:4,1:5),MomDK(1:4,1:6)
+type(Particle) :: ExtParticles(1:5)
+real(8) :: Mom(1:4,1:5),MomDK(1:4,1:8)
 integer :: Hel(1:5)
 
      ExtParticles(1)%Mom(1:4) = dcmplx(Mom(1:4,1))   ! HERE WAS A BUG: this was inside the (TopDecays.ge.1) condition
@@ -1526,14 +1616,23 @@ integer :: Hel(1:5)
         call ubarSpi(ExtParticles(2)%Mom(1:4),ExtParticles(2)%Mass,Hel(2),ExtParticles(2)%Pol(1:4))
     endif
 
+
+     ExtParticles(5)%Mom(1:4) = dcmplx(Mom(1:4,5))
+     ExtParticles(5)%Helicity = Hel(5)
+     if (ZDecays.ge.1) then
+          call ZDecay(ExtParticles(5),DK_LO,MomDK(1:4,7:8))
+     else
+          call pol_massSR(ExtParticles(5)%Mom(1:4),ExtParticles(5)%Mass,ExtParticles(5)%Helicity,ExtParticles(5)%Pol(1:4))
+    endif
+
     ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
     call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
 
     ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
     call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))
 
-    ExtParticles(5)%Mom(1:4) = dcmplx(Mom(1:4,5))
-    call pol_massSR(ExtParticle(5)%Mom(1:4),ExtParticle(5)%Mass,Hel(5),ExtParticle(5)%Pol(1:4))
+
+! ExtParticles(3)%Pol(1:4)=ExtParticles(3)%Mom(1:4); print *, "check gauge inv. in dipoles"
 
 RETURN
 END SUBROUTINE

@@ -111,10 +111,10 @@ type(Particle) :: HeavyTop,TopQuark
 integer :: Topol,NMom,BHHel,i
 real(8),optional :: MomGlu(1:4)
 integer,optional :: GluHel,HelTop
-real(8) :: NWAFactor_HTop,zeros(1:7),m_tmp
+real(8) :: NWAFactor_HTop,zeros(1:7),m_tmp,MomIn(1:4,1:4)
 real(8) :: Mom(:,:)! order: BH,t,b,lep,neu
 complex(8) :: BarSpi(1:4), Spi(1:4),BHPol(1:4),C0R,C0L,C1R,C1L,GluPol(1:4),PropMom(1:4),HTOPPROP,TOPPROP
-integer,parameter :: BH=1,top=2,bot=3,lep=4,neu=5,glu=6
+integer,parameter :: BH=1,top=2,bot=3,lep=4,neu=5
 real(8) :: beta,omega,P3,P0,Ppl,Pmi,Yp,Yw,z,W0,Wpl,Wmi,v13,Catani,ccf,bbf,epspole
 real(8),parameter :: CF=4d0/3d0
 
@@ -133,10 +133,10 @@ endif
    NMom = size(Mom(:,:),2)
    zeros(:) = 0d0
    zeros(1:4) = dble(HeavyTop%Mom(1:4)) - Mom(1:4,BH) - Mom(1:4,top)
-   if( present(MomGlu) ) zeros(1:4) = zeros(1:4) - MomGlu(1:4)
+   if( present(MomGlu) .and. Topol.eq.DKX_HTBH_RE1 ) zeros(1:4) = zeros(1:4) - MomGlu(1:4)
 
    if( any(abs(zeros(1:4)/dble(HeavyTop%Mom(1))).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation in SUBROUTINE HTopBHDecay(): ",HeavyTop%PartType,zeros(1:4)
+      print *, "ERROR: energy-momentum violation in SUBROUTINE HTopBHDecay(): ",HeavyTop%PartType,zeros(1:4),present(MomGlu)
       print *, "momentum dump:"
       print *, Mom(:,:)
       pause
@@ -305,9 +305,13 @@ ELSEIF( Topol.eq.DKX_HTBH_RE2 ) THEN! real emission from top lines
           TopQuark%PartType = Top_
           TopQuark%Mass = m_SMTop
           TopQuark%Mass2= m_SMTop**2
-          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu)+MomGlu(1:4))
           m_Top = m_SMTop
-          call TopDecay(TopQuark,DK_RE_T,Mom(1:4,bot:glu),GluonHel=GluHel)
+          MomIn(1:4,1)=Mom(1:4,bot)
+          MomIn(1:4,2)=Mom(1:4,lep)
+          MomIn(1:4,3)=Mom(1:4,neu)
+          MomIn(1:4,4)=MomGlu(1:4)
+          call TopDecay(TopQuark,DK_RE_T,MomIn(1:4,1:4),GluonHel=GluHel)
           m_Top = m_HTop
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
@@ -317,9 +321,13 @@ ELSEIF( Topol.eq.DKX_HTBH_RE2 ) THEN! real emission from top lines
           TopQuark%PartType = ATop_
           TopQuark%Mass = m_SMTop
           TopQuark%Mass2= m_SMTop**2
-          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu)+MomGlu(1:4))
           m_Top = m_SMTop
-          call TopDecay(TopQuark,DK_RE_T,Mom(1:4,bot:glu),GluonHel=GluHel)
+          MomIn(1:4,1)=Mom(1:4,bot)
+          MomIn(1:4,2)=Mom(1:4,lep)
+          MomIn(1:4,3)=Mom(1:4,neu)
+          MomIn(1:4,4)=MomGlu(1:4)
+          call TopDecay(TopQuark,DK_RE_T,MomIn(1:4,1:4),GluonHel=GluHel)
           m_Top = m_HTop
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))
@@ -340,7 +348,11 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           m_tmp = m_Top
           m_Top = m_SMTop
-          call TopDecay(TopQuark,DK_RE_Q,Mom(1:4,bot:glu),GluonHel=GluHel)
+          MomIn(1:4,1)=Mom(1:4,bot)
+          MomIn(1:4,2)=Mom(1:4,lep)
+          MomIn(1:4,3)=Mom(1:4,neu)
+          MomIn(1:4,4)=MomGlu(1:4)
+          call TopDecay(TopQuark,DK_RE_Q,MomIn(1:4,1:4),GluonHel=GluHel)
           m_Top = m_tmp
           HeavyTop%Pol(1:4) = spb2_(TopQuark%Pol(1:4),BHPol(1:4))
           HeavyTop%Pol(1:4) = ( IBHTt(+1)*Chir(.true.,HeavyTop%Pol(1:4)) + IBHTt(-1)*Chir(.false.,HeavyTop%Pol(1:4)) ) * (0d0,1d0)
@@ -353,7 +365,11 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
           TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
           m_tmp = m_Top
           m_Top = m_SMTop
-          call TopDecay(TopQuark,DK_RE_Q,Mom(1:4,bot:glu),GluonHel=GluHel)
+          MomIn(1:4,1)=Mom(1:4,bot)
+          MomIn(1:4,2)=Mom(1:4,lep)
+          MomIn(1:4,3)=Mom(1:4,neu)
+          MomIn(1:4,4)=MomGlu(1:4)
+          call TopDecay(TopQuark,DK_RE_Q,MomIn(1:4,1:4),GluonHel=GluHel)
           m_Top = m_tmp
           HeavyTop%Pol(1:4) = ( IBHTt(-1)*Chir(.false.,TopQuark%Pol(1:4)) + IBHTt(+1)*Chir(.true.,TopQuark%Pol(1:4)) ) * (0d0,1d0)
           HeavyTop%Pol(1:4) = spi2_(BHPol(1:4),HeavyTop%Pol(1:4))

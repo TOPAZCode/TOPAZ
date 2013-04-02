@@ -2274,7 +2274,7 @@ ENDIF
           call TopDecay(ExtParticle(2),DK_1L_Q,MomDK(1:4,4:6))
           do iPrimAmp=1,NumBornAmps
               call EvalTree(BornAmps(iPrimAmp))
-              DKResult(iPrimAmp) = DKResult(iPrimAmp) + BornAmps(iPrimAmp)%Result
+              DKResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
           enddo
           do jPrimAmp=1,NumBornAmps
           do iPrimAmp=1,NumBornAmps

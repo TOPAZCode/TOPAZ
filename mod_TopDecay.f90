@@ -369,8 +369,8 @@ ELSEIF( Topol.eq.DK_1L_Q ) THEN! 1-loop correction to light quark line + int.dip
     if( TopQuark%PartType.eq.Top_ ) then ! Top quark decay
 !       assemble lepton current
         call ubarSpi_Weyl(dcmplx(Mom(1:4,1)),-1,BotSpi(1:4))  ! bot
-        call    vSpi_Weyl(dcmplx(Mom(1:4,2)),+1,Spi(1:4))     ! dn_bar
-        call ubarSpi_Weyl(dcmplx(Mom(1:4,3)),-1,BarSpi(1:4))  ! up
+!         call    vSpi_Weyl(dcmplx(Mom(1:4,2)),+1,Spi(1:4))     ! dn_bar
+!         call ubarSpi_Weyl(dcmplx(Mom(1:4,3)),-1,BarSpi(1:4))  ! up
 !         call ampl_w_qbq(Mom(1:4,2:3),Wcurr)
 !         Wcurr = Wcurr*WProp*g2_weak/sqrt2
 !         if( TOPDECAYS.EQ.2 .or. TOPDECAYS.EQ.3 .or. TOPDECAYS.EQ.4 ) Wcurr(1:4) = Wcurr(1:4) * dsqrt(6d0)
@@ -387,8 +387,8 @@ ELSEIF( Topol.eq.DK_1L_Q ) THEN! 1-loop correction to light quark line + int.dip
     elseif( TopQuark%PartType.eq.ATop_ ) then  ! Anti-Top quark decay
 !       assemble lepton current
         call    vSpi_Weyl(dcmplx(Mom(1:4,1)),+1,BotSpi(1:4))  ! Abot
-        call ubarSpi_Weyl(dcmplx(Mom(1:4,2)),-1,BarSpi(1:4))  ! dn
-        call    vSpi_Weyl(dcmplx(Mom(1:4,3)),+1,Spi(1:4))     ! up_bar
+!         call ubarSpi_Weyl(dcmplx(Mom(1:4,2)),-1,BarSpi(1:4))  ! dn
+!         call    vSpi_Weyl(dcmplx(Mom(1:4,3)),+1,Spi(1:4))     ! up_bar
 !         call ampl_w_qbq((/Mom(1:4,3),Mom(1:4,2)/),Wcurr)
 !         if( TOPDECAYS.EQ.2 .or. TOPDECAYS.EQ.3 .or. TOPDECAYS.EQ.4 ) Wcurr(1:4) = Wcurr(1:4) * dsqrt(6d0)
 !         Wcurr = Wcurr*WProp*g2_weak/sqrt2

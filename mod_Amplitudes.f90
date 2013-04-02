@@ -29,6 +29,8 @@ integer :: NumParticles,iTree
       allocate( TreeAmpsDip(iTree)%Gluons(1:NumGluons)     )
 !     TreeAmpsDip(iTree)%Boson doesn't need to be allocated
       TreeAmpsDip(iTree)%NumGlu(0) = NumGluons
+
+      TreeAmpsDip(iTree)%NumSca = 0 ! not required yet
   enddo
 
 RETURN
@@ -60,16 +62,21 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
 !!           enddo
 
 
+            TheTreeAmp%NumW = 0
+            TheTreeAmp%NumV = 0
+            counterQ = 0
+            counterG = 0
+
 !   this one replaces the old code above, newly introduced for ttb+Z calculation
             do NPart=1,TheTreeAmp%NumPart
-                  TheTreeAmp%PartType(NPart) = ExtParticle( TheTreeAmp%PartRef(NPart) )%PartType
+                  TheTreeAmp%PartType(NPart) = TheParticles( TheTreeAmp%PartRef(NPart) )%PartType
                   if( IsAQuark(TheTreeAmp%PartType(NPart)) ) then
                      !TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1   ! this is suppoed to be done outside this subroutine
                      counterQ = counterQ + 1
                      QuarkPos(counterQ) = counterQ + counterG
                      LastQuark = NPart! only required for BosonVertex below
                   elseif( IsAScalar(TheTreeAmp%PartType(NPart)) ) then
-                     TheTreeAmp%NumSca = TheTreeAmp%NumSca + 1
+!                      TheTreeAmp%NumSca = TheTreeAmp%NumSca + 1   ! this is suppoed to be done outside this subroutine
                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
                      QuarkPos(counterQ) = counterQ + counterG
                   elseif( TheTreeAmp%PartType(NPart).eq.Glu_ ) then
@@ -84,19 +91,17 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
             enddo
 
 
-
-
 !           set number of gluons between quark lines
-           if( IsAQuark( TheTreeAmp%PartType(1) ) ) then ! not a gluon and not a boson
-             if( TheTreeAmp%NumQua .eq. 2 ) then
+           if( IsAQuark( TheTreeAmp%PartType(1) ) .or. IsAScalar(TheTreeAmp%PartType(1)) ) then ! not a gluon and not a boson
+             if( TheTreeAmp%NumQua+TheTreeAmp%NumSca .eq. 2 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
-                   TheTreeAmp%NumGlu(2) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(2)
+                   TheTreeAmp%NumGlu(2) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(2)
              endif
              if( TheTreeAmp%NumQua .eq. 4 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
                    TheTreeAmp%NumGlu(2) = QuarkPos(3) - QuarkPos(2) - 1
                    TheTreeAmp%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
-                   TheTreeAmp%NumGlu(4) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(4)
+                   TheTreeAmp%NumGlu(4) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(4)
              endif
              if( TheTreeAmp%NumQua .eq. 6 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(2) - QuarkPos(1) - 1
@@ -104,21 +109,21 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
                    TheTreeAmp%NumGlu(3) = QuarkPos(4) - QuarkPos(3) - 1
                    TheTreeAmp%NumGlu(4) = QuarkPos(5) - QuarkPos(4) - 1
                    TheTreeAmp%NumGlu(5) = QuarkPos(6) - QuarkPos(5) - 1
-                   TheTreeAmp%NumGlu(6) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(6)
+                   TheTreeAmp%NumGlu(6) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(6)
              endif
 
            elseif( TheTreeAmp%PartType(1).eq.10 ) then ! is a gluon
              if( TheTreeAmp%NumQua .eq. 2 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(1) - 2
                    TheTreeAmp%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
-                   TheTreeAmp%NumGlu(3) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(2)
+                   TheTreeAmp%NumGlu(3) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(2)
              endif
              if( TheTreeAmp%NumQua .eq. 4 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(1) - 2
                    TheTreeAmp%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                    TheTreeAmp%NumGlu(3) = QuarkPos(3) - QuarkPos(2) - 1
                    TheTreeAmp%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
-                   TheTreeAmp%NumGlu(5) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(4)
+                   TheTreeAmp%NumGlu(5) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(4)
              endif
              if( TheTreeAmp%NumQua .eq. 6 ) then
                    TheTreeAmp%NumGlu(1) = QuarkPos(1) - 2
@@ -127,7 +132,7 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
                    TheTreeAmp%NumGlu(4) = QuarkPos(4) - QuarkPos(3) - 1
                    TheTreeAmp%NumGlu(5) = QuarkPos(5) - QuarkPos(4) - 1
                    TheTreeAmp%NumGlu(6) = QuarkPos(6) - QuarkPos(5) - 1
-                   TheTreeAmp%NumGlu(7) = TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(6)
+                   TheTreeAmp%NumGlu(7) = TheTreeAmp%NumSca+TheTreeAmp%NumQua+TheTreeAmp%NumGlu(0) - QuarkPos(6)
              endif
            endif
 
@@ -159,9 +164,6 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
      elseif( IsABoson(PartType) ) then  ! PartType==Boson
            ib=ib+1
            if( ib.ge.2 ) call Error("Too many bosons in LinkTreeParticles")
-           if( abs(PartType).eq.abs(Wp_) ) TheTreeAmp%NumW = TheTreeAmp%NumW + 1
-           if( abs(PartType).eq.abs(Z0_) ) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
-           if( abs(PartType).eq.abs(Pho_)) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
            TheTreeAmp%Boson%PartType => TheParticles(PartRef)%PartType
            TheTreeAmp%Boson%ExtRef   => TheParticles(PartRef)%ExtRef
            TheTreeAmp%Boson%Mass     => TheParticles(PartRef)%Mass
@@ -172,7 +174,8 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
            if( PartType.ne.TheParticles(PartRef)%PartType ) print *,"Error2 in LinkTreeParticles"
      endif
   enddo
-  if( ig.ne.TheTreeAmp%NumGlu(0) .OR. iq.ne.TheTreeAmp%NumQua .OR. ib.ne.TheTreeAmp%NumPart-TheTreeAmp%NumGlu(0)-TheTreeAmp%NumQua) print *,"Error3 in LinkTreeParticles"
+  if( ig.ne.TheTreeAmp%NumGlu(0) .OR. iq.ne.TheTreeAmp%NumQua+TheTreeAmp%NumSca .OR. ib.ne.TheTreeAmp%NumPart-TheTreeAmp%NumGlu(0)-TheTreeAmp%NumQua-TheTreeAmp%NumSca) print *,"Error3 in LinkTreeParticles"
+
 
 return
 END SUBROUTINE

@@ -72,20 +72,20 @@ IF( ObsSet.EQ.0 ) THEN! set of observables for ttb production without decays at 
 ELSEIF( ObsSet.EQ.1 ) THEN! set of observables for ttb production without decays at LHC
 
 ELSEIF( ObsSet.EQ.2 ) THEN! set of observables for ttb production as signal process at Tevatron (di-lept. decay)
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 20d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_lep_cut  = 20d0*GeV
-    pT_miss_cut = 25d0*GeV
-    eta_lep_cut = 2.5d0
+    Rsep_jet    = 0.4d0         !*0d0
+    pT_bjet_cut = 20d0*GeV      !*0d0
+    eta_bjet_cut= 2.5d0         !*1d2
+    pT_lep_cut  = 20d0*GeV      !*0d0
+    pT_miss_cut = 25d0*GeV      !*0d0
+    eta_lep_cut = 2.5d0         !*1d2
 
 ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal process at LHC (di-lept. decay)
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 25d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_lep_cut  = 25d0*GeV
-    pT_miss_cut = 50d0*GeV
-    eta_lep_cut = 2.5d0
+    Rsep_jet    = 0.4d0         !*0d0
+    pT_bjet_cut = 25d0*GeV      !*0d0
+    eta_bjet_cut= 2.5d0         !*1d2
+    pT_lep_cut  = 25d0*GeV      !*0d0
+    pT_miss_cut = 50d0*GeV      !*0d0
+    eta_lep_cut = 2.5d0         !*1d2
 
 ELSEIF( ObsSet.EQ.4 ) THEN! ! set of observables for ttb production with hadr. Atop, lept. top decay
     Rsep_jet    = 0.5d0
@@ -119,14 +119,14 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay at LHC
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 25d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_jet_cut  = 25d0*GeV
-    eta_jet_cut = 2.5d0
-    pT_lep_cut  = 25d0*GeV
-    eta_lep_cut = 2.5d0
-    pT_miss_cut = 25d0*GeV
+    Rsep_jet    = 0.4d0         *0d0
+    pT_bjet_cut = 25d0*GeV      *0d0
+    eta_bjet_cut= 2.5d0         *1d2
+    pT_jet_cut  = 25d0*GeV      *0d0
+    eta_jet_cut = 2.5d0         *1d2
+    pT_lep_cut  = 25d0*GeV      *0d0
+    eta_lep_cut = 2.5d0         *1d2
+    pT_miss_cut = 25d0*GeV      *0d0
 
 
 ELSEIF( ObsSet.EQ.7 ) THEN! set of observables for ttb production with lept. top and J/Psi fragmentation, hadr. Atop decay at LHC
@@ -3917,7 +3917,6 @@ logical,save :: flip=.true.
       call boost(MomDK(1:4,3),TopMom(1:4),m_Top)
       PSWgt = PSWgt2*PiWgt2 * PSWgt3*PiWgt2
 
-
     else! extra gluon emission
 !     MomDK(1:4,i): i=1:bottom, 2:lepton, 3:neutrino, 4: gluon
 !      call genps(3,m_Top,xRndPS(1:5),(/0d0,0d0,m_W/),MomDK(1:4,1:3),PSWgt2)! top decay with additional gluon
@@ -4710,10 +4709,13 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
   call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
-!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
-!   TmpMom(1:4) = Mom(1:4,3)
-!   Mom(1:4,3)  = Mom(1:4,5)
-!   Mom(1:4,5)  = TmpMom(1:4)
+!    Pcol1= 1 -1
+!    Pcol2= 3 -1
+!    SingDepth = 1d-16
+!    Steps = 20
+!    PSWgt = 1d0
+!    call gensing(4,EHat,(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing"
+
 
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
@@ -6843,7 +6845,7 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
    endif
    if( NPlus1PS.eq.1 ) zeros(1:4) = zeros(1:4) - Mom(1:4,realp)
    if( any(abs(zeros(1:4)/Mom(1,inLeft)).gt.1d-8) ) then
-      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARZ(): ",zeros(1:4)
+      print *, "ERROR: energy-momentum violation in SUBROUTINE Kinematics_TTBARZ(): ",NPlus1PS,zeros(1:4)
       print *, "momenta dump:"
       do k=1,12
          print *,k, Mom(1:4,k)
@@ -9834,7 +9836,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!        ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
+!        ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

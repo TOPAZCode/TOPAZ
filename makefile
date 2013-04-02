@@ -264,7 +264,8 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(HOME)/lib/HELAS-3.0/fvoxxx.o \
 				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
 				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a \
-				  $(Here)/MadGraph/gg_ttbz.o
+				  $(Here)/MadGraph/gg_ttbz.o \
+ 				  $(Here)/MadGraph/gg_ttbzg.o
 #				  $(Here)/MadGraph/gg_ttb.o \
 #				  $(Here)/MadGraph/gg_ttba.o \
 #				  $(Here)/MadGraph/gg_tbtga.o \
