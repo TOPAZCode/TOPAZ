@@ -3053,7 +3053,8 @@ else
         k2 = -k2 - p
         k2sq = sc_(k2,k2)   !-mass**2
 
-        sp2 = spb2_(sp2,k2) !+mass*sp2
+!        sp2 = spb2_(sp2,k2) !+mass*sp2
+        sp2 = spi2_(k2,sp2) !+mass*sp2
 
         tmp = vWq(eW,sp2)
         if (abs(k2sq) > propcut) then
@@ -3361,7 +3362,8 @@ else
         k2 = -k2 - p
         k2sq = sc_(k2,k2)   -mass**2
 
-        sp2 = spb2_(sp2,k2) +mass*sp2
+!        sp2 = spb2_(sp2,k2) +mass*sp2
+        sp2 = spi2_(k2,sp2) +mass*sp2
 
         tmp = vVq(eV,sp2,couplVQQ_left,couplVQQ_right)
         if (abs(k2sq) > propcut) then
