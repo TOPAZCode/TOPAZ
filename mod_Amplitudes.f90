@@ -207,18 +207,21 @@ integer :: i,j,Order(1:6)
           else
                 Boson=.true.
           endif
-          if( TreeProc%PartType(1).eq.Glu_ ) then
+          if( TreeProc%PartType(1).eq.Glu_ .and. .not. Boson ) then
               Res(1:Dv) = cur_g_2f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:3) )
 ! print *, "CHECK POINT cur_g_2f"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom)
 ! pause
+           elseif ( TreeProc%PartType(1).eq.Glu_ .and. Boson ) then
+              Res(1:Dv) = cur_g_2fV( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%Boson,TreeProc%NumGlu(0:3) )
+
           elseif( IsAQuark(TreeProc%PartType(1)) .and. .not.Boson ) then
              Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) ) 
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
              if( TreeProc%NumV.eq.1 ) then
-                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))
-             elseif( TreeProc%NumW.eq.1 ) then!  this should only be used in top quark decay (because it is a Weyl current)
+                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))   
+          elseif( TreeProc%NumW.eq.1 ) then!  this should only be used in top quark decay (because it is a Weyl current)
 !                 Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
                 Res(1:Ds) = cur_f_2fW_WEYL( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )! this should be default
              else
@@ -546,17 +549,30 @@ complex(8) :: pol_q(1:4,1:2), p_q(1:4,1:2)
 real(8) :: Mu2Ren
 
        if( TheBornAmp%TreeProc%NumQua.eq.2 .and. TheBornAmp%TreeProc%NumSca.eq.0 ) then
-          ResSpi = cur_f_2f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
-          ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
-          res(-1) = res(-1) + ResMCT*3d0/2d0
-          res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+          if ( TheBornAmp%TreeProc%NumV .eq. 0 ) then
+             ResSpi = cur_f_2f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
+             ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+             res(-1) = res(-1) + ResMCT*3d0/2d0
+             res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
 
+          elseif ( TheBornAmp%TreeProc%NumV .eq. 1 ) then
+             ResSpi = cur_f_2fV_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%Boson,TheBornAmp%TreeProc%NumGlu)
+             ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+             res(-1) = res(-1) + ResMCT*3d0/2d0
+             res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+          else
+             call Error("evalmasscts")
+          endif
+             
        elseif( TheBornAmp%TreeProc%NumQua.eq.4 .and. TheBornAmp%TreeProc%NumSca.eq.0 ) then
-          ResSpi = cur_f_4f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:4),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
-          ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
-          res(-1) = res(-1) + ResMCT*3d0/2d0
-          res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
-
+          if ( TheBornAmp%TreeProc%NumV .eq. 0 ) then
+             ResSpi = cur_f_4f_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:4),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%NumGlu)
+             ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+             res(-1) = res(-1) + ResMCT*3d0/2d0
+             res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+          else
+             call Error("these mass cts not implemented yet!")
+          endif
        elseif( TheBornAmp%TreeProc%NumQua.eq.0 .and. TheBornAmp%TreeProc%NumSca.eq.2 ) then
           ResSpi(1) = cur_s_2s_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Scalars(2:2),TheBornAmp%TreeProc%NumGlu)
           ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Pol(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
