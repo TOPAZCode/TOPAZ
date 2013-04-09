@@ -3250,27 +3250,53 @@ END SUBROUTINE
 
 
 
-      function Chir(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
-      implicit none
-      logical :: sign
-      double complex :: sp(1:4)
-      double complex :: Chir(1:4)
+!ORIG      function Chir(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
+!ORIG      implicit none
+!ORIG      logical :: sign
+!ORIG      double complex :: sp(1:4)
+!ORIG      double complex :: Chir(1:4)
+!ORIG
+!ORIG        if(sign) then !omega_+
+!ORIG          Chir(1) = 0.5d0*(sp(1)+sp(3))
+!ORIG          Chir(2) = 0.5d0*(sp(2)+sp(4))
+!ORIG          Chir(3) = Chir(1)
+!ORIG          Chir(4) = Chir(2)
+!ORIG        else !omega_-
+!ORIG          Chir(1) = 0.5d0*(sp(1)-sp(3))
+!ORIG          Chir(2) = 0.5d0*(sp(2)-sp(4))
+!ORIG          Chir(3) =-Chir(1)
+!ORIG          Chir(4) =-Chir(2)
+!ORIG        endif
+!ORIG      return
+!ORIG      end function
+             
+! RR -- new for D-dim chirality
+             recursive function Chir(sign,sp) result(res)
+               implicit none
+               logical :: sign
+               double complex :: sp(:)
+               double complex :: res(size(sp))               
+               integer        :: D
+               
+               D = size(sp)
+               if ( D .eq. 4) then
+                  if(sign) then !omega_+
+                     res(1) = 0.5d0*(sp(1)+sp(3))
+                     res(2) = 0.5d0*(sp(2)+sp(4))
+                     res(3) = res(1)
+                     res(4) = res(2)
+                  else !omega_-
+                     res(1) = 0.5d0*(sp(1)-sp(3))
+                     res(2) = 0.5d0*(sp(2)-sp(4))
+                     res(3) =-res(1)
+                     res(4) =-res(2)
+                  endif
+               else
+                  res(1:D/2) = Chir(sign,sp(1:D/2))
+                  res((D/2+1):D) = Chir(sign,sp( (D/2+1):D ))
+               endif
 
-        if(sign) then !omega_+
-          Chir(1) = 0.5d0*(sp(1)+sp(3))
-          Chir(2) = 0.5d0*(sp(2)+sp(4))
-          Chir(3) = Chir(1)
-          Chir(4) = Chir(2)
-        else !omega_-
-          Chir(1) = 0.5d0*(sp(1)-sp(3))
-          Chir(2) = 0.5d0*(sp(2)-sp(4))
-          Chir(3) =-Chir(1)
-          Chir(4) =-Chir(2)
-        endif
-      return
-      end function
-
-
+             end function Chir
 
 !--------------------Weyl routines-----------------------
 
