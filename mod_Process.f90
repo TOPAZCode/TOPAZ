@@ -64,6 +64,7 @@ type :: UnitarityCut
    type(TreeProcess), allocatable :: TreeProcess(:,:)  ! process for a cut at a vertex, first and last number are the prop.ID, the rest corresp. to the ExtParticle ID
    real(8), allocatable :: KMom(:,:,:)
    complex(8), allocatable :: NMom(:,:,:)
+    logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
 end type
 
 type :: PrimitiveAmplitude
@@ -3728,8 +3729,8 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
       NumPrimAmps = 2
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
-!       NumPrimAmps = 28
-!       NumBornAmps = 2
+       NumPrimAmps = 12    ! this EXCLUDES ferm loop prims
+       NumBornAmps = 2
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -4502,7 +4503,8 @@ logical :: ColorLessParticles
 type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(BornAmplitude),pointer :: TheBornAmp
 type(TreeProcess),pointer :: TheTree
-
+! RR for printout at end only
+integer :: NPoint,NCut
 
 ! convention for labeling particles with 4 quarks: (1_tb, 2_t, 3_qb, 4_q)
 ! AmpType = 1/a:  1,2,3,4 (both fermion lines in loop)
@@ -5658,7 +5660,46 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
       BornAmps(2)%ExtLine = (/1,5,2,4,3/)
 
-      call Error("need more work here:MasterProcess.EQ.17 ")
+      PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
+      PrimAmps(1)%AmpType = 1
+
+      PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
+      PrimAmps(2)%AmpType = 1
+
+      PrimAmps(3)%ExtLine = (/1,3,5,2,4/)
+      PrimAmps(3)%AmpType = 1
+
+      PrimAmps(4)%ExtLine = (/1,5,3,2,4/)
+      PrimAmps(4)%AmpType = 1
+
+      PrimAmps(5)%ExtLine = (/1,4,5,2,3/)
+      PrimAmps(5)%AmpType = 1
+
+      PrimAmps(6)%ExtLine = (/1,5,4,2,3/)
+      PrimAmps(6)%AmpType = 1
+
+      PrimAmps(7)%ExtLine = (/1,5,3,4,2/)
+      PrimAmps(7)%AmpType = 1
+
+      PrimAmps(8)%ExtLine = (/1,3,5,4,2/)
+      PrimAmps(8)%AmpType = 1
+
+      PrimAmps(9)%ExtLine = (/1,3,4,5,2/)
+      PrimAmps(9)%AmpType = 1
+
+      PrimAmps(10)%ExtLine = (/1,5,4,3,2/)
+      PrimAmps(10)%AmpType = 1
+
+      PrimAmps(11)%ExtLine = (/1,4,5,3,2/)
+      PrimAmps(11)%AmpType = 1
+
+      PrimAmps(12)%ExtLine = (/1,4,3,5,2/)
+      PrimAmps(12)%AmpType = 1
+
+! for the time being, I'm ignoring ferm loop prims
+!      call Error("need more work here:MasterProcess.EQ.17 ")
+      print *, 'WARNING: FERMION LOOPS NOT INCLUDED'
+!      call Error("need more work here:MasterProcess.EQ.17 ")
 
    ENDIF
 
@@ -5954,7 +5995,8 @@ ENDIF
                      if( abs(TheTree%PartType(NPart)).eq.abs(Wp_) ) TheTree%NumW = TheTree%NumW + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Z0_) ) TheTree%NumV = TheTree%NumV + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Pho_)) TheTree%NumV = TheTree%NumV + 1
-                     TheTree%BosonVertex = TheTree%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
+!                     TheTree%BosonVertex = TheTree%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
+                     TheTree%BosonVertex = LastQuark! this variable specifies to which quark flavor the vector boson couples
                   endif
             enddo
 
@@ -6365,7 +6407,29 @@ IF( Correction.EQ.1 ) THEN
 !          pause
 
          call InitUCuts(ThePrimAmp)
-   enddo! NPrimAmp
+         print *, 'cuts inited'
+      enddo! NPrimAmp
+      print *, 'calling remove dupl cuts'
+    call remove_duplicate_cuts()
+
+!! RR printout to check id of duplicates !!
+    print *, ' PRINTOUT FOR DUPLICATES'
+!    pause
+    do NPrimAmp=1,NumPrimAmps
+       print *, '-------------------------'
+       print *, '   Primitive ', NPrimAmp
+       print *, '-------------------------'
+       do NPoint=1,5
+          print *, 'number of cuts = ', NPoint
+          do NCut=1,PrimAmps(NPrimAmp)%UCuts(NPoint)%NumCuts
+             print *, ' cuts: ', NCut, PrimAmps(NPrimAmp)%UCuts(NPoint)%CutProp(NCut,1:NPoint),  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
+!             print *, 'skip ?',  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
+          enddo
+       enddo
+    enddo
+!    pause
+! RR printout ends here
+
 ENDIF
 
 RETURN
@@ -6449,6 +6513,9 @@ include 'misc/global_import'
          Lab_ex(Vertex)='bot'! bot because the label HTop is only used in closed T' fermion loops
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
          Lab_ex(Vertex)='sto'
+      elseif(ExtPartType.eq.Z0_ ) then
+         Lab_ex(Vertex)='zee'
+
       else
          print *, "error in kirills conv, ExtPartType=", ExtPartType
       endif
@@ -6517,11 +6584,11 @@ use ModMisc
 use ModParameters
 implicit none
 integer :: AllocStatus,NCut
-integer :: i1,i2,i3,i4,i5
+integer :: i1,i2,i3,i4,i5,j
 type(PrimitiveAmplitude),target :: ThePrimAmp
-integer :: NumVertPart,NPart,NPoint,NTree
+integer :: NumVertPart,NPart,NPoint,NTree,LastQuark
 logical :: MasslessExtLeg,MasslessIntParticles
-integer :: QuarkPos(1:6),counter,counterQ,counterG,counterS
+integer :: QuarkPos(1:6),counter,counterQ,counterG,counterS,counterV
 type(TreeProcess),pointer :: TheTree
 
 
@@ -6612,7 +6679,18 @@ type(TreeProcess),pointer :: TheTree
    allocate( ThePrimAmp%UCuts(1)%Coeff_128(1:ThePrimAmp%UCuts(1)%NumCuts,0:0),     stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
 
-
+   print *, 'allocate skip'
+   allocate( ThePrimAmp%UCuts(5)%skip(1:ThePrimAmp%UCuts(5)%NumCuts),stat=AllocStatus )
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 5")
+   allocate( ThePrimAmp%UCuts(4)%skip(1:ThePrimAmp%UCuts(4)%NumCuts),stat=AllocStatus )
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 4")
+   allocate( ThePrimAmp%UCuts(3)%skip(1:ThePrimAmp%UCuts(3)%NumCuts),stat=AllocStatus )
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 3")
+   allocate( ThePrimAmp%UCuts(2)%skip(1:ThePrimAmp%UCuts(2)%NumCuts),stat=AllocStatus )
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 2")
+   allocate( ThePrimAmp%UCuts(1)%skip(1:ThePrimAmp%UCuts(1)%NumCuts),stat=AllocStatus )
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 1")
+   print *, 'done allocating skip'
 
 !  init pentcuts
    allocate(ThePrimAmp%UCuts(5)%TreeProcess(1:ThePrimAmp%UCuts(5)%NumCuts,1:5), stat=AllocStatus)
@@ -6735,7 +6813,14 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(5)%CutProp(NCut,3) = i3
            ThePrimAmp%UCuts(5)%CutProp(NCut,4) = i4
            ThePrimAmp%UCuts(5)%CutProp(NCut,5) = i5
-
+           print *, 'cuts:', NCut, ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
+           print *, 'tree 1:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:TheTree%NumPart)
+           print *, 'tree 2:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,2)%PartType(1:TheTree%NumPart)
+           print *, 'tree 3:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,3)%PartType(1:TheTree%NumPart)
+           print *, 'tree 4:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,4)%PartType(1:TheTree%NumPart)
+           print *, 'tree 5:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:TheTree%NumPart)
+           
+           
            NCut = NCut + 1
    enddo
    enddo
@@ -6845,7 +6930,12 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(4)%CutProp(NCut,2) = i3
            ThePrimAmp%UCuts(4)%CutProp(NCut,3) = i4
            ThePrimAmp%UCuts(4)%CutProp(NCut,4) = i5
-
+           print *,'cuts', NCut, ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
+           print *, 'tree 1:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart)
+           print *, 'tree 2:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%NumPart)
+           print *, 'tree 3:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%NumPart)
+           print *, 'tree 4:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart)
+           ThePrimAmp%UCuts(4)%CutProp(NCut,1) = i2
            NCut = NCut + 1
    enddo
    enddo
@@ -6935,6 +7025,12 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(3)%CutProp(NCut,2) = i4
            ThePrimAmp%UCuts(3)%CutProp(NCut,3) = i5
 
+           print *, NCut, ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
+           print *, 'tree 1:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart)
+           print *, 'tree 2:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%NumPart)
+           print *, 'tree 3:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart)
+          
+
            NCut = NCut + 1
    enddo
    enddo
@@ -7006,7 +7102,9 @@ type(TreeProcess),pointer :: TheTree
            enddo
 
 !          check for massless external leg at vertex 2
-           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+! RR bug fix?           
+!           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(i5) )%Mass .le. 1d-10 ) then
                MasslessExtLeg = .true.
            endif
 
@@ -7030,6 +7128,10 @@ type(TreeProcess),pointer :: TheTree
                ThePrimAmp%UCuts(2)%CutProp(NCut,2) = i5
                NCut = NCut + 1
            endif
+!           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2),  ThePrimAmp%IntPart(i4)%PartType,ThePrimAmp%IntPart(i5)%PartType
+           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
+           print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
+           print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
 
 
    enddo
@@ -7088,6 +7190,10 @@ type(TreeProcess),pointer :: TheTree
 !              set sing cut
                ThePrimAmp%UCuts(1)%CutProp(NCut,1) = i5
                NCut = NCut + 1
+           print *, NCut-1, ThePrimAmp%UCuts(1)%CutProp(NCut-1,1)
+           print *, 'tree 1:', ThePrimAmp%UCuts(1)%TreeProcess(NCut-1,1)%PartType(1:TheTree%NumPart)
+
+
            endif
    enddo
    if ( NCut-1 .ne. ThePrimAmp%UCuts(1)%NumCuts ) call Error("Something went wrong while setting sing-cuts.")
@@ -7099,12 +7205,14 @@ type(TreeProcess),pointer :: TheTree
 
    do NPoint=1,5
       do NCut=1,ThePrimAmp%UCuts(NPoint)%NumCuts
+          ThePrimAmp%UCuts(NPoint)%skip(NCut)=.false.
          do NTree=1,NPoint
 
             TheTree => ThePrimAmp%UCuts(NPoint)%TreeProcess(NCut,NTree)
 !           set number of quarks and gluons
             TheTree%NumQua = 0
             TheTree%NumSca = 0
+            TheTree%NumV = 0
             counterQ = 0
             do NPart=1,TheTree%NumPart
                   if( IsAQuark(TheTree%PartType(NPart)) ) then
@@ -7129,9 +7237,12 @@ type(TreeProcess),pointer :: TheTree
             endif
             if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%NumGlu")
             do NPart=1,TheTree%NumPart
-                  if( TheTree%PartType(NPart) .eq. Glu_ ) then
-                     TheTree%NumGlu(0) = TheTree%NumGlu(0) + 1
-                  endif
+               if( TheTree%PartType(NPart) .eq. Glu_ ) then
+                  TheTree%NumGlu(0) = TheTree%NumGlu(0) + 1 
+! If there is an EW boson (just Z for the moment), will overcount gluons, so remove these particles
+                  ! This is a clumsy way to do things, but here goes...
+
+               endif
             enddo
 
 !           set number of gluons between quark or scalar lines
@@ -7178,6 +7289,83 @@ type(TreeProcess),pointer :: TheTree
             endif
             endif
 
+            do NPart=1,TheTree%NumPart
+               if( TheTree%PartType(NPart) .eq. Z0_ ) then
+                  TheTree%NumV = TheTree%NumV + 1
+                  LastQuark=0
+                  do j=1, NPart-1   
+                     
+                     if (IsAQuark(TheTree%PartType(j))) then
+                        LastQuark=LastQuark+1
+                     endif
+                  enddo
+                  TheTree%BosonVertex = LastQuark! this variable specifies to which quark flavor the vector boson couples
+!                  TheTree%NumGlu(0) = TheTree%NumGlu(0) - 1
+                  
+                  if( IsAQuark(TheTree%PartType(1)) .or. IsAScalar(TheTree%PartType(1)) ) then
+                     if ( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
+                        if ( QuarkPos(1) .lt. NPart .and. QuarkPos(2) .gt. NPart) then
+                           TheTree%NumGlu(1)=TheTree%NumGlu(1)-1
+                        else
+                           TheTree%NumGlu(2)=TheTree%NumGlu(2)-1
+                        endif
+                     elseif( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
+                        if ( QuarkPos(1) .lt. NPart .and. QuarkPos(2) .gt. NPart) then
+                           TheTree%NumGlu(1)=TheTree%NumGlu(1)-1
+                        elseif ( QuarkPos(2) .lt. NPart .and. QuarkPos(3) .gt. NPart) then
+                           TheTree%NumGlu(2)=TheTree%NumGlu(2)-1
+                        elseif ( QuarkPos(3) .lt. NPart .and. QuarkPos(4) .gt. NPart) then
+                           TheTree%NumGlu(3)=TheTree%NumGlu(3)-1
+                        else
+                           TheTree%NumGlu(4)=TheTree%NumGlu(4)-1
+                        endif
+                        
+                     elseif( TheTree%NumQua+TheTree%NumSca .eq. 6 ) then
+                        if ( QuarkPos(1) .lt. NPart .and. QuarkPos(2) .gt. NPart) then
+                           TheTree%NumGlu(1)=TheTree%NumGlu(1)-1
+                        elseif ( QuarkPos(2) .lt. NPart .and. QuarkPos(3) .gt. NPart) then
+                           TheTree%NumGlu(2)=TheTree%NumGlu(2)-1
+                        elseif ( QuarkPos(3) .lt. NPart .and. QuarkPos(4) .gt. NPart) then
+                           TheTree%NumGlu(3)=TheTree%NumGlu(3)-1
+                        elseif ( QuarkPos(4) .lt. NPart .and. QuarkPos(5) .gt. NPart) then
+                           TheTree%NumGlu(4)=TheTree%NumGlu(4)-1
+                        elseif ( QuarkPos(3) .lt. NPart .and. QuarkPos(6) .gt. NPart) then
+                           TheTree%NumGlu(5)=TheTree%NumGlu(5)-1
+                        else
+                           TheTree%NumGlu(6)=TheTree%NumGlu(6)-1
+                        endif
+                     else
+                        call Error("Tree with EW boson and > 6 quarks not supported")
+                     endif
+                     
+                  elseif( TheTree%PartType(1).eq.Glu_ ) then
+                     if( TheTree%NumQua+TheTree%NumSca .eq. 2 ) then
+                        if (NPart .gt. 1 .and. NPart .lt. QuarkPos(1)) then
+                           TheTree%NumGlu(1)=TheTree%NumGlu(1)-1
+                        elseif (QuarkPos(1) .lt. NPart .and. QuarkPos(2) .gt. NPart) then
+                           TheTree%NumGlu(2)=TheTree%NumGlu(2)-1
+                        else
+                           TheTree%NumGlu(3)=TheTree%NumGlu(3)-1
+                        endif
+                     elseif( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
+                        if (NPart .gt. 1 .and. NPart .lt. QuarkPos(1)) then
+                           TheTree%NumGlu(1)=TheTree%NumGlu(1)-1
+                        elseif (QuarkPos(1) .lt. NPart .and. QuarkPos(2) .gt. NPart) then
+                           TheTree%NumGlu(2)=TheTree%NumGlu(2)-1
+                        elseif (QuarkPos(2) .lt. NPart .and. QuarkPos(3) .gt. NPart) then
+                           TheTree%NumGlu(3)=TheTree%NumGlu(3)-1
+                        elseif (QuarkPos(3) .lt. NPart .and. QuarkPos(4) .gt. NPart) then
+                           TheTree%NumGlu(4)=TheTree%NumGlu(4)-1
+                        else
+                           TheTree%NumGlu(5)=TheTree%NumGlu(5)-1
+                        endif
+                     else
+                        call Error("Tree with EW boson and initial gluon and > 4 quarks not supported")
+                     endif
+                  endif
+               endif
+            enddo
+
 
 !          allocate memory for pointer to quarks
            allocate( TheTree%Quarks(1:TheTree%NumQua), stat=AllocStatus )
@@ -7192,6 +7380,7 @@ type(TreeProcess),pointer :: TheTree
            counterQ = 0
            counterG = 0
            counterS = 0
+           counterV = 0
 
            do NPart=1,TheTree%NumPart
                if( IsAQuark(TheTree%PartType(NPart)) ) then
@@ -7253,6 +7442,21 @@ type(TreeProcess),pointer :: TheTree
                         TheTree%Scalars(counterS)%Mom => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mom
                         TheTree%Scalars(counterS)%Pol => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Pol
                      endif
+                  endif
+                  if( IsABoson(TheTree%PartType(NPart)) ) then
+                     counterV = counterV + 1
+                     if( counterV.ge.2 ) call Error("only one vector boson allowed",counterV)
+                     if( NPart.eq.1 .or. NPart.eq.TheTree%NumPart) then
+                        call Error("EW bosons not allowed in the loop!")
+                     else
+                        TheTree%Boson%PartType => TheTree%PartType(NPart)
+                        TheTree%Boson%ExtRef => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%ExtRef
+                        TheTree%Boson%Mass => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mass
+                        TheTree%Boson%Mass2 => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mass2
+                        TheTree%Boson%Helicity => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Helicity
+                        TheTree%Boson%Mom => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Mom
+                        TheTree%Boson%Pol => ExtParticle( ThePrimAmp%ExtLine(TheTree%PartRef(NPart)) )%Pol
+                  endif
                endif
            enddo
 
@@ -7391,6 +7595,91 @@ character :: Filename*(*)
 END SUBROUTINE
 
 
+
+    SUBROUTINE REMOVE_DUPLICATE_CUTS()
+    ! Routine to remove duplicate cuts from different parent diagrams
+!      type(PrimitiveAmplitude)          :: P
+      type(PrimitiveAmplitude),pointer  :: NewPrimAmp, OldPrimAmp
+      integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp
+      logical                          :: are_equiv
+    
+      print *, 'in remove duplicate cuts'
+    
+      do NPrimAmp=2,NumPrimAmps
+         NewPrimAmp => PrimAmps(NPrimAmp)
+         do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
+            do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
+            j = 0
+            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) &
+                    & .and. (j+1 .lt. NPrimAmp))
+    
+                  j = j+1
+                  OldPrimAmp => PrimAmps(j)
+                  if ( OldPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .true.) cycle
+    
+                  Nequivtrees = 0
+                  ! This should always be true, put in as a additional safety net
+                  if (all(NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:) .eq. OldPrimAmp%UCuts(Npoint)%CutProp(NCut,:))) then
+                     
+                     do NTree = 1,Npoint
+                        call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree), &
+                             &OldPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree),are_equiv)
+                        if (are_equiv) Nequivtrees = Nequivtrees+1
+                     enddo
+                  endif
+    
+                  if (Nequivtrees == Npoint) then                        ! all trees equivalent = duplicate cut!
+                     NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
+                  else
+                     NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
+                  endif
+    
+               enddo    ! j
+            enddo       ! Ncut
+         enddo          ! NParent
+      enddo             ! NPoint
+    end SUBROUTINE REMOVE_DUPLICATE_CUTS
+    
+    
+    
+    
+    SUBROUTINE ARE_TREES_EQUIV(Tree1, Tree2, isequiv)
+    ! Routine to decide whether two tree processes are equivalent.
+      type(TreeProcess),target  :: Tree1, Tree2
+      logical, intent(out)      :: isequiv
+      integer                   :: i, j
+    
+      isequiv=.false.
+    
+      ! Check they have the same number of particles.
+      if (Tree1%NumPart .ne. Tree2%NumPart) return
+    
+      ! Check they have the same numbers of quarks
+      if (Tree1%NumQua .ne. Tree2%NumQua) return
+      ! Check they have the same numbers of scalars
+      if (Tree1%NumSca .ne. Tree2%NumSca) return
+      ! Check they have the same numbers of EW bosons
+      ! NB no check on charge of W... (taken care of by check on flavors of quarks?)
+      if (Tree1%NumV .ne. Tree2%NumV) return
+      if (Tree1%NumW .ne. Tree2%NumW) return
+    
+      ! Check quarks have the same flavours
+      do i = 1,Tree1%NumQua
+         if (Tree1%Quarks(i)%PartType .ne. Tree2%Quarks(i)%PartType) return
+      enddo
+    
+      ! Check they have the same number of gluons in the right place.
+      do i = 0,Tree1%NumQua
+         if (Tree1%NumGlu(i) .ne. Tree2%NumGlu(i)) return
+         do j=1,Tree1%NumGlu(i)
+            if (Tree1%Gluons(j)%ExtRef .ne. Tree2%Gluons(j)%ExtRef) return
+         enddo
+      enddo
+    
+    
+      isequiv = .true.
+    
+    END SUBROUTINE ARE_TREES_EQUIV
 
 
 

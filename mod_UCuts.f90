@@ -28,6 +28,10 @@ double complex :: Res(1:2)
    PentCuts => ThePrimAmp%UCuts(5)
    IntPart  => ThePrimAmp%IntPart(1:NumExtParticles)
    do CutNum = 1,PentCuts%NumCuts
+      if (PentCuts%skip(CutNum)) then
+         PentCuts%Coeff(CutNum,:)=(0d0,0d0)
+         cycle
+      endif
 !DEC$ IF (_DebugShowCuts==1)
        print *, "PentCut: ",PentCuts%CutProp(CutNum,1:5)
 !DEC$ ENDIF
@@ -121,6 +125,11 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
    do CutNum = 1,QuadCuts%NumCuts
+      if (QuadCuts%skip(CutNum)) then
+         QuadCuts%Coeff(CutNum,:)=(0d0,0d0)
+         cycle
+      endif
+
 !DEC$ IF (_DebugShowCuts==1)
    print *, "QuadCut",CutNum,": ", QuadCuts%CutProp(CutNum,1:4)
 !DEC$ ENDIF
@@ -264,6 +273,10 @@ include "misc/global_import"
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
     do CutNum = 1,TripCuts%NumCuts
+      if (TripCuts%skip(CutNum)) then
+         TripCuts%Coeff(CutNum,:)=(0d0,0d0)
+         cycle
+      endif
 !DEC$ IF (_DebugShowCuts==1)
    print *, "TripCut",CutNum,":",TripCuts%CutProp(CutNum,1:3)
 !DEC$ ENDIF
@@ -641,6 +654,10 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 !DEC$ IF (_DebugShowCuts==1)
    print *, "DoubCut ",CutNum,":",DoubCuts%CutProp(CutNum,1:2)
 !DEC$ ENDIF
+   if (DoubCuts%skip(CutNum)) then
+         DoubCuts%Coeff(CutNum,:)=(0d0,0d0)
+         cycle
+      endif
 
       TreeProcs => ThePrimAmp%UCuts(2)%TreeProcess(CutNum,1:2)
 
@@ -1000,6 +1017,10 @@ double complex :: Res(1:2)
 !DEC$ IF (_DebugShowCuts==1)
       print *, "SingCut ",CutNum,":",SingCuts%CutProp(CutNum,1:1)
 !DEC$ ENDIF
+      if (SingCuts%skip(CutNum)) then
+         SingCuts%Coeff(CutNum,:)=(0d0,0d0)
+         cycle
+      endif
 
        TreeProcs => ThePrimAmp%UCuts(1)%TreeProcess(CutNum,1:1)
 
@@ -1024,16 +1045,13 @@ double complex :: Res(1:2)
        NMom(4,3) = (0d0,0d0)
        NMom(4,4) = (0d0,1d0)
 
-
        LoopMom(1:4) = IntPart(SingCuts%CutProp(CutNum,1))%Mass*(NMom(1,1:4)+NMom(2,1:4)+NMom(3,1:4)+NMom(4,1:4))/2d0
        LoopMom(5)   = 0d0
        call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(1))
 
-
        LoopMom(1:4) = - LoopMom(1:4)
        LoopMom(5)   = 0d0
        call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(2))
-
        SingCuts%Coeff(CutNum,0) = 0.5d0 * ( Res(1) + Res(2) )
 
 
@@ -1044,7 +1062,6 @@ double complex :: Res(1:2)
 !       print *, "# singcut",CutNum
 !       write(*,"(1PE23.16,3X,1PE23.16)") dreal(coeff1(CutNum,1)),dimag(coeff1(CutNum,1))
 !       if( cdabs(coeff1(CutNum,1)).lt.1d-6 ) coeff1(CutNum,1) = (0d0,0d0)
-
 
 
 !DEC$ IF (_DebugPrintSingCoeff==1)

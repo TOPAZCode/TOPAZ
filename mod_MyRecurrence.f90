@@ -2003,7 +2003,53 @@ END FUNCTION
 
 
 
+FUNCTION cur_f_2fV_massCT(Gluons,Quarks,Quark1PartType,Boson,NumGlu) result(Res)
+implicit none
+complex(8) :: Res(1:Ds)
+integer :: NumGlu(0:2),i,rIn,rOut,Quark1PartType
+type(PtrToParticle) :: Gluons(1:),Boson,Quarks(2:2)      ! off-shell quark is not included in Quarks(:)
+complex(8) :: GluMom(1:Dv,NumGlu(0)), QuarkMom(1:Dv)
+complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
+character :: FerFla1*3,FerFla2*3
 
+
+   do i=1,NumGlu(0)
+    GluMom(1:Dv,i) = Gluons(i)%Mom(1:Dv)
+    GluPol(1:Dv,i) = Gluons(i)%Pol(1:Dv)
+   enddo
+   QuarkMom(1:Dv) = Quarks(2)%Mom(1:Dv)
+   QuarkPol(1:Ds) = Quarks(2)%Pol(1:Ds)
+
+!   if( abs(Quark1PartType).eq.5 ) then
+!    FerFla1="top"
+!   elseif( abs(Quark1PartType).eq.6 ) then
+!    FerFla1="bot"
+!   elseif( abs(Quark1PartType).eq.3 ) then
+!    FerFla1="chm"
+!   else
+!    FerFla1="str"
+!   endif
+!
+!   if( abs(Quarks(2)%PartType).eq.5 ) then
+!    FerFla2="top"
+!   elseif( abs(Quarks(2)%PartType).eq.6 ) then
+!    FerFla2="bot"
+!   elseif( abs(Quarks(2)%PartType).eq.3 ) then
+!    FerFla2="chm"
+!   else
+!    FerFla2="str"
+!   endif
+
+   rIn =1
+   rOut=NumGlu(0)
+   if( Quarks(2)%PartType.gt.0 ) then      !    X----->----
+      Res(:) = fVmCT(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quarks(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Ds),NumGlu(1),.true.)
+   else                                     !    X-----<----
+      print *,"Error in cur_f_2f_CT: Quarks(1)%PartType.gt.0 not implemented"
+   endif
+
+return
+END FUNCTION
 
 
 
@@ -3379,6 +3425,186 @@ endif
 
 
 
+ recursive function fVmCT(e,k,sp,p,mass,QuarkFlavor,eV,kV,ms,CTIns) result(res)
+      use ModParameters
+      implicit none
+      logical CTIns
+      complex(8), intent(in) :: e(:,:), k(:,:)
+      complex(8), intent(in) :: sp(:), p(:)
+      complex(8), intent(in) :: eV(:), kV(:)
+      integer, intent(in) ::  ms, QuarkFlavor
+      integer             :: ms1,m,ng1, ng2
+      integer :: ngluon
+      complex(8)             :: res(size(sp))
+      complex(8)             :: tmp(size(sp))
+      complex(8)             :: k1(size(p))
+      complex(8)             :: k2(size(p))
+      complex(8)             :: sp2(size(sp))
+      complex(8)             :: sp3(size(sp))
+      complex(8)             :: e1(size(e,dim=1))
+      complex(8)             :: e2(size(e,dim=1))
+      complex(8)  :: k1sq,k2sq,k3sq
+      real(8) :: mass
+      complex(8) :: couplVQQ_left,couplVQQ_right
+      character,parameter :: FerFla*3="dum" ! dummy, only used for check of flavor consistency inside the functions f,bf
+
+      ngluon = size(e,dim=2)
+      ng1 = ms   !#gluons to the left of a f-line
+      ng2 = ngluon - ms  !#gluons to the right of the f-line
+
+      if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT A in fVmCT', ng2
+      
+      if( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_ ) then!   note that Bot_ is treated as top quark in TOPAZ!
+         couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
+         couplVQQ_right = couplZTT_right_dyn
+      else
+         call Error('Mass counter-term for massless particle!')
+      endif
+
+      if (ngluon == 0) then
+         res = vbqV(sp,eV,couplVQQ_left,couplVQQ_right)
+      else
+
+       res = (0d0,0d0)
+       do m=0,ng2-1
+          k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
+          e1=g(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon))
+          k1sq=sc_(k1,k1)
+           
+          k2 = sum(k(:,1:ng1+m),dim=2)
+          k2 = k2 + p +  kV
+          k2sq = sc_(k2,k2)-mass**2
+          sp2 = fVmCT(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1,.false.)
+
+          if (CTIns) then
+             sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
+              
+             if (abs(k2sq) > propcut) then
+                sp2 =  sp2/k2sq * ((0d0,1d0))
+             else
+                sp2 = (0d0,0d0)
+             endif
+
+             if (m>0 .or. ng1>0) then
+                sp3 = fVmCT(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1,.true.)
+                sp3 = spb2_(sp3,k2)+mass*sp3
+                sp2(:) = sp2(:) + sp3(:)
+             endif
+          else
+             sp2 = spb2_(sp2,k2)+mass*sp2
+          endif
+               
+           tmp = vqg(sp2,e1)
+              if (abs(k2sq) > propcut) then
+                  tmp =  (0d0,1d0)/k2sq*tmp
+              else
+                  tmp = (0d0,0d0)
+               endif
+
+           if (m < ng2-1)  then
+              if(abs(k1sq) > propcut) then
+                  tmp = -(0d0,1d0)/k1sq*tmp
+              else
+                  tmp = (0d0,0d0)
+              endif
+           endif
+
+           res = res + tmp
+        enddo
+
+
+
+        do m=1,ng1
+           print *, 'shouldnt be here'
+           k1 = sum(k(:,1:m),dim=2)
+           e1=g(e(:,1:m),k(:,1:m))
+           k1sq = sc_(k1,k1)
+
+           k2 = sum(k(:,m+1:ngluon),dim=2)
+           k2 = k2 + p + kV
+           k2sq = sc_(k2,k2) - mass**2
+           ms1 = ng1 - m
+           sp2=fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.true.)
+
+           if (ng2 > 0.or.m < ng1) then
+               if (CTIns) then
+                  sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
+
+                  if (abs(k2sq) > propcut) then
+                        sp2 =  sp2/k2sq * ((0d0,1d0))
+                  else
+                        sp2 = (0d0,0d0)
+                  endif
+
+                  if(m<ng1-1 .or. ng2>0) then
+                     sp3 = fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.true.)
+                     sp3 = spb2_(sp3,k2)+mass*sp3
+                     sp2(:) = sp2(:) + sp3(:)
+                  endif
+               else
+                  sp2 = spb2_(sp2,k2)+mass*sp2
+               endif
+           else
+               if(CTIns) cycle
+           endif
+
+           tmp = vgq(e1,sp2)
+
+           if (m > 1) then
+              if (abs(k1sq) > propcut) then
+                  tmp=-(0d0,1d0)/k1sq*tmp
+              else
+                  tmp = (0d0,0d0)
+              endif
+           endif
+
+           if (ng2 > 0.or. m < ng1) then
+            if (abs(k2sq) > propcut) then
+              tmp=(0d0,1d0)/k2sq*tmp
+            else
+              tmp = (0d0,0d0)
+            endif
+           endif
+
+           res = res + tmp
+        enddo
+
+! now the additional bit from the V
+           sp2 = fmCT(e,k,sp,p,mass,FerFla,FerFla,ms,.false.)
+           k2 = sum(k(:,1:ngluon),dim=2)
+           k2 = k2 + p
+           k2sq = sc_(k2,k2)  - mass**2
+
+           if (CTins) then
+              sp3=czero
+              sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
+              if (abs(k2sq) > propcut) then
+                 sp2 =  sp2/k2sq * ((0d0,1d0))
+              else
+                 sp2 = (0d0,0d0)
+              endif
+              if (ngluon > 1) then
+                 sp3 = fmCT(e,k,sp,p,mass,FerFla,FerFla,ms,.true.)
+                 sp3 = spb2_(sp3,k2)+mass*sp3
+                 sp2(:) = sp2(:) + sp3(:)
+              endif
+           else
+              sp2 = spb2_(sp2,k2)+ mass*sp2
+           endif
+
+           tmp = vbqV(sp2,eV,couplVQQ_left,couplVQQ_right)
+           if (abs(k2sq) > propcut) then
+              tmp = (0d0,1d0)/k2sq*tmp
+           else
+              tmp = (0d0,0d0)
+           endif
+           res = res + tmp
+
+        endif
+
+
+         return
+       end function fVmCT
 
 
 
@@ -3426,7 +3652,9 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       u1(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(1:1),-Quarks(1)%PartType,Boson,(/n1b+n2a,n1b,n2a/))
       !if(n1b.ge.1 .or. n2a.ge.1) then
          PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(1)%Mass2)
-         if( abs(sc_(PMom1,PMom1)-Quarks(1)%Mass2).lt.PropCut ) cycle
+         if( abs(sc_(PMom1,PMom1)-Quarks(1)%Mass2).lt.PropCut ) then
+            PropFac1=(0d0,0d0)
+         endif
          if( Quarks(1)%PartType.lt.0 ) then
             u1(:) = (-spi2_(PMom1,u1)+Quarks(1)%Mass*u1(:) )*PropFac1
          else
@@ -3441,7 +3669,9 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       ubar2(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,(/n2b+n3a,n2b,n3a/))
       if(n2b.ge.1 .or. n3a.ge.1) then
          PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
-         if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) cycle
+         if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) then
+            PropFac2=(0d0,0d0)
+         endif
          if( Quarks(2)%PartType.lt.0 ) then
             ubar2(:) = (-spi2_(PMom2,ubar2)+Quarks(2)%Mass*ubar2(:) )*PropFac2
          else
@@ -3566,7 +3796,9 @@ integer :: rIn,rOut,i,counter
 
    Res(:)=(0d0,0d0)
 
-   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
+
+!   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
+   if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. BosonVertex .eq. 1 ) then
 !     (I)
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
@@ -3589,7 +3821,11 @@ integer :: rIn,rOut,i,counter
             !if(n1b.ge.1 .or. n2a.ge.1) then
                PMom2(:) = Quarks(2)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
-               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) cycle
+
+               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) then
+                  PropFac2=(0d0,0d0)
+               endif
+
                if( Quarks(2)%PartType.lt.0 ) then
                   ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(2)%Mass*ubar1(:))*PropFac2
                else
@@ -3605,7 +3841,9 @@ integer :: rIn,rOut,i,counter
             PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
             if(n1a.ge.1 .or. n4b.ge.1) then
                PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
-               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) cycle
+               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) then
+                  cycle
+               endif
                if( Quarks(2)%PartType.lt.0 ) then
                   ubar0(:) = (-spi2_(PMom1,ubar0)+Quarks(2)%Mass*ubar0(:))*PropFac1
                else
@@ -3660,7 +3898,9 @@ integer :: rIn,rOut,i,counter
             PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
             !if(n1a.ge.1 .or. n4b.ge.1) then
                PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
-               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) cycle
+               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) then
+                  cycle
+               endif
                if( Quarks(2)%PartType.lt.0 ) then
                   ubar0(:) = (-spi2_(PMom1,ubar0)+Quarks(2)%Mass*ubar0(:))*PropFac1
                else
@@ -3692,13 +3932,12 @@ integer :: rIn,rOut,i,counter
             Res(:) = Res(:) + tmp(:)
          enddo
       enddo
-      enddo
-
-   endif
+   enddo
 
 
 
-   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quarks(3)%PartType)) then
+!   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quarks(3)%PartType)) then
+elseif( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. BosonVertex .eq. 3 ) then
 !     (I)
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
@@ -3721,7 +3960,9 @@ integer :: rIn,rOut,i,counter
             if(n1b.ge.1 .or. n2a.ge.1) then
                PMom2(:) = Quarks(2)%Mom + SumMom(Gluons,rIn,rOut)  ! can be moved outside the n1a-loop
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
-               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) cycle
+               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) then
+                  PropFac2=(0d0,0d0)
+               endif
                if( Quarks(2)%PartType.lt.0 ) then
                   ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(2)%Mass*ubar1(:))*PropFac2
                else
@@ -3734,7 +3975,7 @@ integer :: rIn,rOut,i,counter
                ubar0(:) = vqg(ubar1,eps2)
             endif
 
-            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)+Boson%Mom
             if(n1a.ge.1 .or. n4b.ge.1) then
                PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
                if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) cycle
@@ -3770,6 +4011,9 @@ integer :: rIn,rOut,i,counter
          enddo
       enddo
       enddo
+
+   else
+      call Error("current not yet implemented in cur_f_4fV")
    endif
 
 

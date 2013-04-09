@@ -121,10 +121,17 @@ IF( Correction.EQ.0 ) THEN
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
 
-   do iHel=nHel(1),nHel(2)
+!   do iHel=nHel(1),nHel(2)
+   do iHel=4,4
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
-      do iPrimAmp=1,12
+!          print *, 'Gauge check:'
+!          ExtParticle(3)%Pol(1:4)=ExtParticle(3)%Mom(1:4)
+!          ExtParticle(4)%Pol(1:4)=ExtParticle(4)%Mom(1:4)
+!          print *,ExtParticle(3)%Pol(1:4)
+!          print *,ExtParticle(4)%Pol(1:4)
+      do iPrimAmp=1,NumBornAmps
+         print *, 'prim',iPrimAmp
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 
@@ -139,18 +146,48 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 !------------ bosonic loops --------------
-       do iPrimAmp=1,12
+!       do iPrimAmp=1,NumPrimAmps
+       do iPrimAmp=1,NumPrimAmps
+          
           call SetKirill(PrimAmps(iPrimAmp))
+          print *, 'doing pentcut'
           call PentCut(PrimAmps(iPrimAmp))
+!          print *, 'coeffs'
+!          print *,PrimAmps(iPrimAmp)%UCuts(5)%Coeff
           call QuadCut(PrimAmps(iPrimAmp))
+          print *, 'doing quadcut'
+!          print *,PrimAmps(iPrimAmp)%UCuts(4)%Coeff
+!          pause
+          print *, 'doing tricut'
           call TripCut(PrimAmps(iPrimAmp))
+!          print *,PrimAmps(iPrimAmp)%UCuts(3)%Coeff
+!           pause
+          print *, 'doing doubcut'
           call DoubCut(PrimAmps(iPrimAmp))
+!          print *,PrimAmps(iPrimAmp)%UCuts(2)%Coeff
+!          pause
+          print *, 'doing singcut'
           call SingCut(PrimAmps(iPrimAmp))
+!          print *,PrimAmps(iPrimAmp)%UCuts(1)%Coeff
+!          pause
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+          print *, 'Res', PrimAmps(iPrimAmp)%Result(-1)
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
-!    print *, 'iPrimAmp',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+      print *, 'iPrimAmp',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+!    print *, 'BornAmp', BornAmps(1)%Result
+    print *, 'ratio 1',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)/BornAmps(1)%Result
+    print *, 'ratio 2',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)/BornAmps(2)%Result
+    print *, 'should be', rdiv(2), rdiv(1)
+    print *, 'diff1', rdiv(2)-PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
+    print *, 'diff2', rdiv(1)-PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
+    print *, 'diff1', rdiv(2)-PrimAmps(iPrimAmp)%Result(-2)/BornAmps(2)%Result
+    print *, 'diff2', rdiv(1)-PrimAmps(iPrimAmp)%Result(-1)/BornAmps(2)%Result
+!    print *, 'should be ', rdiv(1)*BornAmps(1)%Result
+    
+    pause
+ enddo
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
@@ -175,7 +212,7 @@ ELSEIF( Correction.EQ.1 ) THEN
               endif
           endif
 !DEC$ ENDIF
-      enddo
+!       enddo
 
       BosonicPartAmp(1,-2:1) =    Nc   *  PrimAmps(PrimAmp1_15234)%Result(-2:1) &
                              - 1d0/Nc *(  PrimAmps(PrimAmp1_15432)%Result(-2:1) &
