@@ -1,0 +1,8 @@
+      COMMON /Np/ Npoint
+      COMMON /Ncuts/ N5,N4,N3,N2,N1
+      COMMON /kine/ mom, hel,momline
+      COMMON /energy/ en
+      COMMON /mass/ mt, mb,mc
+      COMMON /Lcuts/ Lc5,Lc4,Lc3,Lc2,Lc1
+      COMMON /lables/ Lab_ex, Lab_in
+      COMMON /ampli/  AMP

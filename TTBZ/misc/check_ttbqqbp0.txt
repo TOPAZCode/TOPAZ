@@ -1,0 +1,92 @@
+OLD NUMBERS: 2+3+7+8 wrong
+
+> 1.) tree level
+8.719726413028718E-002
+
+
+> > 2.) Summe aller 1-loop BeitrÃ¤ge
+0.232526037680713
+1.01247238362380
+3.10070150140627
+
+
+> > 3.) 2.) ohne geschlossene fermion loops
+0.232526037680713
+1.35979334928097
+1.95255875126847
+
+
+> > 4.) alle fermion loops
+0.000000000000000E+000
+0.348789056530058
+1.14911879126167
+
+
+> > 1-loop ohne geschlossene fermion loops:
+> > 5.) leading color (LC), Q_top term (d.h. Photonkopplung an tops)   (Nc ist in
+allen Zahlen enthalten)
+0.190024348481269
+0.944863609602999
+1.55094088522072
+
+
+> > 6.) LC, Q_q term (d.h. Photonkopplung an leichte externe quarks)  (Q_q=Q_up=Q_dn=1)
+8.477654583701069E-002
+0.421536890111033
+1.46355639605411
+
+
+> > 7.) subLC, Q_top term
+2.111381649793430E-002
+0.137002251239505
+0.759861021612000
+
+
+> > 8.) subLC, Q_q term
+9.419616204113822E-003
+6.331404101609148E-002
+0.477163614020598
+
+
+> > nur geschlossene fermion loops:
+> > 9a.) top loop, Q_top term
+0.000000000000000E+000
+4.222763299584092E-002
+0.148710273470387
+
+> > 9b.) top loop, Q_q term
+0.000000000000000E+000
+1.883923240822343E-002
+5.573631056884315E-002
+
+> > 9c.) top loop, Q_f term (Photonkopplung an geschlossenen top loop,
+> > d.h.Q_f=Q_top)
+0.000000000000000E+000
+3.086179714122544E-011
+3.312310254036982E-011
+
+
+> > 10a.) light loops, Q_top term
+0.000000000000000E+000
+0.211138164979197
+0.767718482364151
+
+
+> > 10b.) light loops, Q_q term
+0.000000000000000E+000
+9.419616204131984E-002
+0.303658919373173
+
+
+> > 10c.) light loops, summme Ã¼ber Q_f terms (Photonkopplung an alle
+> > geschlossenen loops)
+0.000000000000000E+000
+6.835450886999125E-014
+4.424860585223442E-013
+
+
+
+
+
+
+

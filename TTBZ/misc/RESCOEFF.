@@ -1,0 +1,7 @@
+      COMMON /COEFF/ coeff5,coeff4,coeff3,coeff2,coeff1
+      COMMON /COEFF_128/ coeff5_128,coeff4_128,coeff3_128,coeff2_128,coeff1_128
+      COMMON /RVECT/ refvect4,refvect3,refvect2
+      COMMON /PROP/  propv5,propv4,propv3,propv2
+      COMMON /MLIST/ mass5,mass4,mass3,mass2,mass1
+      COMMON /MLIST_128/ mass5_128
+      COMMON /TAGS/  tagdcut

@@ -1,0 +1,36 @@
+      integer Npoint
+      integer N5,N4,N3,N2,N1
+      integer tagdcut(50,1)
+      complex(8) mom(7,4),hel(7,4)
+      complex(8) momline(6,4)
+      integer Lc5(50,5),Lc4(50,4),Lc3(50,3),Lc2(50,2),Lc1(50,1)
+!      character AMP*6
+      character Lab_ex(7)*3, Lab_in(7)*3
+      complex(8) coeff5(50,1),coeff4(50,5),coeff3(50,10),coeff2(50,10),coeff1(50,1)
+      complex(16) coeff5_128(50,1),coeff4_128(50,5),coeff3_128(50,10),coeff2_128(50,10),coeff1_128(50,1)
+
+      complex(8) refvect4(50,4),refvect3(50,8),refvect2(50,12)
+      complex(8) propv5(50,20)
+      complex(8) propv4(50,16),propv3(50,12),propv2(50,8)
+      real(8) mass5(50,5)
+      real(8) mass4(50,4),mass3(50,3),mass2(50,2)
+      real(8) mass1(50,1)
+!      real(8) en,ptcut,etacut
+!      real(8) mt,mb,mc
+
+      COMMON /Np/ Npoint
+      COMMON /Ncuts/ N5,N4,N3,N2,N1
+      COMMON /kine/ mom, hel,momline
+!      COMMON /energy/ en
+!      COMMON /mass/ mt, mb,mc
+      COMMON /Lcuts/ Lc5,Lc4,Lc3,Lc2,Lc1
+      COMMON /lables/ Lab_ex, Lab_in
+!      COMMON /ampli/  AMP
+
+      COMMON /COEFF/ coeff5,coeff4,coeff3,coeff2,coeff1
+      COMMON /COEFF_128/ coeff5_128,coeff4_128,coeff3_128,coeff2_128,coeff1_128
+      COMMON /RVECT/ refvect4,refvect3,refvect2
+      COMMON /PROP/  propv5,propv4,propv3,propv2
+      COMMON /MLIST/ mass5,mass4,mass3,mass2,mass1
+!      COMMON /MLIST_128/ mass5_128
+      COMMON /TAGS/  tagdcut

@@ -1,0 +1,127 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{booktabs}
+
+
+\setlength{\oddsidemargin}{-1.4cm}
+
+\begin{document}
+
+
+\centerline{\Large $\bar{t} t + \mathrm{jet}$ production at NLO QCD}
+
+
+\vspace{1cm}
+\newcommand{\tb}{\bar{t}}
+\newcommand{\rd}{\mathrm{d}}
+\newcommand{\LO}{\mathrm{LO}}
+\newcommand{\NLO}{\mathrm{NLO}}
+\newcommand{\VI}{\mathrm{virt}}
+\newcommand{\RE}{\mathrm{real}}
+\newcommand{\ds}{ \mathrm{d}\sigma_{\bar{t}t}}
+\newcommand{\dsj}{\mathrm{d}\sigma_{\bar{t}tj}}
+\newcommand{\dsjj}{\mathrm{d}\sigma_{\bar{t}tjj}}
+\newcommand{\dBtb}{\; \mathrm{d}{\cal B}_{\bar{t}}}
+\newcommand{\dBt}{  \mathrm{d}{\cal B}_{t}}
+\newcommand{\dBtbj}{\;\mathrm{d}{\cal B}_{\bar{t}j}}
+\newcommand{\dBtj}{ \mathrm{d}{\cal B}_{tj}}
+\newcommand{\dBtbjj}{\;\mathrm{d}{\cal B}_{\bar{t}jj}}
+\newcommand{\dBtjj}{ \mathrm{d}{\cal B}_{tjj}}
+\begin{tabular}{ c  c  c  c  c }
+\midrule
+   & {\bf contribution} & {\bf processes } & {\bf correction} & {\bf subroutine (\texttt{EvalCS...})} \\
+\midrule
+    A &  $\dsj^\LO \dBtb^\LO \dBt^\LO  $   & 3,4,5,6 &  0 &  \texttt{\_1L\_ttbggg, \_1L\_ttbqqbg}\\
+\midrule
+    B &    $\ds^\LO \dBtbj^\LO \dBt^\LO  $   & 33,34 & 0&  \texttt{\_DKJ\_1L\_ttbgg, \_DKJ\_1L\_ttbqqb}\\
+      &   +$\ds^\LO \dBtb^\LO \dBtj^\LO  $   & (nJetRad=1-4)  & \\
+\midrule
+\midrule
+    C &    $\dsj^\VI \dBtb^\LO \dBt^\LO  $   & 3,4,5,6   & 1 &  \texttt{\_1L\_ttbggg, \_1L\_ttbqqbg} \\
+\midrule
+    D &    $\dsjj^\RE \dBtb^\LO \dBt^\LO  $ & 9-19  & 2,3 &  \texttt{\_Real\_ttbgggg, \_Real\_ttbqqbgg} \\
+      &                                     &       &     & \texttt{\_Real\_ttbqqbqqb, \_1L\_ttbggg, \_1L\_ttbqqbg} \\
+\midrule
+    E &    $\ds^\VI \dBtbj^\LO \dBt^\LO   $ & 33,34  &  1 &  \texttt{\_DKJ\_1L\_ttbgg, \_DKJ\_1L\_ttbqqb}\\
+      &    +$\ds^\VI \dBtb^\LO \dBtj^\LO   $ & (nJetRad=1-4)  &   \\
+\midrule
+    F &    $\dsj^\RE \dBtbj^\RE \dBt^\LO   $ & 35-38  &  2,3 &  \texttt{\_DKJ\_Real\_ttbggg, \_DKJ\_Real\_ttbqqbg,} \\
+      &    $+\dsj^\RE \dBtb^\LO \dBtj^\RE   $ & (nJetRad=1-4)  &  &  \texttt{\_DKJ\_1L\_ttbgg, \_DKJ\_1L\_ttbqqb} \\
+\midrule
+    G &    $\dsj^\LO \dBtb^\VI \dBt^\LO   $ & 3,4,5,6  &  4 &  \texttt{\_1LDK\_ttbggg, \_1LDK\_ttbqqbg}\\
+      &   +$\dsj^\LO \dBtb^\LO \dBt^\VI   $ &   &   \\
+\midrule
+    H &   $\ds^\LO \dBtbj^\VI \dBt^\LO   $ & 33,34  &  4 &  \texttt{\_1LDKJ\_ttb}\\
+      &  +$\ds^\LO \dBtb^\LO \dBtj^\VI   $ & (nJetRad=1-16) &   & \\
+      &  +$\ds^\LO \dBtbj^\LO \dBt^\VI   $ &   &   &  \\
+      &  +$\ds^\LO \dBtb^\VI \dBtj^\LO   $ &   &   &  \\
+\midrule
+    I &    $\ds^\LO \dBtbjj^\RE \dBt^\LO   $ & 33,34  &  5 &  \texttt{\_REDKJ\_ttb} \\
+      &   +$\ds^\LO \dBtb^\LO \dBtjj^\RE   $ &  (nJetRad=1-20) &   \\
+      &   +$\ds^\LO \dBtbj^\RE \dBtj^\RE   $ &   &   \\
+\midrule
+\end{tabular}
+\\
+``real'' means that the jet is allowed to become unresolved
+\\
+
+
+
+
+\newpage
+
+
+
+
+\newcommand{\ttb}{\rightarrow \bar{t}t\;}
+\newcommand{\qb}{\bar{q}}
+\newcommand{\gDK}{\;g_\mathrm{DK}}
+
+\begin{tabular}{ c  l }
+\midrule
+   processes \\
+\midrule
+   3 & $qg \ttb q $ \\
+   4 & $\qb g \ttb \qb $   \\
+   5 & $gg \ttb g $   \\
+   6 & $\qb q \ttb g $   \\
+   9 & $gg \ttb g \;g$   \\
+  10 & $\qb q \ttb g \; g$   \\
+  11 & $gg \ttb q\qb $  \\
+  12 & $q g \ttb q \; g$   \\
+  13 & $\qb g \ttb \qb \; g$   \\
+  14 & $\qb q \ttb (\qb q + \qb' q')$   \\
+  15 & $q \qb' \ttb q \qb'$   \\
+  16 & $q q' \ttb q q'$   \\
+  17 & $\qb \qb' \ttb \qb \qb'  $   \\
+  18 & $q q \ttb q q $   \\
+  19 & $\qb \qb \ttb \qb \qb$   \\
+  33 & $gg \ttb \gDK $   \\
+  34 & $\qb q \ttb \gDK $   \\
+  35 & $qg \ttb q \gDK $   \\
+  36 & $\qb g \ttb \qb \gDK $   \\
+  37 & $gg \ttb g  \gDK$   \\
+  38 & $\qb q \ttb g \gDK $   \\
+\midrule
+
+\end{tabular}
+
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+

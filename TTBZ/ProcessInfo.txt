@@ -1,0 +1,107 @@
+    IF( PROCESS.EQ.0 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_Glu  + 2_Glu + 6_Glu
+ELSEIF( PROCESS.EQ.1 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.2 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top
+
+ELSEIF( PROCESS.EQ.3 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.4 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.5 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.6 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.9 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 6_Glu  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.10 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 6_Glu  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.11 ) THEN !   5_Glu  + 6_Glu --> 3_Str  + 4_AStr + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.12 ) THEN !   3_Str + 5_Glu --> 4_Str  + 1_ATop + 2_Top + 6_Glu
+ELSEIF( PROCESS.EQ.13 ) THEN !   4_AStr + 5_Glu --> 3_Str  + 1_ATop + 2_Top + 6_Glu
+ELSEIF( PROCESS.EQ.14 ) THEN !   3_Str + 4_AStr -->  5_Chm + 6_AChm + 1_ATop + 2_Top //  5_Str + 6_AStr + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.15 ) THEN !   3_Str + 6_AChm -->  4_Str + 5_AChm + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.16 ) THEN !   3_Str + 6_Chm -->  4_Str + 5_Chm + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.17 ) THEN !   4_AStr + 5_AChm -->  3_AStr + 5_AChm + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.18 ) THEN !   3_Chm + 5_Chm -->  4_Chm + 6_Chm + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.19 ) THEN !   4_AChm + 6_AChm -->  3_AChm + 5_AChm + 1_ATop + 2_Top
+
+
+
+
+
+ELSEIF( PROCESS.EQ.20 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho(in production)
+ELSEIF( PROCESS.EQ.21 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho(in decay)
+ELSEIF( PROCESS.EQ.22 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Pho(in production)
+ELSEIF( PROCESS.EQ.23 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Pho(in decay)
+
+ELSEIF( PROCESS.EQ.24 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top + 6_Pho(in production)
+ELSEIF( PROCESS.EQ.25 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top + 6_Pho(in decay)
+
+ELSEIF( PROCESS.EQ.26 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top + 6_Pho(in production)
+ELSEIF( PROCESS.EQ.27 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top + 6_Pho(in decay)
+
+ELSEIF( PROCESS.EQ.28 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top + 6_Pho(in production)
+ELSEIF( PROCESS.EQ.29 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top + 6_Pho(in decay)
+
+ELSEIF( PROCESS.EQ.30 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Pho(in production)
+ELSEIF( PROCESS.EQ.31 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Pho(in decay)
+
+
+
+
+
+ELSEIF( PROCESS.EQ.33 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Glu(in decay)
+ELSEIF( PROCESS.EQ.34 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Glu(in decay)
+
+ELSEIF( PROCESS.EQ.35 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top + 6_Glu(in decay)
+ELSEIF( PROCESS.EQ.36 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top + 6_Glu(in decay)
+ELSEIF( PROCESS.EQ.37 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top + 6_Glu(in decay)
+ELSEIF( PROCESS.EQ.38 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Glu(in decay)
+
+
+
+
+
+ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
+ELSEIF( PROCESS.EQ.42 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop
+ELSEIF( PROCESS.EQ.43 ) THEN !   3_Str  + 5_Glu  --> 1_AHeavyTop + 2_HeavyTop + 4_Str
+ELSEIF( PROCESS.EQ.44 ) THEN !   4_AStr + 5_Glu  --> 1_AHeavyTop + 2_HeavyTop + 3_AStr
+ELSEIF( PROCESS.EQ.45 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop + 5_Glu(in production)
+ELSEIF( PROCESS.EQ.46 ) THEN !   3_Str  + 4_AStr --> 1_AHeavyTop + 2_HeavyTop + 5_Glu(in production)
+ELSEIF( PROCESS.EQ.47 ) THEN !  AStop -> ChiBar +ATop (AHeavyTop width)
+ELSEIF( PROCESS.EQ.48 ) THEN !   Stop -> Chi + Top ( HeavyTop width)
+
+
+ELSEIF( PROCESS.EQ.51 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop
+ELSEIF( PROCESS.EQ.52 ) THEN !   3_Str  + 4_AStr --> 1_ASTop + 2_STop
+ELSEIF( PROCESS.EQ.53 ) THEN !   3_Str  + 5_Glu  --> 1_ASTop + 2_STop + 4_Str
+ELSEIF( PROCESS.EQ.54 ) THEN !   4_AStr + 5_Glu  --> 1_ASTop + 2_STop + 3_AStr
+ELSEIF( PROCESS.EQ.55 ) THEN !   3_Glu  + 4_Glu  --> 1_ASTop + 2_STop + 5_Glu(in production)
+ELSEIF( PROCESS.EQ.56 ) THEN !   3_Str  + 4_AStr --> 1_ASTop + 2_STop + 5_Glu(in production)
+ELSEIF( PROCESS.EQ.57 ) THEN !  AStop -> ChiBar +ATop (Astop width)
+ELSEIF( PROCESS.EQ.58 ) THEN !   Stop -> Chi + Top ( stop width)
+
+
+
+ELSEIF( PROCESS.EQ.62 ) THEN !   3_Str  + 4_AStr --> Zprime --> 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.63 ) THEN !   3_Str  + 5_Glu  --> Zprime --> 4_Str  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.64 ) THEN !   4_AStr + 5_Glu  --> Zprime --> 3_AStr + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.66 ) THEN !   3_Str  + 4_AStr --> Zprime --> 5_Glu  + 1_ATop + 2_Top
+
+ELSEIF( PROCESS.EQ.65 ) THEN !   3_Str  + 4_AStr --> Zprime/QCD --> 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.67 ) THEN !   3_Str  + 5_Glu  --> Zprime/QCD --> 4_Str  + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.68 ) THEN !   4_AStr + 5_Glu  --> Zprime/QCD --> 3_AStr + 1_ATop + 2_Top
+ELSEIF( PROCESS.EQ.69 ) THEN !   3_Str  + 4_AStr --> Zprime/QCD --> 5_Glu  + 1_ATop + 2_Top
+
+
+
+
+
+
+ELSEIF( PROCESS.EQ.71 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Z
+ELSEIF( PROCESS.EQ.72 ) THEN !   3_Str  + 4_AStr --> 1_ATop + 2_Top + 5_Z
+ELSEIF( PROCESS.EQ.73 ) THEN !   3_Str  + 5_Glu  --> 4_Str  + 1_ATop + 2_Top + 6_Z
+ELSEIF( PROCESS.EQ.74 ) THEN !   4_AStr + 5_Glu  --> 3_AStr + 1_ATop + 2_Top + 6_Z
+ELSEIF( PROCESS.EQ.75 ) THEN !   3_Glu  + 4_Glu  --> 5_Glu  + 1_ATop + 2_Top + 6_Z
+ELSEIF( PROCESS.EQ.76 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Z
+
+
+
+
+
+
+
+

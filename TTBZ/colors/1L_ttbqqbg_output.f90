@@ -1,0 +1,18 @@
+Col1L_ttbqqbg(1,1) = (24.D0)  
+Col1L_ttbqqbg(2,1) = (8.D0/3.D0)  
+Col1L_ttbqqbg(3,1) = ( 0.d0)  
+Col1L_ttbqqbg(4,1) = (8.D0/3.D0)  
+Col1L_ttbqqbg(1,2) = (8.D0)  
+Col1L_ttbqqbg(2,2) = (8.D0)  
+Col1L_ttbqqbg(3,2) = (8.D0)  
+Col1L_ttbqqbg(4,2) = ( 0.d0)  
+Col1L_ttbqqbg(1,3) = ( 0.d0)  
+Col1L_ttbqqbg(2,3) = (8.D0/3.D0)  
+Col1L_ttbqqbg(3,3) = (24.D0)  
+Col1L_ttbqqbg(4,3) = (8.D0/3.D0)  
+Col1L_ttbqqbg(1,4) = (8.D0)  
+Col1L_ttbqqbg(2,4) = ( 0.d0)  
+Col1L_ttbqqbg(3,4) = (8.D0)  
+Col1L_ttbqqbg(4,4) = (8.D0)  
+
+

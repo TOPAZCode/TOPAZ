@@ -1,0 +1,15 @@
+Average center of mass energy <EHat> in ttbar production at LO (MSTW PDFS):
+
+thresh = 2*mtop = 344 GeV
+
+TEV:
+<EHat> = 450 GeV
+<EHat>/thresh = 1.31
+
+LHC(7TeV):
+<EHat> = 500 GeV
+<EHat>/thresh = 1.45
+
+LHC(14TeV):
+<EHat> = 534 GeV
+<EHat>/thresh = 1.56
