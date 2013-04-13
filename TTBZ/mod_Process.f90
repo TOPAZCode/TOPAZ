@@ -55,6 +55,21 @@ type :: TreeProcess
 !    procedure(), pointer, nopass :: EvalCurrent
 end type
 
+
+
+type :: AMatch
+  integer, allocatable :: NumMatch(:)                    ! the first index labels the sister
+  integer, allocatable :: MatchHiCuts(:,:)!  the first index labels the sister: 0=prim.amp itself, 1..NumSister labels the sisters, the second index labels the the matching higher cuts, e.g. for 3-cut (1,2,4) the number of the matching 4-cuts are 1 and 3
+  integer, allocatable :: FirstHiProp(:,:)! the first index labels the sister
+  integer, allocatable :: MissHiProp(:,:,:)! the first index labels the sister
+end type
+
+type :: UCutMatch
+  type(AMatch) :: Subt(2:5)
+end type
+
+
+
 type :: UnitarityCut
    integer              :: CutType              ! 5,...,1: pent.,...,sing. cut
    integer              :: NumCuts              ! number of cuts
@@ -64,7 +79,8 @@ type :: UnitarityCut
    type(TreeProcess), allocatable :: TreeProcess(:,:)  ! process for a cut at a vertex, first and last number are the prop.ID, the rest corresp. to the ExtParticle ID
    real(8), allocatable :: KMom(:,:,:)
    complex(8), allocatable :: NMom(:,:,:)
-    logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
+   logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
+   type(UCutMatch),allocatable :: Match(:)      ! for matching a cut with higher cuts, array includes all cuts
 end type
 
 type :: PrimitiveAmplitude
@@ -86,6 +102,8 @@ type :: PrimitiveAmplitude
 !    integer :: NumInsertions1                    ! number of insertions of colorless particles in quark line 1 (corresp. to NCut)
 !    integer :: NumInsertions2                    ! number of insertions of colorless particles in quark line 2
 !    type(TreeProcess) :: TreeProc                ! tree amplitude
+   integer,allocatable :: Sisters(:)               ! sister primitive amplitudes for ttb+Z
+   integer :: NumSisters
 end type
 
 type :: BornAmplitude
@@ -123,7 +141,7 @@ IF( abs(TOPDECAYS).GE.1 ) THEN
   NDim = NDim + 4+4
 ENDIF
 
-IF( abs(ZDECAYS).GE.1 ) THEN
+IF( ZDECAYS.GE.1 ) THEN
   NDim = NDim + 2
 ENDIF
 
@@ -3768,8 +3786,8 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
         Helicities(7,1:5) = (/0,0,-1,-1,+1/)
         Helicities(8,1:5) = (/0,0,-1,-1,-1/)
      endif
-    ELSE
-       if (Zdecays .eq. 0) then
+    ELSE! .eq.0 or .eq.-1
+       if (Zdecays.eq.0 .or. Zdecays.eq.-1 ) then
         NumHelicities = 48
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         sig_tb=+1; sig_t =+1;
@@ -4513,6 +4531,10 @@ integer :: NPoint,NCut
 ! AmpType = 2/d:  1,2,3,4 (closed fermion loop)
 !  the ordering of the first PrimAmps should match the BornAmps because of the MassCT contribution
 
+
+  do nPrimAmp = 1,NumPrimAmps
+    PrimAmps(nPrimAmp)%NumSisters = 0
+  enddo
 
 
 IF( MASTERPROCESS.EQ.0 ) THEN
@@ -5662,39 +5684,88 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
+      PrimAmps(1)%NumSisters = 0
 
       PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
       PrimAmps(2)%AmpType = 1
+      PrimAmps(2)%NumSisters = 0
 
       PrimAmps(3)%ExtLine = (/1,3,5,2,4/)
       PrimAmps(3)%AmpType = 1
+      PrimAmps(3)%NumSisters = 1
+      allocate( PrimAmps(3)%Sisters(1:PrimAmps(3)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(3)%Sisters(1) = 4
 
       PrimAmps(4)%ExtLine = (/1,5,3,2,4/)
       PrimAmps(4)%AmpType = 1
+      PrimAmps(4)%NumSisters = 1
+      allocate( PrimAmps(4)%Sisters(1:PrimAmps(4)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(4)%Sisters(1) = 3
 
       PrimAmps(5)%ExtLine = (/1,4,5,2,3/)
       PrimAmps(5)%AmpType = 1
+      PrimAmps(5)%NumSisters = 1
+      allocate( PrimAmps(5)%Sisters(1:PrimAmps(5)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(5)%Sisters(1) = 6
 
       PrimAmps(6)%ExtLine = (/1,5,4,2,3/)
       PrimAmps(6)%AmpType = 1
+      PrimAmps(6)%NumSisters = 1
+      allocate( PrimAmps(6)%Sisters(1:PrimAmps(6)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(6)%Sisters(1) = 5
 
       PrimAmps(7)%ExtLine = (/1,5,3,4,2/)
       PrimAmps(7)%AmpType = 1
+      PrimAmps(7)%NumSisters = 2
+      allocate( PrimAmps(7)%Sisters(1:PrimAmps(7)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(7)%Sisters(1) = 8
+      PrimAmps(7)%Sisters(2) = 9
 
       PrimAmps(8)%ExtLine = (/1,3,5,4,2/)
       PrimAmps(8)%AmpType = 1
+      PrimAmps(8)%NumSisters = 2
+      allocate( PrimAmps(8)%Sisters(1:PrimAmps(8)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(8)%Sisters(1) = 7
+      PrimAmps(8)%Sisters(2) = 9
 
       PrimAmps(9)%ExtLine = (/1,3,4,5,2/)
       PrimAmps(9)%AmpType = 1
+      PrimAmps(9)%NumSisters = 2
+      allocate( PrimAmps(9)%Sisters(1:PrimAmps(9)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(9)%Sisters(1) = 7
+      PrimAmps(9)%Sisters(2) = 8
 
       PrimAmps(10)%ExtLine = (/1,5,4,3,2/)
       PrimAmps(10)%AmpType = 1
+      PrimAmps(10)%NumSisters = 2
+      allocate( PrimAmps(10)%Sisters(1:PrimAmps(10)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(10)%Sisters(1) = 11
+      PrimAmps(10)%Sisters(2) = 12
 
       PrimAmps(11)%ExtLine = (/1,4,5,3,2/)
       PrimAmps(11)%AmpType = 1
+      PrimAmps(11)%NumSisters = 2
+      allocate( PrimAmps(11)%Sisters(1:PrimAmps(11)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(11)%Sisters(1) = 10
+      PrimAmps(11)%Sisters(2) = 12
 
       PrimAmps(12)%ExtLine = (/1,4,3,5,2/)
       PrimAmps(12)%AmpType = 1
+      PrimAmps(12)%NumSisters = 2
+      allocate( PrimAmps(12)%Sisters(1:PrimAmps(12)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(12)%Sisters(1) = 10
+      PrimAmps(12)%Sisters(2) = 11
+
 
 ! for the time being, I'm ignoring ferm loop prims
 !      call Error("need more work here:MasterProcess.EQ.17 ")
@@ -6345,8 +6416,9 @@ IF( Correction.EQ.1 ) THEN
                endif
 
             elseif( (ExtPartType .eq. Pho_) .or. (ExtPartType .eq. Z0_) ) then
-               ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(PropaMinus1)%PartType
-               ColorLessParticles = .true.
+               ThePrimAmp%IntPart(Propa)%PartType = ThePrimAmp%IntPart(PropaMinus1)%PartType  &
+                                                  + sign(1,ThePrimAmp%IntPart(PropaMinus1)%PartType)*1000!  incr.parttype by 1000 to take track of where the z is emitted, important for rejecting certain cuts
+               ColorLessParticles = .true.                                                               !  this will be reset at the end of this subroutine
 
             elseif( ExtPartType .eq. Wp_ ) then
                ThePrimAmp%IntPart(Propa)%PartType = abs( ThePrimAmp%IntPart(PropaMinus1)%PartType -1)
@@ -6368,7 +6440,7 @@ IF( Correction.EQ.1 ) THEN
 
          do Propa=1,NumExtParticles
             if( ThePrimAmp%IntPart(Propa)%PartType .eq. 99 ) call Error("internal particle type is 99")
-            ThePrimAmp%IntPart(Propa)%Mass  = GetMass( ThePrimAmp%IntPart(Propa)%PartType )
+            ThePrimAmp%IntPart(Propa)%Mass  = GetMass( mod(ThePrimAmp%IntPart(Propa)%PartType,1000) )! mod(..,1000) because of Z0_ condition above
             ThePrimAmp%IntPart(Propa)%Mass2 = (ThePrimAmp%IntPart(Propa)%Mass)**2
             ThePrimAmp%IntPart(Propa)%ExtRef = -1
             if( IsAScalar(ExtParticle( ThePrimAmp%ExtLine(Propa) )%PartType) .and. ThePrimAmp%ScaLine1In.eq.0 ) then! checking if there are scalars
@@ -6409,8 +6481,22 @@ IF( Correction.EQ.1 ) THEN
          call InitUCuts(ThePrimAmp)
          print *, 'cuts inited'
       enddo! NPrimAmp
-      print *, 'calling remove dupl cuts'
-    call remove_duplicate_cuts()
+
+     print *, 'calling remove dupl cuts'
+     call remove_duplicate_cuts()
+
+     call FindSubtractions()
+
+
+!   undoing +/- 1000 required for Z0 couplings
+    do NPrimAmp=1,NumPrimAmps
+       do Propa=1,NumExtParticles
+           PrimAmps(NPrimAmp)%IntPart(Propa)%PartType = mod( PrimAmps(NPrimAmp)%IntPart(Propa)%PartType  , 1000)
+       enddo
+    enddo
+
+
+
 
 !! RR printout to check id of duplicates !!
     print *, ' PRINTOUT FOR DUPLICATES'
@@ -6592,7 +6678,6 @@ integer :: QuarkPos(1:6),counter,counterQ,counterG,counterS,counterV
 type(TreeProcess),pointer :: TheTree
 
 
-
    if( ThePrimAmp%AmpType.eq.1 ) then
       ThePrimAmp%NPoint = NumExtParticles
    elseif( ThePrimAmp%AmpType.eq.2 ) then
@@ -6703,11 +6788,11 @@ type(TreeProcess),pointer :: TheTree
    do i5 = i4+1, NumExtParticles
 
 !          skip cuts that are marked for discarding
-           if( ThePrimAmp%IntPart(i1)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i2)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i3)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i4)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i5)%PartType .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i1)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i2)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i3)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i4)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i5)%PartType,1000) .eq. 0 ) cycle
 
 !          set tree processes
 !          vertex 1
@@ -6720,9 +6805,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 5-1")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i1
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i1)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i1)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i2
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i2)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i2)%PartType,1000)   )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i1+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i1+NPart) )%PartType
@@ -6738,9 +6823,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 5-2")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i2
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i2)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i2)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i3
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i3)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i2+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i2+NPart) )%PartType
@@ -6757,9 +6842,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 5-3")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i3
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i3)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i4
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i4)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i3+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i3+NPart) )%PartType
@@ -6776,9 +6861,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 5-4")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i4
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i4)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i5
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i5)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i4+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i4+NPart) )%PartType
@@ -6795,9 +6880,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 5-5")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i5
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i5)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i1
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i1)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i1)%PartType,1000)  )
            do NPart=0,NumVertPart-1
              if( i5+NPart.le.NumExtParticles ) then
                   TheTree%PartRef(NPart+2) = i5+NPart
@@ -6813,12 +6898,12 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(5)%CutProp(NCut,3) = i3
            ThePrimAmp%UCuts(5)%CutProp(NCut,4) = i4
            ThePrimAmp%UCuts(5)%CutProp(NCut,5) = i5
-           print *, 'cuts:', NCut, ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
-           print *, 'tree 1:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:TheTree%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,2)%PartType(1:TheTree%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,3)%PartType(1:TheTree%NumPart)
-           print *, 'tree 4:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,4)%PartType(1:TheTree%NumPart)
-           print *, 'tree 5:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:TheTree%NumPart)
+!            print *, 'cuts:', NCut, ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,2)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,3)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 4:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,4)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 5:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:TheTree%NumPart)
            
            
            NCut = NCut + 1
@@ -6843,10 +6928,10 @@ type(TreeProcess),pointer :: TheTree
 
 
 !          skip cuts that are marked for discarding
-           if( ThePrimAmp%IntPart(i2)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i3)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i4)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i5)%PartType .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i2)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i3)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i4)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i5)%PartType,1000) .eq. 0 ) cycle
 
 !          set tree processes
 !          vertex 1
@@ -6859,9 +6944,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 4-1")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i2
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i2)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i2)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i3
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i3)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i2+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i2+NPart) )%PartType
@@ -6877,9 +6962,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 4-2")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i3
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i3)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i4
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj( mod(ThePrimAmp%IntPart(i4)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i3+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i3+NPart) )%PartType
@@ -6895,9 +6980,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 4-3")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i4
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i4)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i5
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(  mod(ThePrimAmp%IntPart(i5)%PartType,1000)  )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i4+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i4+NPart) )%PartType
@@ -6913,9 +6998,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 4-4")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i5
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i5)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i2
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i2)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(  mod(ThePrimAmp%IntPart(i2)%PartType,1000)   )
            do NPart=0,NumVertPart-1
                if( i5+NPart.le.NumExtParticles ) then
                   TheTree%PartRef(NPart+2) = i5+NPart
@@ -6930,11 +7015,11 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(4)%CutProp(NCut,2) = i3
            ThePrimAmp%UCuts(4)%CutProp(NCut,3) = i4
            ThePrimAmp%UCuts(4)%CutProp(NCut,4) = i5
-           print *,'cuts', NCut, ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
-           print *, 'tree 1:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%NumPart)
-           print *, 'tree 4:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart)
+!            print *,'cuts', NCut, ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%NumPart)
+!            print *, 'tree 4:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart)
            ThePrimAmp%UCuts(4)%CutProp(NCut,1) = i2
            NCut = NCut + 1
    enddo
@@ -6957,9 +7042,9 @@ type(TreeProcess),pointer :: TheTree
    do i5 = i4+1, NumExtParticles
 
 !          skip cuts that are marked for discarding
-           if( ThePrimAmp%IntPart(i3)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i4)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i5)%PartType .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i3)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i4)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i5)%PartType,1000) .eq. 0 ) cycle
 
 !          set tree processes
 !          vertex 1
@@ -6972,9 +7057,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 3-1")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i3
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i3)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i4
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i4)%PartType,1000) )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i3+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i3+NPart) )%PartType
@@ -6990,9 +7075,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 3-2")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i4
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i4)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i5
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i5)%PartType,1000) )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i4+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i4+NPart) )%PartType
@@ -7008,9 +7093,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 3-3")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i5
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i5)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i3
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i3)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i3)%PartType,1000) )
            do NPart=0,NumVertPart-1
                if( i5+NPart.le.NumExtParticles ) then
                   TheTree%PartRef(NPart+2) = i5+NPart
@@ -7025,10 +7110,10 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(3)%CutProp(NCut,2) = i4
            ThePrimAmp%UCuts(3)%CutProp(NCut,3) = i5
 
-           print *, NCut, ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
-           print *, 'tree 1:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart)
+!            print *, NCut, ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart)
           
 
            NCut = NCut + 1
@@ -7049,8 +7134,8 @@ type(TreeProcess),pointer :: TheTree
    do i5 = i4+1, NumExtParticles
 
 !          skip cuts that are marked for discarding
-           if( ThePrimAmp%IntPart(i4)%PartType .eq. 0 ) cycle
-           if( ThePrimAmp%IntPart(i5)%PartType .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i4)%PartType,1000) .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i5)%PartType,1000) .eq. 0 ) cycle
 
 !          set tree processes
 !          vertex 1
@@ -7063,9 +7148,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 2-1")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i4
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i4)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i5
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i5)%PartType,1000) )
            do NPart=0,NumVertPart-1
                TheTree%PartRef(NPart+2) = i4+NPart
                TheTree%PartType(NPart+2) = ExtParticle( ThePrimAmp%ExtLine(i4+NPart) )%PartType
@@ -7088,9 +7173,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 2-2")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i5
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i5)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i4
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i4)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i4)%PartType,1000) )
            do NPart=0,NumVertPart-1
                if( i5+NPart.le.NumExtParticles ) then
                   TheTree%PartRef(NPart+2) = i5+NPart
@@ -7129,9 +7214,9 @@ type(TreeProcess),pointer :: TheTree
                NCut = NCut + 1
            endif
 !           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2),  ThePrimAmp%IntPart(i4)%PartType,ThePrimAmp%IntPart(i5)%PartType
-           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
-           print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
+!            print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
 
 
    enddo
@@ -7149,7 +7234,7 @@ type(TreeProcess),pointer :: TheTree
    do i5 = 1, NumExtParticles
 
 !          skip cuts that are marked for discarding
-           if( ThePrimAmp%IntPart(i5)%PartType .eq. 0 ) cycle
+           if( mod(ThePrimAmp%IntPart(i5)%PartType,1000) .eq. 0 ) cycle
 
 !          set tree processes
 !          vertex 1
@@ -7162,9 +7247,9 @@ type(TreeProcess),pointer :: TheTree
            if( AllocStatus .ne. 0 ) call Error("Memory allocation in TheTree%PartType 1-1")
 !          set particle reference (wrt.prim.amp) and flavor
            TheTree%PartRef(1) = i5
-           TheTree%PartType(1) = (ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(1) = mod(ThePrimAmp%IntPart(i5)%PartType,1000)
            TheTree%PartRef(NumVertPart+2) = i5
-           TheTree%PartType(NumVertPart+2) = ChargeConj(ThePrimAmp%IntPart(i5)%PartType)
+           TheTree%PartType(NumVertPart+2) = ChargeConj(mod(ThePrimAmp%IntPart(i5)%PartType,1000) )
            do NPart=0,NumVertPart-1
                if( i5+NPart.le.NumExtParticles ) then
                   TheTree%PartRef(NPart+2) = i5+NPart
@@ -7191,17 +7276,12 @@ type(TreeProcess),pointer :: TheTree
                ThePrimAmp%UCuts(1)%CutProp(NCut,1) = i5
                NCut = NCut + 1
            print *, NCut-1, ThePrimAmp%UCuts(1)%CutProp(NCut-1,1)
-           print *, 'tree 1:', ThePrimAmp%UCuts(1)%TreeProcess(NCut-1,1)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(1)%TreeProcess(NCut-1,1)%PartType(1:TheTree%NumPart)
 
 
            endif
    enddo
    if ( NCut-1 .ne. ThePrimAmp%UCuts(1)%NumCuts ) call Error("Something went wrong while setting sing-cuts.")
-
-
-
-
-
 
    do NPoint=1,5
       do NCut=1,ThePrimAmp%UCuts(NPoint)%NumCuts
@@ -7472,6 +7552,125 @@ END SUBROUTINE
 
 
 
+SUBROUTINE MatchUCuts(PrimAmp,Cut,HiCut,CutNum)
+use ModMisc
+implicit none
+type(PrimitiveAmplitude),target :: PrimAmp
+integer :: Cut,CutNum,HiCut,NumMatch,MatchHiCuts(1:20),FirstHiProp(1:20),MissHiProp(1:20,1:4)
+integer :: Prop(1:5),HiProp(1:5),INTER(1:5),COMPL(1:5),FirstInterPos
+integer :: i,numcheck,AllocStatus
+type(UCutMatch),pointer :: TheMatch
+
+NumMatch=0
+do i=1,PrimAmp%UCuts(HiCut)%NumCuts
+    Prop(1:Cut) = PrimAmp%UCuts(Cut)%CutProp(CutNum,1:Cut)
+    HiProp(1:HiCut) = PrimAmp%UCuts(HiCut)%CutProp(i,1:HiCut)
+    numcheck= MatchSets(HiProp(1:HiCut),Prop(1:Cut),INTER,COMPL,FirstInterPos)
+    if( numcheck.eq.Cut ) then
+        NumMatch=NumMatch+1
+        MatchHiCuts(NumMatch)=i
+        FirstHiProp(NumMatch)=FirstInterPos
+        MissHiProp(NumMatch,1:HiCut-Cut)=COMPL(1:HiCut-Cut)
+    endif
+enddo
+
+  TheMatch => PrimAmp%UCuts(Cut)%Match(CutNum)
+
+
+  allocate(TheMatch%Subt(HiCut)%NumMatch(0:PrimAmp%NumSisters), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 1")
+
+
+  TheMatch%Subt(HiCut)%NumMatch = NumMatch
+
+  allocate(TheMatch%Subt(HiCut)%MatchHiCuts(0:PrimAmp%NumSisters,1:NumMatch), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 1")
+  TheMatch%Subt(HiCut)%MatchHiCuts(0,1:NumMatch) = MatchHiCuts(1:NumMatch)
+
+  allocate(TheMatch%Subt(HiCut)%FirstHiProp(0:PrimAmp%NumSisters,1:NumMatch), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 2")
+  TheMatch%Subt(HiCut)%FirstHiProp(0,1:NumMatch) = FirstHiProp(1:NumMatch)
+
+  allocate(TheMatch%Subt(HiCut)%MissHiProp(0:PrimAmp%NumSisters,1:NumMatch,1:HiCut-Cut), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 3")
+  TheMatch%Subt(HiCut)%MissHiProp(0,1:NumMatch,1:HiCut-Cut) = MissHiProp(1:NumMatch,1:HiCut-Cut)
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE MatchUCuts_new(PrimAmp,Cut,HiCut,CutNum)
+use ModMisc
+implicit none
+type(PrimitiveAmplitude),target :: PrimAmp
+type(PrimitiveAmplitude), pointer :: HiPrimAmp
+integer :: Cut,CutNum,HiCut,NumMatch,MatchHiCuts(1:20),FirstHiProp(1:20),MissHiProp(1:20,1:4)
+integer :: Prop(1:5),HiProp(1:5),INTER(1:5),COMPL(1:5),FirstInterPos
+integer :: i,j,k,numcheck,AllocStatus
+type(UCutMatch),pointer :: TheMatch
+logical :: RejectWrongFlavor
+
+
+  TheMatch => PrimAmp%UCuts(Cut)%Match(CutNum)
+
+                                                            ! 1:50 is the maximum number of matches for a given primitive
+  allocate(TheMatch%Subt(HiCut)%NumMatch(0:PrimAmp%NumSisters), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 1")
+  allocate(TheMatch%Subt(HiCut)%MatchHiCuts(0:PrimAmp%NumSisters,1:50), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 1")
+  allocate(TheMatch%Subt(HiCut)%FirstHiProp(0:PrimAmp%NumSisters,1:50), stat=AllocStatus )
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 2")
+  allocate(TheMatch%Subt(HiCut)%MissHiProp(0:PrimAmp%NumSisters,1:50,1:5), stat=AllocStatus )   !   1:5 is the maximum number of missing propagators
+  if( AllocStatus .ne. 0 ) call Error("Memory allocation in MatchUCuts 3")
+
+
+do k=0,PrimAmp%NumSisters
+
+  NumMatch=0
+
+if( k.eq.0 ) then
+  HiPrimAmp => PrimAmp
+else
+  HiPrimAmp => PrimAmps( PrimAmp%Sisters(k) )
+endif
+
+do i=1,HiPrimAmp%UCuts(HiCut)%NumCuts
+    Prop(1:Cut) = PrimAmp%UCuts(Cut)%CutProp(CutNum,1:Cut)
+    HiProp(1:HiCut) = HiPrimAmp%UCuts(HiCut)%CutProp(i,1:HiCut)
+    numcheck= MatchSets(HiProp(1:HiCut),Prop(1:Cut),INTER,COMPL,FirstInterPos)
+
+    RejectWrongFlavor=.false.
+    do j=1,Cut
+      if( PrimAmp%IntPart(INTER(j))%PartType .ne. HiPrimAmp%IntPart(INTER(j))%PartType ) then
+           RejectWrongFlavor = .true.
+           exit
+      endif
+    enddo
+
+    if( numcheck.eq.Cut .and. .not.RejectWrongFlavor .and. .not.HiPrimAmp%UCuts(HiCut)%skip(i) ) then
+        NumMatch=NumMatch+1
+        MatchHiCuts(NumMatch)=i
+        FirstHiProp(NumMatch)=FirstInterPos
+        MissHiProp(NumMatch,1:HiCut-Cut)=COMPL(1:HiCut-Cut)
+    endif
+enddo
+
+
+  TheMatch%Subt(HiCut)%NumMatch(k) = NumMatch
+
+  TheMatch%Subt(HiCut)%MatchHiCuts(k,1:NumMatch) = MatchHiCuts(1:NumMatch)
+  TheMatch%Subt(HiCut)%FirstHiProp(k,1:NumMatch) = FirstHiProp(1:NumMatch)
+  TheMatch%Subt(HiCut)%MissHiProp(k,1:NumMatch,1:HiCut-Cut) = MissHiProp(1:NumMatch,1:HiCut-Cut)
+
+enddo
+
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -7479,7 +7678,7 @@ SUBROUTINE InfoPrimAmps(Filename)
 use ModMisc
 implicit none
 type(PrimitiveAmplitude),pointer :: ThePrimAmp
-integer :: NPrimAmp,NCut,NPart
+integer :: NPrimAmp,NCut,NPart,k
 character :: Filename*(*)
 
 
@@ -7516,12 +7715,21 @@ character :: Filename*(*)
       write(14,"(A32,A100)") " ", WritePartType( ExtParticle(ThePrimAmp%ExtLine(1:NumExtParticles))%PartType )
       write(14,"(A31,10I3)") "Internal ordering: ",ThePrimAmp%IntPart(1:NumExtParticles)%PartType
       write(14,"(A32,A100)") " ", WritePartType( ThePrimAmp%IntPart(1:NumExtParticles)%PartType )
+      if( ThePrimAmp%NumSisters.ne.0 ) then
+	  write(14,"(A31,10I3)") "Sister primitives: ",ThePrimAmp%Sisters(1:ThePrimAmp%NumSisters)
+      else
+	  write(14,"(A31,10I3)") "Sister primitives: ",0
+      endif
       write(14,*) ""
       write(14,"(A)") "--------------------------------------"
 
       write(14,"(A31,I3)") "Number of pent-cuts: ",ThePrimAmp%UCuts(5)%NumCuts
       do NCut=1,ThePrimAmp%UCuts(5)%NumCuts
-         write(14,"(A31,I3,A1,5I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
+       write(14,"(A31,I3,A1,5I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
+
+       if( ThePrimAmp%UCuts(5)%Skip(NCut) ) then
+          write(14,"(A31)") "skipped"
+       else
          NPart = ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%NumPart
          write(14,"(A40,10I3)") "Tree 1:",ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:NPart) )
@@ -7537,11 +7745,21 @@ character :: Filename*(*)
          NPart = ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%NumPart
          write(14,"(A40,10I3)") "Tree 5:",ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:NPart) )
+       endif
       enddo
 
       write(14,"(A31,I3)") "Number of quad-cuts: ",ThePrimAmp%UCuts(4)%NumCuts
       do NCut=1,ThePrimAmp%UCuts(4)%NumCuts
          write(14,"(A31,I3,A1,4I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
+       if( ThePrimAmp%UCuts(4)%Skip(NCut) ) then
+          write(14,"(A31)") "skipped"
+       else
+         do k=0,ThePrimAmp%NumSisters
+            if( k.eq.0 ) write(14,"(A52)") "Subtraction from Primitive amplitude itself"
+            if( k.gt.0 ) write(14,"(A43,I3)") "Subtraction from sister Primitive ",ThePrimAmp%Sisters(k)
+            write(14,"(A40,10I3)") "Number of subtracted penta-cuts",ThePrimAmp%UCuts(4)%Match(NCut)%Subt(5)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted penta-cuts ",ThePrimAmp%UCuts(4)%Match(NCut)%Subt(5)%MatchHiCuts(k,1:ThePrimAmp%UCuts(4)%Match(NCut)%Subt(5)%NumMatch(k))
+         enddo
          NPart = ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart
          write(14,"(A40,10I3)") "Tree 1:",ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:NPart) )
@@ -7554,11 +7772,23 @@ character :: Filename*(*)
          NPart = ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart
          write(14,"(A40,10I3)") "Tree 4:",ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:NPart) )
+       endif
       enddo
 
       write(14,"(A31,I3)") "Number of trip-cuts: ",ThePrimAmp%UCuts(3)%NumCuts
       do NCut=1,ThePrimAmp%UCuts(3)%NumCuts
          write(14,"(A31,I3,A1,4I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
+       if( ThePrimAmp%UCuts(3)%Skip(NCut) ) then
+          write(14,"(A31)") "skipped"
+       else
+         do k=0,ThePrimAmp%NumSisters
+            if( k.eq.0 ) write(14,"(A52)") "Subtraction from Primitive amplitude itself"
+            if( k.gt.0 ) write(14,"(A43,I3)") "Subtraction from sister Primitive ",ThePrimAmp%Sisters(k)
+!             write(14,"(A40,10I3)") "Number of subtracted penta-cuts",ThePrimAmp%UCuts(3)%Match(NCut)%Subt(5)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted penta-cuts ",ThePrimAmp%UCuts(3)%Match(NCut)%Subt(5)%MatchHiCuts(k,1:ThePrimAmp%UCuts(3)%Match(NCut)%Subt(5)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted quad-cuts ",ThePrimAmp%UCuts(3)%Match(NCut)%Subt(4)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted quad-cuts  ",ThePrimAmp%UCuts(3)%Match(NCut)%Subt(4)%MatchHiCuts(k,1:ThePrimAmp%UCuts(3)%Match(NCut)%Subt(4)%NumMatch(k))
+         enddo
          NPart = ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart
          write(14,"(A40,10I3)") "Tree 1:",ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:NPart) )
@@ -7568,25 +7798,56 @@ character :: Filename*(*)
          NPart = ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart
          write(14,"(A40,10I3)") "Tree 3:",ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:NPart) )
+       endif
       enddo
 
       write(14,"(A31,I3)") "Number of doub-cuts: ",ThePrimAmp%UCuts(2)%NumCuts
       do NCut=1,ThePrimAmp%UCuts(2)%NumCuts
          write(14,"(A31,I3,A1,4I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(2)%CutProp(NCut,1:2)
+       if( ThePrimAmp%UCuts(2)%Skip(NCut) ) then
+          write(14,"(A31)") "skipped"
+       else
+         do k=0,ThePrimAmp%NumSisters
+            if( k.eq.0 ) write(14,"(A52)") "Subtraction from Primitive amplitude itself"
+            if( k.gt.0 ) write(14,"(A43,I3)") "Subtraction from sister Primitive ",ThePrimAmp%Sisters(k)
+!             write(14,"(A40,10I3)") "Number of subtracted penta-cuts",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(5)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted penta-cuts ",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(5)%MatchHiCuts(k,1:ThePrimAmp%UCuts(2)%Match(NCut)%Subt(5)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted quad-cuts ",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(4)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted quad-cuts  ",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(4)%MatchHiCuts(k,1:ThePrimAmp%UCuts(2)%Match(NCut)%Subt(4)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted trip-cuts ",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(3)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted trip-cuts  ",ThePrimAmp%UCuts(2)%Match(NCut)%Subt(3)%MatchHiCuts(k,1:ThePrimAmp%UCuts(2)%Match(NCut)%Subt(3)%NumMatch(k))
+         enddo
          NPart = ThePrimAmp%UCuts(2)%TreeProcess(NCut,1)%NumPart
          write(14,"(A40,10I3)") "Tree 1:",ThePrimAmp%UCuts(2)%TreeProcess(NCut,1)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(2)%TreeProcess(NCut,1)%PartType(1:NPart) )
          NPart = ThePrimAmp%UCuts(2)%TreeProcess(NCut,2)%NumPart
          write(14,"(A40,10I3)") "Tree 2:",ThePrimAmp%UCuts(2)%TreeProcess(NCut,2)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(2)%TreeProcess(NCut,2)%PartType(1:NPart) )
+       endif
       enddo
 
       write(14,"(A31,I3)") "Number of sing-cuts: ",ThePrimAmp%UCuts(1)%NumCuts
       do NCut=1,ThePrimAmp%UCuts(1)%NumCuts
          write(14,"(A31,I3,A1,4I3)") "cut (pointer)",NCut,":",ThePrimAmp%UCuts(1)%CutProp(NCut,1:1)
+       if( ThePrimAmp%UCuts(1)%Skip(NCut) ) then
+          write(14,"(A31)") "skipped"
+       else
+         do k=0,ThePrimAmp%NumSisters
+            if( k.eq.0 ) write(14,"(A52)") "Subtraction from Primitive amplitude itself"
+            if( k.gt.0 ) write(14,"(A43,I3)") "Subtraction from sister Primitive ",ThePrimAmp%Sisters(k)
+!             write(14,"(A40,10I3)") "Number of subtracted penta-cuts",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(5)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted penta-cuts ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(5)%MatchHiCuts(k,1:ThePrimAmp%UCuts(1)%Match(NCut)%Subt(5)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted quad-cuts ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(4)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted quad-cuts  ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(4)%MatchHiCuts(k,1:ThePrimAmp%UCuts(1)%Match(NCut)%Subt(4)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted trip-cuts ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(3)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted trip-cuts  ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(3)%MatchHiCuts(k,1:ThePrimAmp%UCuts(1)%Match(NCut)%Subt(3)%NumMatch(k))
+!             write(14,"(A40,10I3)") "Number of subtracted bubl-cuts ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(2)%NumMatch(k)
+            write(14,"(A40,10I3)") "Label of subtracted bubl-cuts  ",ThePrimAmp%UCuts(1)%Match(NCut)%Subt(2)%MatchHiCuts(k,1:ThePrimAmp%UCuts(1)%Match(NCut)%Subt(2)%NumMatch(k))
+         enddo
          NPart = ThePrimAmp%UCuts(1)%TreeProcess(NCut,1)%NumPart
          write(14,"(A40,10I3)") "Tree 1:",ThePrimAmp%UCuts(1)%TreeProcess(NCut,1)%PartRef(1:NPart)
          write(14,"(A41,A100)") "       ",WritePartType( ThePrimAmp%UCuts(1)%TreeProcess(NCut,1)%PartType(1:NPart) )
+       endif
       enddo
    enddo
    write(14,*) ""
@@ -7596,15 +7857,101 @@ END SUBROUTINE
 
 
 
-    SUBROUTINE REMOVE_DUPLICATE_CUTS()
+
+SUBROUTINE FindSubtractions()
+use modMisc
+implicit none
+integer :: nPrimAmp,NCut,AllocStatus
+type(PrimitiveAmplitude), pointer ::  ThePrimAmp
+
+  do nPrimAmp=1,NumPrimAmps
+         ThePrimAmp => PrimAmps(NPrimAmp)
+
+      ! set cut matchings
+	allocate( ThePrimAmp%UCuts(4)%Match(1:ThePrimAmp%UCuts(4)%NumCuts)  , stat=AllocStatus )
+	if( AllocStatus .ne. 0 ) call Error("Memory allocation for quad cut matching")
+
+	allocate( ThePrimAmp%UCuts(3)%Match(1:ThePrimAmp%UCuts(3)%NumCuts)  , stat=AllocStatus )
+	if( AllocStatus .ne. 0 ) call Error("Memory allocation for trip cut matching")
+
+	allocate( ThePrimAmp%UCuts(2)%Match(1:ThePrimAmp%UCuts(2)%NumCuts)  , stat=AllocStatus )
+	if( AllocStatus .ne. 0 ) call Error("Memory allocation for doub cut matching")
+
+	allocate( ThePrimAmp%UCuts(1)%Match(1:ThePrimAmp%UCuts(1)%NumCuts)  , stat=AllocStatus )
+	if( AllocStatus .ne. 0 ) call Error("Memory allocation for sing cut matching")
+
+! 	do NCut=1,ThePrimAmp%UCuts(4)%NumCuts
+! 	  call MatchUCuts(ThePrimAmp,4,5,NCut)
+! 	enddo
+! 
+! 	do NCut=1,ThePrimAmp%UCuts(3)%NumCuts
+! 	  call MatchUCuts(ThePrimAmp,3,5,NCut)
+! 	  call MatchUCuts(ThePrimAmp,3,4,NCut)
+! 	enddo
+! 
+! 	do NCut=1,ThePrimAmp%UCuts(2)%NumCuts
+! 	  call MatchUCuts(ThePrimAmp,2,5,NCut)
+! 	  call MatchUCuts(ThePrimAmp,2,4,NCut)
+! 	  call MatchUCuts(ThePrimAmp,2,3,NCut)
+! 	enddo
+! 
+! 	do NCut=1,ThePrimAmp%UCuts(1)%NumCuts
+! 	  call MatchUCuts(ThePrimAmp,1,5,NCut)
+! 	  call MatchUCuts(ThePrimAmp,1,4,NCut)
+! 	  call MatchUCuts(ThePrimAmp,1,3,NCut)
+! 	  call MatchUCuts(ThePrimAmp,1,2,NCut)
+! 	enddo
+
+
+
+	do NCut=1,ThePrimAmp%UCuts(4)%NumCuts
+	  call MatchUCuts_new(ThePrimAmp,4,5,NCut)
+	enddo
+
+	do NCut=1,ThePrimAmp%UCuts(3)%NumCuts
+	  call MatchUCuts_new(ThePrimAmp,3,5,NCut)
+	  call MatchUCuts_new(ThePrimAmp,3,4,NCut)
+	enddo
+
+	do NCut=1,ThePrimAmp%UCuts(2)%NumCuts
+	  call MatchUCuts_new(ThePrimAmp,2,5,NCut)
+	  call MatchUCuts_new(ThePrimAmp,2,4,NCut)
+	  call MatchUCuts_new(ThePrimAmp,2,3,NCut)
+	enddo
+
+	do NCut=1,ThePrimAmp%UCuts(1)%NumCuts
+	  call MatchUCuts_new(ThePrimAmp,1,5,NCut)
+	  call MatchUCuts_new(ThePrimAmp,1,4,NCut)
+	  call MatchUCuts_new(ThePrimAmp,1,3,NCut)
+	  call MatchUCuts_new(ThePrimAmp,1,2,NCut)
+	enddo
+
+
+
+
+  enddo
+
+END SUBROUTINE
+
+
+
+
+
+
+
+
+
+
+
+
+ SUBROUTINE REMOVE_DUPLICATE_CUTS()
     ! Routine to remove duplicate cuts from different parent diagrams
 !      type(PrimitiveAmplitude)          :: P
       type(PrimitiveAmplitude),pointer  :: NewPrimAmp, OldPrimAmp
-      integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp
+      integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp,OldNcut
       logical                          :: are_equiv
-    
-      print *, 'in remove duplicate cuts'
-    
+
+
       do NPrimAmp=2,NumPrimAmps
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
@@ -7612,36 +7959,40 @@ END SUBROUTINE
             j = 0
             do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) &
                     & .and. (j+1 .lt. NPrimAmp))
-    
+
                   j = j+1
                   OldPrimAmp => PrimAmps(j)
-                  if ( OldPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .true.) cycle
-    
-                  Nequivtrees = 0
+                  OldNCut=0
+!                  do OldNcut=1,OldPrimAmp%UCuts(Npoint)%NumCuts
+                  do while ( (OldNCut .lt. OldPrimAmp%UCuts(Npoint)%NumCuts)&
+                       & .and. (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
+                     OldNCut=OldNCut+1
+
+                     if ( OldPrimAmp%UCuts(Npoint)%skip(OldNCut) .eq. .true.) cycle
+
+                     Nequivtrees = 0
                   ! This should always be true, put in as a additional safety net
-                  if (all(NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:) .eq. OldPrimAmp%UCuts(Npoint)%CutProp(NCut,:))) then
-                     
-                     do NTree = 1,Npoint
-                        call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree), &
-                             &OldPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree),are_equiv)
-                        if (are_equiv) Nequivtrees = Nequivtrees+1
-                     enddo
-                  endif
-    
+                     if (all(NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:) .eq. OldPrimAmp%UCuts(Npoint)%CutProp(OldNCut,:))) then
+
+                        do NTree = 1,Npoint
+                           call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree), &
+&OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,Ntree),are_equiv)
+                           if (are_equiv) Nequivtrees = Nequivtrees+1
+                        enddo
+                     endif
                   if (Nequivtrees == Npoint) then                        ! all trees equivalent = duplicate cut!
                      NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
                   else
                      NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
                   endif
-    
-               enddo    ! j
+               enddo
+
+            enddo    ! j
             enddo       ! Ncut
          enddo          ! NParent
       enddo             ! NPoint
-    end SUBROUTINE REMOVE_DUPLICATE_CUTS
-    
-    
-    
+    end SUBROUTINE REMOVE_DUPLICATE_CUTS 
+
     
     SUBROUTINE ARE_TREES_EQUIV(Tree1, Tree2, isequiv)
     ! Routine to decide whether two tree processes are equivalent.

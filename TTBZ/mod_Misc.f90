@@ -747,18 +747,19 @@ END FUNCTION
 
 ! split two sets into INTERsection and COMPLement
 ! e.g.: A=(1,2,3,4,5), B=(2,4,5)
-!       INTER=(2,4,5), COMPL=(1,3), numMatch=3
+!       INTER=(2,4,5), COMPL=(1,3), numMatch=3,  FirstInterPos= position of first intersection
 ! healthy requirements: size(A).ge.size(B), size(INTER)=size(B), size(COMPL)=size(A)
-FUNCTION MatchSets(A,B,INTER,COMPL)
+FUNCTION MatchSets(A,B,INTER,COMPL,FirstInterPos)
 implicit none
 integer :: MatchSets
 integer, intent(in) :: A(:),B(:)
-integer, intent(out):: INTER(:),COMPL(:)
+integer, intent(out):: INTER(:),COMPL(:),FirstInterPos
 integer :: n,numMismatch,numMatch
 
-  numMatch=0; numMismatch=0;
+  numMatch=0; numMismatch=0; FirstInterPos=0;
   do n=1,size(A,1)
     if( any(B(:).eq.A(n)) ) then
+        if( numMatch.eq.0 ) FirstInterPos = n
         numMatch=numMatch+1
         INTER(numMatch) = A(n)
     else

@@ -68,7 +68,6 @@
       sum_dip = zero
 
             do n=1,ndip
-!             do n=7,9; print *, "constraint dipole sum"
 
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor

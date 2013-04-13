@@ -53,7 +53,7 @@ complex(8) :: couplZFF_right,couplZFF_left,couplZFF
 
    PropPhoton = (1d0,0d0)! the photon propagator is included as 1/kV^2 term in the decay matrix element
 
-    if( ZDecays.eq.1 .or. ZDecays.eq.11 ) then 
+    if( abs(ZDecays).eq.1 .or. ZDecays.eq.11 ) then
         couplZFF_right = couplZEE_right 
         couplZFF_left  = couplZEE_left
     elseif( ZDecays.eq.2 .or. ZDecays.eq.12 ) then 

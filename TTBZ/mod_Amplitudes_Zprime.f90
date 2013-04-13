@@ -328,6 +328,8 @@ contains
     complex(8) :: resLL(-1:1), resLR(-1:1), boxL, boxR
     complex(8) :: LO_L, LO_R
     real(8) :: catani
+! #INCLUDE "looptools.h"
+
 
     epv = 0
 
@@ -374,6 +376,59 @@ contains
 
     bub5 = qlI2(u,0d0,mt2,mur2,epv)
     bub6 = qlI2(0d0,mZp2,0d0,mur2,epv)
+
+!     print *, "old results with QCDLib"
+!     print *, bub1 
+!     print *, bub2
+!     print *, bub3
+!     print *, bub4
+!     print *, bub5
+!     print *, bub6
+!     print *, tri1
+!     print *, tri2
+!     print *, tri3
+!     print *, tri4
+!     print *, tri5
+!     print *, tri6
+!     print *, bo1
+!     print *, bo2
+! 
+! !   calculate new integrals with Looptools
+!     print *, "new results with LoopTools"
+!     call setlambda(0d0)!    this sets finite part for loop tools integrals, also: -1d0, -2d0
+!     call setmudim(MuRen**2) ! this is for the looptools integrals
+!     bo1 = D0(0d0,0d0,mt2,mt2,s,t,0d0,0d0,mZp2,mt2)
+!     bo2 = D0(0d0,0d0,mt2,mt2,s,u,0d0,0d0,mZp2,mt2)
+!     tri1 = C0(s,mt2,mt2,0d0,mZp2,mt2)
+!     tri2 = C0(0d0,mt2,t,0d0,mZp2,mt2)
+!     tri3 = C0(0d0,mt2,t,0d0,0d0,mt2)
+!     tri4 = C0(0d0,mt2,u,0d0,0d0,mt2)
+!     tri5 = C0(0d0,u,mt2,mZp2,0d0,mt2)
+!     tri6 = C0(0d0,0d0,s,0d0,0d0,mZp2)
+!     bub1 = B0(s,0d0,mZp2)
+!     bub2 = B0(t,0d0,mt2)
+!     bub3 = B0(mt2,mZp2,mt2)
+!     bub4 = B0(mt2,0d0,mt2)
+!     bub5 = B0(u,0d0,mt2)
+! !     bub6 = B0C(dcmplx(0d0),dcmplx(mZp2+(0d0,1d0)*Ga_Zpr*M_Zpr),dcmplx(0d0))! all arguments have to be complex
+!     bub6 = B0(0d0,mZp2,0d0)
+!     print *, bub1
+!     print *, bub2
+!     print *, bub3
+!     print *, bub4
+!     print *, bub5
+!     print *, bub6
+!     print *, tri1
+!     print *, tri2
+!     print *, tri3
+!     print *, tri4
+!     print *, tri5
+!     print *, tri6
+!     print *, bo1
+!     print *, bo2
+!     PAUSE
+! 
+! !!!!!!!!!!!!!!!!!!
 
     spst1(-1) = spab(ub1,p2,v4)*spbb(ub3,v2)
     spst2(-1) = spab(ub1,p3,v2)*spab(ub3,p1,v4)

@@ -13,6 +13,7 @@ FUNCTION EvalCS_1L_ttbggg(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
 use ModUCuts
+use ModUCuts_new
 use ModUCuts_128
 use ModIntegrals
 use ModAmplitudes
@@ -149,6 +150,19 @@ ELSEIF( Correction.EQ.1 ) THEN
           call DoubCut(PrimAmps(iPrimAmp))
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+print *, "before",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+
+          call SetKirill(PrimAmps(iPrimAmp))
+          call PentCut_new(PrimAmps(iPrimAmp))
+          call QuadCut_new(PrimAmps(iPrimAmp))
+          call TripCut_new(PrimAmps(iPrimAmp))
+          call DoubCut_new(PrimAmps(iPrimAmp))
+          call SingCut_new(PrimAmps(iPrimAmp))
+          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+
+print *, "after ",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+pause
+
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -PrimAmps(iPrimAmp)%Result(-2:1)    ! A_R -> A_L factor
           PrimAmps(iPrimAmp)%Result(-2:1) = -PrimAmps(iPrimAmp)%Result(-2:1)    ! correction to compensate in color factor
@@ -1020,7 +1034,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus if from closed fermion loop
 !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,EHat)
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv); pause
 !           call WriteLatexOutput(iPrimAmp,PrimAmps(iPrimAmp),BornAmps(iPrimAmp))
       enddo
 

@@ -438,7 +438,7 @@ contains
       vBub =0.5d0*(pr2+pr1)*dlog(m12/mu2)
       endif
 
-      if(m12.ne.m22) print *,"There may be an error in vBub"
+      if(m12.ne.m22) print *,"There may be an error in vBub",m12,m22
 
       return
       END FUNCTION vBub

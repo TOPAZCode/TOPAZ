@@ -10,7 +10,7 @@
       private
 
       integer, parameter  :: dp = selected_real_kind(15)
-      real(dp), private :: yRnDK(1:8), Wgt_ext(2)
+      real(dp), private :: yRnDK(1:10), Wgt_ext
       real(dp), parameter, private  :: Momzero(1:4)=0d0
 
       public :: EvalDipoles_QQBTTBGZ
@@ -30,11 +30,11 @@
       subroutine EvalDipoles_QQBTTBGZ(p,yRnDk1,Wgt,sum_dip)
       real(dp), intent(out) ::  sum_dip(2)
       real(dp), intent(in) :: p(4,6)
-      real(dp), intent(in) :: yRnDK1(1:8), Wgt(2)
+      real(dp), intent(in) :: yRnDK1(1:10), Wgt
       integer, parameter :: ndip = 12
       integer, parameter :: in1 = 4
       integer, parameter :: in2 = 5
-      real(dp) :: res(2)
+      real(dp) :: res
       integer ::  dip(ndip,3)
       data dip(1,1)/6/, dip(1,2)/1/, dip(1,3)/3/
       data dip(2,1)/6/, dip(2,2)/1/, dip(2,3)/4/
@@ -74,7 +74,6 @@
       sum_dip = zero
 
             do n=1,ndip
-!             do n=1,4
 
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor
@@ -82,56 +81,42 @@
 
          res = zero
 
-!      if( i.eq.6 .and. j.eq.5 .and. k.eq.1 ) then
-!         alpha_ff=1d-2
-!      else
-!         alpha_ff=1d0
-!      endif
-
-
       if (j.ne.in1.and.j.ne.in2.and.k.ne.in1.and.k.ne.in2) then
         call dipff(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
-!         print *, "ff"
       endif
 
       if ((j.ne.in1.and.j.ne.in2).and.(k.eq.in1.or.k.eq.in2)) then
         call dipfi(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
-!         print *, "fi"
       endif
 
 
       if ( (k.ne.in1.and.k.ne.in2).and.(j.eq.in1.or.j.eq.in2)) then
         call dipif(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
-!         print *, "if"
       endif
 
       if ( (j.eq.in1.and.k.eq.in2).or.(j.eq.in2.and.k.eq.in1)) then
         call dipii(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
-!         print *, "ii"
       endif
 
-        sum_dip = sum_dip + res
-!         print *, n,res
-        enddo
+      sum_dip = sum_dip + res
+      enddo
 
       end subroutine
 
 
 
 !      dipole subroutines
-
        subroutine dipff(n,i,j,k,mi,mj,mk,fl1,fl2,p,res)
        implicit none
        integer, intent(in) :: n,i,j,k
        real(dp), intent(in) :: mi,mj,mk
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res(2)
-       complex(dp) :: cres(2)
+       real(dp), intent(out) :: res
+       complex(dp) :: cres
        integer :: oh(6,5)
        real(dp) :: mij
-       real(dp) :: Cup(2,2),Cdn(2,2)
-       character :: ixq*2
+       real(dp) :: C(2,2)
        real(dp) :: mui,muj,muk,q2sqrt,yp
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
        real(dp) :: q(4,5), paux(4), pijk(4)
@@ -155,8 +140,8 @@
        real(dp) ::  pjetout(4,5), weight
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms)
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
-       integer :: Njet, Nmax(5), Nhisto
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       integer :: Njet, Nmax(5), Nhisto,N2jump
        logical, save :: first_time = .true.
 
 
@@ -167,8 +152,8 @@
                         ! jet cuts
 
        if( first_time ) then
-              call InitTrees(4,1,2,TreeAmpsDip)
-              call InitProcess_TbTQbQG(ExtParticles(1:5))
+             call InitTrees(4,0,2,TreeAmpsDip,NumBoson=1)
+             call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
              do iTree=1,2
@@ -177,8 +162,9 @@
              first_time=.false.
       endif
 
-!       momentum mapping
 
+
+!       momentum mapping
         pi=p(:,i)
         pj=p(:,j)
         pk=p(:,k)
@@ -250,14 +236,11 @@
           pos = j
        endif
 
-
-
        if (TopDecays.ge.1) then
-         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false., &
-  MomDK(1:4,1:3),PSWgt1)
-         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false., &
-  MomDK(1:4,4:6),PSWgt2)
+         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
+         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
        elseif(TopDecays.eq.0) then
+         MomDK = 0d0
          PSWgt1 = one
          PSWgt2 = one
        else
@@ -265,37 +248,48 @@
           pause
        endif
 
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
 
 
-  call Kinematics_TTBARPHOTON(0, &
- (/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero, &
-    MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3), &
-    MomDK(1:4,4),MomDK(1:4,5),MomDK(1:4,6)/), &
-    (/4,5,3,1,2,6,7,8,9,10,11,12/), &
-    Not_Passed_Cuts,NBin(1:NumHistograms) &
-    )
+!----------------- ini   ini     final   top   top, real
+
+
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+
+
+
 
      if(Not_Passed_Cuts.eq..false.) then
 
-        call cc_qq_ttgamg_soft(n,'up',Cup)
-        call cc_qq_ttgamg_soft(n,'dn',Cdn)
-
+        call cc_qq_ttgamg_soft(n,C)
 !--- after momentum mapping -- sum over colors and polarizations
 
 
         Nmax = 1
-
         if (TopDecays.ge.1) then ! Top decays
-               Nmax(3) = -1
-               Nmax(1) = -1
-       if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1          ! helicity index below
-               Nmax(1) = 1
-       endif
-       endif
+              Nmax(3) = -1
+              Nmax(1) = -1
+              if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1               ! helicity index below
+                  Nmax(1) = 1
+              endif
+        endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
+        endif
 
        do i1=-1,Nmax(1),2
-         do i2 = -1,Nmax(2),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
            do i3 = -1,Nmax(3),2
              do i4 = -1,Nmax(4),2
                do i5 = -1,Nmax(5),2
@@ -332,9 +326,7 @@
               hel(1) = i5
            endif
 
-
-  call GenerateEventttqqg2((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/), &
-  momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
 
    if (pos.eq.1) then
@@ -444,8 +436,7 @@
            do i1 = -1,1,2
            do i2 = -1,1,2
 
-      cres(1) = cres(1) + Cup(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-      cres(2) = cres(2) + Cdn(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
           enddo
           enddo
@@ -464,7 +455,7 @@
 !------- fill in histograms --- this  is not going to
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res)
          enddo
 
 
@@ -479,11 +470,11 @@
        real(dp), intent(in) :: mi,mj,ma
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res(2)
-       complex(dp) :: cres(2)
+       real(dp), intent(out) :: res
+       complex(dp) :: cres
        integer :: oh(6,5)
        real(dp) :: mij
-       real(dp) :: Cup(2,2),Cdn(2,2)
+       real(dp) :: C(2,2)
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
        real(dp) :: q(4,5), paux(4), pijk(4), pa(4),  pat(4)
        real(dp) :: xx1, xx2, zi, zj, yijk, vijk, zim
@@ -506,8 +497,8 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
        res = zero
        cres = (0d0,0d0)
@@ -516,8 +507,8 @@
 
 
        if( first_time ) then
-              call InitTrees(4,1,2,TreeAmpsDip)
-              call InitProcess_TbTQbQG(ExtParticles(1:5))
+             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
              do iTree=1,2
@@ -607,9 +598,7 @@
      if(Not_Passed_Cuts.eq..false.) then
 
 
-        call cc_qq_ttgamg_soft(n,'up',Cup)
-        call cc_qq_ttgamg_soft(n,'dn',Cdn)
-
+        call cc_qq_ttgamg_soft(n,C)
          Nmax = 1
 
         if (TopDecays.ge.1) then ! Top decays
@@ -659,8 +648,7 @@
               hel(1) =i5
            endif
 
-  call GenerateEventttqqg2((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/), &
-  momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
       if (pos.eq.1) then
        if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -767,8 +755,7 @@
            do i4=1,2
 
 
-      cres(1) = cres(1) + Cup(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-      cres(2) = cres(2) + Cdn(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
 
              enddo
@@ -786,7 +773,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res)
          enddo
 
 
@@ -801,10 +788,10 @@
        real(dp), intent(in) :: mi,mj,ma
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res(2)
-       complex(dp) :: cres(2)
+       real(dp), intent(out) :: res
+       complex(dp) :: cres
        real(dp) :: mij
-       real(dp) :: Cup(2,2),Cdn(2,2)
+       real(dp) :: C(2,2)
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
        real(dp) :: q(4,5), paux(4), pijk(4), pa(4),  pat(4)
        real(dp) :: xx1, xx2, zi, zj, yijk, vijk, zim, u
@@ -828,8 +815,8 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
        res = zero
        cres = (0d0,0d0)
@@ -838,8 +825,8 @@
 
 
        if( first_time ) then
-              call InitTrees(4,1,2,TreeAmpsDip)
-              call InitProcess_TbTQbQG(ExtParticles(1:5))
+             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
              do iTree=1,2
@@ -929,8 +916,7 @@
 
      if(Not_Passed_Cuts.eq..false.) then
 
-        call cc_qq_ttgamg_soft(n,'up',Cup)
-        call cc_qq_ttgamg_soft(n,'dn',Cdn)
+        call cc_qq_ttgamg_soft(n,C)
 
 !--- after momentum mapping -- sum over colors and polarizations
 
@@ -985,8 +971,7 @@
 
 
 
-  call GenerateEventttqqg2((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/), &
-  momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
 
 !       print *, "if dipole"
@@ -1114,8 +1099,7 @@
            do i3=1,2
              do i4=1,2
 
-      cres(1) = cres(1) + Cup(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-      cres(2) = cres(2) + Cdn(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
             enddo
            enddo
@@ -1130,7 +1114,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res)
          enddo
 
          endif ! -- ! passed cuts
@@ -1145,10 +1129,10 @@
        real(dp), intent(in) :: mi,ma,mb
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res(2)
-       complex(dp) :: cres(2)
+       real(dp), intent(out) :: res
+       complex(dp) :: cres
        real(dp) :: mij
-       real(dp) :: Cup(2,2),Cdn(2,2)
+       real(dp) :: C(2,2)
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
        real(dp) :: q(4,5), paux(4), pijk(4), pa(4),  pat(4)
        real(dp) :: xx1, xx2, zi, zj, yijk, vijk, zim
@@ -1174,8 +1158,8 @@
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
-       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto
-       real(dp) :: MomDK(1:4,1:6),PSWgt1,PSWgt2
+       integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
 
 
        res = zero
@@ -1184,8 +1168,8 @@
 
 
        if( first_time ) then
-              call InitTrees(4,1,2,TreeAmpsDip)
-              call InitProcess_TbTQbQG(ExtParticles(1:5))
+             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
              do iTree=1,2
@@ -1277,8 +1261,7 @@
 
      if(Not_Passed_Cuts.eq..false.) then
 
-        call cc_qq_ttgamg_soft(n,'up',Cup)
-        call cc_qq_ttgamg_soft(n,'dn',Cdn)
+        call cc_qq_ttgamg_soft(n,C)
 
 !--- after momentum mapping -- sum over colors and polarizations
 
@@ -1330,8 +1313,7 @@
               hel(1) =i5
            endif
 
-  call GenerateEventttqqg2((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/), &
-  momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
      if (pos.eq.1) then
       if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -1444,8 +1426,7 @@
            do i3=1,2
              do i4=1,2
 
-       cres(1) = cres(1) + Cup(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-       cres(2) = cres(2) + Cdn(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+       cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
             enddo
           enddo
@@ -1461,7 +1442,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res)
          enddo
 
          endif !  for passed cuts
@@ -1474,169 +1455,88 @@
 
 
 
-      subroutine cc_qq_ttgamg_soft(n,ixq,C)  ! ixq labels the power of the
-      integer, intent(in) :: n               ! electric charge of the
-      real(dp), intent(out) :: C(2,2)        ! emitting quark
-      character, intent(in) :: ixq*2
+      subroutine cc_qq_ttgamg_soft(n,C)  
+      integer, intent(in) :: n           
+      real(dp), intent(out) :: C(2,2)    
 
       C = 0.0_dp
 
-      if (ixq.eq.'up') then
-
 
 
       if(n.eq.1) then
       C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.2) then
       C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.3) then
       C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.4) then
       C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.5) then
       C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.6) then
       C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.7) then
       C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.8) then
       C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.9) then
       C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.10) then
       C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.11) then
       C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.12) then
       C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_up/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_up**2/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
 
 
-
-      elseif(ixq.eq.'dn') then
-
-      if(n.eq.1) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.2) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.3) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.4) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.5) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.6) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.7) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.8) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.9) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.10) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=56.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=56.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.11) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=16.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=16.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-      if(n.eq.12) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,1)=-8.0_dp/3.0_dp*Q_dn/Q_top
-      C(2,2)=-8.0_dp/3.0_dp*Q_dn**2/Q_top**2
-      endif
-
-
-      endif
 
 
       end subroutine
@@ -1644,177 +1544,86 @@
 
 
 
+SUBROUTINE SetPolarization(Mom,MomDK,Hel,ExtParticles)
+use ModMisc
+use ModProcess
+use ModTopDecay
+use ModZDecay
+implicit none
+type(Particle) :: ExtParticles(1:5)
+real(8) :: Mom(1:4,1:5),MomDK(1:4,1:8)
+integer :: Hel(1:5)
+
+     ExtParticles(1)%Mom(1:4) = dcmplx(Mom(1:4,1))   ! HERE WAS A BUG: this was inside the (TopDecays.ge.1) condition
+     ExtParticles(2)%Mom(1:4) = dcmplx(Mom(1:4,2))
+     if (TopDecays.ge.1) then
+        call TopDecay(ExtParticles(1),DK_LO,MomDK(1:4,1:3))
+        call TopDecay(ExtParticles(2),DK_LO,MomDK(1:4,4:6))
+     else
+        call vSpi(ExtParticles(1)%Mom(1:4),ExtParticles(1)%Mass,Hel(1),ExtParticles(1)%Pol(1:4))
+        call ubarSpi(ExtParticles(2)%Mom(1:4),ExtParticles(2)%Mass,Hel(2),ExtParticles(2)%Pol(1:4))
+    endif
 
 
+     ExtParticles(5)%Mom(1:4) = dcmplx(Mom(1:4,5))
+     ExtParticles(5)%Helicity = Hel(5)
+     if (ZDecays.ge.1) then
+          call ZDecay(ExtParticles(5),DK_LO,MomDK(1:4,7:8))
+     else
+          call pol_massSR(ExtParticles(5)%Mom(1:4),ExtParticles(5)%Mass,ExtParticles(5)%Helicity,ExtParticles(5)%Pol(1:4))
+    endif
 
-!       subroutine cc_qq_ttgamg_soft(n,ixq,C)  ! ixq labels the power of the
-!       integer, intent(in) :: n           ! electric charge of the
-!       real(dp), intent(out) :: C(2,2)        ! emitting quark
-!       character, intent(in) :: ixq*2
-!
-!       C = 0.0_dp
-!
-!       if (ixq.eq.'up') then
-!
-!       if(n.eq.1) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=-8.0_dp/3.0_dp
-!       endif
-!       if(n.eq.2) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=16.0_dp/3.0_dp
-!       C(2,1)=16.0_dp/3.0_dp
-!       C(2,2)=16.0_dp/3.0_dp
-!       endif
-!       if(n.eq.3) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=56.0_dp/3.0_dp
-!       C(2,1)=56.0_dp/3.0_dp
-!       C(2,2)=56.0_dp/3.0_dp
-!       endif
-!       if(n.eq.4) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=-8.0_dp/3.0_dp
-!       endif
-!       if(n.eq.5) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=56.0_dp/3.0_dp
-!       C(2,1)=56.0_dp/3.0_dp
-!       C(2,2)=56.0_dp/3.0_dp
-!       endif
-!       if(n.eq.6) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=16.0_dp/3.0_dp
-!       C(2,1)=16.0_dp/3.0_dp
-!       C(2,2)=16.0_dp/3.0_dp
-!       endif
-!       if(n.eq.7) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=16.0_dp/3.0_dp
-!       C(2,1)=16.0_dp/3.0_dp
-!       C(2,2)=16.0_dp/3.0_dp
-!       endif
-!       if(n.eq.8) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=56.0_dp/3.0_dp
-!       C(2,1)=56.0_dp/3.0_dp
-!       C(2,2)=56.0_dp/3.0_dp
-!       endif
-!       if(n.eq.9) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=-8.0_dp/3.0_dp
-!       endif
-!       if(n.eq.10) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=56.0_dp/3.0_dp
-!       C(2,1)=56.0_dp/3.0_dp
-!       C(2,2)=56.0_dp/3.0_dp
-!       endif
-!       if(n.eq.11) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=16.0_dp/3.0_dp
-!       C(2,1)=16.0_dp/3.0_dp
-!       C(2,2)=16.0_dp/3.0_dp
-!       endif
-!       if(n.eq.12) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=-8.0_dp/3.0_dp
-!       endif
-!
-!
-!
-!       elseif(ixq.eq.'dn') then
-!
-!       if(n.eq.1) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=4.0_dp/3.0_dp
-!       C(2,1)=4.0_dp/3.0_dp
-!       C(2,2)=-2.0_dp/3.0_dp
-!       endif
-!       if(n.eq.2) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=4.0_dp/3.0_dp
-!       endif
-!       if(n.eq.3) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=-28.0_dp/3.0_dp
-!       C(2,1)=-28.0_dp/3.0_dp
-!       C(2,2)=14.0_dp/3.0_dp
-!       endif
-!       if(n.eq.4) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=4.0_dp/3.0_dp
-!       C(2,1)=4.0_dp/3.0_dp
-!       C(2,2)=-2.0_dp/3.0_dp
-!       endif
-!       if(n.eq.5) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=-28.0_dp/3.0_dp
-!       C(2,1)=-28.0_dp/3.0_dp
-!       C(2,2)=14.0_dp/3.0_dp
-!       endif
-!       if(n.eq.6) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=4.0_dp/3.0_dp
-!       endif
-!       if(n.eq.7) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=4.0_dp/3.0_dp
-!       endif
-!       if(n.eq.8) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=-28.0_dp/3.0_dp
-!       C(2,1)=-28.0_dp/3.0_dp
-!       C(2,2)=14.0_dp/3.0_dp
-!       endif
-!       if(n.eq.9) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=4.0_dp/3.0_dp
-!       C(2,1)=4.0_dp/3.0_dp
-!       C(2,2)=-2.0_dp/3.0_dp
-!       endif
-!       if(n.eq.10) then
-!       C(1,1)=56.0_dp/3.0_dp
-!       C(1,2)=-28.0_dp/3.0_dp
-!       C(2,1)=-28.0_dp/3.0_dp
-!       C(2,2)=14.0_dp/3.0_dp
-!       endif
-!       if(n.eq.11) then
-!       C(1,1)=16.0_dp/3.0_dp
-!       C(1,2)=-8.0_dp/3.0_dp
-!       C(2,1)=-8.0_dp/3.0_dp
-!       C(2,2)=4.0_dp/3.0_dp
-!       endif
-!       if(n.eq.12) then
-!       C(1,1)=-8.0_dp/3.0_dp
-!       C(1,2)=4.0_dp/3.0_dp
-!       C(2,1)=4.0_dp/3.0_dp
-!       C(2,2)=-2.0_dp/3.0_dp
-!       endif
-!
-!       endif
-!
-!
-!       end subroutine
+    ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
+    call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
+
+    ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
+    call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))
+
+
+! ExtParticles(3)%Pol(1:4)=ExtParticles(3)%Mom(1:4); print *, "check gauge inv. in dipoles"
+
+RETURN
+END SUBROUTINE
 
 
 
 
 
+
+
+SUBROUTINE InitProcess_TbTQbQZ(ExtParticles)
+use ModProcess
+implicit none
+type(Particle) :: ExtParticles(:)
+
+  ExtParticles(1)%PartType = ATop_
+  ExtParticles(1)%ExtRef   = 1
+  ExtParticles(1)%Mass = m_Top
+  ExtParticles(1)%Mass2= ExtParticles(1)%Mass**2
+
+  ExtParticles(2)%PartType = Top_
+  ExtParticles(2)%ExtRef   = 2
+  ExtParticles(2)%Mass = m_Top
+  ExtParticles(2)%Mass2= ExtParticles(2)%Mass**2
+
+  ExtParticles(3)%PartType = AStr_
+  ExtParticles(3)%ExtRef   = 3
+  ExtParticles(3)%Mass = 0d0
+  ExtParticles(3)%Mass2= 0d0
+
+  ExtParticles(4)%PartType = Str_
+  ExtParticles(4)%ExtRef   = 4
+  ExtParticles(4)%Mass = 0d0
+  ExtParticles(4)%Mass2= 0d0
+
+  ExtParticles(5)%PartType = Z0_
+  ExtParticles(5)%ExtRef   = 5
+  ExtParticles(5)%Mass = m_Z
+  ExtParticles(5)%Mass2= ExtParticles(5)%Mass**2
+
+
+RETURN
+END SUBROUTINE
 
 
 

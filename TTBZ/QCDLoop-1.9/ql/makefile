@@ -1,4 +1,4 @@
-FFLAGS 	= -O2
+FFLAGS 	= -O0
 HERE = $(PWD)
 LIBDIR = $(HERE)/../ff/
 FC = ifort

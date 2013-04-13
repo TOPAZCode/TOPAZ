@@ -1,0 +1,8 @@
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 20
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: disabled
+  -inline-max-per-compile: disabled
+

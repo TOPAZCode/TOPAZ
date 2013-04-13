@@ -3,14 +3,14 @@
 #define WorkPath "/home/schulze/projects/ttbjets/colors/"
 #define LibPath "/home/schulze/lib/FeynArtsToForm/"
 *_____________________________________________________________________________________________*
-#define InputColorFile "/home/schulze/projects/ttbjets/colors/1L_ttbqqb_input.frm"
-#define OutputFile "/home/schulze/projects/ttbjets/colors/1L_ttbqqb_output"
+#define InputColorFile "/home/schulze/projects/TOPAZ/colors/1L_ttbqqb_input.frm"
+#define OutputFile "/home/schulze/projects/TOPAZ/colors/1L_ttbqqb_output"
 *_____________________________________________________________________________________________*
 #define setDSTm4 "0"
 #define setDST   "4"
 
-#define InterfereDiags1 "1,1";
-#define InterfereDiags2 "{10,11}";
+#define InterfereDiags1 "{1,2}";
+#define InterfereDiags2 "{10,11,12,13}";
 *_____________________________________________________________________________________________*
 #include `LibPath'header2.frm;
 #include `InputColorFile';

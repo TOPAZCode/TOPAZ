@@ -63,11 +63,15 @@ IntegralObj = $(QCDLoop)/ql/libqcdloop.a\
 
 OPPDep = mod_NVBasis.f90 \
          mod_Residues.f90 \
-         mod_UCuts.f90
+         mod_UCuts.f90 \
+         mod_Residues_new.f90 \
+         mod_UCuts_new.f90
 
 OPPObj = $(ObjectDir)/mod_NVBasis.o \
          $(ObjectDir)/mod_Residues.o \
          $(ObjectDir)/mod_UCuts.o \
+         $(ObjectDir)/mod_Residues_new.o \
+         $(ObjectDir)/mod_UCuts_new.o \
          $(ObjectDir)/mod_NVBasis128.o \
          $(ObjectDir)/mod_Residues128.o \
          $(ObjectDir)/mod_UCuts128.o
@@ -595,6 +599,8 @@ $(OPPObj): $(OPPDep) $(makeDep)
 	$(fcomp) -c mod_NVBasis.f90 -o $(ObjectDir)/mod_NVBasis.o
 	$(fcomp) -c mod_Residues.f90 -o $(ObjectDir)/mod_Residues.o
 	$(fcomp) -c mod_UCuts.f90 -o $(ObjectDir)/mod_UCuts.o
+	$(fcomp) -c mod_Residues_new.f90 -o $(ObjectDir)/mod_Residues_new.o
+	$(fcomp) -c mod_UCuts_new.f90 -o $(ObjectDir)/mod_UCuts_new.o
 	@echo " compiling OPP (128bit) "
 	$(fcomp) -r16 -c mod_NVBasis128.f90 -o $(ObjectDir)/mod_NVBasis128.o
 	$(fcomp) -r16 -c mod_Residues128.f90 -o $(ObjectDir)/mod_Residues128.o

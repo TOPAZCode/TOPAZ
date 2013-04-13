@@ -13,6 +13,7 @@ FUNCTION EvalCS_1L_ttbggZ(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
 use ModUCuts
+use ModUCuts_new
 use ModUCuts_128
 use ModIntegrals
 use ModAmplitudes
@@ -23,9 +24,9 @@ use ModZDecay
 implicit none
 real(8) ::  EvalCS_1L_ttbggZ,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:3,-2:1)
-complex(8) :: BosonicPartAmp(1:3,-2:1),mydummy
+complex(8) :: BosonicPartAmp(1:3,-2:1),mydummy,ZPolVec(1:4),BarSpi(1:4),Spi(1:4)
 integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
-real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac
+real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,ZDKMatel,Msq_T_BWENU
 real(8) :: MomExt(1:4,1:14)
 logical :: applyPSCut
 real(8) :: MG_MOM(0:3,1:5)
@@ -73,6 +74,47 @@ IF( ZDECAYS.NE.0 ) THEN
    PSWgt = PSWgt * PSWgt4
 ENDIF
 
+IF( ZDECAYS.EQ.-1 ) THEN
+     ExtParticle(5)%Helicity=+1
+     call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,+1,ZPolVec(1:4))
+     ZDKMatel = cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,-1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,0,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+
+     ExtParticle(5)%Helicity=-1
+     call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,+1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,-1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,0,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+
+     PSWgt = PSWgt * ZDKMatel/3d0
+
+      call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,6:8))
+      Spi(1:4) = ExtParticle(1)%Pol(1:4)
+      call vBarSpi(ExtParticle(1)%Mom(1:4),m_Top,-1,BarSpi(1:4))
+      Msq_T_BWENU = cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+      call vBarSpi(ExtParticle(1)%Mom(1:4),m_Top,+1,BarSpi(1:4))
+      Msq_T_BWENU = Msq_T_BWENU + cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+
+      PSWgt = PSWgt * Msq_T_BWENU
+
+
+      call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
+      BarSpi(1:4) = ExtParticle(2)%Pol(1:4)
+      call uSpi(ExtParticle(2)%Mom(1:4),m_Top,-1,Spi(1:4))
+      Msq_T_BWENU = cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+      call uSpi(ExtParticle(2)%Mom(1:4),m_Top,+1,Spi(1:4))
+      Msq_T_BWENU = Msq_T_BWENU + cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+
+      PSWgt = PSWgt * Msq_T_BWENU
+ENDIF
+
 
    call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
 
@@ -98,7 +140,7 @@ IF( Correction.EQ.0 ) THEN
     do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
-      if( ZDecays.ne.0 ) then
+      if( ZDecays.gt.0 ) then
           if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
       endif
@@ -148,29 +190,50 @@ ELSEIF( Correction.EQ.1 ) THEN
 !------------ bosonic loops --------------
 !       do iPrimAmp=1,NumPrimAmps
        do iPrimAmp=1,NumPrimAmps
-          
           call SetKirill(PrimAmps(iPrimAmp))
-          print *, 'doing pentcut'
-          call PentCut(PrimAmps(iPrimAmp))
+          print *, 'doing pentcut',iPrimAmp
+          call PentCut_new(PrimAmps(:),iPrimAmp)
+       enddo
+
+       do iPrimAmp=1,NumPrimAmps
 !          print *, 'coeffs'
 !          print *,PrimAmps(iPrimAmp)%UCuts(5)%Coeff
-          call QuadCut(PrimAmps(iPrimAmp))
           print *, 'doing quadcut'
+          call SetKirill(PrimAmps(iPrimAmp))
+          call QuadCut_new(PrimAmps(:),iPrimAmp)
+       enddo
 !          print *,PrimAmps(iPrimAmp)%UCuts(4)%Coeff
 !          pause
           print *, 'doing tricut'
-          call TripCut(PrimAmps(iPrimAmp))
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call TripCut_new(PrimAmps(:),iPrimAmp)
+       enddo
 !          print *,PrimAmps(iPrimAmp)%UCuts(3)%Coeff
 !           pause
           print *, 'doing doubcut'
-          call DoubCut(PrimAmps(iPrimAmp))
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call DoubCut_new(PrimAmps(:),iPrimAmp)
+       enddo
 !          print *,PrimAmps(iPrimAmp)%UCuts(2)%Coeff
 !          pause
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call SingCut_new(PrimAmps(:),iPrimAmp)
           print *, 'doing singcut'
-          call SingCut(PrimAmps(iPrimAmp))
+       enddo
 !          print *,PrimAmps(iPrimAmp)%UCuts(1)%Coeff
 !          pause
+       do iPrimAmp=1,NumPrimAmps
+          print *, 'doing integrals'
+          call SetKirill(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+       enddo
+
+
+
+       do iPrimAmp=1,NumPrimAmps
           print *, 'Res', PrimAmps(iPrimAmp)%Result(-1)
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
@@ -187,7 +250,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 !    print *, 'should be ', rdiv(1)*BornAmps(1)%Result
     
     pause
- enddo
+      enddo 
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
@@ -462,8 +525,8 @@ complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
 integer :: iHel,iPrimAmp,jPrimAmp,tmphel
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
-real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv
-complex(8) :: propZ
+real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv,ZDKMatel,Msq_T_BWENU
+complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4)
 logical :: applyPSCut
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
@@ -506,6 +569,49 @@ IF( ZDECAYS.NE.0 ) THEN
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
    PSWgt = PSWgt * PSWgt4
 ENDIF
+
+IF( ZDECAYS.EQ.-1 ) THEN
+     ExtParticle(5)%Helicity=+1
+     call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,+1,ZPolVec(1:4))
+     ZDKMatel = cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,-1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,0,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+
+     ExtParticle(5)%Helicity=-1
+     call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,+1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,-1,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+     call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,0,ZPolVec(1:4))
+     ZDKMatel = ZDKMatel + cdabs((ExtParticle(5)%Pol(1:4).dot.ZPolVec(1:4)))**2
+
+     PSWgt = PSWgt * ZDKMatel/3d0
+
+      call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,6:8))
+      Spi(1:4) = ExtParticle(1)%Pol(1:4)
+      call vBarSpi(ExtParticle(1)%Mom(1:4),m_Top,-1,BarSpi(1:4))
+      Msq_T_BWENU = cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+      call vBarSpi(ExtParticle(1)%Mom(1:4),m_Top,+1,BarSpi(1:4))
+      Msq_T_BWENU = Msq_T_BWENU + cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+
+      PSWgt = PSWgt * Msq_T_BWENU
+
+
+      call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
+      BarSpi(1:4) = ExtParticle(2)%Pol(1:4)
+      call uSpi(ExtParticle(2)%Mom(1:4),m_Top,-1,Spi(1:4))
+      Msq_T_BWENU = cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+      call uSpi(ExtParticle(2)%Mom(1:4),m_Top,+1,Spi(1:4))
+      Msq_T_BWENU = Msq_T_BWENU + cdabs(psp1_(Spi(1:4),BarSpi(1:4))/(2d0*m_Top))**2/2d0
+
+      PSWgt = PSWgt * Msq_T_BWENU
+ENDIF
+
+
 
    call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
    if( applyPSCut ) then
@@ -559,7 +665,7 @@ IF( CORRECTION.EQ.0 ) THEN
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
 
         call SetPolarizations()
-        if( ZDecays.ne.0 ) then    
+        if( ZDecays.ne.0 ) then
            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
            call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept

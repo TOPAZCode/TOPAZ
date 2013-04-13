@@ -1,11 +1,8 @@
-       MODULE ModResidues
+       MODULE ModResidues_new
 ! this is the version before matching routines have been removed from here to mod_UCuts
 ! not 100% sure about precision when swiching to 128bit
-       public  :: resid5,resid4,resid3,resid2,resid1
-       private :: mymatch4_5,mismatch4_5
-       private :: mymatch3_5,mismatch3_5,mymatch3_4,mismatch3_4
-       private :: mymatch2_5,mismatch2_5,mymatch2_4,mismatch2_4,mymatch2_3,mismatch2_3
-       private :: mymatch1_5,mismatch1_5,mymatch1_4,mismatch1_4,mymatch1_3,mismatch1_3,mymatch1_2,mismatch1_2
+       public  :: resid5_new,resid4_new,resid3_new,resid2_new,resid1_new
+       public  :: resid4Subtr,resid3Subtr,resid2Subtr,resid1Subtr
        private :: givepol
 
 
@@ -13,7 +10,7 @@
 
 
 
-       SUBROUTINE resid5(lv,k1,k2,k3,k4,l5c,TreeProcs,res)
+       SUBROUTINE resid5_new(lv,k1,k2,k3,k4,l5c,TreeProcs,res)
        use ModAmplitudes
        use ModProcess
        use ModMisc
@@ -320,7 +317,7 @@ END SUBROUTINE
 
 
 
-       subroutine resid4(lv,k1,k2,k3,l4c,TreeProcs,res)
+       subroutine resid4_new(lv,k1,k2,k3,l4c,TreeProcs,res)
        use ModAmplitudes
        use ModProcess
        use ModMisc
@@ -654,56 +651,6 @@ END SUBROUTINE
          endif
 
 
-!     subtracting  the 5-cut contribution
-
-!!      returns n45: number of matched cuts in pentcuts
-!!      lmatch45: cut numbers for these pentcuts
-         call mymatch4_5(l4c,n45,lmatch45)
-
-!          res_Impr = (0q0,0q0)
-         do i=1,n45
-
-           im = lmatch45(i)
-
-            j=1
- 49         if (l4c(1).ne.Lc5(im,j)) then
-               j=j+1
-               go to 49
-            endif
-!!          j is the number of the first cut in pentcut that matches the quadcut
-
-            pos=j
-
-!!          returns pos1: biggest element number in pentcut that is not included in quadcut
-            call mismatch4_5(l4c,im,pos1)
-
-
-
-!!          calc the prop. term...
-            do j=1,4
-            krefa(j)=propv5(im,4*(pos-1)+j)
-            enddo
-
-
-            do j=1,4
-            lvt(j)=q1(j)-krefa(j)
-            enddo
-            lvt(5)=q1(5)
-
-            do j=1,4
-            vprop(j)=lvt(j)+propv5(im,j+4*(pos1-1))
-            enddo
-            vprop(5)=lvt(5)
-
-
-            call sc(5,vprop,vprop,propX)
-
-            propX = propX-dcmplx(mass5(im,pos1)**2,0d0)
-
-            res=res - coeff5(im,1)*lvt(5)**2/propX
-
-         enddo
-
        return
        end subroutine
 
@@ -714,7 +661,7 @@ END SUBROUTINE
 
 
 
-       subroutine resid3(lv,k1,k2,l3c,TreeProcs,res)
+       subroutine resid3_new(lv,k1,k2,l3c,TreeProcs,res)
        use ModAmplitudes
        use ModProcess
        use ModMisc
@@ -1000,151 +947,6 @@ END SUBROUTINE
          endif
 
 
-!     subtracting the 5-cut
-
-      call mymatch3_5(l3c,n35,lmatch35)
-
-      do i=1,n35
-
-      im = lmatch35(i)
-      j=1
- 61   if (l3c(1).ne.Lc5(im,j)) then
-      j=j+1
-      go to 61
-      endif
-
-      pos=j
-
-
-       call mismatch3_5(l3c,im,lpos1)
-
-       pos1=lpos1(1)
-       pos2=lpos1(2)
-
-        do j=1,4
-       krefa(j)=propv5(im,4*(pos-1)+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass5(im,pos1)**2,0d0)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass5(im,pos2)**2,0d0)
-
-       res=res -coeff5(im,1)*lvt(5)**2/prop1/prop2
-
-         enddo
-
-
-
-
-!     subtracting the 4-cut
-!     res_Impr=(0q0,0q0)
-      call mymatch3_4(l3c,n34,lmatch34)
-      do i=1,n34
-      im=lmatch34(i)
-      j=1
- 50   if (l3c(1).ne.Lc4(im,j)) then
-      j=j+1
-      go to 50
-      endif
-      pos=j
-      call mismatch3_4(l3c,im,pos1)
-
-!        do j=1,5
-!          d(j)=coeff4(im,j)
-!        enddo
-
-
-       do j=1,4
-         krefa(j)=propv4(im,4*(pos-1)+j)
-         v45(j)=refvect4(im,j)
-       enddo
-       do j=1,4
-         lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-       do j=1,4
-         vprop(j)=lvt(j)+propv4(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-       propX = propX-dcmplx(mass4(im,pos1)**2,0d0)
-       do j=1,5
-         vne(j)=dcmplx(0d0,0d0)
-       enddo
-       vne(5)=dcmplx(0d0,1d0)
-       call sc(4,v45,lvt,r1)
-       call sc(5,vne,lvt,r2)
-
-!        res=res-(d(1)+d(2)*r1+(r2**2)*(d(3)+d(4)*r1+d(5)*(r2**2)))/propX
-       res=res-(coeff4(im,1)+coeff4(im,2)*r1+(r2**2)*(coeff4(im,3)+coeff4(im,4)*r1+coeff4(im,5)*(r2**2)))/propX
-!      res_Impr = res_Impr + (coeff4_QP(im,1)+coeff4_QP(im,2)*qcmplx(r1)+qcmplx(r22)*(coeff4_QP(im,3)+coeff4_QP(im,4)*qcmplx(r1)+coeff4_QP(im,5)*qcmplx(r22)))/qcmplx(propX)
-       enddo
-
-
-!       res_Q = qcmplx(res)
-! !     subtracting the 4-cut improved version
-!       call mymatch3_4(l3c,n34,lmatch34)
-!       do i=1,n34
-!       im=lmatch34(i)
-!       j=1
-!  50   if (l3c(1).ne.Lc4(im,j)) then
-!       j=j+1
-!       go to 50
-!       endif
-!       pos=j
-!       call mismatch3_4(l3c,im,pos1)
-!
-!        do j=1,4
-!          krefa_Q(j)= qcmplx(propv4(im,4*(pos-1)+j))
-!          v45_Q(j)  = refvect4_Q(im,j)
-!        enddo
-!        do j=1,4
-!          lvt_Q(j)=qcmplx(q1(j))-krefa_Q(j)
-!        enddo
-!        lvt_Q(5)=qcmplx(q1(5))
-!        do j=1,4
-!          vprop_Q(j)=lvt_Q(j)+qcmplx(propv4(im,j+4*(pos1-1)))
-!        enddo
-!        vprop_Q(5)=lvt_Q(5)
-!
-!        call sc_Q(5,vprop_Q,vprop_Q,propX_Q)
-!        propX_Q = propX_Q-qcmplx(mass4(im,pos1)**2,0q0)
-!        do j=1,5
-!          vne_Q(j)=qcmplx(0q0,0q0)
-!        enddo
-!        vne_Q(5)=qcmplx(0q0,1q0)
-!        call sc_Q(4,v45_Q,lvt_Q,r1_Q)
-!        call sc_Q(5,vne_Q,lvt_Q,r2_Q)
-!
-! !        res=res-(coeff4(im,1)+coeff4(im,2)*r1+(r2**2)*(coeff4(im,3)+coeff4(im,4)*r1+coeff4(im,5)*(r2**2)))/propX
-!        res_Q=res_Q-(qcmplx(coeff4(im,1))+qcmplx(coeff4(im,2))*r1_Q+(r2_Q**2)*(qcmplx(coeff4(im,3))+qcmplx(coeff4(im,4))*r1_Q+qcmplx(coeff4(im,5))*(r2_Q**2)))/propX_Q
-!
-!        enddo
-!       print *, "after", res_Q
-!       stop
-
-
 
        return
        end subroutine
@@ -1153,7 +955,7 @@ END SUBROUTINE
 
 
 
-       subroutine resid2(lv,k1,l2c,TreeProcs,res)
+       subroutine resid2_new(lv,k1,l2c,TreeProcs,res)
        use ModAmplitudes
        use ModProcess
        use ModMisc
@@ -1417,220 +1219,6 @@ END SUBROUTINE
 
  
 
-!     subtracting the 5-cut
-
-         call mymatch2_5(l2c,n25,lmatch25)
-
-            do i=1,n25
-
-           im = lmatch25(i)
-
-      j=1
- 62   if (l2c(1).ne.Lc5(im,j)) then
-      j=j+1
-      go to 62
-      endif
-
-      pos=j
-
-
-       call mismatch2_5(l2c,im,lpos2)
-
-       pos1=lpos2(1)
-       pos2=lpos2(2)
-       pos3=lpos2(3)
-
-
-       do j=1,1
-       e(j)=coeff5(im,j)
-       enddo
-
-        do j=1,4
-       krefa(j)=propv5(im,4*(pos-1)+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass5(im,pos1)**2,0d0)
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass5(im,pos2)**2,0d0)
-
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos3-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop3 = propX-dcmplx(mass5(im,pos3)**2,0d0)
-
-       res=res - e(1)*lvt(5)**2/prop1/prop2/prop3
-
-
-         enddo
-
-
-
-!        subtracting the 4-cut
-
-         call mymatch2_4(l2c,n24,lmatch24)
-
-!       res_Impr=(0q0,0q0)
-
-         do i=1,n24
-
-            im=lmatch24(i)
-
-      j=1
- 51   if (l2c(1).ne.Lc4(im,j)) then
-      j=j+1
-      go to 51
-      endif
-
-      pos=j
-
-
-       call mismatch2_4(l2c,im,lpos)
-
-       pos1=lpos(1)
-       pos2=lpos(2)
-
-       do j=1,5
-       d(j)=coeff4(im,j)
-       enddo
-
-       do j=1,4
-       krefa(j)=propv4(im,4*(pos-1)+j)
-       v45(j)=refvect4(im,j)
-       enddo
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv4(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass4(im,pos1)**2,0d0)
-
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv4(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass4(im,pos2)**2,0d0)
-
-       do j=1,5
-       vne(j)=dcmplx(0d0,0d0)
-       enddo
-        vne(5)=dcmplx(0d0,1d0)
-
-       call sc(4,v45,lvt,r1)
-       call sc(5,vne,lvt,r2)
-
-       r22=r2**2
-
-
-       res=res-(d(1)+d(2)*r1+r22*(d(3)+d(4)*r1+d(5)*r22))/prop1/prop2
-!        res_Impr =res_Impr+(qcmplx(d(1))+qcmplx(d(2))*qcmplx(r1)+qcmplx(r22)*(qcmplx(d(3))+qcmplx(d(4))*qcmplx(r1)+qcmplx(d(5))*qcmplx(r22)))/qcmplx(prop1*prop2)
-        enddo
-
-
-!        subtracting the triple -cut contribution
-         call mymatch2_3(l2c,n23,lmatch23)
-
-             do i=1,n23
-
-           im = lmatch23(i)
-
-      j=1
- 52   if (l2c(1).ne.Lc3(im,j)) then
-      j=j+1
-      go to 52
-      endif
-
-      pos=j
-
-
-       call mismatch2_3(l2c,im,pos1)
-
-
-       do j=1,10
-       c(j)=coeff3(im,j)
-       enddo
-
-       do j=1,4
-       krefa(j)=propv3(im,4*(pos-1)+j)
-       v3(j)=refvect3(im,j)
-       v4(j)=refvect3(im,4+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv3(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       propX = propX-dcmplx(mass3(im,pos1)**2,0d0)
-
-
-       do j=1,5
-       vne(j)=dcmplx(0d0,0d0)
-       enddo
-       vne(5)=dcmplx(0d0,1d0)
-
-       call sc(4,v3,lvt,r3)
-       call sc(4,v4,lvt,r4)
-       call sc(5,vne,lvt,re)
-
-       r42=r4**2
-       r32=r3**2
-
-      trikoeff=c(1)+c(2)*r3+c(3)*r4+c(4)*r3*r4+c(5)*(r32-r42)+c(6)*r32*r4+c(7)*r3*r42+re**2*(c(8)+c(9)*r3+c(10)*r4)
-      res=res-trikoeff/propX
-
-!       res_Impr =res_Impr+(qcmplx(c(1))+qcmplx(c(2))*qcmplx(r3)+qcmplx(c(3))*qcmplx(r4)+qcmplx(c(4))*qcmplx(r3)*qcmplx(r4)+qcmplx(c(5))*(qcmplx(r32)-qcmplx(r42))+qcmplx(c(6))*qcmplx(r32)*qcmplx(r4)+qcmplx(c(7))*qcmplx(r3)*qcmplx(r42)+qcmplx(re)**2*(qcmplx(c(8))+qcmplx(c(9))*qcmplx(r3)+qcmplx(c(10))*qcmplx(r4)))/qcmplx(propX)
-
-       enddo
-!        res = res - res_Impr
-
  
        return
        end subroutine
@@ -1639,7 +1227,7 @@ END SUBROUTINE
 
 
 
-       subroutine resid1(lv,l1c,TreeProcs,res)
+       subroutine resid1_new(lv,l1c,TreeProcs,res)
        use ModAmplitudes
        use ModProcess
        use ModMisc
@@ -1747,329 +1335,6 @@ END SUBROUTINE
 
 
 
-
-
-!        matching and subtracting computed contributions
-
-!     subtracting the 5-cut
-
-         call mymatch1_5(l1c,n15,lmatch15)
-
-            do i=1,n15
-
-           im = lmatch15(i)
-
-      j=1
- 72   if (l1c(1).ne.Lc5(im,j)) then
-      j=j+1
-      go to 72
-      endif
-
-      pos=j
-
-
-       call mismatch1_5(l1c,im,lpos3)
-
-       pos1=lpos3(1)
-       pos2=lpos3(2)
-       pos3=lpos3(3)
-       pos4=lpos3(4)
-
-       do j=1,1
-       e(j)=coeff5(im,j)
-       enddo
-
-        do j=1,4
-       krefa(j)=propv5(im,4*(pos-1)+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass5(im,pos1)**2,0d0)
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass5(im,pos2)**2,0d0)
-
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos3-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop3 = propX-dcmplx(mass5(im,pos3)**2,0d0)
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv5(im,j+4*(pos4-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop4 = propX-dcmplx(mass5(im,pos4)**2,0d0)
-
-
-       res=res - e(1)*lvt(5)**2/prop1/prop2/prop3/prop4
-
-         enddo
-
-
-
-
-!     the 4-cut
-
-         call mymatch1_4(l1c,n14,lmatch14)
-
-         do i=1,n14
-
-        im=lmatch14(i)
-
-      j=1
- 52   if (l1c(1).ne.Lc4(lmatch14(i),j)) then
-      j=j+1
-      go to 52
-      endif
-
-      pos=j
-
-
-       call mismatch1_4(l1c,lmatch14(i),lpos)
-
-       pos1=lpos(1)
-       pos2=lpos(2)
-       pos3=lpos(3)
-
-       do j=1,5
-       d(j)=coeff4(im,j)
-       enddo
-
-       do j=1,4
-       krefa(j)=propv4(im,4*(pos-1)+j)
-       v45(j)=refvect4(im,j)
-       enddo
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv4(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass4(im,pos1)**2,0d0)
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv4(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass4(im,pos2)**2,0d0)
-
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv4(im,j+4*(pos3-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop3 = propX-dcmplx(mass4(im,pos3)**2,0d0)
-
-
-       do j=1,5
-       vne(j)=dcmplx(0d0,0d0)
-       enddo
-        vne(5)=dcmplx(0d0,1d0)
-
-       call sc(4,v45,lvt,r1)
-       call sc(5,vne,lvt,r2)
-
-
-       res=res-(d(1)+d(2)*r1+d(3)*r2**2+d(4)*r2**2*r1+d(5)*r2**4)/prop1/prop2/prop3
-         enddo
-
-
-
-
-!        subtracting the triple -cut contribution
-
-         call mymatch1_3(l1c,n13,lmatch13)
-
-             do i=1,n13
-
-           im = lmatch13(i)
-
-      j=1
- 53   if (l1c(1).ne.Lc3(im,j)) then
-      j=j+1
-      go to 53
-      endif
-
-      pos=j
-
-
-       call mismatch1_3(l1c,im,lpos1)
-
-       pos1=lpos1(1)
-       pos2=lpos1(2)
-
-       do j=1,10
-       c(j)=coeff3(im,j)
-       enddo
-
-
-       do j=1,4
-       krefa(j)=propv3(im,4*(pos-1)+j)
-       v3(j)=refvect3(im,j)
-       v4(j)=refvect3(im,4+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv3(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass3(im,pos1)**2,0d0)
-
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv3(im,j+4*(pos2-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop2 = propX-dcmplx(mass3(im,pos2)**2,0d0)
-
-       do j=1,5
-       vne(j)=dcmplx(0d0,0d0)
-       enddo
-       vne(5)=dcmplx(0d0,1d0)
-
-       call sc(4,v3,lvt,r3)
-       call sc(4,v4,lvt,r4)
-       call sc(5,vne,lvt,re)
-
-       trikoeff=c(1)+c(2)*r3+c(3)*r4+c(4)*r3*r4+c(5)*(r3**2-r4**2)+c(6)*r3**2*r4+c(7)*r3*r4**2+c(8)*re**2+c(9)*re**2*r3+c(10)*re**2*r4
-
-
-       res=res-trikoeff/prop1/prop2
-
-        enddo
-
-! print *, "resid1b",res
-
-
-!      subtracting a double cut
-         call mymatch1_2(l1c,n12,lmatch12)
-
-             do i=1,n12
-
-           im = lmatch12(i)
-
-
-
-      j=1
- 54   if (l1c(1).ne.Lc2(im,j)) then
-      j=j+1
-      go to 54
-      endif
-
-      pos=j
-
-
-       call mismatch1_2(l1c,im,pos1)
-
-
-       do j=1,10
-       b(j)=coeff2(im,j)
-       enddo
-
-
-
-       do j=1,4
-       krefa(j)=propv2(im,4*(pos-1)+j)
-       v2(j)=refvect2(im,j)
-       v3(j)=refvect2(im,4+j)
-       v4(j)=refvect2(im,8+j)
-       enddo
-
-
-       do j=1,4
-       lvt(j)=q1(j)-krefa(j)
-       enddo
-       lvt(5)=q1(5)
-
-       do j=1,4
-       vprop(j)=lvt(j)+propv2(im,j+4*(pos1-1))
-       enddo
-       vprop(5)=lvt(5)
-
-       call sc(5,vprop,vprop,propX)
-
-       prop1 = propX-dcmplx(mass2(im,pos1)**2,0d0)
-
-       do j=1,5
-       vne(j)=dcmplx(0d0,0d0)
-       enddo
-       vne(5)=dcmplx(0d0,1d0)
-
-       call sc(4,v2,lvt,r2)
-       call sc(4,v3,lvt,r3)
-       call sc(4,v4,lvt,r4)
-       call sc(5,vne,lvt,re)
-
-       if (tagdcut(im,1).eq.666) then
-          bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*(r2**2-r3**2)+b(6)*(r2**2+r3**2-2*r4**2)+b(7)*r2*r3+b(8)*r2*r4        +b(9)*r3*r4+b(10)*re**2
-       elseif (tagdcut(im,1).eq.999) then
-          bkoeff=b(1)+b(2)*r2+b(3)*r3+b(4)*r4+b(5)*r2*r2        +b(6)*r2*r3                +b(7)*r2*r4+b(8)*(r3**2-r4**2)+b(9)*r3*r4+ b(10)*re**2
-       else
-          call Error("Error in bub subtraction in resid1")
-       endif
-
-       res=res-bkoeff/prop1
-
-! print *, "resid1c",res,tagdcut(im,1)
-
-        enddo
-
  
           return
           end subroutine
@@ -2079,623 +1344,490 @@ END SUBROUTINE
 
 
 
+       subroutine resid4Subtr(lv,ThePrimAmps,iPrimAmp,CutNum,res)
+       use ModProcess
+       use ModMisc
+       implicit none
+       double complex lv(5),res
+       type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+       type(PrimitiveAmplitude),pointer :: ThePrimAmp
+       integer i,CutNum,iPrimAmp,PrimSelect,k
+       double complex lvt(5),propX
+       double complex vprop(5)
+       integer MatchCutNum,FirstCutMatch
+       integer :: NumMatch,MatchHiCuts(1:10),FirstHiProp(1:10),MissHiProp(1:10,1:1)
+
+
+!        subtracting the 5-cut
+
+       ThePrimAmp => ThePrimAmps(iPrimAmp)
+
+       do k=0,ThePrimAmp%NumSisters
+
+         if(k.eq.0) then
+             PrimSelect = iPrimAmp
+         else
+             PrimSelect = ThePrimAmp%Sisters(k)
+         endif
+         do i = 1,ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%MissHiProp(k,i,1)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart( ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch) )%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            propX = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/propX
+         enddo
+      enddo
+
+       return
+       end subroutine
 
 
 
 
+       subroutine resid3Subtr(lv,ThePrimAmps,iPrimAmp,CutNum,res)
+       use ModProcess
+       use ModMisc
+       implicit none
+       double complex v45(4),vprop(5),propX,r1,r2,lv(5),res,lvt(5)
+       integer CutNum,i,iPrimAmp,k,PrimSelect
+       double complex prop1,prop2
+       double complex vne(5)
+       type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+       type(PrimitiveAmplitude),pointer :: ThePrimAmp
+       integer MatchCutNum,FirstCutMatch
+       integer :: NumMatch,MatchHiCuts(1:10),FirstHiProp(1:10),MissHiProp(1:10,1:2)
 
 
+       ThePrimAmp => ThePrimAmps(iPrimAmp)
 
-!!       procedures to match various cuts
-!!      returns ns: number of matched cuts in pentcuts
-!!      lmatch: cut numbers for these pentcuts
-        subroutine  mymatch4_5(l4cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l4cut(4)
+       do k=0,ThePrimAmp%NumSisters
 
-         ns=0
-
-        do i=1,N5
-         xtot=0
-
-            do j1=1,4
-            do j2=1,5
-!!                 check whether the quadcut matches any of the pentcuts
-                   if (l4cut(j1).eq.Lc5(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-             enddo
-             enddo
-
-!!       if 4 matches for this pentcut then save number of this pentcut
-         if (xtot.eq.4) then
-           ns = ns+1
-            lmatch(ns)=i
+         if(k.eq.0) then
+             PrimSelect = iPrimAmp
+         else
+             PrimSelect = ThePrimAmp%Sisters(k)
          endif
 
-        enddo
 
-        return
-        end subroutine
+!        subtracting the 5-cut
+         do i = 1,ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(5)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(5)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(5)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(5)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(5)%MissHiProp(k,i,2)
 
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
 
-        subroutine  mismatch4_5(l4cut,ia,pos)
-        implicit none
-        integer j1,j2,xtot,ia,pos
-        include 'misc/global_import'
-        integer l4cut(4)
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
 
-            do j1=1,5
-                xtot = 1
-                do j2=1,4
-                  if (Lc5(ia,j1).eq.l4cut(j2)) then
-                     xtot = 0
-                  endif
-                enddo
-                if (xtot.eq.1) then
-                  pos = j1
-                endif
-            enddo
-
-        return
-        end subroutine
+            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2
+         enddo
 
 
 
-        subroutine  mymatch3_5(l3cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l3cut(3)
 
-         ns=0
+!        subtracting the 4-cut
+         do i = 1,ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(4)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(4)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(4)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(3)%Match(CutNum)%Subt(4)%MissHiProp(k,i,1)
 
-        do i=1,N5
-         xtot=0
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            propX = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
 
-            do j1=1,3
-            do j2=1,5
-                   if (l3cut(j1).eq.Lc5(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(4)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v45(1:4) = ThePrimAmps(PrimSelect)%UCuts(4)%NMom(MatchCutNum,1,1:4)
+            call sc(4,v45,lvt,r1)
+            r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            enddo
+            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+                    )/propX
+       enddo
 
-         if (xtot.eq.3) then
-           ns = ns+1
-            lmatch(ns)=i
+
+      enddo
+
+       return
+       end subroutine
+
+
+
+
+
+
+       subroutine resid2Subtr(lv,ThePrimAmps,iPrimAmp,CutNum,res)
+       use ModProcess
+       use ModMisc
+       implicit none
+       integer CutNum,iPrimAmp
+       double complex lv(1:5),res
+       double complex v45(4),vprop(5),propX,r1,r2,r22,lvt(5)
+       type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+       type(PrimitiveAmplitude),pointer :: ThePrimAmp
+       double complex prop1,prop2,prop3
+       double complex r3,r4,re
+       double complex vne(5)
+       double complex v3(4),v4(4),r32,r42
+       integer i,MatchCutNum,FirstCutMatch,k,PrimSelect
+       integer :: NumMatch,MatchHiCuts(1:10),FirstHiProp(1:10),MissHiProp(1:10,1:3)
+
+
+       ThePrimAmp => ThePrimAmps(iPrimAmp)
+
+       do k=0,ThePrimAmp%NumSisters
+
+         if(k.eq.0) then
+             PrimSelect = iPrimAmp
+         else
+             PrimSelect = ThePrimAmp%Sisters(k)
          endif
 
+
+
+!        subtracting the 5-cut
+         do i = 1,ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%NumMatch(k)
+            MatchCutNum=ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%MatchHiCuts(k,i)
+            FirstCutMatch=ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%MissHiProp(k,i,2)
+            MissHiProp(i,3) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(5)%MissHiProp(k,i,3)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,3))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop3 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,3) )%Mass2,0d0)
+
+            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3
+         enddo
+
+
+
+
+
+!        subtracting the 4-cut
+         do i = 1,ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(4)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(4)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(4)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(4)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(4)%MissHiProp(k,i,2)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
+
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(4)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v45(1:4) = ThePrimAmps(PrimSelect)%UCuts(4)%NMom(MatchCutNum,1,1:4)
+            call sc(4,v45,lvt,r1)
+            r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
+
+            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+                    )/prop1/prop2
+       enddo
+
+
+
+
+
+
+!      subtracting the 3-cut
+       do i = 1,ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(3)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(3)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(3)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(2)%Match(CutNum)%Subt(3)%MissHiProp(k,i,1)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(3)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            propX = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(3)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v3(1:4) = ThePrimAmps(PrimSelect)%UCuts(3)%NMom(MatchCutNum,1,1:4)
+            v4(1:4) = ThePrimAmps(PrimSelect)%UCuts(3)%NMom(MatchCutNum,2,1:4)
+            call sc(4,v3,lvt,r3)
+            call sc(4,v4,lvt,r4)
+            re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
+
+            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+                      )/propX
+       enddo
+
+
+       enddo
+
+       return
+       end subroutine
+
+
+
+
+
+
+
+       subroutine resid1Subtr(lv,ThePrimAmps,iPrimAmp,CutNum,res)
+       use ModProcess
+       use ModMisc
+       implicit none
+       include 'misc/global_import'!   this is only needed for tagcut(:)
+       integer CutNum,l1c(1:1),iPrimAmp
+       double complex lv(1:5),res,lvt(5),re
+       double complex v45(4),vprop(5),propX,r1,r2
+       double complex prop1,prop2,prop3,prop4
+       double complex r3,r4,vne(5)
+       double complex v2(4),v3(4),v4(4)
+       type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+       type(PrimitiveAmplitude),pointer :: ThePrimAmp
+       integer MatchCutNum,FirstCutMatch,k,PrimSelect
+       integer :: i,NumMatch,MatchHiCuts(1:10),FirstHiProp(1:10),MissHiProp(1:10,1:4)
+
+
+       ThePrimAmp => ThePrimAmps(iPrimAmp)
+
+
+       do k=0,ThePrimAmp%NumSisters
+
+         if(k.eq.0) then
+             PrimSelect = iPrimAmp
+         else
+             PrimSelect = ThePrimAmp%Sisters(k)
+         endif
+
+
+!        subtracting the 5-cut
+         do i = 1,ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%NumMatch(k)
+            MatchCutNum=ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%MatchHiCuts(k,i)
+            FirstCutMatch=ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%MissHiProp(k,i,2)
+            MissHiProp(i,3) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%MissHiProp(k,i,3)
+            MissHiProp(i,4) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(5)%MissHiProp(k,i,4)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,3))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop3 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,3) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,4))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop4 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,4) )%Mass2,0d0)
+
+            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3/prop4
+         enddo
+
+
+
+
+!        subtracting the 4-cut
+         do i = 1,ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%MissHiProp(k,i,2)
+            MissHiProp(i,3) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(4)%MissHiProp(k,i,3)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(4)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,3))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop3 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,3) )%Mass2,0d0)
+
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(4)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v45(1:4) = ThePrimAmps(PrimSelect)%UCuts(4)%NMom(MatchCutNum,1,1:4)
+            call sc(4,v45,lvt,r1)
+            r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
+
+            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+                    )/prop1/prop2/prop3
+         enddo
+
+
+
+
+!        subtracting the 3-cut
+         do i = 1,ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(3)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(3)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(3)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(3)%MissHiProp(k,i,1)
+            MissHiProp(i,2) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(3)%MissHiProp(k,i,2)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(3)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
+
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(3)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,2))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
+
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(3)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v3(1:4) = ThePrimAmps(PrimSelect)%UCuts(3)%NMom(MatchCutNum,1,1:4)
+            v4(1:4) = ThePrimAmps(PrimSelect)%UCuts(3)%NMom(MatchCutNum,2,1:4)
+            call sc(4,v3,lvt,r3)
+            call sc(4,v4,lvt,r4)
+            re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
+
+            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+                      )/prop1/prop2
         enddo
 
-        return
-        end subroutine
 
 
-        subroutine  mismatch3_5(l3cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia
-        include 'misc/global_import'
-        integer l3cut(3),lpos(2)
 
+!        subtracting the 2-cut
+         do i = 1,ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(2)%NumMatch(k)
+            MatchCutNum = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(2)%MatchHiCuts(k,i)
+            FirstCutMatch =   ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(2)%FirstHiProp(k,i)
+            MissHiProp(i,1) = ThePrimAmp%UCuts(1)%Match(CutNum)%Subt(2)%MissHiProp(k,i,1)
 
-           ns=0
+            vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart(ThePrimAmp%UCuts(2)%CutProp(MatchCutNum,FirstCutMatch))%Mom(1:4) &
+                       + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
+            vprop(5:5) = lv(5:5)
+            call sc(5,vprop,vprop,propX)
+            prop1 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
 
-            do j1=1,5
-                xtot = 1
-                do j2=1,3
-            if (Lc5(ia,j1).eq.l3cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
+            lvt(1:5) = lv(1:5)
+            if( FirstCutMatch.gt.1 ) lvt(1:4) = lvt(1:4) - ThePrimAmps(PrimSelect)%UCuts(2)%KMom(MatchCutNum,FirstCutMatch-1,1:4)
+            v2(1:4) = ThePrimAmps(PrimSelect)%UCuts(2)%NMom(MatchCutNum,1,1:4)
+            v3(1:4) = ThePrimAmps(PrimSelect)%UCuts(2)%NMom(MatchCutNum,2,1:4)
+            v4(1:4) = ThePrimAmps(PrimSelect)%UCuts(2)%NMom(MatchCutNum,3,1:4)
+            call sc(4,v2,lvt,r2)
+            call sc(4,v3,lvt,r3)
+            call sc(4,v4,lvt,r4)
+            re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
+
+            if (tagdcut(MatchCutNum,1).eq.666) then
+              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*(r2**2-r3**2)     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*(r2**2+r3**2-2*r4**2)     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r3     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*r2*r4           &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
+            elseif (tagdcut(MatchCutNum,1).eq.999) then
+              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*r2**2        &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*r2*r3              &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r4     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*(r3**2-r4**2)     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
             endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-
-
-        subroutine  mymatch3_4(l3cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l3cut(3)
-
-        ns=0
-
-
-        do i=1,N4
-         xtot=0
-
-            do j1=1,3
-            do j2=1,4
-                   if (l3cut(j1).eq.Lc4(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.3) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
         enddo
 
-        return
-        end subroutine
+       enddo
 
+       return
+       end subroutine
 
 
-        subroutine  mismatch3_4(l3cut,ia,pos)
-        implicit none
-        integer j1,j2,xtot,ia,pos
-        include 'misc/global_import'
-        integer l3cut(3)
 
-
-            do j1=1,4
-                xtot = 1
-                do j2=1,3
-            if (Lc4(ia,j1).eq.l3cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                pos = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-        subroutine  mymatch2_5(l2cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l2cut(2)
-
-         ns=0
-
-
-        do i=1,N5
-         xtot=0
-
-            do j1=1,2
-            do j2=1,5
-                   if (l2cut(j1).eq.Lc5(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.2) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-        subroutine  mismatch2_5(l2cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia
-        include 'misc/global_import'
-        integer l2cut(2),lpos(3)
-
-
-           ns=0
-
-            do j1=1,5
-                xtot = 1
-                do j2=1,2
-            if (Lc5(ia,j1).eq.l2cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-
-        subroutine  mymatch2_4(l2cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l2cut(2)
-
-         ns=0
-
-        do i=1,N4
-         xtot=0
-
-            do j1=1,2
-            do j2=1,4
-                   if (l2cut(j1).eq.Lc4(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.2) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-
-
-        subroutine mismatch2_4(l2cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia,lpos(2)
-        include 'misc/global_import'
-        integer l2cut(2)
-
-             ns=0
-
-            do j1=1,4
-                xtot = 1
-                do j2=1,2
-            if (Lc4(ia,j1).eq.l2cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-        subroutine  mymatch2_3(l2cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l2cut(2)
-
-         ns=0
-
-        do i=1,N3
-         xtot=0
-
-            do j1=1,2
-            do j2=1,3
-                   if (l2cut(j1).eq.Lc3(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.2) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-        subroutine mismatch2_3(l2cut,ia,pos)
-        implicit none
-        integer j1,j2,ns,xtot,ia,pos
-        include 'misc/global_import'
-        integer l2cut(2)
-
-             ns=0
-
-            do j1=1,3
-                xtot = 1
-                do j2=1,2
-            if (Lc3(ia,j1).eq.l2cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                pos = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-        subroutine  mymatch1_5(l1cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l1cut(1)
-
-         ns=0
-
-        do i=1,N5
-         xtot=0
-
-            do j1=1,1
-            do j2=1,5
-                   if (l1cut(j1).eq.Lc5(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.1) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-        subroutine mismatch1_5(l1cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia,lpos(4)
-        include 'misc/global_import'
-        integer l1cut(1)
-
-             ns=0
-
-            do j1=1,5
-                xtot = 1
-                do j2=1,1
-            if (Lc5(ia,j1).eq.l1cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-
-
-        subroutine  mymatch1_4(l1cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l1cut(1)
-
-         ns=0
-
-
-        do i=1,N4
-         xtot=0
-
-            do j1=1,1
-            do j2=1,4
-                   if (l1cut(j1).eq.Lc4(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.1) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-        subroutine mismatch1_4(l1cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia,lpos(3)
-        include 'misc/global_import'
-        integer l1cut(1)
-
-             ns=0
-
-            do j1=1,4
-                xtot = 1
-                do j2=1,1
-            if (Lc4(ia,j1).eq.l1cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-        subroutine  mymatch1_3(l1cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l1cut(1)
-
-         ns=0
-
-
-        do i=1,N3
-         xtot=0
-
-            do j1=1,1
-            do j2=1,3
-                   if (l1cut(j1).eq.Lc3(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.1) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-        subroutine mismatch1_3(l1cut,ia,lpos)
-        implicit none
-        integer j1,j2,ns,xtot,ia,lpos(2)
-        include 'misc/global_import'
-        integer l1cut(1)
-
-             ns=0
-
-            do j1=1,3
-                xtot = 1
-                do j2=1,1
-            if (Lc3(ia,j1).eq.l1cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-                ns=ns+1
-                lpos(ns) = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
-
-
-
-        subroutine  mymatch1_2(l1cut,ns,lmatch)
-        implicit none
-        integer i,j1,j2,ns,xtot
-        include 'misc/global_import'
-        integer lmatch(50),l1cut(1)
-
-         ns=0
-
-
-        do i=1,N2
-         xtot=0
-
-            do j1=1,1
-            do j2=1,2
-                   if (l1cut(j1).eq.Lc2(i,j2)) then
-                    xtot= xtot + 1
-                    endif
-              enddo
-
-            enddo
-
-         if (xtot.eq.1) then
-           ns = ns+1
-            lmatch(ns)=i
-         endif
-
-        enddo
-
-        return
-        end subroutine
-
-
-
-
-
-        subroutine mismatch1_2(l1cut,ia,pos)
-        implicit none
-        integer j1,j2,xtot,ia,pos
-        include 'misc/global_import'
-        integer l1cut(1)
-
-
-
-            do j1=1,2
-                xtot = 1
-                do j2=1,1
-            if (Lc2(ia,j1).eq.l1cut(j2)) then
-                xtot = 0*xtot
-                else
-                xtot = xtot
-            endif
-               enddo
-             if (xtot.eq.1) then
-!                 ns=ns+1
-                pos = j1
-             endif
-
-            enddo
-
-        return
-        end subroutine
 
 
 
@@ -2879,4 +2011,4 @@ END SUBROUTINE
 
 
 
-END MODULE ModResidues
+END MODULE ModResidues_new

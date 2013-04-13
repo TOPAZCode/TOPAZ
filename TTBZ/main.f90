@@ -246,7 +246,7 @@ logical :: dirresult
               print *, "required: ZDK:      0=stable, 1=Z-->l+ l-, 2=Z-->nu nubar"
               stop
           endif
-          if( (ZDecays.ne.0 .and. TopDecays.eq.0) .OR. (ZDecays.eq.0 .and. TopDecays.ne.0) ) then
+          if( (ZDecays.gt.0 .and. TopDecays.eq.0) .OR. (ZDecays.eq.0 .and. TopDecays.ne.0) ) then
               print *, "if the Z boson decays then the tops also have to decay (and vice versa)"
               stop
           endif
@@ -1445,6 +1445,7 @@ IF( MASTERPROCESS.EQ.62 ) THEN
 IF( (CORRECTION.LE.1) .AND. PROCESS.EQ.62 ) THEN
    print *, 'LO / Virt Zprime'
    call qlinit()
+!   call ltini ! looptools
    call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
    if( warmup ) then
       itmx = VegasIt1
@@ -1455,6 +1456,7 @@ IF( (CORRECTION.LE.1) .AND. PROCESS.EQ.62 ) THEN
 ELSEIF ( CORRECTION.EQ.3 .AND. (PROCESS.EQ.63 .OR. PROCESS.EQ.64 .OR. PROCESS.EQ.66)) THEN
    print *, 'Zprime Int Dipoles'
    call qlinit()
+!   call ltini ! looptools
    call vegas(EvalCS_1L_Zprime_ttbqqb,VG_Result,VG_Error,VG_Chi2)
    if( warmup ) then
       itmx = VegasIt1
@@ -1499,8 +1501,8 @@ ENDIF
 IF ( MASTERPROCESS.EQ.2) THEN
 IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
    call qlinit()
+!   call ltini  ! looptools
    print *, "Gluon-Z' interference, virtual"
-   call qlinit()
   call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
@@ -1511,6 +1513,7 @@ IF ( CORRECTION.EQ.1 .AND. PROCESS.EQ.65 ) THEN
 ENDIF
 IF ( CORRECTION.EQ.3 .AND. PROCESS.EQ.69 ) THEN
    call qlinit()
+!   call ltini  ! looptools
    print *, "Gluon-Z' interference, integrated dipoles"
   call vegas(EvalCS_Virt_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
@@ -1525,6 +1528,7 @@ ENDIF
 IF ( MASTERPROCESS.EQ.4) THEN
 IF ( CORRECTION.EQ.2 .AND. PROCESS.EQ.67 ) THEN
    call qlinit()
+!   call ltini ! looptools
    print *, "Gluon-Z' interference, real"
   call vegas(EvalCS_Real_Zprime_Interf,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then

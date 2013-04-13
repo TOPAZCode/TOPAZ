@@ -1,4 +1,4 @@
-FC            = ifort -O2
+FC            = ifort -O0
 FFLAGS        = 
 
 LFLAGS	      = $(FFLAGS)

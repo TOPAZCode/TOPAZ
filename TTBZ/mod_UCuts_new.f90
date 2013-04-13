@@ -1,22 +1,23 @@
-MODULE ModUCuts
-! this is the version before the matching routines have been moved out of mod_residues
+MODULE ModUCuts_new
 
-public :: PentCut,QuadCut,TripCut,DoubCut,SingCut
+
+public :: PentCut_new,QuadCut_new,TripCut_new,DoubCut_new,SingCut_new
 
 contains
 
 
-SUBROUTINE PentCut(ThePrimAmp)
+SUBROUTINE PentCut_new(ThePrimAmps,iPrimAmp)
 use ModProcess
 use ModNVBasis
 use ModMisc
-use ModResidues
+use ModResidues_new
 implicit none
-type(PrimitiveAmplitude),target :: ThePrimAmp
+type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(UnitarityCut),pointer :: PentCuts
 type(Propagator),pointer :: IntPart(:)
 type(TreeProcess),pointer :: TreeProcs(:)
-integer :: CutNum
+integer :: CutNum,iPrimAmp
 double precision :: KMom(1:4,1:4),VMom(1:4,1:4)
 double precision :: V5(1:4),x1,x2,x3,x4
 double complex :: SqrtPreF
@@ -25,6 +26,7 @@ double complex :: Res(1:2)
 
    include 'misc/global_import'
 
+   ThePrimAmp => ThePrimAmps(iPrimAmp)
    PentCuts => ThePrimAmp%UCuts(5)
    IntPart  => ThePrimAmp%IntPart(1:NumExtParticles)
    do CutNum = 1,PentCuts%NumCuts
@@ -37,7 +39,6 @@ double complex :: Res(1:2)
 !DEC$ ENDIF
 
       TreeProcs => ThePrimAmp%UCuts(5)%TreeProcess(CutNum,1:5)
-
 ! def. of k's as in paper
 !       KMom(1,1:4) = ThePrimAmp%IntPart(PentCuts%CutProp(CutNum,2))%Mom(1:4) - ThePrimAmp%IntPart(PentCuts%CutProp(CutNum,1))%Mom(1:4)
 !       KMom(2,1:4) = ThePrimAmp%IntPart(PentCuts%CutProp(CutNum,3))%Mom(1:4) - ThePrimAmp%IntPart(PentCuts%CutProp(CutNum,2))%Mom(1:4)
@@ -48,7 +49,10 @@ double complex :: Res(1:2)
       KMom(2,1:4) = IntPart(PentCuts%CutProp(CutNum,3))%Mom(1:4) - IntPart(PentCuts%CutProp(CutNum,1))%Mom(1:4)
       KMom(3,1:4) = IntPart(PentCuts%CutProp(CutNum,4))%Mom(1:4) - IntPart(PentCuts%CutProp(CutNum,1))%Mom(1:4)
       KMom(4,1:4) = IntPart(PentCuts%CutProp(CutNum,5))%Mom(1:4) - IntPart(PentCuts%CutProp(CutNum,1))%Mom(1:4)
-
+      PentCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)!   I think this assignment is only 64bit even if in 128bit mode... check!
+      PentCuts%KMom(CutNum,2,1:4) = KMom(2,1:4)
+      PentCuts%KMom(CutNum,3,1:4) = KMom(3,1:4)
+      PentCuts%KMom(CutNum,4,1:4) = KMom(4,1:4)
 
 ! construct NV-basis
       call NVBasis4(KMom(1:4,1:4),VMom(1:4,1:4))
@@ -63,10 +67,10 @@ double complex :: Res(1:2)
       LoopMom(1:4) = V5(1:4)
       alpha_5 = (0d0,+1d0)
       LoopMom(5)   = SqrtPreF * alpha_5
-      call resid5(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),dcmplx(KMom(4,1:4)),PentCuts%CutProp(CutNum,1:5),TreeProcs,Res(1))
+      call resid5_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),dcmplx(KMom(4,1:4)),PentCuts%CutProp(CutNum,1:5),TreeProcs,Res(1))
       alpha_5 = (0d0,-1d0)
       LoopMom(5)   = SqrtPreF * alpha_5
-      call resid5(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),dcmplx(KMom(4,1:4)),PentCuts%CutProp(CutNum,1:5),TreeProcs,Res(2))
+      call resid5_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),dcmplx(KMom(4,1:4)),PentCuts%CutProp(CutNum,1:5),TreeProcs,Res(2))
 
       PentCuts%Coeff(CutNum,0) = 0.5d0*(Res(1) + Res(2))/LoopMom(5)**2
 
@@ -85,9 +89,9 @@ double complex :: Res(1:2)
 
 
 !DEC$ IF (_DebugPrintPentCoeff==1)
-       print *, coeff5(CutNum,1)
+      print *,"5 cuts"
+      print *, coeff5(CutNum,1)
       enddo
-      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -100,18 +104,19 @@ END SUBROUTINE
 
 
 
-SUBROUTINE QuadCut(ThePrimAmp)
+SUBROUTINE QuadCut_new(ThePrimAmps,iPrimAmp)
 use ModProcess
 use ModNVBasis
 use ModMisc
-use ModResidues
+use ModResidues_new
 use ifport
 implicit none
-type(PrimitiveAmplitude),target :: ThePrimAmp
+type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(UnitarityCut),pointer :: QuadCuts
 type(Propagator) :: IntPart(NumExtParticles)
 type(TreeProcess),pointer :: TreeProcs(:)
-integer :: CutNum,k
+integer :: CutNum,k,iPrimAmp
 double precision :: KMom(1:3,1:4),VMom(1:3,1:4)
 double precision :: V4(1:4),x1,x2,x3
 double complex :: SqrtPreF
@@ -121,7 +126,7 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
 
    include 'misc/global_import'
 
-
+   ThePrimAmp => ThePrimAmps(iPrimAmp)
    QuadCuts => ThePrimAmp%UCuts(4)
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
@@ -130,7 +135,6 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
          QuadCuts%Coeff(CutNum,:)=(0d0,0d0)
          cycle
       endif
-
 !DEC$ IF (_DebugShowCuts==1)
    print *, "QuadCut",CutNum,": ", QuadCuts%CutProp(CutNum,1:4)
 !DEC$ ENDIF
@@ -148,6 +152,11 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
 
 ! construct NV-basis
       call NVBasis3(KMom(1:3,1:4),VMom(1:3,1:4),NMom(1,1:4))
+      QuadCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)
+      QuadCuts%KMom(CutNum,2,1:4) = KMom(2,1:4)
+      QuadCuts%KMom(CutNum,3,1:4) = KMom(3,1:4)
+      QuadCuts%NMom(CutNum,1,1:4) = NMom(1,1:4)
+
       x1 = (KMom(1,1:4).dot.KMom(1,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,2))%Mass2
       x2 = (KMom(2,1:4).dot.KMom(2,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,3))%Mass2
       x3 = (KMom(3,1:4).dot.KMom(3,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,4))%Mass2
@@ -161,7 +170,8 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       s1(1) = alpha_1*SqrtPreF
       LoopMom(1:4) = V4(1:4) + s1(1)*NMom(1,1:4)
       LoopMom(5)   = 0d0
-      call resid4(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(1))
+      call resid4_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(1))
+      call resid4Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
 !----------------- 2 ---------------------
       alpha_1 = -1d0
 !     alpha_5 = 0d0
@@ -169,7 +179,8 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       LoopMom(1:4) = V4(1:4) + s1(2)*NMom(1,1:4)
       LoopMom(5)   = 0d0
 
-      call resid4(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(2))
+      call resid4_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(2))
+      call resid4Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(2))
       QuadCuts%Coeff(CutNum,0) = 0.5d0*(Res(1) + Res(2))
       QuadCuts%Coeff(CutNum,1) = 0.5d0*(Res(1) - Res(2))/SqrtPreF
 !----------------- 3 ---------------------
@@ -187,7 +198,8 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
             LinSysEq(k-2,1) = se2(k)
             LinSysEq(k-2,2) = se2(k)*s1(k)
             LinSysEq(k-2,3) = se2(k)**2
-            call resid4(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(k))
+            call resid4_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(k))
+            call resid4Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(k))
             LinSysEq(k-2,4) = Res(k) - QuadCuts%Coeff(CutNum,0) - QuadCuts%Coeff(CutNum,1) * s1(k)
       enddo
       QuadCuts%Coeff(CutNum,2:4) = go_Gauss(3,LinSysEq(1:3,1:4))
@@ -225,12 +237,11 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
 
 
 !DEC$ IF (_DebugPrintQuadCoeff==1)
-      print *, ""
+      print *, "4 cuts"
       do k=1,5
          print *, k,coeff4(CutNum,k)
       enddo
       enddo
-      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -246,19 +257,20 @@ END SUBROUTINE
 
 
 
-SUBROUTINE TripCut(ThePrimAmp)
+SUBROUTINE TripCut_new(ThePrimAmps,iPrimAmp)
 use ModProcess
 use ModParameters
 use ModNVBasis
 use ModMisc
-use ModResidues
+use ModResidues_new
 use ifport
 implicit none
-type(PrimitiveAmplitude),target :: ThePrimAmp
+type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(UnitarityCut),pointer :: TripCuts
 type(Propagator) :: IntPart(NumExtParticles)
 type(TreeProcess),pointer :: TreeProcs(:)
-integer :: CutNum
+integer :: CutNum,iPrimAmp
 double precision :: KMom(1:2,1:4),VMom(1:2,1:4)
 double precision :: V3(1:4),x1,x2,x3,phi
 double complex :: SqrtPreF,swap_tmp
@@ -270,6 +282,7 @@ double complex :: LHSEQ(1:4),LHSEQ_NEW(1:4),BCOEFF(0:3)
 include "misc/global_import"
 
 
+   ThePrimAmp => ThePrimAmps(iPrimAmp)
    TripCuts => ThePrimAmp%UCuts(3)
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
@@ -293,6 +306,12 @@ include "misc/global_import"
 
 ! construct NV-basis
       call NVBasis2(KMom(1:2,1:4),VMom(1:2,1:4),NMom(1:2,1:4))
+      TripCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)
+      TripCuts%KMom(CutNum,2,1:4) = KMom(2,1:4)
+      TripCuts%NMom(CutNum,1,1:4) = NMom(1,1:4)
+      TripCuts%NMom(CutNum,2,1:4) = NMom(2,1:4)
+
+
       x1 = (KMom(1,1:4).dot.KMom(1,1:4)) + IntPart(TripCuts%CutProp(CutNum,1))%Mass2 - IntPart(TripCuts%CutProp(CutNum,2))%Mass2
       x2 = (KMom(2,1:4).dot.KMom(2,1:4)) + IntPart(TripCuts%CutProp(CutNum,1))%Mass2 - IntPart(TripCuts%CutProp(CutNum,3))%Mass2
       V3(1:4) = -0.5d0*( x1*VMom(1,1:4) + x2*VMom(2,1:4) )
@@ -322,7 +341,8 @@ include "misc/global_import"
             LinSysEq(k,5) = s1(k)**2 - s2(k)**2
             LinSysEq(k,6) = s1(k)**2*s2(k)
             LinSysEq(k,7) = s1(k)*s2(k)**2
-            call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,LinSysEq(k,8))
          enddo
 
          TripCuts%Coeff(CutNum,0:6) = go_Gauss(7,LinSysEq(1:7,1:8))
@@ -338,7 +358,8 @@ include "misc/global_import"
          LinSysEq(1,1) = se2(8)
          LinSysEq(1,2) = se2(8)*s1(8)
          LinSysEq(1,3) = 0d0
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res8)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res8)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res8)
          LinSysEq(1,4) = Res8 - TripCuts%Coeff(CutNum,0)           &
                                 - TripCuts%Coeff(CutNum,1) * s1(8)     &
 !                                 - TripCuts%Coeff(CutNum,3) * s1(8)**2
@@ -354,7 +375,8 @@ include "misc/global_import"
          LinSysEq(2,1) = se2(9)
          LinSysEq(2,2) = se2(9)*s1(9)
          LinSysEq(2,3) = 0d0
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res9)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res9)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res9)
          LinSysEq(2,4) = Res9 - TripCuts%Coeff(CutNum,0)             &
                                 - TripCuts%Coeff(CutNum,1) * s1(9)     &
 !                                 - TripCuts%Coeff(CutNum,3) * s1(9)**2
@@ -372,7 +394,8 @@ include "misc/global_import"
          LinSysEq(3,1) = se2(10)
          LinSysEq(3,2) = 0d0
          LinSysEq(3,3) = se2(10)*s2(10)
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res10)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res10)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res10)
          LinSysEq(3,4) = Res10 - TripCuts%Coeff(CutNum,0)              &
                                  - TripCuts%Coeff(CutNum,2) * s2(10)     &
 !                                  + TripCuts%Coeff(CutNum,3) * s2(10)**2
@@ -400,7 +423,8 @@ include "misc/global_import"
             LinSysEq(k,5) = s1(k)**2 - s2(k)**2
             LinSysEq(k,6) = s1(k)**2*s2(k)
             LinSysEq(k,3) = s1(k)*s2(k)**2
-            call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,LinSysEq(k,8))
          enddo
 
 
@@ -422,7 +446,8 @@ include "misc/global_import"
             LinSysEq(k,5) = s1(k)**2 - s2(k)**2
             LinSysEq(k,6) = s1(k)**2*s2(k)
             LinSysEq(k,3) = s1(k)*s2(k)**2
-            call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+            call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,LinSysEq(k,8))
          enddo
 
          TripCuts%Coeff(CutNum,0:6) = go_Gauss(7,LinSysEq(1:7,1:8))
@@ -450,7 +475,7 @@ include "misc/global_import"
 !             LinSysEq(k,5) = s1(k)**2 - s2(k)**2
 !             LinSysEq(k,6) = s1(k)**2*s2(k)
 !             LinSysEq(k,3) = s1(k)*s2(k)**2
-!             call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+!             call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
 !          enddo
 !
 !          do k=5,8
@@ -469,7 +494,7 @@ include "misc/global_import"
 !             LinSysEq(k,5) = s1(k)**2 - s2(k)**2
 !             LinSysEq(k,6) = s1(k)**2*s2(k)
 !             LinSysEq(k,3) = s1(k)*s2(k)**2
-!             call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
+!             call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,LinSysEq(k,8))
 !
 !             lhseq_new(k-4)=0.5d0/(-alpha_2)*(LinSysEq(k-4,8)-LinSysEq(k,8))
 !          enddo
@@ -506,7 +531,8 @@ include "misc/global_import"
          LinSysEq(1,1) = se2(8)
          LinSysEq(1,2) = se2(8)*s1(8)
          LinSysEq(1,3) = 0d0
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res8)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res8)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res8)
          LinSysEq(1,4) = Res8 - TripCuts%Coeff(CutNum,0)             &
                               - TripCuts%Coeff(CutNum,1) * s1(8)     &
                               - TripCuts%Coeff(CutNum,4) * s1(8)**2
@@ -522,7 +548,8 @@ include "misc/global_import"
          LinSysEq(2,2) = se2(9)*s1(9)
          LinSysEq(2,3) = 0d0
 
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res9)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res9)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res9)
          LinSysEq(2,4) = Res9 - TripCuts%Coeff(CutNum,0)             &
                                 - TripCuts%Coeff(CutNum,1) * s1(9)     &
                                 - TripCuts%Coeff(CutNum,4) * s1(9)**2
@@ -538,7 +565,8 @@ include "misc/global_import"
          LinSysEq(3,1) = se2(10)
          LinSysEq(3,2) = 0d0
          LinSysEq(3,3) = se2(10)*s2(10)
-         call resid3(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res10)
+         call resid3_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),TripCuts%CutProp(CutNum,1:3),TreeProcs,Res10)
+         call resid3Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res10)
          LinSysEq(3,4) = Res10 - TripCuts%Coeff(CutNum,0)             &
                                  - TripCuts%Coeff(CutNum,2) * s2(10)    &
                                  + TripCuts%Coeff(CutNum,4) * s2(10)**2
@@ -605,11 +633,11 @@ include "misc/global_import"
 !       enddo
 
 !DEC$ IF (_DebugPrintTripCoeff==1)
+      print *, "3 cuts"
       do k=1,10
          print *, coeff3(Cutnum,k)
       enddo
       enddo
-      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -621,19 +649,20 @@ END SUBROUTINE
 
 
 
-SUBROUTINE DoubCut(ThePrimAmp)
+SUBROUTINE DoubCut_new(ThePrimAmps,iPrimAmp)
 use ModProcess
 use ModParameters
 use ModNVBasis
 use ModMisc
-use ModResidues
+use ModResidues_new
 use ifport
 implicit none
-type(PrimitiveAmplitude),target :: ThePrimAmp
+type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(UnitarityCut),pointer :: DoubCuts
 type(Propagator) :: IntPart(NumExtParticles)
 type(TreeProcess),pointer :: TreeProcs(:)
-integer :: CutNum
+integer :: CutNum,iPrimAmp
 double precision :: KMom(1,1:4),VMom(1,1:4)
 double complex :: NMom(1:3,1:4),SqrtPreF
 double precision :: V2(1:4),x1,x2,phi
@@ -647,6 +676,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
    include 'misc/global_import'
 
 
+   ThePrimAmp => ThePrimAmps(iPrimAmp)
    DoubCuts => ThePrimAmp%UCuts(2)
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
@@ -658,13 +688,17 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
    if (DoubCuts%skip(CutNum)) then
          DoubCuts%Coeff(CutNum,:)=(0d0,0d0)
          cycle
-      endif
-
+   endif
       TreeProcs => ThePrimAmp%UCuts(2)%TreeProcess(CutNum,1:2)
 
       KMom(1,1:4) = IntPart(DoubCuts%CutProp(CutNum,2))%Mom(1:4) - IntPart(DoubCuts%CutProp(CutNum,1))%Mom(1:4)
       if ( dabs(KMom(1,1:4).dot.KMom(1,1:4)) .ge. 1d-7 ) then    !  NON-light like vector
          call NVBasis1(KMom(1,1:4),VMom(1,1:4),NMom(1:3,1:4))
+         DoubCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)
+         DoubCuts%NMom(CutNum,1,1:4) = NMom(1,1:4)
+         DoubCuts%NMom(CutNum,2,1:4) = NMom(2,1:4)
+         DoubCuts%NMom(CutNum,3,1:4) = NMom(3,1:4)
+
          x1 = (KMom(1,1:4).dot.KMom(1,1:4)) + IntPart(DoubCuts%CutProp(CutNum,1))%Mass2 - IntPart(DoubCuts%CutProp(CutNum,2))%Mass2
          V2(1:4) = -0.5d0*x1*VMom(1,1:4)
          SqrtPreF = cdsqrt(dcmplx( IntPart(DoubCuts%CutProp(CutNum,1))%Mass2 - (V2.dot.V2) ))
@@ -694,7 +728,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
                LinSysEq(k,7) = s1(k)*s2(k)
                LinSysEq(k,8) = s1(k)*s3(k)
                LinSysEq(k,9) = s2(k)*s3(k)
-               call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(k))
+               call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(k))
+               call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(k))
             enddo
             LinSysEq(1:9,10) = Res(1:9)
             DoubCuts%Coeff(CutNum,0:8) = go_Gauss(9,LinSysEq(1:9,1:10))
@@ -724,7 +759,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
                 LinSysEq(k,7) = s1(k)*s2(k)
                 LinSysEq(k,8) = s1(k)*s3(k)
                 LinSysEq(k,9) = s2(k)*s3(k)
-                call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(k))
+                call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(k))
+                call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(k))
           enddo
 
           LinSysEq(1,10) = Res(1)
@@ -747,7 +783,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          se2     = alpha_5
          LoopMom(1:4) = V2(1:4) + s3(10)*NMom(3,1:4)
          LoopMom(5)   = (0d0,1d0)
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(10))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(10))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(10))
 
          DoubCuts%Coeff(CutNum,9) = Res(10) - DoubCuts%Coeff(CutNum,0)  &
                                             - DoubCuts%Coeff(CutNum,3)*s3(10)  &
@@ -781,6 +818,10 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
       else    !  light-like-vector
 
          call NVBasis1_Light(KMom(1,1:4),VMom(1,1:4),NMom(1:3,1:4))
+         DoubCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)
+         DoubCuts%NMom(CutNum,1,1:4) = NMom(1,1:4)
+         DoubCuts%NMom(CutNum,2,1:4) = NMom(2,1:4)
+         DoubCuts%NMom(CutNum,3,1:4) = NMom(3,1:4)
 
 ! -------- #1
          r1 = KMom(1,1:4).dot.NMom(1,1:4)
@@ -789,17 +830,19 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x3 = 1d0
          SqrtPreF = cdsqrt(dcmplx( IntPart(DoubCuts%CutProp(CutNum,1))%Mass2*(1d0+x1) - x1*IntPart(DoubCuts%CutProp(CutNum,2))%Mass2 ))
          x4 = cdsqrt(SqrtPreF**2 - x3**2)
-
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
+
 
 ! -------- #2
          x3 = -x3
          x4 = x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(2))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(2))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(2))
 
 
 ! -------- #3
@@ -807,7 +850,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = -x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(3))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(3))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(3))
 
 
 ! -------- #4
@@ -815,7 +859,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(4))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(4))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(4))
 
          lhseq1   = 0.25d0*(Res(1)+Res(2)+Res(3)+Res(4))
          DoubCuts%Coeff(CutNum,8) = 0.25d0/(-x4)*(Res(1)-Res(3)-Res(2)+Res(4))
@@ -828,7 +873,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = zsqrt(SqrtPreF**2 - x3**2)
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(5))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(5))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(5))
 
 
 ! -------- #6
@@ -838,7 +884,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = cdsqrt(SqrtPreF**2 - x3**2)
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
 
 
 ! -------- #7
@@ -846,7 +893,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(2))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(2))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(2))
 
 
 ! -------- #8
@@ -854,7 +902,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = -x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(3))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(3))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(3))
 
 
 ! -------- #9
@@ -862,7 +911,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 =  x4
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(4))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(4))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(4))
 
 
          lhseq3=0.25d0*(Res(1)+Res(2)+Res(3)+Res(4))
@@ -898,7 +948,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = cdsqrt(SqrtPreF**2 - x3**2)
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = 0d0
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(6))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(6))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(6))
 
 
          alpha_1 = LoopMom(1:4).dot.NMom(1,1:4)
@@ -918,15 +969,14 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
          x4 = cdsqrt(SqrtPreF**2 - xe**2 - x3**2)
          LoopMom(1:4) = x1*VMom(1,1:4) + x2*NMom(1,1:4) + x3*NMom(2,1:4) + x4*NMom(3,1:4)
          LoopMom(5)   = xe * (0d0,1d0)
-         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,Res(1))
+         call resid2Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
 
 
          DoubCuts%Coeff(CutNum,9) = 1d0/xe**2*(Res(1) - DoubCuts%Coeff(CutNum,0) - DoubCuts%Coeff(CutNum,1)*r1*x1 - DoubCuts%Coeff(CutNum,2)*x3-DoubCuts%Coeff(CutNum,3)*x4 -DoubCuts%Coeff(CutNum,4)*r1**2*x1**2 -DoubCuts%Coeff(CutNum,5)*r1*x1*x3 - DoubCuts%Coeff(CutNum,6)*r1*x1*x4-DoubCuts%Coeff(CutNum,7)*(x3**2 - x4**2) - DoubCuts%Coeff(CutNum,8)*x3*x4 )
 
 
          tagdcut(CutNum,1)=999    ! needed for integrals
-
-
 
          coeff2(CutNum,1) = DoubCuts%Coeff(CutNum,0)
          coeff2(CutNum,2) = DoubCuts%Coeff(CutNum,1)
@@ -975,11 +1025,11 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 !       endif
 
 !DEC$ IF (_DebugPrintDoubCoeff==1)
+      print *, "2 cuts"
       do k=1,10
          print *, cutnum,k,coeff2(Cutnum,k)
       enddo
       enddo
-      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
@@ -991,18 +1041,22 @@ END SUBROUTINE
 
 
 
-SUBROUTINE SingCut(ThePrimAmp)
+
+
+
+SUBROUTINE SingCut_new(ThePrimAmps,iPrimAmp)
 use ModProcess
 use ModParameters
 use ModNVBasis
 use ModMisc
-use ModResidues
+use ModResidues_new
 implicit none
-type(PrimitiveAmplitude),target :: ThePrimAmp
+type(PrimitiveAmplitude),target :: ThePrimAmps(:)
+type(PrimitiveAmplitude),pointer :: ThePrimAmp
 type(UnitarityCut),pointer :: SingCuts
 type(Propagator) :: IntPart(NumExtParticles)
 type(TreeProcess),pointer :: TreeProcs(:)
-integer :: CutNum
+integer :: CutNum,iPrimAmp
 double complex :: NMom(1:4,1:4),SqrtPreF
 double complex :: LoopMom(1:5)
 double complex :: Res(1:2)
@@ -1010,6 +1064,7 @@ double complex :: Res(1:2)
    include 'misc/global_import'
 
 
+   ThePrimAmp => ThePrimAmps(iPrimAmp)
    SingCuts => ThePrimAmp%UCuts(1)
    IntPart(1:NumExtParticles) = ThePrimAmp%IntPart(1:NumExtParticles)
 
@@ -1022,7 +1077,6 @@ double complex :: Res(1:2)
          SingCuts%Coeff(CutNum,:)=(0d0,0d0)
          cycle
       endif
-
        TreeProcs => ThePrimAmp%UCuts(1)%TreeProcess(CutNum,1:1)
 
 
@@ -1046,15 +1100,18 @@ double complex :: Res(1:2)
        NMom(4,3) = (0d0,0d0)
        NMom(4,4) = (0d0,1d0)
 
+
        LoopMom(1:4) = IntPart(SingCuts%CutProp(CutNum,1))%Mass*(NMom(1,1:4)+NMom(2,1:4)+NMom(3,1:4)+NMom(4,1:4))/2d0
        LoopMom(5)   = 0d0
-       call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(1))
+       call resid1_new(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(1))
+       call resid1Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
 
        LoopMom(1:4) = - LoopMom(1:4)
        LoopMom(5)   = 0d0
-       call resid1(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(2))
-       SingCuts%Coeff(CutNum,0) = 0.5d0 * ( Res(1) + Res(2) )
+       call resid1_new(LoopMom(1:5),SingCuts%CutProp(CutNum,1:1),TreeProcs,Res(2))
+       call resid1Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(2))
 
+       SingCuts%Coeff(CutNum,0) = 0.5d0 * ( Res(1) + Res(2) )
 
 !     set vars. for kirill's routines
       coeff1(CutNum,1) = SingCuts%Coeff(CutNum,0)
@@ -1065,10 +1122,11 @@ double complex :: Res(1:2)
 !       if( cdabs(coeff1(CutNum,1)).lt.1d-6 ) coeff1(CutNum,1) = (0d0,0d0)
 
 
+
 !DEC$ IF (_DebugPrintSingCoeff==1)
-         print *, cutnum,coeff1(Cutnum,1)
+      print *, "1 cut"
+      print *, cutnum,coeff1(Cutnum,1)
       enddo
-      pause
 !DEC$ ELSE
       enddo
 !DEC$ ENDIF
