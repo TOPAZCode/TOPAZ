@@ -3147,7 +3147,7 @@ complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
    rOut=NumGlu(0)
    if( Quark(2)%PartType .gt.0 ) then      !    X----->----
       Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
-   else                                     !    X-----<----
+   else 
       Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
    endif
 

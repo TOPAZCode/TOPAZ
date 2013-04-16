@@ -366,6 +366,12 @@ ELSEIF( Topol.eq.DK_1L_Q ) THEN! 1-loop correction to light quark line + int.dip
       int_dip_factor = 2d0*alpha_sOver2Pi*RunAlphaS(NLOParam,MuRen)*CF*(  ep2 +3d0/2d0*ep1+5d0-pisq/2d0  &
                      + 3d0/2d0*(alpha_DKWff - 1d0 -dlog(alpha_DKWff))-dlog(alpha_DKWff)**2  )
 
+
+! the total width correction is +alpha_s/Pi, see e.g. Albert,Marciano,Wyler,Parsa; Nucl.Phys.B166 (1980) 460; eq.(A.5),(A.22)
+! note: the sum of v_factor and int_dip_factor is  alpha_sOver2Pi*CF*( +2 )
+! hence: the real corrections plus dipoles have to integrate to alpha_sOver2Pi*CF*( -1/2 )   (if all alpha_DK parameter are 1)
+! last checked: Apr.16 2013
+
     if( TopQuark%PartType.eq.Top_ ) then ! Top quark decay
 !       assemble lepton current
         call ubarSpi_Weyl(dcmplx(Mom(1:4,1)),-1,BotSpi(1:4))  ! bot

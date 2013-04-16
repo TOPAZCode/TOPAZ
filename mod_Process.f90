@@ -64,7 +64,7 @@ type :: UnitarityCut
    type(TreeProcess), allocatable :: TreeProcess(:,:)  ! process for a cut at a vertex, first and last number are the prop.ID, the rest corresp. to the ExtParticle ID
    real(8), allocatable :: KMom(:,:,:)
    complex(8), allocatable :: NMom(:,:,:)
-    logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
+   logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
 end type
 
 type :: PrimitiveAmplitude
@@ -123,7 +123,7 @@ IF( abs(TOPDECAYS).GE.1 ) THEN
   NDim = NDim + 4+4
 ENDIF
 
-IF( abs(ZDECAYS).GE.1 ) THEN
+IF( ZDECAYS.GE.1 ) THEN
   NDim = NDim + 2
 ENDIF
 
@@ -1550,7 +1550,7 @@ ELSEIF( PROCESS.EQ.41 ) THEN !   3_Glu  + 4_Glu  --> 1_AHeavyTop + 2_HeavyTop
       Crossing(:) = (/3,4,-1,-2/)
       MasterProcess=1
       AvgFactor = SpinAvg * GluonColAvg**2
-      NDim = NDim + 2    ! t tbar PS integration
+      NDim = NDim + 2    ! T Tbar PS integration
       NDim = NDim + 2    ! shat integration
       NDim = NDim + 4    ! T -> A0+t decays
       VegasNc0_default = 1000000
@@ -5742,6 +5742,30 @@ ELSEIF( MasterProcess.EQ.19 ) THEN
 
       PrimAmps(6)%ExtLine = (/1,6,2,5,4,3/)
       BornAmps(6)%ExtLine = (/1,6,2,5,4,3/)
+
+
+
+!     this configuration checks bfv
+!       print *, "reversing top quark line for check of bfv";pause
+!       PrimAmps(1)%ExtLine = (/2,6,1,3,4,5/)
+!       BornAmps(1)%ExtLine = (/2,6,1,3,4,5/)
+! 
+!       PrimAmps(2)%ExtLine = (/2,6,1,3,5,4/)
+!       BornAmps(2)%ExtLine = (/2,6,1,3,5,4/)
+! 
+!       PrimAmps(3)%ExtLine = (/2,6,1,4,3,5/)
+!       BornAmps(3)%ExtLine = (/2,6,1,4,3,5/)
+! 
+!       PrimAmps(4)%ExtLine = (/2,6,1,4,5,3/)
+!       BornAmps(4)%ExtLine = (/2,6,1,4,5,3/)
+! 
+!       PrimAmps(5)%ExtLine = (/2,6,1,5,3,4/)
+!       BornAmps(5)%ExtLine = (/2,6,1,5,3,4/)
+! 
+!       PrimAmps(6)%ExtLine = (/2,6,1,5,4,3/)
+!       BornAmps(6)%ExtLine = (/2,6,1,5,4,3/)
+
+
    ENDIF
 
 

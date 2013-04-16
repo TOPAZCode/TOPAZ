@@ -4759,7 +4759,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
 mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
 
 
-2000 continue!! dipoles for gluon emission off anti-stop
+2000 continue!! dipoles for gluon emission off Anti-HTop
 
 
    if( nJetRad.eq.1 ) then
@@ -5024,7 +5024,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
 mydummy(3) = EvalCS_DKJ_Real_HtHtbgg
 
 
-2001 continue!! dipoles for gluon emission off stop
+2001 continue!! dipoles for gluon emission off HTop
 
 
 
@@ -5881,7 +5881,7 @@ use ModParameters
 implicit none
 real(8) ::  EvalCS_DKJ_1L_HtHtbgg,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: NLO_Res_Pol,NLO_Res_Unpol,TreeResult(1:6),VirtResult(1:6),LO_Res_Unpol
-integer :: iHel,jHel,iPrimAmp,jPrimAmp,nHel(1:2)
+integer :: iHel,jHel,iPrimAmp,jPrimAmp
 integer :: NBin(1:NumMaxHisto),NHisto,BHMaxHel,BH1Hel,BH2Hel
 real(8) :: SpinAvg,ColorAvg,EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,RunFactor
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac
@@ -5889,6 +5889,7 @@ real(8) :: MomExt(1:4,1:15)
 real(8) :: pdf(-6:6,1:2)
 logical :: applyPSCut
 include 'vegas_common.f'
+
 
 
    EvalCS_DKJ_1L_HtHtbgg = 0d0
@@ -5901,6 +5902,7 @@ include 'vegas_common.f'
    call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! HTbar, HT
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    ISFac = MomCrossing(MomExt)
+
 
    BHMaxHel = -1
    IF(XTOPDECAYS.EQ.1) THEN
@@ -5919,7 +5921,6 @@ include 'vegas_common.f'
    ENDIF
 
 
-
    call Kinematics_TTbarETmiss(.false.,MomExt,(/3,4,5,10,6,11,7,8,9,12,13,14,0/),applyPSCut,NBin)
    if( applyPSCut ) then
       EvalCS_DKJ_1L_HtHtbgg = 0d0
@@ -5930,15 +5931,16 @@ include 'vegas_common.f'
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
-   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
+
+
+
 
 
 !----------------------------------------
 ! one loop correction to HTbar decay |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -5975,12 +5977,11 @@ include 'vegas_common.f'
 
 
 
-
 !----------------------------------------
 ! one loop correction to anti-top decay |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6022,7 +6023,7 @@ include 'vegas_common.f'
 !----------------------------------------
   IF( TOPDECAYS.EQ.4 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6067,7 +6068,7 @@ include 'vegas_common.f'
 ! one loop correction on HT decay     |
 ! ----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6082,7 +6083,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L1,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L1,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
@@ -6109,7 +6110,7 @@ include 'vegas_common.f'
 ! one loop correction on top decay      |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6124,7 +6125,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L2,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L2,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
@@ -6151,7 +6152,7 @@ include 'vegas_common.f'
 !----------------------------------------
   IF( TOPDECAYS.EQ.3 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6166,7 +6167,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L3,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L3,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
@@ -6226,7 +6227,7 @@ implicit none
 real(8) ::  EvalCS_DKJ_1L_HtHtbqqb
 real(8) :: yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: NLO_Res_Pol,NLO_Res_Unpol,TreeResult(1:6),VirtResult(1:6),LO_Res_Unpol
-integer :: iHel,jHel,iPrimAmp,jPrimAmp,nHel(1:2)
+integer :: iHel,jHel,iPrimAmp,jPrimAmp
 integer :: NBin(1:NumMaxHisto),NHisto,BHMaxHel,BH1Hel,BH2Hel
 real(8) :: SpinAvg,ColorAvg,EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5,ISFac,RunFactor
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac_a,PDFFac_b
@@ -6281,15 +6282,13 @@ include 'vegas_common.f'
    PDFFac = PDFFac_a + PDFFac_b
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   nHel(1:2) = getHelicity(yrnd(17))
-   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
 
 
 ! -------------------------------------
 ! one loop correction to HTbar decay  |
 !-------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6331,7 +6330,7 @@ include 'vegas_common.f'
 ! one loop correction to anti-top decay |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6373,7 +6372,7 @@ include 'vegas_common.f'
 !----------------------------------------
   IF( TOPDECAYS.EQ.4 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6418,7 +6417,7 @@ include 'vegas_common.f'
 ! one loop correction on HT decay     |
 ! ----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6433,7 +6432,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L1,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L1,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
@@ -6460,7 +6459,7 @@ include 'vegas_common.f'
 ! one loop correction on top decay      |
 !----------------------------------------
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6475,7 +6474,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L2,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L2,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
@@ -6502,7 +6501,7 @@ include 'vegas_common.f'
 !----------------------------------------
   IF( TOPDECAYS.EQ.3 .OR. TOPDECAYS.EQ.2 ) THEN
     NLO_Res_Unpol = (0d0,0d0)
-    do iHel=nHel(1),nHel(2)
+    do iHel=1,NumHelicities
     do BH1Hel=-1,BHMaxHel
     do BH2Hel=-1,BHMaxHel
         IF( XTOPDECAYS.EQ.1 ) THEN
@@ -6517,7 +6516,7 @@ include 'vegas_common.f'
             TreeResult(iPrimAmp) = BornAmps(iPrimAmp)%Result
         enddo
 
-        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L3,BH1Hel,MomExt(1:4,10:14))
+        call HTopBHDecay(ExtParticle(2),DKX_HTBH_1L3,BH2Hel,MomExt(1:4,10:14))
         do iPrimAmp=1,NumBornAmps
             call EvalTree(BornAmps(iPrimAmp))
             VirtResult(iPrimAmp) = BornAmps(iPrimAmp)%Result

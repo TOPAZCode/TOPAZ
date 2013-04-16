@@ -2424,7 +2424,6 @@ END SUBROUTINE
 
 
 
-
       function vbqV(sp,e1,coupl_left,coupl_right)!   careful, Chir works only in D=4 dimensions
       implicit none
       complex(8), intent(in) :: e1(:)

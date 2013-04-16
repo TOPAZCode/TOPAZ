@@ -345,7 +345,7 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
           TopQuark%PartType = Top_
           TopQuark%Mass = m_SMTop
           TopQuark%Mass2= m_SMTop**2
-          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu)+MomGlu(1:4))
           m_tmp = m_Top
           m_Top = m_SMTop
           MomIn(1:4,1)=Mom(1:4,bot)
@@ -362,7 +362,7 @@ ELSEIF( Topol.eq.DKX_HTBH_RE3 ) THEN! real emission from W lines
           TopQuark%PartType = ATop_
           TopQuark%Mass = m_SMTop
           TopQuark%Mass2= m_SMTop**2
-          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu))
+          TopQuark%Mom(1:4) = dcmplx(Mom(1:4,bot)+Mom(1:4,lep)+Mom(1:4,neu)+MomGlu(1:4))
           m_tmp = m_Top
           m_Top = m_SMTop
           MomIn(1:4,1)=Mom(1:4,bot)
@@ -500,7 +500,6 @@ ELSEIF( Topol.eq.DKX_HTBH_1L2 ) THEN! virtual correction on top lines
           HeavyTop%Pol(1:4) = ( spi2_(HeavyTop%Mom(1:4),HeavyTop%Pol(1:4)) - M_HTop*HeavyTop%Pol(1:4) ) * NWAFactor_HTop
           HeavyTop%Pol(5:16)= (0d0,0d0)
     endif
-
 
 !-----------------------------------------------------------------------------
 ELSEIF( Topol.eq.DKX_HTBH_1L3 ) THEN! virtual correction on W lines

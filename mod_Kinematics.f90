@@ -119,14 +119,14 @@ ELSEIF( ObsSet.EQ.5 ) THEN! set of observables for ttb production with hadr. top
 
 
 ELSEIF( ObsSet.EQ.6 ) THEN! set of observables for ttb production with lept. top, hadr. Atop decay at LHC
-    Rsep_jet    = 0.4d0         *0d0
-    pT_bjet_cut = 25d0*GeV      *0d0
-    eta_bjet_cut= 2.5d0         *1d2
-    pT_jet_cut  = 25d0*GeV      *0d0
-    eta_jet_cut = 2.5d0         *1d2
-    pT_lep_cut  = 25d0*GeV      *0d0
-    eta_lep_cut = 2.5d0         *1d2
-    pT_miss_cut = 25d0*GeV      *0d0
+    Rsep_jet    = 0.4d0         !*0d0
+    pT_bjet_cut = 25d0*GeV      !*0d0
+    eta_bjet_cut= 2.5d0         !*1d2
+    pT_jet_cut  = 25d0*GeV      !*0d0
+    eta_jet_cut = 2.5d0         !*1d2
+    pT_lep_cut  = 25d0*GeV      !*0d0
+    eta_lep_cut = 2.5d0         !*1d2
+    pT_miss_cut = 25d0*GeV      !*0d0
 
 
 ELSEIF( ObsSet.EQ.7 ) THEN! set of observables for ttb production with lept. top and J/Psi fragmentation, hadr. Atop decay at LHC
@@ -156,12 +156,12 @@ ELSEIF( ObsSet.EQ.11 ) THEN! set of observables for ttbjet production without de
 ELSEIF( ObsSet.EQ.12 ) THEN! set of observables for ttbjet production as signal process at Tevatron (hadr.Atop, lept.top decay)
     pT_jet_cut  = 20d0*GeV
     pT_bjet_cut = pT_jet_cut
-    eta_jet_cut = 2d0            *100d0
-    eta_bjet_cut= eta_jet_cut    *100d0
-    pT_lep_cut  = 20d0*GeV       *0d0
-    eta_lep_cut = 1d0            *100d0
-    pT_miss_cut = 20d0*GeV       *0d0
-    HT_cut      = 220d0*GeV      *0d0
+    eta_jet_cut = 2d0            !*100d0
+    eta_bjet_cut= eta_jet_cut    !*100d0
+    pT_lep_cut  = 20d0*GeV       !*0d0
+    eta_lep_cut = 1d0            !*100d0
+    pT_miss_cut = 20d0*GeV       !*0d0
+    HT_cut      = 220d0*GeV      !*0d0
     Rsep_jet    = 0.5d0
 
 ELSEIF( ObsSet.EQ.13 ) THEN! set of observables for ttbjet production as signal process at LHC (di-lept. decay)
@@ -2997,7 +2997,7 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
           if(XTopDecays.ne.1 .and. XTopDecays.ne.2 ) call Error("XTopDecays needs to be 1(BH) or 2(A0)!")
-          NumHistograms = 7
+          NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3033,17 +3033,27 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
           Histo(5)%LowVal = 0d0
           Histo(5)%SetScale= 100d0
 
-          Histo(6)%Info   = "MT(W)"
+          Histo(6)%Info   = "HT"
           Histo(6)%NBins  = 50
           Histo(6)%BinSize= 20d0*GeV
           Histo(6)%LowVal = 0d0
           Histo(6)%SetScale= 100d0
 
-          Histo(7)%Info   = "MT^eff"
+          Histo(7)%Info   = "MT(W)"
           Histo(7)%NBins  = 50
           Histo(7)%BinSize= 20d0*GeV
           Histo(7)%LowVal = 0d0
           Histo(7)%SetScale= 100d0
+
+          Histo(8)%Info   = "MT^eff"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 20d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 100d0
+
+
+
+
 
 
 ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production
@@ -3599,7 +3609,7 @@ ELSEIF( ObsSet.EQ.64 .OR. ObsSet.EQ.65 ) THEN ! Zprime, semi-hadronic top decay 
 
 
 ELSEIF( ObsSet.EQ.66 ) THEN ! Zprime, semi-hadronic top decay (for CMS analysis: Roman Kogler)
-          if(Collider.ne.12)  call Error("Collider needs to be LHC!")
+          if(Collider_Energy.ne.8000d0*GeV)  call Error("Collider needs to be LHC(8TeV)!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
           NumHistograms = 8
           if( .not.allocated(Histo) ) then
@@ -8685,7 +8695,7 @@ real(8) :: CosTheta_scatter,CosTheta_soper,CosTheta_star,Phi,Phibar,dPhiPlus,dPh
 real(8) :: MomHadr(1:4,1:7),MomLept(1:4,1:4),zeros(1:9),cosPhi,cosPhibar
 real(8) :: MomTopsCMS(1:4,1:2),nx(2:4),ny(2:4),nz(2:4),MomLeptTRF(1:4),MomBeam(2:4)
 integer :: i,j,n,k
-real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4), Mttb_cut,MTW
+real(8) :: sinPhi, sinPhibar, deltaSin, MomBeam1(1:4), MomBeam2(1:4), Mttb_cut,MTW, pT_rel, p_rel(2:4)
 real(8) :: pT_bjet1, pT_bjet2, pT_lep1, pT_lep2, eta_bjet1, eta_bjet2, eta_lep1, eta_lep2,R_LepJet, eta_jet1, eta_jet2
 real(8) :: MomLeptOrd(1:4,1:2), MomJetOrd(1:4,1:8), pT_miss, ET_miss, pT_jet1, pT_jet2, M_eff, HT, Minv_Lept,MomFatJet(1:4)
 
@@ -9336,11 +9346,19 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
 
     do i=1,NJet
       R_LepJet = get_R(MomJet(1:4,i),MomLept(1:4,3))
-      if( R_LepJet.lt.Rsep_LepJet ) then
+      p_rel(2:4) = MomLept(2:4,3) - VectorProd(MomLept(2:4,3),MomJet(2:4,i))/VectorProd(MomJet(2:4,i),MomJet(2:4,i)) * MomJet(2:4,i)
+      pT_rel = dsqrt(abs( p_rel(2)**2+p_rel(3)**2+p_rel(4)**2 ))
+
+
+!     below is the negation of: (R_LepJet.gt.Rsep_LepJet .OR. pT_rel.gt.25*GeV) .AND. (pT_jet.gt.25*GeV .AND. y_jet.lt.2.5d0)
+      if(  (R_LepJet.lt.Rsep_LepJet .AND. pT_rel.lt.25*GeV) .OR. get_PT(MomJet(1:4,i)).lt.25*GeV .OR. get_ETA(MomJet(1:4,i)).gt.2.5d0 ) then
          applypscut = .true.
          RETURN
       endif 
     enddo
+
+
+
 
 !   --------------------------------
 !   this is just for binning
@@ -9836,7 +9854,7 @@ integer :: NPart
    enddo
 
 !       check gauge invariance
-!        ExtParticle(5)%Pol(1:4) = ExtParticle(5)%Mom(1:4);       print *, "gauge invariance check"
+!        ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 

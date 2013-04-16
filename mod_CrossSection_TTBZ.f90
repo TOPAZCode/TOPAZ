@@ -1038,8 +1038,10 @@ endif!applyPSCut
 
     PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
     call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),PreFac,DipoleResult)
-!      sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
-! !      sij = MomExt(1,3)**2
+
+!     !dipole check
+!      sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3)) !   for coll. singularity
+! !      sij = MomExt(1,3)**2   ! for soft singularity
 !      print *,  sij/EHat**2,EvalCS_Real_ttbgggZ,DipoleResult,(1d0+EvalCS_Real_ttbgggZ/DipoleResult)
 !      pause
 
@@ -1048,26 +1050,22 @@ endif!applyPSCut
 
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
-! if (ZDecays .eq. 0) then
-!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!       MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
-!       MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
-!       MG_MOM(0:3,5) = MomExt(1:4,4)*100d0
-!       MG_MOM(0:3,6) = MomExt(1:4,3)*100d0
-!       call coupsm(0)
-!       call SGG_TTBZG(MG_MOM,MadGraph_tree)
-!       print *, ""
-!       print *, alpha_s*RunFactor,m_top,m_z
-!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
-!       print *, "MadGraph hel.amp:", MadGraph_tree
-!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
-!       pause
-!    else
-!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
-!       print *, "MG/ME ratio: ", 0.872680470745814d-13/(LO_Res_Unpol/(100d0)**4)
-!    endif
-!    stop
+if (ZDecays .eq. 0) then
+      MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+      MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+      MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
+      MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
+      MG_MOM(0:3,5) = MomExt(1:4,4)*100d0
+      MG_MOM(0:3,6) = MomExt(1:4,3)*100d0
+      call coupsm(0)
+      call SGG_TTBZG(MG_MOM,MadGraph_tree)
+      print *, ""
+      print *, alpha_s*RunFactor,m_top,m_z
+      print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+      print *, "MadGraph hel.amp:", MadGraph_tree
+      print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**4)
+      pause
+endif
        
 
 

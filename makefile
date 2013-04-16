@@ -19,7 +19,7 @@ Opt = Yes
 
 
 ifeq ($(Opt),Yes)
-   IfortOpts   = -O1 -fpp -vec-report0 -opt-report -opt-report-file$(OptReport) -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
+   IfortOpts   = -O2 -fpp -vec-report0 -opt-report -opt-report-file$(OptReport) -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
 else
    IfortOpts   = -O0 -fpp -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
 endif
