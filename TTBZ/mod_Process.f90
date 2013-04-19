@@ -81,6 +81,7 @@ type :: UnitarityCut
    complex(8), allocatable :: NMom(:,:,:)
    logical, allocatable  :: skip(:)                 ! If the cut is a duplicate, set this to true and don't compute anything
    type(UCutMatch),allocatable :: Match(:)      ! for matching a cut with higher cuts, array includes all cuts
+   integer,allocatable  :: tagcuts(:)
 end type
 
 type :: PrimitiveAmplitude
@@ -3748,7 +3749,7 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
        NumPrimAmps = 12    ! this EXCLUDES ferm loop prims
-       NumBornAmps = 2
+       NumBornAmps = 12
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -5681,6 +5682,16 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
    ELSEIF( Correction.EQ.1 ) THEN
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
       BornAmps(2)%ExtLine = (/1,5,2,4,3/)
+      BornAmps(3)%ExtLine = (/1,3,5,2,4/)
+      BornAmps(4)%ExtLine = (/1,5,3,2,4/)
+      BornAmps(5)%ExtLine = (/1,4,5,2,3/)
+      BornAmps(6)%ExtLine = (/1,5,4,2,3/)
+      BornAmps(7)%ExtLine = (/1,5,3,4,2/)
+      BornAmps(8)%ExtLine = (/1,3,5,4,2/)
+      BornAmps(9)%ExtLine = (/1,3,4,5,2/)
+      BornAmps(10)%ExtLine = (/1,5,4,3,2/)
+      BornAmps(11)%ExtLine = (/1,4,5,3,2/)
+      BornAmps(12)%ExtLine = (/1,4,3,5,2/)
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
@@ -6776,6 +6787,26 @@ type(TreeProcess),pointer :: TheTree
    allocate( ThePrimAmp%UCuts(1)%skip(1:ThePrimAmp%UCuts(1)%NumCuts),stat=AllocStatus )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 1")
    print *, 'done allocating skip'
+
+! allocate tagcuts
+   allocate( ThePrimAmp%UCuts(5)%tagcuts(1:ThePrimAmp%UCuts(5)%NumCuts),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(5)")
+   allocate( ThePrimAmp%UCuts(4)%tagcuts(1:ThePrimAmp%UCuts(4)%NumCuts),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(4)")
+   allocate( ThePrimAmp%UCuts(3)%tagcuts(1:ThePrimAmp%UCuts(3)%NumCuts),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(3)")
+   allocate( ThePrimAmp%UCuts(2)%tagcuts(1:ThePrimAmp%UCuts(2)%NumCuts),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(2)")
+   allocate( ThePrimAmp%UCuts(1)%tagcuts(1:ThePrimAmp%UCuts(1)%NumCuts),   stat=AllocStatus)
+   if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
+!  now set tagcuts to -1 for all values -- only needed for doub cut anyway
+   ThePrimAmp%UCuts(5)%tagcuts(1:ThePrimAmp%UCuts(5)%NumCuts)=-1
+   ThePrimAmp%UCuts(4)%tagcuts(1:ThePrimAmp%UCuts(4)%NumCuts)=-1
+   ThePrimAmp%UCuts(3)%tagcuts(1:ThePrimAmp%UCuts(3)%NumCuts)=-1
+   ThePrimAmp%UCuts(2)%tagcuts(1:ThePrimAmp%UCuts(2)%NumCuts)=-1
+   ThePrimAmp%UCuts(1)%tagcuts(1:ThePrimAmp%UCuts(1)%NumCuts)=-1
+
+   print *, 'done tagcuts'
 
 !  init pentcuts
    allocate(ThePrimAmp%UCuts(5)%TreeProcess(1:ThePrimAmp%UCuts(5)%NumCuts,1:5), stat=AllocStatus)

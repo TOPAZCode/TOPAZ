@@ -235,7 +235,6 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       print *, "QuadRes 5",ResCheck
 !DEC$ ENDIF
 
-
 !DEC$ IF (_DebugPrintQuadCoeff==1)
       print *, "4 cuts"
       do k=1,5
@@ -793,7 +792,8 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
 !     set vars. for kirill's routines
          tagdcut(CutNum,1)=666    ! needed for integrals
-
+         DoubCuts%tagcuts(CutNum)=666
+         
          coeff2(CutNum,1) = DoubCuts%Coeff(CutNum,0)
          coeff2(CutNum,2) = DoubCuts%Coeff(CutNum,1)
          coeff2(CutNum,3) = DoubCuts%Coeff(CutNum,2)
@@ -977,6 +977,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
 
          tagdcut(CutNum,1)=999    ! needed for integrals
+         DoubCuts%tagcuts(CutNum)=999
 
          coeff2(CutNum,1) = DoubCuts%Coeff(CutNum,0)
          coeff2(CutNum,2) = DoubCuts%Coeff(CutNum,1)

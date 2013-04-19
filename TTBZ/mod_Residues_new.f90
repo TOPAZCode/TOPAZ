@@ -1343,7 +1343,6 @@ END SUBROUTINE
 
 
 
-
        subroutine resid4Subtr(lv,ThePrimAmps,iPrimAmp,CutNum,res)
        use ModProcess
        use ModMisc
@@ -1363,7 +1362,6 @@ END SUBROUTINE
        ThePrimAmp => ThePrimAmps(iPrimAmp)
 
        do k=0,ThePrimAmp%NumSisters
-
          if(k.eq.0) then
              PrimSelect = iPrimAmp
          else
@@ -1374,13 +1372,14 @@ END SUBROUTINE
             FirstCutMatch =   ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%FirstHiProp(k,i)
             MissHiProp(i,1) = ThePrimAmp%UCuts(4)%Match(CutNum)%Subt(5)%MissHiProp(k,i,1)
 
+
             vprop(1:4) = lv(1:4) + dcmplx( -ThePrimAmps(PrimSelect)%IntPart( ThePrimAmp%UCuts(5)%CutProp(MatchCutNum,FirstCutMatch) )%Mom(1:4) &
                        + ThePrimAmps(PrimSelect)%IntPart(MissHiProp(i,1))%Mom(1:4) )
             vprop(5:5) = lv(5:5)
             call sc(5,vprop,vprop,propX)
             propX = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,1) )%Mass2,0d0)
-
-            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/propX
+!            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/propX
+            res=res - ThePrimAmps(PrimSelect)%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/propX
          enddo
       enddo
 
@@ -1434,7 +1433,8 @@ END SUBROUTINE
             call sc(5,vprop,vprop,propX)
             prop2 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,2) )%Mass2,0d0)
 
-            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2
+!            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2
+            res=res - ThePrimAmps(PrimSelect)%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2
          enddo
 
 
@@ -1458,11 +1458,18 @@ END SUBROUTINE
             call sc(4,v45,lvt,r1)
             r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
-                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+!                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!                    )/propX
+
+            res=res-(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
                     )/propX
        enddo
 
@@ -1532,7 +1539,8 @@ END SUBROUTINE
             call sc(5,vprop,vprop,propX)
             prop3 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,3) )%Mass2,0d0)
 
-            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3
+!            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3
+            res=res - ThePrimAmps(PrimSelect)%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3
          enddo
 
 
@@ -1564,11 +1572,18 @@ END SUBROUTINE
             call sc(4,v45,lvt,r1)
             r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
-                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+!                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!                    )/prop1/prop2
+
+            res=res-(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
                     )/prop1/prop2
        enddo
 
@@ -1597,15 +1612,26 @@ END SUBROUTINE
             call sc(4,v4,lvt,r4)
             re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
-                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
-                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+!            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+!                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+!                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+!                      )/propX
+
+            res=res - ( ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,0)    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+                      + re**2*( ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+                              + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
                       )/propX
        enddo
 
@@ -1683,7 +1709,8 @@ END SUBROUTINE
             call sc(5,vprop,vprop,propX)
             prop4 = propX-dcmplx(ThePrimAmps(PrimSelect)%IntPart( MissHiProp(i,4) )%Mass2,0d0)
 
-            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3/prop4
+!            res=res - ThePrimAmp%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3/prop4
+            res=res - ThePrimAmps(PrimSelect)%UCuts(5)%Coeff(MatchCutNum,0)*lv(5)**2/prop1/prop2/prop3/prop4
          enddo
 
 
@@ -1721,11 +1748,18 @@ END SUBROUTINE
             call sc(4,v45,lvt,r1)
             r2 = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
-                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
-                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!            res=res-(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,0)     &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+!                    +(r2**2)*(ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,2)    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+!                    +ThePrimAmp%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
+!                    )/prop1/prop2/prop3
+
+            res=res-(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,0)     &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,1)*r1   &
+                    +(r2**2)*(ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,2)    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,3)*r1    &
+                    +ThePrimAmps(PrimSelect)%UCuts(4)%Coeff(MatchCutNum,4)*(r2**2))    &
                     )/prop1/prop2/prop3
          enddo
 
@@ -1759,15 +1793,26 @@ END SUBROUTINE
             call sc(4,v4,lvt,r4)
             re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
-                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
-                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
-                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+!            res=res - ( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,0)    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+!                      + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+!                      + re**2*( ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+!                              + ThePrimAmp%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
+!                      )/prop1/prop2
+
+            res=res - ( ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,0)    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,1)*r3    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,2)*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,3)*r3*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,4)*(r3**2-r4**2)    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,5)*r3**2*r4    &
+                      + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,6)*r3*r4**2    &
+                      + re**2*( ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,7)+ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,8)*r3    &
+                              + ThePrimAmps(PrimSelect)%UCuts(3)%Coeff(MatchCutNum,9)*r4)     &
                       )/prop1/prop2
         enddo
 
@@ -1796,28 +1841,53 @@ END SUBROUTINE
             call sc(4,v4,lvt,r4)
             re = -(0d0,1d0)*lvt(5) != (0,0,0,0,i).dot.lvt(1:5)
 
-            if (tagdcut(MatchCutNum,1).eq.666) then
-              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*(r2**2-r3**2)     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*(r2**2+r3**2-2*r4**2)     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r3     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*r2*r4           &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
-            elseif (tagdcut(MatchCutNum,1).eq.999) then
-              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*r2**2        &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*r2*r3              &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r4     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*(r3**2-r4**2)     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
-                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
+!            if (tagdcut(MatchCutNum,1).eq.666) then
+            if (ThePrimAmps(PrimSelect)%UCuts(2)%tagcuts(MatchCutNum).eq.666) then
+!              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*(r2**2-r3**2)     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*(r2**2+r3**2-2*r4**2)     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r3     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*r2*r4           &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
+!
+              res = res - ( ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,0)     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,4)*(r2**2-r3**2)     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,5)*(r2**2+r3**2-2*r4**2)     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,6)*r2*r3     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,7)*r2*r4           &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
+
+!            elseif (tagdcut(MatchCutNum,1).eq.999) then
+           elseif (ThePrimAmps(PrimSelect)%UCuts(2)%tagcuts(MatchCutNum).eq.999) then
+!              res = res - ( ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,0)     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,4)*r2**2        &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,5)*r2*r3              &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,6)*r2*r4     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,7)*(r3**2-r4**2)     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+!                          + ThePrimAmp%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
+
+              res = res - ( ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,0)     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,1)*r2     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,2)*r3     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,3)*r4     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,4)*r2**2        &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,5)*r2*r3              &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,6)*r2*r4     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,7)*(r3**2-r4**2)     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,8)*r3*r4     &
+                          + ThePrimAmps(PrimSelect)%UCuts(2)%Coeff(MatchCutNum,9)*re**2 )/prop1
             endif
         enddo
 

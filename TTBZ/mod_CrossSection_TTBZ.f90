@@ -15,6 +15,7 @@ use ModKinematics
 use ModUCuts
 use ModUCuts_new
 use ModUCuts_128
+use ModUCuts_128_new
 use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
@@ -25,7 +26,7 @@ implicit none
 real(8) ::  EvalCS_1L_ttbggZ,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:3,-2:1)
 complex(8) :: BosonicPartAmp(1:3,-2:1),mydummy,ZPolVec(1:4),BarSpi(1:4),Spi(1:4)
-integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp
+integer :: iHel,jHel,kHel,iPrimAmp,jPrimAmp,BPrimAmp,APrimAmp,ListPrimAmps(6)
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,ZDKMatel,Msq_T_BWENU
 real(8) :: MomExt(1:4,1:14)
 logical :: applyPSCut
@@ -40,7 +41,6 @@ include 'vegas_common.f'
 
 
 EvalCS_1L_ttbggZ = 0d0
-
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_Top+M_Z  ) then
       EvalCS_1L_ttbggZ = 0d0
@@ -117,14 +117,13 @@ ENDIF
 
 
    call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
-
    if( applyPSCut ) then
       EvalCS_1L_ttbggZ = 0d0
       return
    endif
-
    call SetPropagators()
    call SetPDFs(eta1,eta2,MuFac,pdf)
+
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
@@ -164,16 +163,15 @@ IF( Correction.EQ.0 ) THEN
 ELSEIF( Correction.EQ.1 ) THEN
 
 !   do iHel=nHel(1),nHel(2)
-   do iHel=4,4
+   do iHel=1,NumHelicities
+      print *, 'Helicity', iHel
+      print *, 'Born...'
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
 !          print *, 'Gauge check:'
 !          ExtParticle(3)%Pol(1:4)=ExtParticle(3)%Mom(1:4)
 !          ExtParticle(4)%Pol(1:4)=ExtParticle(4)%Mom(1:4)
-!          print *,ExtParticle(3)%Pol(1:4)
-!          print *,ExtParticle(4)%Pol(1:4)
       do iPrimAmp=1,NumBornAmps
-         print *, 'prim',iPrimAmp
           call EvalTree(BornAmps(iPrimAmp))
       enddo
 
@@ -188,215 +186,297 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 !------------ bosonic loops --------------
-!       do iPrimAmp=1,NumPrimAmps
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
-          print *, 'doing pentcut',iPrimAmp
           call PentCut_new(PrimAmps(:),iPrimAmp)
+!          call PentCut(PrimAmps(iPrimAmp))
        enddo
-
        do iPrimAmp=1,NumPrimAmps
-!          print *, 'coeffs'
-!          print *,PrimAmps(iPrimAmp)%UCuts(5)%Coeff
-          print *, 'doing quadcut'
           call SetKirill(PrimAmps(iPrimAmp))
           call QuadCut_new(PrimAmps(:),iPrimAmp)
+!          call QuadCut(PrimAmps(iPrimAmp))
+
        enddo
-!          print *,PrimAmps(iPrimAmp)%UCuts(4)%Coeff
-!          pause
-          print *, 'doing tricut'
+       
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
           call TripCut_new(PrimAmps(:),iPrimAmp)
+!          call TripCut(PrimAmps(iPrimAmp))
        enddo
-!          print *,PrimAmps(iPrimAmp)%UCuts(3)%Coeff
-!           pause
-          print *, 'doing doubcut'
+
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
           call DoubCut_new(PrimAmps(:),iPrimAmp)
+!          call DoubCut(PrimAmps(iPrimAmp))
        enddo
-!          print *,PrimAmps(iPrimAmp)%UCuts(2)%Coeff
-!          pause
+
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
           call SingCut_new(PrimAmps(:),iPrimAmp)
-          print *, 'doing singcut'
+          !         call SingCut(PrimAmps(iPrimAmp))
        enddo
-!          print *,PrimAmps(iPrimAmp)%UCuts(1)%Coeff
+
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+       enddo
+
+
+! now combine into real prims:
+       PrimAmps(3)%Result=PrimAmps(3)%Result+PrimAmps(4)%Result
+       PrimAmps(5)%Result=PrimAmps(5)%Result+PrimAmps(6)%Result
+       PrimAmps(7)%Result=PrimAmps(7)%Result+PrimAmps(8)%Result + PrimAmps(9)%Result
+       PrimAmps(10)%Result=PrimAmps(10)%Result+PrimAmps(11)%Result + PrimAmps(12)%Result
+
+       ListPrimAmps=(/1,2,3,5,7,10/)
+
+       do iPrimAmp=1,6
+          APrimAmp=ListPrimAmps(iPrimAmp)
+          call RenormalizeUV(PrimAmps(APrimAmp),BornAmps(APrimAmp),MuRen**2)
+          PrimAmps(APrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(APrimAmp)%Result(-2:1)
+          call OneLoopDiv(PrimAmps(APrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
+          
+          
+!       print *, 'APrimAmp',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)
+!       print *, 'BornAmp', APrimAmp,BornAmps(APrimAmp)%Result
+!       print *, 'ratio 1',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)/BornAmps(APrimAmp)%Result
+!       !    print *, 'ratio 2',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)/BornAmps(2)%Result
+!       print *,'****************'
+!       print *, 'ADDING 1.5 TO ANALYTIC SINGLE POLE VALUE FOR SOME REASON?'
+!       print *,'****************'
+       rdiv(1)=rdiv(1)+1.5d0
+!       print *, 'should be', rdiv(2), rdiv(1)
+!       print *, '-----------------'
+!       print *, 'diff1', rdiv(2)-PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
+!       print *, 'diff2', rdiv(1)-PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
+!       print *, '-----------------'
+       AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
+       if ( AccPoles .gt. 1d-5 ) then
+          print *, 'either higher accuracy req, or fails'
+!          print*, ''
+!          print *, 'ratio 1',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)/BornAmps(APrimAmp)%Result
+!          print *, 'should be', rdiv(2), rdiv(1)
+!          print *, '-----------------'
+!          print *, 'diff1', rdiv(2)-PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
+!          print *, 'diff2', rdiv(1)-PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
+!          print *, '-----------------'
 !          pause
+       endif
+       enddo
+
+       print *, 'quad prec'
+       
        do iPrimAmp=1,NumPrimAmps
-          print *, 'doing integrals'
+          PrimAmps(iPrimAmp)%result=(0d0,0d0)
+          call SetKirill(PrimAmps(iPrimAmp))
+          call PentCut_128_new(PrimAmps(:),iPrimAmp)
+          !          call PentCut(PrimAmps(iPrimAmp))
+       enddo
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call QuadCut_128_new(PrimAmps(:),iPrimAmp)
+!          call QuadCut(PrimAmps(iPrimAmp))
+
+       enddo
+       
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call TripCut_128_new(PrimAmps(:),iPrimAmp)
+!          call TripCut(PrimAmps(iPrimAmp))
+       enddo
+
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call DoubCut_128_new(PrimAmps(:),iPrimAmp)
+!          call DoubCut(PrimAmps(iPrimAmp))
+       enddo
+
+       do iPrimAmp=1,NumPrimAmps
+          call SetKirill(PrimAmps(iPrimAmp))
+          call SingCut_128_new(PrimAmps(:),iPrimAmp)
+          !         call SingCut(PrimAmps(iPrimAmp))
+       enddo
+
+       do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
        enddo
 
 
+! now combine into real prims, again
+       PrimAmps(3)%Result=PrimAmps(3)%Result+PrimAmps(4)%Result
+       PrimAmps(5)%Result=PrimAmps(5)%Result+PrimAmps(6)%Result
+       PrimAmps(7)%Result=PrimAmps(7)%Result+PrimAmps(8)%Result + PrimAmps(9)%Result
+       PrimAmps(10)%Result=PrimAmps(10)%Result+PrimAmps(11)%Result + PrimAmps(12)%Result
 
-       do iPrimAmp=1,NumPrimAmps
-          print *, 'Res', PrimAmps(iPrimAmp)%Result(-1)
-          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
-          PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
-      print *, 'iPrimAmp',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
-!    print *, 'BornAmp', BornAmps(1)%Result
-    print *, 'ratio 1',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)/BornAmps(1)%Result
-    print *, 'ratio 2',iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)/BornAmps(2)%Result
-    print *, 'should be', rdiv(2), rdiv(1)
-    print *, 'diff1', rdiv(2)-PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result
-    print *, 'diff2', rdiv(1)-PrimAmps(iPrimAmp)%Result(-1)/BornAmps(1)%Result
-    print *, 'diff1', rdiv(2)-PrimAmps(iPrimAmp)%Result(-2)/BornAmps(2)%Result
-    print *, 'diff2', rdiv(1)-PrimAmps(iPrimAmp)%Result(-1)/BornAmps(2)%Result
-!    print *, 'should be ', rdiv(1)*BornAmps(1)%Result
-    
-    pause
-      enddo 
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
-!DEC$ IF (_QuadPrecImpr==1)
-          AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-          if( AccPoles.gt.1d-4 ) then
-!               coeff4_128(:,:) = qcmplx( coeff4(:,:) )!   not re-calculating penta,quad contributions
-!               coeff5_128(:,:) = qcmplx( coeff5(:,:) )
-              call PentCut_128(PrimAmps(iPrimAmp))
-              call QuadCut_128(PrimAmps(iPrimAmp))
-              call TripCut_128(PrimAmps(iPrimAmp))
-              call DoubCut_128(PrimAmps(iPrimAmp))
-              call SingCut_128(PrimAmps(iPrimAmp))
-              call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-              call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
-              PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-              AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
-              if( AccPoles.gt.1d-3 ) then
-                  print *, "SKIP",AccPoles
-!                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
-                  EvalCS_1L_ttbggZ = 0d0
-                  SkipCounter = SkipCounter + 1
-                  return
-              endif
-          endif
-!DEC$ ENDIF
-!       enddo
+       ListPrimAmps=(/1,2,3,5,7,10/)
 
-      BosonicPartAmp(1,-2:1) =    Nc   *  PrimAmps(PrimAmp1_15234)%Result(-2:1) &
-                             - 1d0/Nc *(  PrimAmps(PrimAmp1_15432)%Result(-2:1) &
-                             +            PrimAmps(PrimAmp1_14532)%Result(-2:1) &
-                             +            PrimAmps(PrimAmp1_14352)%Result(-2:1) )
+       do iPrimAmp=1,6
+          APrimAmp=ListPrimAmps(iPrimAmp)
+          call RenormalizeUV(PrimAmps(APrimAmp),BornAmps(APrimAmp),MuRen**2)
+          call OneLoopDiv(PrimAmps(APrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
+          rdiv(1)=rdiv(1)+1.5d0
+          PrimAmps(APrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(APrimAmp)%Result(-2:1)
+!          print *, 'ratio 1',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)/BornAmps(APrimAmp)%Result
+!          print *, 'should be', rdiv(2), rdiv(1)
+       AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
+       if ( AccPoles .gt. 1d-4 ) then
+          print *, 'fails in QP!!!'
+          print *, '-----------------'
+          print *, 'diff1', rdiv(2)-PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
+          print *, 'diff2', rdiv(1)-PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
+          print *, '-----------------'
+       endif
+       enddo
 
 
-      BosonicPartAmp(2,-2:1) =    Nc   *  PrimAmps(PrimAmp1_15243)%Result(-2:1) &
-                             - 1d0/Nc *(  PrimAmps(PrimAmp1_15342)%Result(-2:1) &
-                             +            PrimAmps(PrimAmp1_13542)%Result(-2:1) &
-                             +            PrimAmps(PrimAmp1_13452)%Result(-2:1) )
-
-      BosonicPartAmp(3,-2:1) = PrimAmps(PrimAmp1_15324)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_13524)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15423)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_14523)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15234)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15432)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_14532)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_14352)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15342)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_13542)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_13452)%Result(-2:1)
-
-! print *, ""
-! print *, "1-loop amplitudes:"
-! print *, "bosonic loops"
-! print *, "|Ta*Tb|^2*Re[M0*cong(M1)]:", PhotonCouplCorr*ColLO_ttbgg(1,1)*dreal( BornAmps(1)%Result * dconjg( BosonicPartAmp(1,-2:1) ))
-! print *, "|Tb*Ta|^2*Re[M0*cong(M1)]:", PhotonCouplCorr*ColLO_ttbgg(2,2)*dreal( BornAmps(2)%Result * dconjg( BosonicPartAmp(2,-2:1) ))
-! print *, "check",cdabs( BosonicPartAmp(3,-2:1) )
-! stop
-
-      NLO_Res_Pol(-2:1) = (0d0,0d0)
-      do jPrimAmp=1,3
-      do iPrimAmp=1,NumBornAmps
-          NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + Col1L_ttbggp(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result * dconjg(BosonicPartAmp(jPrimAmp,-2:1)) )
-      enddo
-      enddo
-      NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
-
-
-
-! ------------ fermionic loops --------------
-      do iPrimAmp=13,28
-!       do iPrimAmp=13,13
-          call SetKirill(PrimAmps(iPrimAmp))
-!           print *, ""
-!           print *, 'iPrimAmp',iPrimAmp,PrimAmps(iPrimAmp)%ExtLine(:)
-          call PentCut(PrimAmps(iPrimAmp))
-          call QuadCut(PrimAmps(iPrimAmp))
-          call TripCut(PrimAmps(iPrimAmp))
-          call DoubCut(PrimAmps(iPrimAmp))
-          call SingCut(PrimAmps(iPrimAmp))
-          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
-          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-
-          PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
-!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
-!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
-      enddo
-      FermionLoopPartAmp(1,-2:1) = nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1)  &
-                                 +            PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
-
-                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12534)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12354)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12345)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_15234)%Result(-2:1) &
-                                                   ) &
-                                 + PrimAmps(PrimAmp2m_12534)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12345)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_15234)%Result(-2:1)
-
-
-      FermionLoopPartAmp(2,-2:1) = nf_light * PrimAmps(PrimAmp2_15243)%Result(-2:1)  &
-                                 +            PrimAmps(PrimAmp2m_15243)%Result(-2:1) &
-
-                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12543)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12453)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12435)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_15243)%Result(-2:1) &
-                                                   ) &
-                                 + PrimAmps(PrimAmp2m_12543)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12453)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12435)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_15243)%Result(-2:1)
-
-      FermionLoopPartAmp(3,-2:1) = -1d0/Nc * ( nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1) *0d0  &    ! cancels with  nf_light * PrimAmps(PrimAmp2_15243)  below
-                                 +                        PrimAmps(PrimAmp2m_15234)%Result(-2:1)*0d0 &     ! cancels with  PrimAmps(PrimAmp2m_15243)  below
-                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12534)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12354)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12345)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_15234)%Result(-2:1)*0d0 &       ! cancels with PrimAmps(PrimAmp2_15243)  below
-                                                   ) &
-                                 + PrimAmps(PrimAmp2m_12534)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12345)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
-                                 +             nf_light * PrimAmps(PrimAmp2_15243)%Result(-2:1)*0d0  &
-                                 +                        PrimAmps(PrimAmp2m_15243)%Result(-2:1)*0d0 &
-                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12543)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12453)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_12435)%Result(-2:1) &
-                                                   + PrimAmps(PrimAmp2_15243)%Result(-2:1)*0d0 &
-                                                   ) &
-                                 + PrimAmps(PrimAmp2m_12543)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12453)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_12435)%Result(-2:1) &
-                                 + PrimAmps(PrimAmp2m_15243)%Result(-2:1) &
-                                 )
-
-
-      NLO_Res_Pol(-2:1) = (0d0,0d0)
-      do jPrimAmp=1,3
-      do iPrimAmp=1,NumBornAmps
-          NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + Col1L_ttbggp(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
-      enddo
-      enddo
-      NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
+! !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+!!DEC$ IF (_QuadPrecImpr==1)
+!          AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+!          if( AccPoles.gt.1d-4 ) then
+!!               coeff4_128(:,:) = qcmplx( coeff4(:,:) )!   not re-calculating penta,quad contributions
+!!               coeff5_128(:,:) = qcmplx( coeff5(:,:) )
+!              call PentCut_128(PrimAmps(iPrimAmp))
+!              call QuadCut_128(PrimAmps(iPrimAmp))
+!              call TripCut_128(PrimAmps(iPrimAmp))
+!              call DoubCut_128(PrimAmps(iPrimAmp))
+!              call SingCut_128(PrimAmps(iPrimAmp))
+!              call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+!              call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen*2)
+!              PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
+!              AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+!              if( AccPoles.gt.1d-3 ) then
+!                  print *, "SKIP",AccPoles
+!!                   call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+!                  EvalCS_1L_ttbggZ = 0d0
+!                  SkipCounter = SkipCounter + 1
+!                  return
+!              endif
+!          endif
+!!DEC$ ENDIF
+!          !       enddo
+!
+!      BosonicPartAmp(1,-2:1) =    Nc   *  PrimAmps(PrimAmp1_15234)%Result(-2:1) &
+!                             - 1d0/Nc *(  PrimAmps(PrimAmp1_15432)%Result(-2:1) &
+!                             +            PrimAmps(PrimAmp1_14532)%Result(-2:1) &
+!                             +            PrimAmps(PrimAmp1_14352)%Result(-2:1) )
+!
+!
+!      BosonicPartAmp(2,-2:1) =    Nc   *  PrimAmps(PrimAmp1_15243)%Result(-2:1) &
+!                             - 1d0/Nc *(  PrimAmps(PrimAmp1_15342)%Result(-2:1) &
+!                             +            PrimAmps(PrimAmp1_13542)%Result(-2:1) &
+!                             +            PrimAmps(PrimAmp1_13452)%Result(-2:1) )
+!
+!      BosonicPartAmp(3,-2:1) = PrimAmps(PrimAmp1_15324)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_13524)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_15423)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_14523)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_15234)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_15432)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_14532)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_14352)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_15342)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_13542)%Result(-2:1) &
+!                             + PrimAmps(PrimAmp1_13452)%Result(-2:1)
+!
+!! print *, ""
+!! print *, "1-loop amplitudes:"
+!! print *, "bosonic loops"
+!! print *, "|Ta*Tb|^2*Re[M0*cong(M1)]:", PhotonCouplCorr*ColLO_ttbgg(1,1)*dreal( BornAmps(1)%Result * dconjg( BosonicPartAmp(1,-2:1) ))
+!! print *, "|Tb*Ta|^2*Re[M0*cong(M1)]:", PhotonCouplCorr*ColLO_ttbgg(2,2)*dreal( BornAmps(2)%Result * dconjg( BosonicPartAmp(2,-2:1) ))
+!! print *, "check",cdabs( BosonicPartAmp(3,-2:1) )
+!! stop
+!
+!      NLO_Res_Pol(-2:1) = (0d0,0d0)
+!      do jPrimAmp=1,3
+!      do iPrimAmp=1,NumBornAmps
+!          NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + Col1L_ttbggp(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result * dconjg(BosonicPartAmp(jPrimAmp,-2:1)) )
+!      enddo
+!      enddo
+!      NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
+!
+!
+!
+!! ------------ fermionic loops --------------
+!      do iPrimAmp=13,28
+!!       do iPrimAmp=13,13
+!          call SetKirill(PrimAmps(iPrimAmp))
+!!           print *, ""
+!!           print *, 'iPrimAmp',iPrimAmp,PrimAmps(iPrimAmp)%ExtLine(:)
+!          call PentCut(PrimAmps(iPrimAmp))
+!          call QuadCut(PrimAmps(iPrimAmp))
+!          call TripCut(PrimAmps(iPrimAmp))
+!          call DoubCut(PrimAmps(iPrimAmp))
+!          call SingCut(PrimAmps(iPrimAmp))
+!          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
+!          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+!
+!          PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
+!!           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
+!!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
+!      enddo
+!      FermionLoopPartAmp(1,-2:1) = nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1)  &
+!                                 +            PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
+!
+!                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12534)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12354)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12345)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_15234)%Result(-2:1) &
+!                                                   ) &
+!                                 + PrimAmps(PrimAmp2m_12534)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12345)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_15234)%Result(-2:1)
+!
+!
+!      FermionLoopPartAmp(2,-2:1) = nf_light * PrimAmps(PrimAmp2_15243)%Result(-2:1)  &
+!                                 +            PrimAmps(PrimAmp2m_15243)%Result(-2:1) &
+!
+!                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12543)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12453)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12435)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_15243)%Result(-2:1) &
+!                                                   ) &
+!                                 + PrimAmps(PrimAmp2m_12543)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12453)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12435)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_15243)%Result(-2:1)
+!
+!      FermionLoopPartAmp(3,-2:1) = -1d0/Nc * ( nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1) *0d0  &    ! cancels with  nf_light * PrimAmps(PrimAmp2_15243)  below
+!                                 +                        PrimAmps(PrimAmp2m_15234)%Result(-2:1)*0d0 &     ! cancels with  PrimAmps(PrimAmp2m_15243)  below
+!                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12534)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12354)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12345)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_15234)%Result(-2:1)*0d0 &       ! cancels with PrimAmps(PrimAmp2_15243)  below
+!                                                   ) &
+!                                 + PrimAmps(PrimAmp2m_12534)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12345)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
+!                                 +             nf_light * PrimAmps(PrimAmp2_15243)%Result(-2:1)*0d0  &
+!                                 +                        PrimAmps(PrimAmp2m_15243)%Result(-2:1)*0d0 &
+!                                 + sumQlight/Q_top *( PrimAmps(PrimAmp2_12543)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12453)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_12435)%Result(-2:1) &
+!                                                   + PrimAmps(PrimAmp2_15243)%Result(-2:1)*0d0 &
+!                                                   ) &
+!                                 + PrimAmps(PrimAmp2m_12543)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12453)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_12435)%Result(-2:1) &
+!                                 + PrimAmps(PrimAmp2m_15243)%Result(-2:1) &
+!                                 )
+!
+!
+!      NLO_Res_Pol(-2:1) = (0d0,0d0)
+!      do jPrimAmp=1,3
+!      do iPrimAmp=1,NumBornAmps
+!          NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + Col1L_ttbggp(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
+!      enddo
+!      enddo
+!      NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
    enddo! helicity loop
+   pause
 ENDIF
 
 

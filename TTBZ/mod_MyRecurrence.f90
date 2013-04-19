@@ -3515,7 +3515,6 @@ endif
 
 
         do m=1,ng1
-           print *, 'shouldnt be here'
            k1 = sum(k(:,1:m),dim=2)
            e1=g(e(:,1:m),k(:,1:m))
            k1sq = sc_(k1,k1)
@@ -3524,9 +3523,9 @@ endif
            k2 = k2 + p + kV
            k2sq = sc_(k2,k2) - mass**2
            ms1 = ng1 - m
-           sp2=fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.true.)
+           sp2=fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.false.)
 
-           if (ng2 > 0.or.m < ng1) then
+!           if (ng2 > 0.or.m < ng1) then
                if (CTIns) then
                   sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
 
@@ -3536,7 +3535,8 @@ endif
                         sp2 = (0d0,0d0)
                   endif
 
-                  if(m<ng1-1 .or. ng2>0) then
+!                  if(m<ng1-1 .or. ng2>0) then
+                  if(m<ng1 .or. ng2>0) then
                      sp3 = fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.true.)
                      sp3 = spb2_(sp3,k2)+mass*sp3
                      sp2(:) = sp2(:) + sp3(:)
@@ -3544,9 +3544,9 @@ endif
                else
                   sp2 = spb2_(sp2,k2)+mass*sp2
                endif
-           else
-               if(CTIns) cycle
-           endif
+ !          else
+ !              if(CTIns) cycle
+ !          endif
 
            tmp = vgq(e1,sp2)
 
@@ -3558,13 +3558,13 @@ endif
               endif
            endif
 
-           if (ng2 > 0.or. m < ng1) then
+!           if (ng2 > 0.or. m < ng1) then
             if (abs(k2sq) > propcut) then
               tmp=(0d0,1d0)/k2sq*tmp
             else
               tmp = (0d0,0d0)
             endif
-           endif
+!           endif
 
            res = res + tmp
         enddo

@@ -184,8 +184,6 @@ contains
          enddo
 
 
-
-
 !     3 cut
       do i=1,N3
       c1=ThePrimAmp%UCuts(3)%Coeff(i,0)
@@ -276,10 +274,10 @@ contains
          enddo
 
 
-
 !     2 cut
       do i=1,N2
-      if (tagdcut(i,1).eq.666) then
+!      if (tagdcut(i,1).eq.666) then
+         if (ThePrimAmp%UCuts(2)%tagcuts(i) .eq. 666) then
       !-----buble off the light cone
 
       b1 =ThePrimAmp%UCuts(2)%Coeff(i,0)
@@ -318,7 +316,8 @@ contains
          endif
 
 
-      if (tagdcut(i,1).eq.999) then
+!      if (tagdcut(i,1).eq.999) then
+         if (ThePrimAmp%UCuts(2)%tagcuts(i) .eq. 999) then
       !-----bubble on a light-cone
 
       b1=ThePrimAmp%UCuts(2)%Coeff(i,0)

@@ -558,8 +558,10 @@ real(8) :: Mu2Ren
           elseif ( TheBornAmp%TreeProc%NumV .eq. 1 ) then
              ResSpi = cur_f_2fV_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%Boson,TheBornAmp%TreeProc%NumGlu)
              ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+
              res(-1) = res(-1) + ResMCT*3d0/2d0
              res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+
           else
              call Error("evalmasscts")
           endif
@@ -576,6 +578,7 @@ real(8) :: Mu2Ren
        elseif( TheBornAmp%TreeProc%NumQua.eq.0 .and. TheBornAmp%TreeProc%NumSca.eq.2 ) then
           ResSpi(1) = cur_s_2s_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Scalars(2:2),TheBornAmp%TreeProc%NumGlu)
           ResMCT = ResSpi(1) * TheBornAmp%TreeProc%Scalars(1)%Pol(1) * TheBornAmp%TreeProc%Scalars(1)%Mass2
+
           res(-1) = res(-1) + ResMCT*(3d0/2d0 - 1d0/2d0 )
           res(0)  = res(0)  + ResMCT*(7d0/2d0 - 3d0*dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0     -1d0/2d0+dlog(TheBornAmp%TreeProc%Scalars(1)%Mass2/Mu2Ren)*0.5d0 )
 
