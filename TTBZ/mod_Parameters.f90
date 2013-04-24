@@ -39,7 +39,7 @@ real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-real(8), public, parameter :: m_Z     = 91.19d0*GeV
+real(8), public            :: m_Z     = 91.19d0*GeV  
 real(8), public, parameter :: m_W     = 80.419d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
@@ -98,13 +98,17 @@ real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
 real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
 real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
-complex(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
+! real(8), public, parameter :: couplZTT_left  = Q_up!  This is for the check against ttb+photon.
+! real(8), public, parameter :: couplZTT_right = Q_up
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
 
 real(8), public, parameter :: couplZNN_left  = -sw/cw*Q_nu + 1d0/sw/cw * T3_nu
 real(8), public, parameter :: couplZNN_right = -sw/cw*Q_nu
+
+complex(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
+
 
 real(8), public :: WidthExpansion
 real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2

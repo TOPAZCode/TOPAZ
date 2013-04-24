@@ -15,7 +15,7 @@ use ModKinematics
 use ModUCuts
 use ModUCuts_new
 use ModUCuts_128
-use ModUCuts_128_new
+! use ModUCuts_128_new
 use ModIntegrals
 use ModAmplitudes
 use ModMyRecurrence
@@ -69,12 +69,12 @@ IF( TOPDECAYS.NE.0 ) THEN
    call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,9:11))
    NRndHel=16
 ENDIF
-IF( ZDECAYS.NE.0 ) THEN
+IF( ZDECAYS.NE.0 .AND. ZDECAYS.NE.-2 ) THEN!  -2: Z=photon
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
    PSWgt = PSWgt * PSWgt4
 ENDIF
 
-IF( ZDECAYS.EQ.-1 ) THEN
+IF( ZDECAYS.EQ.-1 ) THEN!   spin un-correlated decays
      ExtParticle(5)%Helicity=+1
      call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
      call pol_massSR(ExtParticle(5)%Mom(1:4),M_Z,+1,ZPolVec(1:4))
@@ -121,9 +121,9 @@ ENDIF
       EvalCS_1L_ttbggZ = 0d0
       return
    endif
+
    call SetPropagators()
    call SetPDFs(eta1,eta2,MuFac,pdf)
-
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
@@ -140,7 +140,7 @@ IF( Correction.EQ.0 ) THEN
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
       if( ZDecays.gt.0 ) then
-          if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+          if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be done more elegantly in mod_process
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
       endif
       do iPrimAmp=1,NumBornAmps
@@ -155,8 +155,6 @@ IF( Correction.EQ.0 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
-
-
 
 
 !------------ 1 LOOP --------------
@@ -176,13 +174,13 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
 
 
-      LO_Res_Pol = (0d0,0d0)
-      do jPrimAmp=1,NumBornAmps
-      do iPrimAmp=1,NumBornAmps
-          LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
-      enddo
-      enddo
-      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+!       LO_Res_Pol = (0d0,0d0)   ! MARKUS: has to be disabled for now because NumBornAmps counts more than just 1,2.
+!       do jPrimAmp=1,NumBornAmps
+!       do iPrimAmp=1,NumBornAmps
+!           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
+!       enddo
+!       enddo
+!       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
 
 !------------ bosonic loops --------------
@@ -264,36 +262,49 @@ ELSEIF( Correction.EQ.1 ) THEN
        endif
        enddo
 
+
+!print *,"This is for the check against ttb+photon. Remember to change couplings to Q_up"
+!run ! ./TOPAZ Collider=1 TopDK=0 ZDK=-2 Process=81 Correction=1 NLOParam=0 ObsSet=51
+!run ! ./TOPAZ Collider=1 TopDK=0 Process=20 Correction=1 NLOParam=0 ObsSet=21
+!print *, "Z LO",iHel,cdabs( BornAmps(1)%Result )/( Q_up *dsqrt(2d0) )
+!print *, "Z VI",iHel,cdabs( PrimAmps(1)%Result(-2) )/( Q_up *dsqrt(2d0) )
+!print *, "Z VI",iHel,cdabs( PrimAmps(1)%Result(-1) )/( Q_up *dsqrt(2d0) )
+!print *, "Z VI",iHel,cdabs( PrimAmps(1)%Result(+0) )/( Q_up *dsqrt(2d0) )
+!print *, "Z VI",iHel,cdabs( PrimAmps(1)%Result(+1) ) /( Q_up *dsqrt(2d0) )
+!pause
+
+
+
        print *, 'quad prec'
        
        do iPrimAmp=1,NumPrimAmps
           PrimAmps(iPrimAmp)%result=(0d0,0d0)
           call SetKirill(PrimAmps(iPrimAmp))
-          call PentCut_128_new(PrimAmps(:),iPrimAmp)
+!           call PentCut_128_new(PrimAmps(:),iPrimAmp)
           !          call PentCut(PrimAmps(iPrimAmp))
        enddo
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
-          call QuadCut_128_new(PrimAmps(:),iPrimAmp)
+!           call QuadCut_128_new(PrimAmps(:),iPrimAmp)
 !          call QuadCut(PrimAmps(iPrimAmp))
 
        enddo
        
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
-          call TripCut_128_new(PrimAmps(:),iPrimAmp)
+!           call TripCut_128_new(PrimAmps(:),iPrimAmp)
 !          call TripCut(PrimAmps(iPrimAmp))
        enddo
 
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
-          call DoubCut_128_new(PrimAmps(:),iPrimAmp)
+!           call DoubCut_128_new(PrimAmps(:),iPrimAmp)
 !          call DoubCut(PrimAmps(iPrimAmp))
        enddo
 
        do iPrimAmp=1,NumPrimAmps
           call SetKirill(PrimAmps(iPrimAmp))
-          call SingCut_128_new(PrimAmps(:),iPrimAmp)
+!           call SingCut_128_new(PrimAmps(:),iPrimAmp)
           !         call SingCut(PrimAmps(iPrimAmp))
        enddo
 

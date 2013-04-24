@@ -70,7 +70,6 @@ ENDIF
       return
    endif
 
-
    call SetPropagators()
    call SetPDFs(eta1,eta2,MuFac,pdf)
    PDFFac = pdf(0,1) * pdf(0,2)
@@ -101,12 +100,11 @@ IF( Correction.EQ.0 ) THEN
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
 
+
 !------------ 1 LOOP --------------
 ELSEIF( Correction.EQ.1 ) THEN
 
    do iHel=nHel(1),nHel(2)
-!    do iHel=1,1    ! 1  1 -1 -1 1
-!    do iHel=27,27  ! 1 -1  1 -1 1
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
       do iPrimAmp=1,12
@@ -127,7 +125,6 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
-
 !------------ bosonic loops --------------
        do iPrimAmp=1,12
           call SetKirill(PrimAmps(iPrimAmp))
@@ -144,6 +141,17 @@ ELSEIF( Correction.EQ.1 ) THEN
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
 !DEC$ IF (_QuadPrecImpr==1)
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
+
+
+!print *, "This is for the check of ttb+Z(=>photon)"
+!print *, "P LO",iHel,cdabs( BornAmps(1)%Result     )
+!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-2) )
+!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-1) )
+!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+0) )
+!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+1) )
+!pause
+
+
           if( AccPoles.gt.1d-4 ) then
 !               coeff4_128(:,:) = qcmplx( coeff4(:,:) )!   not re-calculating penta,quad contributions
 !               coeff5_128(:,:) = qcmplx( coeff5(:,:) )

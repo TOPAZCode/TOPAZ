@@ -100,6 +100,7 @@ ELSEIF( PROCESS.EQ.76 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6
 
 
 
+ELSEIF( PROCESS.EQ.81 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho  (ZDK must be <= -2)
 
 
 

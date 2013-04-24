@@ -153,11 +153,11 @@ ELSEIF( Correction.EQ.1 ) THEN
 print *, "before",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
 
           call SetKirill(PrimAmps(iPrimAmp))
-          call PentCut_new(PrimAmps(iPrimAmp))
-          call QuadCut_new(PrimAmps(iPrimAmp))
-          call TripCut_new(PrimAmps(iPrimAmp))
-          call DoubCut_new(PrimAmps(iPrimAmp))
-          call SingCut_new(PrimAmps(iPrimAmp))
+          call PentCut_new(PrimAmps(:),iPrimAmp)
+          call QuadCut_new(PrimAmps(:),iPrimAmp)
+          call TripCut_new(PrimAmps(:),iPrimAmp)
+          call DoubCut_new(PrimAmps(:),iPrimAmp)
+          call SingCut_new(PrimAmps(:),iPrimAmp)
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
 
 print *, "after ",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)

@@ -6831,6 +6831,9 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
 
 
 
+applyPSCut = .false.
+if( Process.eq.81 ) return!  return for Z => photon
+
 
 ! momentum ordering
   tbar    = MomOrder(1)
@@ -6901,13 +6904,9 @@ integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,q
 
 !!! RR 2013/03/16 : havent made any changes for Z decay from here on - it looks like it shoul just be top decay though (other than some cuts on Z leptons -- much later)
 
-applyPSCut = .false.
 NBin(1:NumHistograms) = 0
-
-
 MomHadr(1:4,1:7) = 0d0
 PartList(1:7)=(/1,2,3,4,5,6,7/)
-
 MomMiss(1:4) = 0d0
 MomObs(1:4)  = 0d0
 
@@ -9886,27 +9885,24 @@ implicit none
 integer :: NPart
 
    do NPart=1,NumExtParticles
-      
-      if( IsABoson(ExtParticle(NPart)%PartType) ) then
-         if ( ExtParticle(NPart)%PartType.eq.Z0_ .and. ZDecays.gt.0) then
-            ! done somewhere else
-         else
-            call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))! on-shell Z-boson polarization
-         endif
-         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
-         cycle
-      endif
-      if(abs(ExtParticle(NPart)%Helicity).ne.1) cycle ! this prevents overriding of top decay spinors,  (ExtParticle(NPart)%Helicity=0)
-      if( ExtParticle(NPart)%PartType .eq. Glu_ ) then
-         call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
-         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
-      elseif( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.gt.0 ) then
-         call ubarSpi(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
-         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
-      elseif( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.lt.0 ) then
+
+      if( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.lt.0 .and. abs(ExtParticle(NPart)%Helicity).eq.1 ) then
          call vSpi(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+      elseif( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.gt.0 .and. abs(ExtParticle(NPart)%Helicity).eq.1 ) then
+         call ubarSpi(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+      elseif( ExtParticle(NPart)%PartType.eq.Glu_ ) then
+         call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+      elseif ( ExtParticle(NPart)%PartType.eq.Z0_ .and. .not. ZDecays.gt.0 ) then 
+         call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))! on-shell Z-boson polarization
+         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+      elseif( ExtParticle(NPart)%PartType.eq.Pho_  ) then
+         call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
+         ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
       endif
+   
    enddo
 
 !       check gauge invariance

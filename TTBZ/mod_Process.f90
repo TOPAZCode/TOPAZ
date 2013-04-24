@@ -2653,6 +2653,32 @@ ELSEIF( PROCESS.EQ.76 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6
   ENDIF
 
 
+ELSEIF( PROCESS.EQ.81 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho ! ttbPhoton
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      NDim = NDim + 5    ! PS integration
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=17
+      AvgFactor = SpinAvg * GluonColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
 
 
 
@@ -3743,6 +3769,8 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
     ExtParticle(3)%PartType = Glu_
     ExtParticle(4)%PartType = Glu_
     ExtParticle(5)%PartType = Z0_
+    
+    if( Process.ge.81 .and. Process.le.89 ) ExtParticle(5)%PartType = Pho_
 
     IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
       NumPrimAmps = 2
@@ -3788,7 +3816,7 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
         Helicities(8,1:5) = (/0,0,-1,-1,-1/)
      endif
     ELSE! .eq.0 or .eq.-1
-       if (Zdecays.eq.0 .or. Zdecays.eq.-1 ) then
+       if (Zdecays.eq.0 .or. Zdecays.eq.-1 ) then!  -1: spin-uncorrelated
         NumHelicities = 48
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         sig_tb=+1; sig_t =+1;
@@ -3852,7 +3880,7 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
         Helicities(48,1:5) = (/sig_tb,sig_t,-1,+1, 0/)! longitudinal polarization of massive V boson
      else
         NumHelicities = 32
-          allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
+          allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay or photon
           ! for now, use all helicities. might be able to use some clever tricks later though...
           sig_tb=+1;sig_t=+1;
           Helicities(1,1:5) = (/sig_tb,sig_t,+1,+1,+1/)
@@ -6610,7 +6638,7 @@ include 'misc/global_import'
          Lab_ex(Vertex)='bot'! bot because the label HTop is only used in closed T' fermion loops
       elseif(ExtPartType.eq.STop_ .or. ExtPartType.eq.ASTop_ ) then! fix for STop
          Lab_ex(Vertex)='sto'
-      elseif(ExtPartType.eq.Z0_ ) then
+      elseif(ExtPartType.eq.Z0_ .or. ExtPartType.eq.Pho_ ) then
          Lab_ex(Vertex)='zee'
 
       else
@@ -7401,7 +7429,7 @@ type(TreeProcess),pointer :: TheTree
             endif
 
             do NPart=1,TheTree%NumPart
-               if( TheTree%PartType(NPart) .eq. Z0_ ) then
+               if( TheTree%PartType(NPart).eq.Z0_ .or. TheTree%PartType(NPart).eq.Pho_  ) then
                   TheTree%NumV = TheTree%NumV + 1
                   LastQuark=0
                   do j=1, NPart-1   
