@@ -6434,7 +6434,7 @@ IF( Correction.EQ.1 ) THEN
          print *, 'cuts inited'
       enddo! NPrimAmp
       print *, 'calling remove dupl cuts'
-    call remove_duplicate_cuts()
+      call remove_duplicate_cuts()
 
 !! RR printout to check id of duplicates !!
     print *, ' PRINTOUT FOR DUPLICATES'
@@ -7630,15 +7630,18 @@ END SUBROUTINE
       print *, 'in remove duplicate cuts'
     
       do NPrimAmp=2,NumPrimAmps
+         print *, NPrimAmp
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
             do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
             j = 0
             do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) &
                     & .and. (j+1 .lt. NPrimAmp))
-    
                   j = j+1
                   OldPrimAmp => PrimAmps(j)
+                  
+                  if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
+                  if ( OldPrimAmp%UCuts(Npoint)%NumCuts .ne. NewPrimAmp%UCuts(Npoint)%NumCuts) cycle
                   if ( OldPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .true.) cycle
     
                   Nequivtrees = 0
