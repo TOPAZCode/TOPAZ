@@ -172,9 +172,9 @@ logical :: dirresult
     elseif( arg(1:7).eq."GridIO=" ) then
         read(arg(8:10),*) GridIO
     elseif( arg(1:10).eq."HistoFile=" ) then
-        read(arg(11:41),*) HistoFile
+        read(arg(11:41),"(A)") HistoFile
     elseif( arg(1:8).eq."FileTag=" ) then
-        read(arg(9:59),*)  FileTag
+        read(arg(9:59),"(A)")  FileTag
         if( FileTag.eq."." ) FileTag=""
     elseif( arg(1:9).eq."DipAlpha=" ) then
         read(arg(10:10),*) iDipAlpha(1)

@@ -400,18 +400,29 @@ ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for HTHTbar + A0/BH production (
 
 
 ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for HTHTbar + A0/BH production (semi-hadr. tops)
+    
+!     Rsep_jet    = 0.4d0
+!     pT_bjet_cut = 30d0*GeV
+!     eta_bjet_cut= 2.5d0
+!     pT_jet_cut = 30d0*GeV 
+!     eta_jet_cut= 2.5d0     
+!     pT_lep_cut  = 20d0*GeV  
+!     eta_lep_cut = 2.5d0      
+!     pT_miss_cut = 150d0*GeV! note that this is ET and not pT
+!     MTW_cut = 120d0*GeV
+
+
+
+! !   these are the cuts for mstop/chi = 250/50 GeV analysis at the Tevatron
     Rsep_jet    = 0.4d0
-
-    pT_bjet_cut = 30d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_jet_cut = 30d0*GeV 
-    eta_jet_cut= 2.5d0     
- 
-    pT_lep_cut  = 20d0*GeV  
-    eta_lep_cut = 2.5d0      
-    pT_miss_cut = 150d0*GeV! note that this is ET and not pT
-
-    MTW_cut = 120d0*GeV
+    pT_bjet_cut = 20d0*GeV
+    eta_bjet_cut= 2.0d0
+    pT_jet_cut = 20d0*GeV
+    eta_jet_cut= 2.0d0
+    pT_lep_cut  = 20d0*GeV
+    eta_lep_cut = 2.0d0
+    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+    MTW_cut = 0d0*GeV
 
 
 
@@ -456,8 +467,8 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
 
-! !   these are the cuts for mstop/chi = 500/100 GeV analysis at 8TeV
-!  if( Collider_Energy.eq.8000d0*GeV .or. Collider_Energy.eq.14000d0*GeV ) then
+!  !these are the cuts for mstop/chi = 500/100 GeV analysis at 8TeV
+ if( Collider_Energy.eq.8000d0*GeV .or. Collider_Energy.eq.14000d0*GeV ) then
 
     Rsep_jet    = 0.4d0
     pT_bjet_cut = 30d0*GeV
@@ -469,20 +480,35 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (se
     pT_miss_cut = 150d0*GeV! note that this is ET and not pT
     MTW_cut = 120d0*GeV
 
-!  elseif( Collider_Energy.eq.7000d0*GeV ) then
-! !   these are the cuts for mstop/chi = 300/100 GeV analysis at 7TeV
+ elseif( Collider_Energy.eq.7000d0*GeV ) then
+!   these are the cuts for mstop/chi = 300/100 GeV analysis at 7TeV
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 30d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut = 25d0*GeV
+    eta_jet_cut= 2.5d0
+    pT_lep_cut  = 20d0*GeV
+    eta_lep_cut = 2.5d0
+    pT_miss_cut = 125d0*GeV! note that this is ET and not pT
+    MTW_cut = 0d0*GeV
+ else
+    call Error("This ObsSet only supports Collider=1,11,12")
+ endif
+
+
+
+
+! ! !   these are the cuts for mstop/chi = 250/50 GeV analysis at the Tevatron
 !     Rsep_jet    = 0.4d0
-!     pT_bjet_cut = 30d0*GeV
-!     eta_bjet_cut= 2.5d0
-!     pT_jet_cut = 25d0*GeV
-!     eta_jet_cut= 2.5d0
+!     pT_bjet_cut = 20d0*GeV
+!     eta_bjet_cut= 2.0d0
+!     pT_jet_cut = 20d0*GeV
+!     eta_jet_cut= 2.0d0
 !     pT_lep_cut  = 20d0*GeV
-!     eta_lep_cut = 2.5d0
-!     pT_miss_cut = 125d0*GeV! note that this is ET and not pT
+!     eta_lep_cut = 2.0d0
+!     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
 !     MTW_cut = 0d0*GeV
-!  else
-!     call Error("This ObsSet only supports Collider=1,11,12")
-!  endif
+
 
 
 ELSEIF( ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops) without acceptance cuts
@@ -826,7 +852,7 @@ ELSEIF( ObsSet.EQ.2 ) THEN! set of observables for ttb production as signal proc
 ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal process at LHC (di-lept. decay)
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(abs(TopDecays).ne.1) call Error("TopDecays needs to be |1|!")
-          NumHistograms = 20
+          NumHistograms = 21
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -951,6 +977,13 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
           Histo(20)%BinSize= 5d0
           Histo(20)%LowVal =-5.0d0
           Histo(20)%SetScale= 1d0
+
+          Histo(21)%Info   = "m_T2"
+          Histo(21)%NBins  = 60
+          Histo(21)%BinSize= 2.5d0*GeV
+          Histo(21)%LowVal = 50d0*GeV
+          Histo(21)%SetScale= 100d0
+
 
 ELSEIF( ObsSet.EQ.4 ) THEN! set of observables for ttb production with semi hadronic decay
           if(Collider.ne.2)  call Error("Collider needs to be TEV!")
@@ -2997,7 +3030,7 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
           if(XTopDecays.ne.1 .and. XTopDecays.ne.2 ) call Error("XTopDecays needs to be 1(BH) or 2(A0)!")
-          NumHistograms = 8
+          NumHistograms = 9
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3051,13 +3084,17 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
           Histo(8)%LowVal = 0d0
           Histo(8)%SetScale= 100d0
 
-
+          Histo(9)%Info   = "MT2"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 100d0
 
 
 
 
 ELSEIF( ObsSet.EQ.33 .OR. ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production
-          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+!           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
           if(XTopDecays.ne.1 ) call Error("XTopDecays needs to be 1!")
           NumHistograms = 11
@@ -3156,7 +3193,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.1  ) call Error("TopDecays needs to be 1!")
           if(XTopDecays.ne.3  ) call Error("XTopDecays needs to be 3!")
-          NumHistograms = 8
+          NumHistograms = 9
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3210,9 +3247,15 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
           Histo(8)%LowVal = 0d0
           Histo(8)%SetScale= 100d0
 
+          Histo(9)%Info   = "MT2"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 100d0
+
 
 ELSEIF( ObsSet.EQ.43 .OR. ObsSet.EQ.45 ) THEN! set of observables for STSTbar + Chi production
-          if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+!           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
           if(TopDecays.ne.4  ) call Error("TopDecays needs to be 4!")
           if(XTopDecays.ne.3 ) call Error("XTopDecays needs to be 3!")
           NumHistograms = 11
@@ -3767,6 +3810,11 @@ logical,save :: flip=.true.
       call boost(MomDK(1:4,2),HTopMom(1:4),m_HTop)
       call boost(MomDK(1:4,3),HTopMom(1:4),m_HTop)
       PSWgt = PSWgt2*PiWgt3
+
+
+      soft = dabs(MomDK(1,3))/m_HTop
+      if( soft.lt.1d-6  ) PSWgt = 0d0
+
 
     endif
 
@@ -7048,6 +7096,9 @@ real(8) :: costheta_star, MomAux1(1:4), MomAux2(1:4), y_Top, y_Atop, m_ttbar, Mt
 real(8) :: pt_lep1, pt_lep2, eta_lep1, eta_lep2, dphi_LL, MassAux, MomTopsCMS(1:4,1:2)
 real(8) :: MomBeam1(1:4), MomBeam2(1:4), MomBeam(1:4), nx(2:4), ny(2:4), nz(2:4), MomLeptTRF(1:4)
 real(8) :: cosPhi, sinPhi, cosPhiBar, sinPhiBar, deltaSin, dPhiMinus, dPhiPlus
+real(8) :: mT2,pA(2:4),pB(2:4),pTInvis(2:4)! this is for MT2 calculation
+
+
 
 ! required momentum order: MomExt(:,:): 1=In_left, 2=In_right, 3,4,...=light particles, N-1=ATop, N=Top    ! HERE WAS A BUG: tops need to be at the end
 !                          MomDK(:,1:7) : 1=ABot, 2=lep-, 3=ANeu, 4=Bot, 5=lep+, 6=Neu, 7=(Glu)
@@ -7306,11 +7357,23 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
 
     MInv_lepP_lepM = get_MInv( MomLept(1:4,1)+MomLept(1:4,3) )
 
+
     if( get_MInv(MomLept(1:4,3)+MomJet(1:4,1)).lt.get_MInv( MomLept(1:4,3)+MomJet(1:4,2)) ) then 
         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,1) )
+        pA(2:4) = (/MomLept(2,1)+MomJet(2,2),MomLept(3,1)+MomJet(3,2), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,2)).dot.(MomLept(1:4,1)+MomJet(1:4,2)))) /)*100d0
+        pB(2:4) = (/MomLept(2,3)+MomJet(2,1),MomLept(3,3)+MomJet(3,1), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,1)).dot.(MomLept(1:4,3)+MomJet(1:4,1)))) /)*100d0
     else
         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,2) )
+        pA(2:4) = (/MomLept(2,1)+MomJet(2,1),MomLept(3,1)+MomJet(3,1), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,1)).dot.(MomLept(1:4,1)+MomJet(1:4,1)))) /)*100d0
+        pB(2:4) = (/MomLept(2,3)+MomJet(2,2),MomLept(3,3)+MomJet(3,2), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,2)).dot.(MomLept(1:4,3)+MomJet(1:4,2)))) /)*100d0
     endif
+
+!   ! calculate MT2 with pA,pB calculated above
+    pTInvis(2:4) = (/MomLept(2,2)+MomLept(2,4),MomLept(3,2)+MomLept(3,4),0d0/) *100d0
+!     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+    mT2=mT2/100d0
+
+
 !MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomDK(1:4,4) )
 
     pT_ATop = get_PT(MomTops(1:4,1))
@@ -7360,6 +7423,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
    DeltaPhi = dabs( Get_PHI(MomLept(1:4,1)) - Get_PHI(MomLept(1:4,3))  )
    if( DeltaPhi.gt.Pi ) DeltaPhi=2d0*Pi-DeltaPhi
    Psi_LepLep  = dacos( ( MomLept(4,1)*MomLept(4,3) +MomLept(2,1)*MomLept(2,3) + MomLept(3,1)*MomLept(3,3) )/dsqrt(MomLept(2,1)**2+MomLept(3,1)**2+MomLept(4,1)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2+MomLept(4,3)**2) )
+
 
 
 
@@ -7547,6 +7611,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
 
     NBin(19) = WhichBin(19,eta_lepM)
     NBin(20) = WhichBin(20,eta_lepP)
+    NBin(21) = WhichBin(21,MT2)
 
 
 
@@ -8269,6 +8334,8 @@ real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb
 real(8) :: pT_jet(1:7),eta_jet(1:7),m_X0,phi_ll,m_ll,MTW,MTeff
 integer :: Htbar,Ht,X0bar,X0,tbar,t,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,Lep,Neu,ib_lep,ib_had
 real(8) :: Stopness,rpT,H_T
+real(8) :: mT2,pA(2:4),pB(2:4),pTInvis(2:4),mA,mB! this is for MT2 calculation
+
 
 
 
@@ -8520,6 +8587,47 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     endif
 
 
+
+!   !check: this input should return  mT2=412.62883811
+!     pA(2:4) = (/410d0,20d0,100d0/)              ! pxA, pyA, mA 
+!     pB(2:4) = (/-210d0,-300d0,150d0/)           ! pxB, pyB, mB
+!     pTInvis(2:4) = (/-200d0, 280d0, 100d0 /)     ! pxMiss, pyMiss, mass of one of the two inv. particles
+!     call callMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+!     print *, mt2;pause
+
+!     pA(2:4) = (/Mom(2,Htbar),Mom(3,Htbar),m_Stop/)*100d0              ! pxA, pyA, mA 
+!     pB(2:4) = (/Mom(2,Ht),Mom(3,Ht),m_Stop/)      *100d0              ! pxB, pyB, mB
+! !     pTInvis(2:4) = (/MomMiss(2),MomMiss(3),m_X0/) *100d0              ! pxMiss, pyMiss, mass of one of the two inv. particles
+!     pTInvis(2:4) = (/Mom(2,X0)+Mom(2,X0bar),Mom(3,X0)+Mom(3,X0bar),m_X0/) *100d0
+!     call callMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+!     mT2=mT2/100d0
+!     MTW=mT2
+!     print *, mt2;pause
+
+
+
+! ! this includes all missing energy
+    if( NLOParam.eq.2 ) call Error("MT2 is not yet IR save")
+    mA = dsqrt(dabs((Mom(1:4,LepP)+Mom(1:4,b)).dot.(Mom(1:4,LepP)+Mom(1:4,b))))
+    mB = dsqrt(dabs((Mom(1:4,LepM)+Mom(1:4,bbar)).dot.(Mom(1:4,LepM)+Mom(1:4,bbar))))
+    pA(2:4) = (/Mom(2,LepP)+Mom(2,b),   Mom(3,LepP)+Mom(3,b),    mA /)*100d0
+    pB(2:4) = (/Mom(2,LepM)+Mom(2,bbar),Mom(3,LepM)+Mom(3,bbar), mB /)*100d0
+    pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar)+Mom(2,X0)+Mom(2,X0bar),Mom(3,nu)+Mom(3,nubar)+Mom(3,X0)+Mom(3,X0bar),0d0/) *100d0
+!     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+    mT2=mT2/100d0
+
+
+! ! this is ttbar hypothesis only, i.e. missing energy = only neutrino momenta
+! !     mA = dsqrt(dabs((Mom(1:4,LepP)+Mom(1:4,b)).dot.(Mom(1:4,LepP)+Mom(1:4,b))))
+! !     mB = dsqrt(dabs((Mom(1:4,LepM)+Mom(1:4,bbar)).dot.(Mom(1:4,LepM)+Mom(1:4,bbar))))
+! !     pA(2:4) = (/Mom(2,LepP)+Mom(2,b),   Mom(3,LepP)+Mom(3,b),    mA /)*100d0
+! !     pB(2:4) = (/Mom(2,LepM)+Mom(2,bbar),Mom(3,LepM)+Mom(3,bbar), mB /)*100d0
+! !     pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar),Mom(3,nu)+Mom(3,nubar),0d0/) *100d0
+! !     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+! !     mT2=mT2/100d0
+
+
+
 ! binning
     NBin(1)= WhichBin(1,pT_lepP)
     NBin(2)= WhichBin(2,eta_lepP)
@@ -8529,6 +8637,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     NBin(6)= WhichBin(6,H_T)
     NBin(7)= WhichBin(7,MTW)
     NBin(8)= WhichBin(8,MTeff)
+    NBin(9)= WhichBin(9,MT2)
 
 
 

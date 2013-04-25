@@ -7,6 +7,7 @@ DipoleDir = $(Here)/dipoles
 OD = $(ObjectDir)
 PDFDir = $(Here)/PDFS
 VegasDir = $(Here)/Vegas
+MT2Dir = $(Here)/MT2Variable
 CubaDir = $(Here)/Cuba
 OptReport = $(Here)/OptRep.txt
 PSDir = $(Here)/PhaseSpace
@@ -28,6 +29,8 @@ fcomp = $(F95compiler) $(IfortOpts) @$(ConfigFile)
 # never use gcc with other than O0, optimization seems to be buggy
 ccomp = gcc -O0
 
+cppcomp = g++
+
 
 # executable file
 Exec = ./TOPAZ
@@ -35,12 +38,6 @@ Exec = ./TOPAZ
 
 makeDep = $(ConfigFile) \
           makefile
-
-
-# fastjet stuff
-FASTJET_CONFIG=/home/schulze/usr/local/bin/fastjet-config
-CXXFLAGS += $(shell $(FASTJET_CONFIG) --cxxflags)
-FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
 
 
 PDFObj = $(PDFDir)/mstwpdf.o \
@@ -237,17 +234,31 @@ DipoleObjHTHTB = $(ObjectDir)/mod_Dipoles_GGHTHTBG.o \
 
 
 
-# Zprime section
-
 DipoleDepZprime = $(Here)/dipoles/mod_Dipoles_ZprimeTTB.f90 \
 		  $(Here)/dipoles/mod_IntDipoles_ZprimeTTB.f90
 
 DipoleObjZprime = $(ObjectDir)/mod_Dipoles_ZprimeTTB.o \
 		 $(ObjectDir)/mod_IntDipoles_ZprimeTTB.o 
 
-# End Zprime section
 
 
+
+
+
+# FastJet stuff
+FASTJET_CONFIG=/home/schulze/usr/local/bin/fastjet-config
+CXXFLAGS += $(shell $(FASTJET_CONFIG) --cxxflags)
+FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
+
+
+# MT2 Variable
+# See http://www.hep.phy.cam.ac.uk/~lester/mt2/
+MT2VarDep = $(Here)/MT2Variable/calcMT2.cpp
+MT2VarObj = $(MT2Dir)/calcMT2.o
+MT2FLAGS = -L /home/schulze/lib/MT2Lib/lib/ -loxbridgekinetics-1.0 -Xlinker -rpath /home/schulze/lib/MT2Lib/lib/
+
+
+# MadGraph objects
 MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(Here)/MadGraph/ddb_Zprime_ttb.o \
 				  $(Here)/MadGraph/uub_Zprime_ttb.o \
@@ -379,7 +390,8 @@ allObjects =   				$(ObjectDir)/mod_Misc.o \
 # they are not being removed by "make clean"
 # their compilation takes long so it should be done only once
 #
-# external libraries for PDFs, PS Generators and Integrals are not compiled with this makefile
+# external libraries for PDFs, PS generators, Master integrals, Vegas, MadGraph, MT2, FastJet, ... are not compiled with this makefile
+# they are compiled with separate makefiles in their respective directory
 #--------------------------------------------------------------------------------------------------
 
 
@@ -390,7 +402,14 @@ all: $(allObjects)
 	@echo " "
 # 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
+
+# additional objects:
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
+# $(CubaLib)
+#  $(MT2VarObj) $(MT2FLAGS)
+# $(MadGraphObj)
+
+
 
 
 clean:

@@ -4,7 +4,7 @@ implicit none
 
 integer,private,parameter :: NumMaxHisto=45
 
-integer,private,parameter :: RemoveHTopClosedLoop = 1!   0=remove, 1=include   closed heavy HT loop
+integer,private,parameter :: IncludeHTopClosedLoop = 1!   0=remove, 1=include   closed heavy HT loop
 
 
  contains
@@ -49,8 +49,6 @@ ENDIF
   endif
   FluxFac = 1d0/(2d0*EHat**2)
 
-!   MuRen = 0.5d0*Ehat
-!   MuFac = MuRen
 
    call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! HTbar, HT
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
@@ -207,8 +205,8 @@ ELSEIF( Correction.EQ.1 ) THEN
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
       enddo
-      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)  + PrimAmps(11)%Result(-2:1)*RemoveHTopClosedLoop
-      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1) + PrimAmps(12)%Result(-2:1)*RemoveHTopClosedLoop
+      FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)  + PrimAmps(11)%Result(-2:1)*IncludeHTopClosedLoop
+      FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1) + PrimAmps(12)%Result(-2:1)*IncludeHTopClosedLoop
 
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
@@ -341,9 +339,6 @@ ENDIF
       return
   endif
   FluxFac = 1d0/(2d0*EHat**2)
-
-!   MuRen = 0.5d0*Ehat
-!   MuFac = MuRen
 
 
    call EvalPhaseSpace_2to2HT(EHat,yRnd(3:4),MomExt(1:4,1:4),PSWgt)! HTbar, HT
@@ -526,8 +521,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 !           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
       enddo
 
-      FermionPartAmp(1,-2:1) =          ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*RemoveHTopClosedLoop )
-      FermionPartAmp(2,-2:1) = -1d0/Nc *( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*RemoveHTopClosedLoop )
+      FermionPartAmp(1,-2:1) =          ( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*IncludeHTopClosedLoop )
+      FermionPartAmp(2,-2:1) = -1d0/Nc *( Nf_light*PrimAmps(5)%Result(-2:1) + PrimAmps(6)%Result(-2:1) + PrimAmps(7)%Result(-2:1)*IncludeHTopClosedLoop )
 
       NLO_Res_Pol(-2:1) = (0d0,0d0)
       do jPrimAmp=1,2
@@ -558,9 +553,9 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0)*LO_Res_Unpol
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol  ! finite log(mu2) contrib. from  Htop WFRC
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*Nf_light+2d0/3d0*Nf_heavy)*LO_Res_Unpol
-   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*RemoveHTopClosedLoop     )*LO_Res_Unpol! this is from the closed HTop loop
+   NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) + (2d0/3d0*IncludeHTopClosedLoop     )*LO_Res_Unpol! this is from the closed HTop loop
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_SMtop)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
-   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*RemoveHTopClosedLoop)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol   ! finite log(mu2) contrib. from HTop in alpha_s ren.
+   NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*IncludeHTopClosedLoop)*2d0*dlog(MuRen/m_Htop)*LO_Res_Unpol   ! finite log(mu2) contrib. from HTop in alpha_s ren.
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
 
@@ -1516,11 +1511,6 @@ complex(8) :: TreeMom(1:4,1:4)
 
 RETURN
 END SUBROUTINE
-
-
-
-
-
 
 
 
@@ -4756,7 +4746,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_HtHtbgg_1 = EvalCS_DKJ_Real_HtHtbgg_1 + EvalCS_DKJ_Real_HtHtbgg
 
-mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
+! mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
 
 
 2000 continue!! dipoles for gluon emission off Anti-HTop
@@ -4918,7 +4908,7 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbgg
                   call intoHisto(NHisto,NBin(NHisto),DipoleResult)
               enddo
               EvalCS_DKJ_Real_HtHtbgg_1 = EvalCS_DKJ_Real_HtHtbgg_1 + DipoleResult
-mydummy(2) = mydummy(2) + DipoleResult
+! mydummy(2) = mydummy(2) + DipoleResult
           enddo   !dipole loop
 
 ! print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,7))/EHat**2
@@ -5021,7 +5011,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_HtHtbgg_2 = EvalCS_DKJ_Real_HtHtbgg_2 + EvalCS_DKJ_Real_HtHtbgg
 
-mydummy(3) = EvalCS_DKJ_Real_HtHtbgg
+! mydummy(3) = EvalCS_DKJ_Real_HtHtbgg
 
 
 2001 continue!! dipoles for gluon emission off HTop
@@ -5403,7 +5393,7 @@ do nJetRad=nJetRad1,nJetRad2!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_HtHtbqqb_1 = EvalCS_DKJ_Real_HtHtbqqb_1 + EvalCS_DKJ_Real_HtHtbqqb
 
-mydummy(1) = EvalCS_DKJ_Real_HtHtbqqb
+! mydummy(1) = EvalCS_DKJ_Real_HtHtbqqb
 
 
 2000 continue!! dipoles for gluon emission off anti-stop
@@ -5567,7 +5557,7 @@ mydummy(1) = EvalCS_DKJ_Real_HtHtbqqb
                   call intoHisto(NHisto,NBin(NHisto),DipoleResult)
               enddo
               EvalCS_DKJ_Real_HtHtbqqb_1 = EvalCS_DKJ_Real_HtHtbqqb_1 + DipoleResult
-mydummy(2) = mydummy(2) + DipoleResult
+! mydummy(2) = mydummy(2) + DipoleResult
           enddo   !dipole loop
 
 ! print *, "sij/shat",(MomExt(1:4,15).dot.MomExt(1:4,7))/EHat**2
@@ -5672,7 +5662,7 @@ do nJetRad=nJetRad3,nJetRad4!   nJetRad=1: gluon radiation off stop line,nJetRad
 
    EvalCS_DKJ_Real_HtHtbqqb_2 = EvalCS_DKJ_Real_HtHtbqqb_2 + EvalCS_DKJ_Real_HtHtbqqb
 
-mydummy(3) = EvalCS_DKJ_Real_HtHtbqqb
+! mydummy(3) = EvalCS_DKJ_Real_HtHtbqqb
 
 
 2001 continue!! dipoles for gluon emission off stop
