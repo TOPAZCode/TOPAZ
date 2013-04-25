@@ -8027,6 +8027,8 @@ END SUBROUTINE
                        & .and. (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
                      OldNCut=OldNCut+1
 
+                     if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
+                     if ( OldPrimAmp%UCuts(Npoint)%NumCuts .ne. NewPrimAmp%UCuts(Npoint)%NumCuts) cycle
                      if ( OldPrimAmp%UCuts(Npoint)%skip(OldNCut) .eq. .true.) cycle
 
                      Nequivtrees = 0
