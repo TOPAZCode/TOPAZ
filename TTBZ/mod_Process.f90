@@ -3778,6 +3778,8 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
     ELSEIF( Correction.EQ.1 ) THEN
        NumPrimAmps = 12    ! this EXCLUDES ferm loop prims
        NumBornAmps = 12
+       NumPrimAmps = NumPrimAmps+6   ! this includes the ferm loops with the Z attached to the loop -- RR
+       NumBornAmps = NumBornAmps+6
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -5720,6 +5722,14 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       BornAmps(10)%ExtLine = (/1,5,4,3,2/)
       BornAmps(11)%ExtLine = (/1,4,5,3,2/)
       BornAmps(12)%ExtLine = (/1,4,3,5,2/)
+      
+      BornAmps(13)%ExtLine = (/1,5,3,4,2/)
+      BornAmps(14)%ExtLine = (/1,3,5,4,2/)
+      BornAmps(15)%ExtLine = (/1,3,4,5,2/)
+
+      BornAmps(16)%ExtLine = (/1,5,4,3,2/)
+      BornAmps(17)%ExtLine = (/1,4,5,3,2/)
+      BornAmps(18)%ExtLine = (/1,4,3,5,2/)
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
@@ -5805,6 +5815,64 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(12)%Sisters(1) = 10
       PrimAmps(12)%Sisters(2) = 11
 
+! ferm loops begin here
+! and for the time being, I'm only doing light quarks (=u,d,c,s) in loop
+! (the actual flavor doesnt matter, since we multiply by the couplings after the
+! prim has been calculated. I guess we'll have to have separate prims for top in the loop...)
+!      PrimAmps(13)%ExtLine=(/1,5,3,4,2/)
+      PrimAmps(13)%ExtLine=(/1,2,5,3,4/)
+      PrimAmps(13)%AmpType=2
+      PrimAmps(13)%NumSisters=2
+      PrimAmps(13)%FermLoopPart=Up_
+      allocate( PrimAmps(13)%Sisters(1:PrimAmps(13)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(13)%Sisters(1) = 14
+      PrimAmps(13)%Sisters(2) = 15
+
+      PrimAmps(14)%ExtLine=(/1,2,3,5,4/)
+      PrimAmps(14)%AmpType=2
+      PrimAmps(14)%NumSisters=2
+      PrimAmps(14)%FermLoopPart=Up_
+      allocate( PrimAmps(14)%Sisters(1:PrimAmps(14)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(14)%Sisters(1) = 13
+      PrimAmps(14)%Sisters(2) = 15
+
+      PrimAmps(15)%ExtLine=(/1,2,3,4,5/)
+      PrimAmps(15)%AmpType=2
+      PrimAmps(15)%NumSisters=2
+      PrimAmps(15)%FermLoopPart=Up_
+      allocate( PrimAmps(15)%Sisters(1:PrimAmps(15)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(15)%Sisters(1) = 13
+      PrimAmps(15)%Sisters(2) = 14
+
+      PrimAmps(16)%ExtLine=(/1,5,3,4,2/)
+      PrimAmps(16)%AmpType=2
+      PrimAmps(16)%NumSisters=2
+      PrimAmps(16)%FermLoopPart=Up_
+      allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(16)%Sisters(1) = 17
+      PrimAmps(16)%Sisters(2) = 18
+
+      PrimAmps(17)%ExtLine=(/1,3,5,4,2/)
+      PrimAmps(17)%AmpType=2
+      PrimAmps(17)%NumSisters=2
+      PrimAmps(17)%FermLoopPart=Up_
+      allocate( PrimAmps(17)%Sisters(1:PrimAmps(17)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(17)%Sisters(1) = 16
+      PrimAmps(17)%Sisters(2) = 18
+
+      PrimAmps(18)%ExtLine=(/1,3,4,5,2/)
+      PrimAmps(18)%AmpType=2
+      PrimAmps(18)%NumSisters=2
+      PrimAmps(18)%FermLoopPart=Up_
+      allocate( PrimAmps(18)%Sisters(1:PrimAmps(18)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(18)%Sisters(1) = 16
+      PrimAmps(18)%Sisters(2) = 17
 
 ! for the time being, I'm ignoring ferm loop prims
 !      call Error("need more work here:MasterProcess.EQ.17 ")
