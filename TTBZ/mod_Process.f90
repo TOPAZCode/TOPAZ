@@ -5727,10 +5727,6 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       BornAmps(14)%ExtLine = (/1,3,5,4,2/)
       BornAmps(15)%ExtLine = (/1,3,4,5,2/)
 
-      BornAmps(16)%ExtLine = (/1,5,4,3,2/)
-      BornAmps(17)%ExtLine = (/1,4,5,3,2/)
-      BornAmps(18)%ExtLine = (/1,4,3,5,2/)
-
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
       PrimAmps(1)%NumSisters = 0
@@ -5823,7 +5819,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(13)%ExtLine=(/1,2,5,3,4/)
       PrimAmps(13)%AmpType=2
       PrimAmps(13)%NumSisters=2
-      PrimAmps(13)%FermLoopPart=Up_
+      PrimAmps(13)%FermLoopPart=Chm_
       allocate( PrimAmps(13)%Sisters(1:PrimAmps(13)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(13)%Sisters(1) = 14
@@ -5832,7 +5828,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(14)%ExtLine=(/1,2,3,5,4/)
       PrimAmps(14)%AmpType=2
       PrimAmps(14)%NumSisters=2
-      PrimAmps(14)%FermLoopPart=Up_
+      PrimAmps(14)%FermLoopPart=Chm_
       allocate( PrimAmps(14)%Sisters(1:PrimAmps(14)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(14)%Sisters(1) = 13
@@ -5841,42 +5837,75 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(15)%ExtLine=(/1,2,3,4,5/)
       PrimAmps(15)%AmpType=2
       PrimAmps(15)%NumSisters=2
-      PrimAmps(15)%FermLoopPart=Up_
+      PrimAmps(15)%FermLoopPart=Chm_
       allocate( PrimAmps(15)%Sisters(1:PrimAmps(15)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(15)%Sisters(1) = 13
       PrimAmps(15)%Sisters(2) = 14
 
-      PrimAmps(16)%ExtLine=(/1,5,3,4,2/)
+      PrimAmps(16)%ExtLine=(/1,2,5,3,4/)
       PrimAmps(16)%AmpType=2
       PrimAmps(16)%NumSisters=2
-      PrimAmps(16)%FermLoopPart=Up_
+      PrimAmps(16)%FermLoopPart=Bot_
       allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(16)%Sisters(1) = 17
       PrimAmps(16)%Sisters(2) = 18
 
-      PrimAmps(17)%ExtLine=(/1,3,5,4,2/)
+      PrimAmps(17)%ExtLine=(/1,2,3,5,4/)
       PrimAmps(17)%AmpType=2
       PrimAmps(17)%NumSisters=2
-      PrimAmps(17)%FermLoopPart=Up_
+      PrimAmps(17)%FermLoopPart=Bot_
       allocate( PrimAmps(17)%Sisters(1:PrimAmps(17)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(17)%Sisters(1) = 16
       PrimAmps(17)%Sisters(2) = 18
 
-      PrimAmps(18)%ExtLine=(/1,3,4,5,2/)
+      PrimAmps(18)%ExtLine=(/1,2,3,4,5/)
       PrimAmps(18)%AmpType=2
       PrimAmps(18)%NumSisters=2
-      PrimAmps(18)%FermLoopPart=Up_
+      PrimAmps(18)%FermLoopPart=Bot_
       allocate( PrimAmps(18)%Sisters(1:PrimAmps(18)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(18)%Sisters(1) = 16
       PrimAmps(18)%Sisters(2) = 17
 
+
+
+
+
+
+
+!       PrimAmps(16)%ExtLine=(/1,5,3,4,2/)        ! M: ??
+!       PrimAmps(16)%AmpType=2
+!       PrimAmps(16)%NumSisters=2
+!       PrimAmps(16)%FermLoopPart=Up_
+!       allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
+!       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+!       PrimAmps(16)%Sisters(1) = 17
+!       PrimAmps(16)%Sisters(2) = 18
+
+!       PrimAmps(17)%ExtLine=(/1,3,5,4,2/)        ! M: ??
+!       PrimAmps(17)%AmpType=2
+!       PrimAmps(17)%NumSisters=2
+!       PrimAmps(17)%FermLoopPart=Up_
+!       allocate( PrimAmps(17)%Sisters(1:PrimAmps(17)%NumSisters), stat=AllocStatus )
+!       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+!       PrimAmps(17)%Sisters(1) = 16
+!       PrimAmps(17)%Sisters(2) = 18
+
+!       PrimAmps(18)%ExtLine=(/1,3,4,5,2/)        ! M: ??
+!       PrimAmps(18)%AmpType=2
+!       PrimAmps(18)%NumSisters=2
+!       PrimAmps(18)%FermLoopPart=Up_
+!       allocate( PrimAmps(18)%Sisters(1:PrimAmps(18)%NumSisters), stat=AllocStatus )
+!       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+!       PrimAmps(18)%Sisters(1) = 16
+!       PrimAmps(18)%Sisters(2) = 17
+
 ! for the time being, I'm ignoring ferm loop prims
 !      call Error("need more work here:MasterProcess.EQ.17 ")
-      print *, 'WARNING: FERMION LOOPS NOT INCLUDED'
+!       print *, 'WARNING: FERMION LOOPS NOT INCLUDED'
 !      call Error("need more work here:MasterProcess.EQ.17 ")
 
    ENDIF
@@ -6605,23 +6634,23 @@ IF( Correction.EQ.1 ) THEN
 
 
 
-!! RR printout to check id of duplicates !!
-    print *, ' PRINTOUT FOR DUPLICATES'
-!    pause
-    do NPrimAmp=1,NumPrimAmps
-       print *, '-------------------------'
-       print *, '   Primitive ', NPrimAmp
-       print *, '-------------------------'
-       do NPoint=1,5
-          print *, 'number of cuts = ', NPoint
-          do NCut=1,PrimAmps(NPrimAmp)%UCuts(NPoint)%NumCuts
-             print *, ' cuts: ', NCut, PrimAmps(NPrimAmp)%UCuts(NPoint)%CutProp(NCut,1:NPoint),  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
-!             print *, 'skip ?',  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
-          enddo
-       enddo
-    enddo
-!    pause
-! RR printout ends here
+! !! RR printout to check id of duplicates !!
+!     print *, ' PRINTOUT FOR DUPLICATES'
+! !    pause
+!     do NPrimAmp=1,NumPrimAmps
+!        print *, '-------------------------'
+!        print *, '   Primitive ', NPrimAmp
+!        print *, '-------------------------'
+!        do NPoint=1,5
+!           print *, 'number of cuts = ', NPoint
+!           do NCut=1,PrimAmps(NPrimAmp)%UCuts(NPoint)%NumCuts
+!              print *, ' cuts: ', NCut, PrimAmps(NPrimAmp)%UCuts(NPoint)%CutProp(NCut,1:NPoint),  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
+! !             print *, 'skip ?',  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
+!           enddo
+!        enddo
+!     enddo
+! !    pause
+! ! RR printout ends here
 
 ENDIF
 
@@ -7285,7 +7314,8 @@ type(TreeProcess),pointer :: TheTree
 
 !          check for massless external leg at vertex 1
            MasslessExtLeg = .false.
-           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+!            if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(TheTree%PartRef(2))   )%Mass .le. 1d-10 ) then
                MasslessExtLeg = .true.
            endif
 
@@ -7313,10 +7343,10 @@ type(TreeProcess),pointer :: TheTree
                endif
            enddo
 
-!          check for massless external leg at vertex 2
-! RR bug fix?           
+!          check for massless external leg at vertex 2         
 !           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
-           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(i5) )%Mass .le. 1d-10 ) then
+!            if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(i5) )%Mass .le. 1d-10 ) then! RR bug fix? 
+           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(TheTree%PartRef(2))   )%Mass .le. 1d-10 ) then  
                MasslessExtLeg = .true.
            endif
 
@@ -7325,6 +7355,16 @@ type(TreeProcess),pointer :: TheTree
            if( ThePrimAmp%IntPart(i4)%Mass .le. 1d-10 .and. ThePrimAmp%IntPart(i5)%Mass .le. 1d-10 ) then
                MasslessIntParticles = .true.
            endif
+
+! if( ThePrimAmp%AmpType.eq.2 ) then
+!            print *, 'prim', ThePrimAmp%ExtLine(:)
+!            print *, 'cuts', i4,i5
+! !            print *, ExtParticle(ThePrimAmp%UCuts(2)%TreeProcess(NCut,1)%PartRef(2) )%Mass,  ExtParticle( ThePrimAmp%UCuts(2)%TreeProcess(NCut,2)%PartRef(2)  )%Mass 
+!            print *, ExtParticle( ThePrimAmp%ExtLine( ThePrimAmp%UCuts(2)%TreeProcess(NCut,1)%PartRef(2)) )%Mass  , ExtParticle( ThePrimAmp%ExtLine( ThePrimAmp%UCuts(2)%TreeProcess(NCut,2)%PartRef(2) )  )%Mass    
+! !            print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
+! !            print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
+! pause
+! endif
 
 
 !          check for massless bubbles
@@ -7340,10 +7380,12 @@ type(TreeProcess),pointer :: TheTree
                ThePrimAmp%UCuts(2)%CutProp(NCut,2) = i5
                NCut = NCut + 1
            endif
-!           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2),  ThePrimAmp%IntPart(i4)%PartType,ThePrimAmp%IntPart(i5)%PartType
-!            print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
+
+!            print *, 'prim', ThePrimAmp%ExtLine(:)
+!            print *, 'cuts', i4,i5
 !            print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
 !            print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
+! pause
 
 
    enddo
@@ -8071,56 +8113,139 @@ END SUBROUTINE
 
 
 
- SUBROUTINE REMOVE_DUPLICATE_CUTS()
+SUBROUTINE REMOVE_DUPLICATE_CUTS()
+use ModMisc
+use ModParameters
+implicit none
     ! Routine to remove duplicate cuts from different parent diagrams
 !      type(PrimitiveAmplitude)          :: P
-      type(PrimitiveAmplitude),pointer  :: NewPrimAmp, OldPrimAmp
+      type(PrimitiveAmplitude),pointer :: NewPrimAmp, OldPrimAmp
       integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp,OldNcut
-      logical                          :: are_equiv
+      integer                          :: NewTree,OldTree,ZinNewTree,ZinOldTree
+      logical                          :: are_equiv,AllTreesEqual
 
 
-      do NPrimAmp=2,NumPrimAmps
+
+      do NPrimAmp=2,NumPrimAmps! the way we compare is (2 vs. 1), (3 vs. 1,2), (4 vs. 1,2,3), ...
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
             do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
             j = 0
-            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) &
-                    & .and. (j+1 .lt. NPrimAmp))
+            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
 
                   j = j+1
                   OldPrimAmp => PrimAmps(j)
                   OldNCut=0
 !                  do OldNcut=1,OldPrimAmp%UCuts(Npoint)%NumCuts
-                  do while ( (OldNCut .lt. OldPrimAmp%UCuts(Npoint)%NumCuts)&
-                       & .and. (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
+                  do while ( (OldNCut .lt. OldPrimAmp%UCuts(Npoint)%NumCuts).and. (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
                      OldNCut=OldNCut+1
 
                      if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
-                     if ( OldPrimAmp%UCuts(Npoint)%NumCuts .ne. NewPrimAmp%UCuts(Npoint)%NumCuts) cycle
                      if ( OldPrimAmp%UCuts(Npoint)%skip(OldNCut) .eq. .true.) cycle
+                     if ( OldPrimAmp%UCuts(Npoint)%NumCuts .ne. NewPrimAmp%UCuts(Npoint)%NumCuts) cycle !  M: why is this condition required ?
 
                      Nequivtrees = 0
                   ! This should always be true, put in as a additional safety net
                      if (all(NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:) .eq. OldPrimAmp%UCuts(Npoint)%CutProp(OldNCut,:))) then
 
                         do NTree = 1,Npoint
-                           call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree), &
-&OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,Ntree),are_equiv)
+                           call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree),OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,Ntree),are_equiv)
                            if (are_equiv) Nequivtrees = Nequivtrees+1
                         enddo
                      endif
-                  if (Nequivtrees == Npoint) then                        ! all trees equivalent = duplicate cut!
-                     NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
-                  else
-                     NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
-                  endif
-               enddo
-
-            enddo    ! j
+                     if (Nequivtrees == Npoint) then                        ! all trees equivalent = duplicate cut!
+                        NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
+                     else
+                        NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
+                     endif
+                   enddo
+            enddo    ! j: OldPrimAmp => PrimAmps(j)
             enddo       ! Ncut
          enddo          ! NParent
       enddo             ! NPoint
+
+
+
+
+! MARKUS: remove additional duplicates for AmpType=2
+
+      do NPrimAmp=2,NumPrimAmps!  idea: select Primamp (called New) and compare it to all others (called Old). The way we compare is (2 vs. 1), (3 vs. 1,2), (4 vs. 1,2,3), ...
+         NewPrimAmp => PrimAmps(NPrimAmp)
+         if( NewPrimAmp%AmpType.ne.2 ) cycle
+         
+         do Npoint = 1,5
+         do Ncut = 1,NewPrimAmp%UCuts(NPoint)%NumCuts
+                ! to this point we have selected a cut for the NewPrimAmp
+                
+                ! now, loop over all OldPrimAmps  ! M: Shouldn't it be enough to loop over sisters only,instead of all other primitives? Would be saver because all existing PrimAmps have 0 sisters.
+                j = 0
+                do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
+                   j = j+1
+                   OldPrimAmp => PrimAmps(j)
+                   OldNCut=0
+
+                   if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
+
+                   do while ( (OldNCut.lt.OldPrimAmp%UCuts(Npoint)%NumCuts) .and. (NewPrimAmp%UCuts(Npoint)%skip(NCut).eq..false.) )
+                     OldNCut=OldNCut+1
+                     ! to this point we have selected a cut for the OldPrimAmp and NewPrimAmp
+
+                     if ( OldPrimAmp%UCuts(Npoint)%skip(OldNCut) .eq. .true.) cycle
+
+! print *, "npoint",Npoint
+! print *, "comparing primamp",NPrimAmp,j
+! print *, "comparing ncut",Ncut,OldNCut
+
+                     ! now, loop over all tree in OldPrimAmp and NewPrimAmp
+                     AllTreesEqual=.false.
+                     Nequivtrees = 0
+                     do NewTree=1,Npoint
+                     do OldTree=1,Npoint
+                              call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree),OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree),are_equiv)
+                              if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
+                                    Nequivtrees = Nequivtrees + 1
+                              endif
+                              if( any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Z0_ )  ) ZinOldTree = OldTree! save the tree's with the Z0 boson
+                              if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
+                      enddo
+                      enddo
+                      ! check if all trees are equal  <-->  equiv_sum(Npoint) = Npoint*(Npoint+1)/2 = 1+2+3+..+NPoint
+                      if (Nequivtrees.eq.Npoint) then
+                         AllTreesEqual=.true.
+                      else
+                         AllTreesEqual=.false.
+                      endif
+                      ! check if the tree with the Z0 boson is the one with external tops
+                      if( AllTreesEqual .and. any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,ZinOldTree)%PartType(:).eq.Top_ ) &
+                                        .and. any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,ZinOldTree)%PartType(:).eq.ATop_) &
+                                        .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
+                                        .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
+                          AllTreesEqual=.true.
+                      else
+                          AllTreesEqual=.false.
+                      endif
+
+                      if( AllTreesEqual ) then
+!                             print *, "checker: ",NPoint,Nequivtrees
+!                             print *, "checker: New amp,cut",NPrimAmp,NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:)
+!                             print *, "checker: Old amp,cut",j,OldPrimAmp%UCuts(Npoint)%CutProp(OldNCut,:)
+                            NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
+                      else
+                            NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
+                      endif
+                  enddo
+                enddo
+
+         enddo! Ncut
+         enddo! Npoint
+         
+
+      enddo! NPrimAmp
+
+
+
     end SUBROUTINE REMOVE_DUPLICATE_CUTS 
+
 
     
     SUBROUTINE ARE_TREES_EQUIV(Tree1, Tree2, isequiv)
