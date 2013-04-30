@@ -747,7 +747,7 @@ END FUNCTION
 
 ! split two sets into INTERsection and COMPLement
 ! e.g.: A=(1,2,3,4,5), B=(2,4,5)
-!       INTER=(2,4,5), COMPL=(1,3), numMatch=3,  FirstInterPos= position of first intersection
+!       INTER=(2,4,5), COMPL=(1,3), MatchSets=3,  FirstInterPos= position of first intersection in A=2
 ! healthy requirements: size(A).ge.size(B), size(INTER)=size(B), size(COMPL)=size(A)
 FUNCTION MatchSets(A,B,INTER,COMPL,FirstInterPos)
 implicit none

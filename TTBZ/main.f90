@@ -10,6 +10,7 @@ include "vegas_common.f"
 real(8) :: VG_Result,VG_Error
 
 
+
    call GetCommandlineArgs()
    call Init_cur_2_2f(4)
    call setDim(4,4)
