@@ -8283,9 +8283,12 @@ implicit none
 !                do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
 !                   j = j+1
                    do j=1,NewPrimAmp%NumSisters
+
                
 !                  j = j+1
                       OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j)) 
+
+
                       if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
 
                       OldNCut=0
@@ -8331,7 +8334,7 @@ implicit none
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
                           AllTreesEquiv=.true.
-                          call inherit_subtr(NPrimAmp,j,NCut,OldNCut,NPoint)
+                          call inherit_subtr(NPrimAmp,NewPrimAmp%Sisters(j),NCut,OldNCut,NPoint)
                       else
                           AllTreesEquiv=.false.
                       endif
