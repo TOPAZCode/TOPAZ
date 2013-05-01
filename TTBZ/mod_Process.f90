@@ -8223,7 +8223,7 @@ implicit none
             do j=1,NewPrimAmp%NumSisters
                
 !                  j = j+1
-                  OldPrimAmp => PrimAmps(NewPrimAmp%Sister(j))
+                  OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j))
                   if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
                   OldNCut=0
 !                  do OldNcut=1,OldPrimAmp%UCuts(Npoint)%NumCuts
