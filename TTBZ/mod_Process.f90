@@ -6619,10 +6619,13 @@ IF( Correction.EQ.1 ) THEN
       enddo! NPrimAmp
 
      print *, 'calling remove dupl cuts'
+! this ONLY finds the usual duplicates, not the unusual ones that we encounter in the fermion loop primitives     
      call remove_duplicate_cuts()
-
+! find subtractions     
      call FindSubtractions()
-
+! this removes the unusual duplicates that we find in fermion loops. 
+! In addition, the subtractions from these duplicate cuts (found above) are inherited by the one cut that survives
+     call remove_cyclic_duplicates()
 
 !   undoing +/- 1000 required for Z0 couplings
     do NPrimAmp=1,NumPrimAmps
@@ -7836,7 +7839,7 @@ do k=0,PrimAmp%NumSisters
 
 
 
-
+  
 
 
 
@@ -7846,71 +7849,71 @@ do k=0,PrimAmp%NumSisters
 
 
 ! M: UNDER CONSTRUCTION
-  if(  k.gt.0 .and. PrimAmp%AmpType.eq.2 .and. HiPrimAmp%AmpType.eq.2 ) then!  MARKUS: additional subtraction for closed fermion loops when sisters are present
+!  if(  k.gt.0 .and. PrimAmp%AmpType.eq.2 .and. HiPrimAmp%AmpType.eq.2 ) then!  MARKUS: additional subtraction for closed fermion loops when sisters are present
+!  
+!print *, "MARKUS: CAREFUL! this code for subtractions of closed fermion loops is unfinished ";pause
+!
+!      do Ncut=1,PrimAmp%UCuts(Cut)%NumCuts
+!      do i=1,HiPrimAmp%UCuts(HiCut)%NumCuts!   code in this do loop is very similar to the second part in SUBROUTINE REMOVE_DUPLICATE_CUTS
+!                                           !   correspondance: PrimAmp~NewPrimAmp,  HiPrimAmp~OldPrimAmp
+!
+!
+!
+!
+!                     ! now, loop over all trees in HiPrimAmp and PrimAmp
+!                     AllTreesEquiv=.false.
+!                     Nequivtrees = 0
+!                     do NewTree=1,Cut
+!                     do OldTree=1,HiCut
+!                              call ARE_TREES_EQUIV(PrimAmp%UCuts(Cut)%TreeProcess(Ncut,NewTree),HiPrimAmp%UCuts(HiCut)%TreeProcess(i,OldTree2),are_equiv)
+!                              if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
+!                                    Nequivtrees = Nequivtrees + 1
+!                                    ! TODO: determine here FirstHiProp
+!                              else
+!                                    ! TODO: determine here MissHiProp(:)
+!                              endif
+!                              if( any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,OldTree)%PartType(:).eq.Z0_ )  ) ZinOldTree = OldTree! save the tree's with the Z0 boson
+!                              if( any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
+!                      enddo
+!                      enddo
+!                      if (Nequivtrees.eq.Cut) then
+!                         AllTreesEquiv=.true.
+!                      else
+!                         AllTreesEquiv=.false.
+!                      endif
+!                      ! check if the tree with the Z0 boson is the one with external tops
+!                      if( AllTreesEquiv .and. any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,ZinOldTree)%PartType(:).eq.Top_ ) &
+!                                        .and. any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,ZinOldTree)%PartType(:).eq.ATop_) &
+!                                        .and. any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
+!                                        .and. any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
+!                          AllTreesEquiv=.true.
+!                      else
+!                          AllTreesEquiv=.false.
+!                      endif
+!
+!                      if( AllTreesEquiv ) then
+!
+!                            ! TODO:  
+!                                  NumMatch = TheMatch%Subt(HiCut)%NumMatch(k) + 1
+!                                  MatchHiCuts(NumMatch) = i
+!                                  FirstHiProp(NumMatch) =  99999999 ! to be determined above
+!                                  MissHiProp(NumMatch,1:HiCut-Cut) = 999999! to be determined above
+!
+!
+!                                  TheMatch%Subt(HiCut)%NumMatch(k) = TheMatch%Subt(HiCut)%NumMatch(k) + 1
+!                                  TheMatch%Subt(HiCut)%MatchHiCuts(k,NumMatch) = MatchHiCuts(NumMatch)
+!                                  TheMatch%Subt(HiCut)%FirstHiProp(k,NumMatch) = FirstHiProp(NumMatch)
+!                                  TheMatch%Subt(HiCut)%MissHiProp(k,NumMatch,1:HiCut-Cut) = MissHiProp(NumMatch,1:HiCut-Cut)
+!                      endif
+!
+!      enddo
+!      enddo
+!
+
+!  endif
+
+
   
-print *, "MARKUS: CAREFUL! this code for subtractions of closed fermion loops is unfinished ";pause
-
-      do Ncut=1,PrimAmp%UCuts(Cut)%NumCuts
-      do i=1,HiPrimAmp%UCuts(HiCut)%NumCuts!   code in this do loop is very similar to the second part in SUBROUTINE REMOVE_DUPLICATE_CUTS
-                                           !   correspondance: PrimAmp~NewPrimAmp,  HiPrimAmp~OldPrimAmp
-
-
-
-
-                     ! now, loop over all trees in HiPrimAmp and PrimAmp
-                     AllTreesEquiv=.false.
-                     Nequivtrees = 0
-                     do NewTree=1,Cut
-                     do OldTree=1,HiCut
-                              call ARE_TREES_EQUIV(PrimAmp%UCuts(Cut)%TreeProcess(Ncut,NewTree),HiPrimAmp%UCuts(HiCut)%TreeProcess(i,OldTree),are_equiv)
-                              if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
-                                    Nequivtrees = Nequivtrees + 1
-                                    ! TODO: determine here FirstHiProp
-                              else
-                                    ! TODO: determine here MissHiProp(:)
-                              endif
-                              if( any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,OldTree)%PartType(:).eq.Z0_ )  ) ZinOldTree = OldTree! save the tree's with the Z0 boson
-                              if( any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
-                      enddo
-                      enddo
-                      if (Nequivtrees.eq.Cut) then
-                         AllTreesEquiv=.true.
-                      else
-                         AllTreesEquiv=.false.
-                      endif
-                      ! check if the tree with the Z0 boson is the one with external tops
-                      if( AllTreesEquiv .and. any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,ZinOldTree)%PartType(:).eq.Top_ ) &
-                                        .and. any( HiPrimAmp%UCuts(HiCut)%TreeProcess(i,ZinOldTree)%PartType(:).eq.ATop_) &
-                                        .and. any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
-                                        .and. any( PrimAmp%UCuts(Cut)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
-                          AllTreesEquiv=.true.
-                      else
-                          AllTreesEquiv=.false.
-                      endif
-
-                      if( AllTreesEquiv ) then
-
-                            ! TODO:  
-                                  NumMatch = TheMatch%Subt(HiCut)%NumMatch(k) + 1
-                                  MatchHiCuts(NumMatch) = i
-                                  FirstHiProp(NumMatch) =  99999999 ! to be determined above
-                                  MissHiProp(NumMatch,1:HiCut-Cut) = 999999! to be determined above
-
-
-                                  TheMatch%Subt(HiCut)%NumMatch(k) = TheMatch%Subt(HiCut)%NumMatch(k) + 1
-                                  TheMatch%Subt(HiCut)%MatchHiCuts(k,NumMatch) = MatchHiCuts(NumMatch)
-                                  TheMatch%Subt(HiCut)%FirstHiProp(k,NumMatch) = FirstHiProp(NumMatch)
-                                  TheMatch%Subt(HiCut)%MissHiProp(k,NumMatch,1:HiCut-Cut) = MissHiProp(NumMatch,1:HiCut-Cut)
-                      endif
-
-      enddo
-      enddo
-
-
-  endif
-
-
-
 
 
 
@@ -7920,7 +7923,7 @@ print *, "MARKUS: CAREFUL! this code for subtractions of closed fermion loops is
 enddo
 
 RETURN
-END SUBROUTINE
+END SUBROUTINE MatchUCuts_new
 
 
 
@@ -8247,8 +8250,20 @@ implicit none
          enddo          ! NParent
       enddo             ! NPoint
 
+    end SUBROUTINE REMOVE_DUPLICATE_CUTS
 
 
+    SUBROUTINE REMOVE_CYCLIC_DUPLICATES()
+     use ModMisc
+     use ModParameters
+     implicit none
+    ! Routine to remove duplicate cuts from different parent diagrams
+!      type(PrimitiveAmplitude)          :: P
+      type(PrimitiveAmplitude),pointer :: NewPrimAmp, OldPrimAmp
+      integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp,OldNcut
+      integer                          :: NewTree,OldTree,ZinNewTree,ZinOldTree
+      logical                          :: are_equiv,AllTreesEquiv
+ 
 
 ! MARKUS: remove additional duplicates for AmpType=2
       do NPrimAmp=2,NumPrimAmps!  idea: select Primamp (called New) and compare it to all others (called Old). The way we compare is (2 vs. 1), (3 vs. 1,2), (4 vs. 1,2,3), ...
@@ -8302,6 +8317,7 @@ implicit none
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
                           AllTreesEquiv=.true.
+                          call inherit_subtr(NPrimAmp,j,NCut,OldNCut,NPoint)
                       else
                           AllTreesEquiv=.false.
                       endif
@@ -8323,8 +8339,42 @@ implicit none
 
 
 
-    end SUBROUTINE REMOVE_DUPLICATE_CUTS 
+    end SUBROUTINE REMOVE_CYCLIC_DUPLICATES
 
+
+    SUBROUTINE inherit_subtr(NewPrim,OldPrim,NewCut,OldCut,NPoint)
+      ! old inherits from new (ok, so this isnt the way inheritance usually works...)
+      implicit none
+      integer        :: NewPrim,OldPrim,NewCut,OldCut,NPoint
+      integer        :: HiCut,NewNumMatch,OldNumMatch,TotNumMatch,j,NSister
+      type(PrimitiveAmplitude),pointer :: NewPrimAmp, OldPrimAmp
+      type(UCutMatch),pointer          :: OldMatch,NewMatch
+
+      NewPrimAmp=>PrimAmps(NewPrim)
+      OldPrimAmp=>PrimAmps(OldPrim)
+      do j=1,OldPrimAmp%NumSisters
+         if (OldPrimAmp%Sisters(j) .eq. NewPrim) NSister=j
+      enddo
+
+      OldMatch=>OldPrimAmp%UCuts(NPoint)%Match(OldCut)
+      NewMatch=>NewPrimAmp%UCuts(NPoint)%Match(NewCut)
+      do HiCut=5,NPoint+1,-1
+         OldNumMatch=OldMatch%Subt(HiCut)%NumMatch(NSister)
+         NewNumMatch=NewMatch%Subt(HiCut)%NumMatch(0)
+         OldMatch%Subt(HiCut)%NumMatch(NSister)=OldNumMatch+NewNumMatch
+         TotNumMatch=OldMatch%Subt(HiCut)%NumMatch(NSister)
+         
+         OldMatch%Subt(HiCut)%MatchHiCuts(NSister,OldNumMatch+1:TotNumMatch) = &
+              & NewMatch%Subt(HiCut)%MatchHiCuts(0,1:NewNumMatch)
+         
+         OldMatch%Subt(HiCut)%FirstHiProp(NSister,OldNumMatch+1:TotNumMatch) = &
+              & NewMatch%Subt(HiCut)%FirstHiProp(0,1:NewNumMatch)
+
+         OldMatch%Subt(HiCut)%MissHiProp(NSister,OldNumMatch+1:TotNumMatch,:) = &
+              & NewMatch%Subt(HiCut)%MissHiProp(0,1:NewNumMatch,:)
+      enddo
+
+    end SUBROUTINE inherit_subtr
 
     
 
