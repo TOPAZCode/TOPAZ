@@ -8279,11 +8279,16 @@ implicit none
                 ! to this point we have selected a cut for the NewPrimAmp
                 
                 ! now, loop over all OldPrimAmps  ! M: Shouldn't it be enough to loop over sisters only,instead of all other primitives? Would be saver because all existing PrimAmps have 0 sisters.
-                j = 0
-                do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
-                   j = j+1
-                   OldPrimAmp => PrimAmps(j)
-                   OldNCut=0
+!                j = 0
+!                do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
+!                   j = j+1
+                   do j=1,NewPrimAmp%NumSisters
+               
+!                  j = j+1
+                      OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j)) 
+                      if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
+
+                      OldNCut=0
 
                    if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
 
@@ -8300,9 +8305,12 @@ implicit none
                      ! now, loop over all trees in OldPrimAmp and NewPrimAmp
                      AllTreesEquiv=.false.
                      Nequivtrees = 0
+                     ZinOldTree=-1
+                     ZinNewTree=-1
                      do NewTree=1,Npoint
-                     do OldTree=1,Npoint
-                              call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree),OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree),are_equiv)
+                        do OldTree=1,Npoint
+                           
+                           call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree),OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree),are_equiv)
                               if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
                                     Nequivtrees = Nequivtrees + 1
                               endif
@@ -8310,6 +8318,8 @@ implicit none
                               if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
                       enddo
                       enddo
+                      if (ZinOldTree .eq. -1 .or. ZinNewTree .eq. -1) call Error("Cyclic duplicates found with no Z!")
+
                       if (Nequivtrees.eq.Npoint) then
                          AllTreesEquiv=.true.
                       else
