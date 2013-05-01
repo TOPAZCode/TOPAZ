@@ -8216,11 +8216,15 @@ implicit none
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
             do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
-            j = 0
-            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
+!            j = 0
+!            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
   ! M: Shouldn't it be enough to loop over sisters only, instead of all other primitives? Would be saver because all existing PrimAmps have 0 sisters.
-                  j = j+1
-                  OldPrimAmp => PrimAmps(j)
+            
+            do j=1,NewPrimAmp%NumSisters
+               
+!                  j = j+1
+                  OldPrimAmp => PrimAmps(NewPrimAmp%Sister(j))
+                  if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
                   OldNCut=0
 !                  do OldNcut=1,OldPrimAmp%UCuts(Npoint)%NumCuts
                   do while ( (OldNCut .lt. OldPrimAmp%UCuts(Npoint)%NumCuts).and. (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
