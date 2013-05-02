@@ -142,13 +142,13 @@ ELSEIF( Correction.EQ.1 ) THEN
           AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
 
 
-!print *, "This is for the check of ttb+Z(=>photon)"
-!print *, "P LO",iHel,cdabs( BornAmps(1)%Result     )
-!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-2) )
-!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-1) )
-!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+0) )
-!print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+1) )
-!pause
+! print *, "This is for the check of ttb+Z(=>photon)"
+! print *, "P LO",iHel,cdabs( BornAmps(1)%Result     )
+! print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-2) )
+! print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(-1) )
+! print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+0) )
+! print *, "P VI",iHel,cdabs( PrimAmps(1)%Result(+1) )
+! pause
 
 
           if( AccPoles.gt.1d-4 ) then

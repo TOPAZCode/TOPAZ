@@ -6622,9 +6622,13 @@ IF( Correction.EQ.1 ) THEN
 ! this ONLY finds the usual duplicates, not the unusual ones that we encounter in the fermion loop primitives     
      call remove_duplicate_cuts()
 ! find subtractions     
+
+     print *, 'FindSubtractions'
      call FindSubtractions()
 ! this removes the unusual duplicates that we find in fermion loops. 
 ! In addition, the subtractions from these duplicate cuts (found above) are inherited by the one cut that survives
+
+     print *, 'remove_cyclic_duplicates'
      call remove_cyclic_duplicates()
 
 !   undoing +/- 1000 required for Z0 couplings
@@ -8317,8 +8321,9 @@ implicit none
                               if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
                                     Nequivtrees = Nequivtrees + 1
                               endif
-                              if( any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Z0_ )  ) ZinOldTree = OldTree! save the tree's with the Z0 boson
-                              if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
+                              
+                              if( any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Z0_) .or. any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Pho_) ) ZinOldTree = OldTree! save the tree's with the Z0 boson
+                              if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_) .or. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Pho_) ) ZinNewTree = NewTree! save the tree's with the Z0 boson
                       enddo
                       enddo
                       if (ZinOldTree .eq. -1 .or. ZinNewTree .eq. -1) call Error("Cyclic duplicates found with no Z!")
@@ -8354,9 +8359,10 @@ implicit none
          enddo! Npoint
       enddo! NPrimAmp
 
-
-
     end SUBROUTINE REMOVE_CYCLIC_DUPLICATES
+
+
+
 
 
     SUBROUTINE inherit_subtr(NewPrim,OldPrim,NewCut,OldCut,NPoint)
