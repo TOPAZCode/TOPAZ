@@ -3800,6 +3800,7 @@ integer :: rIn,rOut,i,counter
 !   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
 if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.4) ) then
 !     (I)
+!   print *, 'in i'
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
          n2b = NumGlu(2)-n2a
@@ -3938,6 +3939,7 @@ if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4
 
 !   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quarks(3)%PartType)) then
 elseif( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. (BosonVertex.eq.2 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4) ) then
+!   print *, 'in ii'
 !     (II)
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
@@ -4022,7 +4024,7 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
     (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
     (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  ) then
 
-
+!   print *, 'in iii'
 !     (III)
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
@@ -4154,15 +4156,13 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
          enddo
       enddo
    enddo
+endif
 
-
-
-
-elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) .AND.  &
+if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) .AND.  &
        (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
        (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.3)  ) then
 
-
+!   print *, 'in iv'
 !     (IV)
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
@@ -4172,7 +4172,7 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+n3a
          Eps2 = cur_g_2fV(Gluons(rIn:rOut),Quarks(2:3),Boson,(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
-         PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom+Boson%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
          if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
          Eps2 = Eps2*PropFac1
@@ -4181,25 +4181,27 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
             rIn =NumGlu(1)+NumGlu(2)+n3a+1
             rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
             ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/n3b+n4a,n3b,n4a/) )
-            PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut)
-            PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
-
-            if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
-               PropFac2=(0d0,0d0)
-            endif
-
-            if( Quarks(4)%PartType.lt.0 ) then
-               ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
-            else
-               ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(4)%Mass*ubar1(:))*PropFac2
+            ! RR debug: unsure about this condition, but sure S0METHING like this should be here
+            if ( n4b .ge. 1 .or. n3a .ge. 1) then
+               PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut)
+               PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
+               
+               if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
+                  PropFac2=(0d0,0d0)
+               endif
+               
+               if( Quarks(4)%PartType.lt.0 ) then
+                  ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
+               else
+                  ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(4)%Mass*ubar1(:))*PropFac2
+               endif
             endif
             if( Quarks(4)%PartType.lt.0 ) then
                ubar0(:) = vbqg(ubar1,eps2)
             else
                ubar0(:) = vqg(ubar1,eps2)
             endif
-
-            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)+Boson%Mom
             if(n1a.ge.1 .or. n4b.ge.1) then
                PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
                if( abs(sc_(PMom1,PMom1)-Quarks(4)%Mass2).lt.PropCut ) then
@@ -4238,7 +4240,6 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
          enddo
       enddo
    enddo
-
 
 
 
