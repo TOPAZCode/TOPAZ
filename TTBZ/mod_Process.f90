@@ -5727,6 +5727,10 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       BornAmps(14)%ExtLine = (/1,3,5,4,2/)
       BornAmps(15)%ExtLine = (/1,3,4,5,2/)
 
+      BornAmps(16)%ExtLine = (/1,5,4,3,2/)
+      BornAmps(17)%ExtLine = (/1,4,5,3,2/)
+      BornAmps(18)%ExtLine = (/1,4,3,5,2/)
+
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
       PrimAmps(1)%NumSisters = 0
@@ -5843,28 +5847,28 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(15)%Sisters(1) = 13
       PrimAmps(15)%Sisters(2) = 14
 
-      PrimAmps(16)%ExtLine=(/1,2,5,3,4/)
+      PrimAmps(16)%ExtLine=(/1,2,5,4,3/)
       PrimAmps(16)%AmpType=2
       PrimAmps(16)%NumSisters=2
-      PrimAmps(16)%FermLoopPart=Bot_
+      PrimAmps(16)%FermLoopPart=Chm_
       allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(16)%Sisters(1) = 17
       PrimAmps(16)%Sisters(2) = 18
 
-      PrimAmps(17)%ExtLine=(/1,2,3,5,4/)
+      PrimAmps(17)%ExtLine=(/1,2,4,5,3/)
       PrimAmps(17)%AmpType=2
       PrimAmps(17)%NumSisters=2
-      PrimAmps(17)%FermLoopPart=Bot_
+      PrimAmps(17)%FermLoopPart=Chm_
       allocate( PrimAmps(17)%Sisters(1:PrimAmps(17)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(17)%Sisters(1) = 16
       PrimAmps(17)%Sisters(2) = 18
 
-      PrimAmps(18)%ExtLine=(/1,2,3,4,5/)
+      PrimAmps(18)%ExtLine=(/1,2,4,3,5/)
       PrimAmps(18)%AmpType=2
       PrimAmps(18)%NumSisters=2
-      PrimAmps(18)%FermLoopPart=Bot_
+      PrimAmps(18)%FermLoopPart=Chm_
       allocate( PrimAmps(18)%Sisters(1:PrimAmps(18)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(18)%Sisters(1) = 16
@@ -6627,9 +6631,8 @@ IF( Correction.EQ.1 ) THEN
      call FindSubtractions()
 ! this removes the unusual duplicates that we find in fermion loops. 
 ! In addition, the subtractions from these duplicate cuts (found above) are inherited by the one cut that survives
-
-     print *, 'remove_cyclic_duplicates'
-     call remove_cyclic_duplicates()
+!     print *, 'remove_cyclic_duplicates'
+!     call remove_cyclic_duplicates()
 
 !   undoing +/- 1000 required for Z0 couplings
     do NPrimAmp=1,NumPrimAmps
@@ -8286,16 +8289,11 @@ implicit none
 !                j = 0
 !                do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
 !                   j = j+1
-                   do j=1,NewPrimAmp%NumSisters
-
-               
-!                  j = j+1
-                      OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j)) 
-
-
-                      if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
-
-                      OldNCut=0
+            do j=1,NewPrimAmp%NumSisters
+!                   OldPrimAmp => PrimAmps(j)
+               OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j))
+               if (NewPrimAmp%Sisters(j) .ge. NPrimAmp) cycle
+                   OldNCut=0
 
                    if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
 
@@ -8321,9 +8319,8 @@ implicit none
                               if( are_equiv ) then! after this was true once, no other trees should be equal in this OldTree loop
                                     Nequivtrees = Nequivtrees + 1
                               endif
-                              
-                              if( any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Z0_) .or. any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Pho_) ) ZinOldTree = OldTree! save the tree's with the Z0 boson
-                              if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_) .or. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Pho_) ) ZinNewTree = NewTree! save the tree's with the Z0 boson
+                              if( any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Z0_ ) .or.  any( OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,OldTree)%PartType(:).eq.Pho_ )  ) ZinOldTree = OldTree! save the tree's with the Z0 boson
+                              if( any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Z0_ .or. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,NewTree)%PartType(:)   .eq.Pho_ ) )  ) ZinNewTree = NewTree! save the tree's with the Z0 boson
                       enddo
                       enddo
                       if (ZinOldTree .eq. -1 .or. ZinNewTree .eq. -1) call Error("Cyclic duplicates found with no Z!")
@@ -8339,6 +8336,7 @@ implicit none
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.Top_ ) &
                                         .and. any( NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,ZinNewTree)%PartType(:).eq.ATop_) ) then
                           AllTreesEquiv=.true.
+!                          call inherit_subtr(NPrimAmp,j,NCut,OldNCut,NPoint)
                           call inherit_subtr(NPrimAmp,NewPrimAmp%Sisters(j),NCut,OldNCut,NPoint)
                       else
                           AllTreesEquiv=.false.
