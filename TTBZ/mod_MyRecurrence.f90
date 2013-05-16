@@ -3146,8 +3146,10 @@ complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
    rIn =1
    rOut=NumGlu(0)
    if( Quark(2)%PartType .gt.0 ) then      !    X----->----
+!      print *, 'fV', Quark1PartType
       Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
-   else                                     !    X-----<----
+   else            
+!      print *, 'bfV'                         !    X-----<----
       Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
    endif
 
@@ -3188,8 +3190,6 @@ END FUNCTION
       ng1 = ms   !#gluons to the left of a f-line
       ng2 = ngluon - ms  !#gluons to the right of the f-line
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
-
-
 
       if( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_ ) then!   note that Bot_ is treated as top quark in TOPAZ!
             couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
@@ -3800,7 +3800,8 @@ integer :: rIn,rOut,i,counter
 !   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
 if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.4) ) then
 !     (I)
-!   print *, 'in i'
+   print *, 'in i'
+   pause
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
          n2b = NumGlu(2)-n2a
@@ -4024,7 +4025,8 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
     (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
     (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  ) then
 
-!   print *, 'in iii'
+!   print *, 'in iii', BosonVertex
+   
 !     (III)
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
@@ -4057,9 +4059,11 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
                ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(4)%Mass*ubar1(:))*PropFac2
             endif
             if( Quarks(4)%PartType.lt.0 ) then
-               ubar0(:) = vbqg(ubar1,eps2)
+!               ubar0(:) = vbqg(ubar1,eps2)
+               ubar0(:) = vgbq(eps2,ubar1)
             else
-               ubar0(:) = vqg(ubar1,eps2)
+!               ubar0(:) = vqg(ubar1,eps2)
+               ubar0(:) = vgq(eps2,ubar1)
             endif
 
             PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
@@ -4096,8 +4100,10 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
               counter=counter+1
             enddo
             tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+! RR debug:  
+            if (BosonVertex .ne. 3) tmp=(0d0,0d0) 
             Res(:) = Res(:) + tmp(:)
-
+            
 
 
             ! radiate V off Fer1
@@ -4115,9 +4121,11 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
                endif
             endif
             if( Quarks(4)%PartType.lt.0 ) then
-               ubar0(:) = vbqg(ubar1,eps2)
+!               ubar0(:) = vbqg(ubar1,eps2)
+               ubar0(:) = vgbq(eps2,ubar1)
             else
-               ubar0(:) = vqg(ubar1,eps2)
+!               ubar0(:) = vqg(ubar1,eps2)
+               ubar0(:) = vgq(eps2,ubar1) 
             endif
 
             PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
@@ -4130,7 +4138,7 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
             else
                ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(4)%Mass*ubar0(:))*PropFac1
             endif
-
+            
             TmpQuark(1)%Mom  => PMom1(:)
             TmpQuark(1)%Pol  => ubar0(:)
             TmpQuark(1)%Mass => Quarks(4)%Mass
@@ -4152,18 +4160,20 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
               counter=counter+1
             enddo
             tmp(:) = cur_f_2fV(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
+! RR debug:  
+            if (BosonVertex .ne. 1) tmp=(0d0,0d0) 
             Res(:) = Res(:) + tmp(:)
          enddo
       enddo
    enddo
-endif
-
-if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) .AND.  &
+!endif
+elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) .AND.  &
        (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
        (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.3)  ) then
 
-!   print *, 'in iv'
 !     (IV)
+!   print *, 'in iv'
+!   pause
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
          n1b = NumGlu(1)-n1a
