@@ -3195,8 +3195,12 @@ END FUNCTION
             couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
             couplVQQ_right = couplZTT_right_dyn
       else
-            couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
-            couplVQQ_right = one ! 
+!            couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
+!            couplVQQ_right = one ! 
+
+            couplVQQ_left  = couplZDD_left  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
+            couplVQQ_right = couplZDD_right
+
       endif
 
 
@@ -3800,8 +3804,7 @@ integer :: rIn,rOut,i,counter
 !   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
 if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.4) ) then
 !     (I)
-   print *, 'in i'
-   pause
+!   print *, 'in i'
       do n2a=0,NumGlu(2)
       do n4a=0,NumGlu(4)
          n2b = NumGlu(2)-n2a
@@ -4027,12 +4030,13 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
 
 !   print *, 'in iii', BosonVertex
    
+   
 !     (III)
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
          n1b = NumGlu(1)-n1a
          n3b = NumGlu(3)-n3a
-
+ 
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+n3a
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
@@ -4192,7 +4196,7 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
             rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
             ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/n3b+n4a,n3b,n4a/) )
             ! RR debug: unsure about this condition, but sure S0METHING like this should be here
-            if ( n4b .ge. 1 .or. n3a .ge. 1) then
+            if ( n3b .ge. 1 .or. n4a .ge. 1) then
                PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut)
                PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
                

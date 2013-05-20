@@ -96,10 +96,10 @@ real(8), public, parameter :: couplZUU_right = -sw/cw*Q_up
 real(8), public, parameter :: couplZDD_left  = -sw/cw*Q_dn + 1d0/sw/cw * T3_dn
 real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
-real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
-real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
-! real(8), public, parameter :: couplZTT_left  = Q_up!  This is for the check against ttb+photon.
-! real(8), public, parameter :: couplZTT_right = Q_up
+!real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
+!real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
+ real(8), public, parameter :: couplZTT_left  = Q_up!  This is for the check against ttb+photon.
+ real(8), public, parameter :: couplZTT_right = Q_up
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el

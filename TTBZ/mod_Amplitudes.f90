@@ -436,6 +436,16 @@ type(TreeProcess) :: TreeProc
             do j2=1,Nj2
                    TreeProc%Quarks(TreeProc%NumQua)%Pol => BPOLF(j2,1:Ds)
                    call new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res(1:Ds))
+!                   if (Ds .eq. 4 .and. TreeProc%NumGlu(0) .eq. 1 .and. TreeProc%NumV .eq. 0 .and. TreeProc%NumQua .eq. 2) then
+!                      print *, 'res',Res(1:4)
+!                      print *, 'p',TreeProc%Quarks(2)%Mom(1:4)
+!                      print *, 'sp',TreeProc%Quarks(2)%Pol(1:4)
+!                      print *, 'k1', TreeProc%Gluons(1)%Mom(1:4)
+!                      print *, 'e1', TreeProc%Gluons(1)%Pol(1:4)
+!                      pause
+!                   endif
+!
+
                    if( TreeProc%PartType(1).eq.Glu_) then
                       do j1=1,Nj1
                          mur(j1,j2) = sc_(POLI(j1,1:Dv),Res(1:Dv))
@@ -451,6 +461,17 @@ type(TreeProcess) :: TreeProc
                         call Error("new_ampl")
                    endif
             enddo
+            
+!            if (Ds .eq. 4 .and. TreeProc%NumGlu(0) .eq. 1 .and. TreeProc%NumV .eq. 0 .and. TreeProc%NumQua .eq. 2) then
+!
+!            do j1=1,Nj1
+!               do j2=1,Nj2
+!                  print *, 'in amp', j1,j2,mur(j1,j2)                  
+!               enddo
+!            enddo
+!         endif
+!         pause
+!         
     elseif( IsAScalar(TreeProc%PartType(TreeProc%NumPart)) ) then
             do j2=1,Nj2
                    TreeProc%Scalars(TreeProc%NumSca)%Pol => BPOLF(j2,1:Ds)
@@ -472,6 +493,7 @@ type(TreeProcess) :: TreeProc
             enddo
     endif
 
+    
 
 
 return

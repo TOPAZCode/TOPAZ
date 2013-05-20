@@ -150,19 +150,30 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       KMom(2,1:4) = IntPart(QuadCuts%CutProp(CutNum,3))%Mom(1:4) - IntPart(QuadCuts%CutProp(CutNum,1))%Mom(1:4)
       KMom(3,1:4) = IntPart(QuadCuts%CutProp(CutNum,4))%Mom(1:4) - IntPart(QuadCuts%CutProp(CutNum,1))%Mom(1:4)
 
+!      print *, 'k1=', KMom(1,1:4)
+!      print *, 'k2=', KMom(2,1:4)
+!      print *, 'k3=', KMom(3,1:4)
+!      pause
 ! construct NV-basis
       call NVBasis3(KMom(1:3,1:4),VMom(1:3,1:4),NMom(1,1:4))
       QuadCuts%KMom(CutNum,1,1:4) = KMom(1,1:4)
       QuadCuts%KMom(CutNum,2,1:4) = KMom(2,1:4)
       QuadCuts%KMom(CutNum,3,1:4) = KMom(3,1:4)
       QuadCuts%NMom(CutNum,1,1:4) = NMom(1,1:4)
+!      print *, 'v1=',VMom(1,1:4)
+!      print *, 'v2=',VMom(2,1:4)
+!      print *, 'v3=',VMom(3,1:4)
+!      print *, 'n4=', NMom(1,1:4)
 
       x1 = (KMom(1,1:4).dot.KMom(1,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,2))%Mass2
       x2 = (KMom(2,1:4).dot.KMom(2,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,3))%Mass2
       x3 = (KMom(3,1:4).dot.KMom(3,1:4)) + IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - IntPart(QuadCuts%CutProp(CutNum,4))%Mass2
       V4(1:4) = -0.5d0*( x1*VMom(1,1:4) + x2*VMom(2,1:4) + x3*VMom(3,1:4) )
       SqrtPreF = cdsqrt(dcmplx( IntPart(QuadCuts%CutProp(CutNum,1))%Mass2 - (V4.dot.V4) ))
-
+!      print *, 'x1,2,3', x1,x2,x3
+!      print *, 'sqrtPreF=', SqrtPreF
+!      print *, 'V4=', V4
+!      pause
 
 !---------------- 1 ----------------------
       alpha_1 = +1d0
@@ -170,6 +181,7 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       s1(1) = alpha_1*SqrtPreF
       LoopMom(1:4) = V4(1:4) + s1(1)*NMom(1,1:4)
       LoopMom(5)   = 0d0
+!      print *, 'l+ = ', LoopMom(1:4)
       call resid4_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(1))
       call resid4Subtr(LoopMom(1:5),ThePrimAmps,iPrimAmp,CutNum,Res(1))
 !----------------- 2 ---------------------
@@ -177,6 +189,7 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
 !     alpha_5 = 0d0
       s1(2) = alpha_1*SqrtPreF
       LoopMom(1:4) = V4(1:4) + s1(2)*NMom(1,1:4)
+!      print *, 'l- = ', LoopMom(1:4)
       LoopMom(5)   = 0d0
 
       call resid4_new(LoopMom(1:5),dcmplx(KMom(1,1:4)),dcmplx(KMom(2,1:4)),dcmplx(KMom(3,1:4)),QuadCuts%CutProp(CutNum,1:4),TreeProcs,Res(2))
@@ -242,9 +255,8 @@ double complex :: LinSysEq(1:3,1:4),s1(1:5),se2(3:5)
       enddo
       enddo
 !DEC$ ELSE
-      enddo
+   enddo
 !DEC$ ENDIF
-
 
 END SUBROUTINE
 

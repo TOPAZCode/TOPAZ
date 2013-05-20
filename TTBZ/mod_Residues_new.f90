@@ -396,6 +396,7 @@ END SUBROUTINE
           endif
 
 
+
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
                 TreeProcs(1)%Gluons(TreeProcs(1)%NumGlu(0))%Mom => q2neg(:)
@@ -480,6 +481,9 @@ END SUBROUTINE
                do j2=1,Nj2
                do j3=1,Nj3
                   do j4=1,Nj4
+!                     print *, j1,j2,j3,j4
+!                     print *,mur1(j1,j2),mur2(j2,j3),mur3(j3,j4),mur4(j4,j1)
+!                     print *, 'add',mur1(j1,j2)*mur2(j2,j3)*mur3(j3,j4)*mur4(j4,j1)
                         res=res+ mur1(j1,j2)*mur2(j2,j3)*mur3(j3,j4)*mur4(j4,j1)
                   enddo
                enddo
@@ -733,7 +737,6 @@ END SUBROUTINE
           else
             tag_f = 99
           endif
-
 
 !     amplitudes for different space dimensions
 !         set momentum vector for last particle

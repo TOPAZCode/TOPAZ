@@ -3780,6 +3780,10 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
        NumBornAmps = 12
        NumPrimAmps = NumPrimAmps+6   ! this includes the ferm loops with the Z attached to the loop -- RR
        NumBornAmps = NumBornAmps+6
+       NumPrimAmps = NumPrimAmps+2   ! this includes the ferm loops with the Z attached to the top 
+       NumBornAmps = NumBornAmps+2
+       NumPrimAmps = NumPrimAmps+8   ! this includes the massive ferm loops
+       NumBornAmps = NumBornAmps+8
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -5731,6 +5735,9 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       BornAmps(17)%ExtLine = (/1,4,5,3,2/)
       BornAmps(18)%ExtLine = (/1,4,3,5,2/)
 
+      BornAmps(19)%ExtLine = (/1,3,4,5,2/)
+      BornAmps(20)%ExtLine = (/1,4,3,5,2/)
+
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
       PrimAmps(1)%NumSisters = 0
@@ -5816,10 +5823,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(12)%Sisters(2) = 11
 
 ! ferm loops begin here
-! and for the time being, I'm only doing light quarks (=u,d,c,s) in loop
-! (the actual flavor doesnt matter, since we multiply by the couplings after the
-! prim has been calculated. I guess we'll have to have separate prims for top in the loop...)
-!      PrimAmps(13)%ExtLine=(/1,5,3,4,2/)
+
       PrimAmps(13)%ExtLine=(/1,2,5,3,4/)
       PrimAmps(13)%AmpType=2
       PrimAmps(13)%NumSisters=2
@@ -5873,6 +5877,96 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(18)%Sisters(1) = 16
       PrimAmps(18)%Sisters(2) = 17
+
+
+      PrimAmps(19)%ExtLine=(/1,5,2,3,4/)
+      PrimAmps(19)%AmpType=2
+      PrimAmps(19)%NumSisters=0
+      PrimAmps(19)%FermLoopPart=Chm_
+      allocate( PrimAmps(19)%Sisters(1:PrimAmps(19)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+
+      PrimAmps(20)%ExtLine=(/1,5,2,4,3/)
+      PrimAmps(20)%AmpType=2
+      PrimAmps(20)%NumSisters=0
+      PrimAmps(20)%FermLoopPart=Chm_
+      allocate( PrimAmps(20)%Sisters(1:PrimAmps(20)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+
+! massive ferm loops
+      PrimAmps(21)%ExtLine=(/1,2,5,3,4/)
+      PrimAmps(21)%AmpType=2
+      PrimAmps(21)%NumSisters=2
+      PrimAmps(21)%FermLoopPart=Bot_
+      allocate( PrimAmps(21)%Sisters(1:PrimAmps(21)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(21)%Sisters(1) = 22
+      PrimAmps(21)%Sisters(2) = 23
+
+      PrimAmps(22)%ExtLine=(/1,2,3,5,4/)
+      PrimAmps(22)%AmpType=2
+      PrimAmps(22)%NumSisters=2
+      PrimAmps(22)%FermLoopPart=Bot_
+      allocate( PrimAmps(22)%Sisters(1:PrimAmps(22)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(22)%Sisters(1) = 21
+      PrimAmps(22)%Sisters(2) = 23
+
+      PrimAmps(23)%ExtLine=(/1,2,3,4,5/)
+      PrimAmps(23)%AmpType=2
+      PrimAmps(23)%NumSisters=2
+      PrimAmps(23)%FermLoopPart=Bot_
+      allocate( PrimAmps(23)%Sisters(1:PrimAmps(23)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(23)%Sisters(1) = 21
+      PrimAmps(23)%Sisters(2) = 22
+
+      PrimAmps(24)%ExtLine=(/1,2,5,4,3/)
+      PrimAmps(24)%AmpType=2
+      PrimAmps(24)%NumSisters=2
+      PrimAmps(24)%FermLoopPart=Bot_
+      allocate( PrimAmps(24)%Sisters(1:PrimAmps(24)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(24)%Sisters(1) = 25
+      PrimAmps(24)%Sisters(2) = 26
+
+      PrimAmps(25)%ExtLine=(/1,2,4,5,3/)
+      PrimAmps(25)%AmpType=2
+      PrimAmps(25)%NumSisters=2
+      PrimAmps(25)%FermLoopPart=Bot_
+      allocate( PrimAmps(25)%Sisters(1:PrimAmps(25)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(25)%Sisters(1) = 24
+      PrimAmps(25)%Sisters(2) = 26
+
+      PrimAmps(26)%ExtLine=(/1,2,4,3,5/)
+      PrimAmps(26)%AmpType=2
+      PrimAmps(26)%NumSisters=2
+      PrimAmps(26)%FermLoopPart=Bot_
+      allocate( PrimAmps(26)%Sisters(1:PrimAmps(26)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+      PrimAmps(26)%Sisters(1) = 24
+      PrimAmps(26)%Sisters(2) = 25
+
+
+      PrimAmps(27)%ExtLine=(/1,5,2,3,4/)
+      PrimAmps(27)%AmpType=2
+      PrimAmps(27)%NumSisters=0
+      PrimAmps(27)%FermLoopPart=Bot_
+      allocate( PrimAmps(27)%Sisters(1:PrimAmps(27)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+
+      PrimAmps(28)%ExtLine=(/1,5,2,4,3/)
+      PrimAmps(28)%AmpType=2
+      PrimAmps(28)%NumSisters=0
+      PrimAmps(28)%FermLoopPart=Bot_
+      allocate( PrimAmps(28)%Sisters(1:PrimAmps(28)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+
 
 
 

@@ -75,7 +75,7 @@ contains
 
 !     4 cut
       do i=1,N4
-
+         if (ThePrimAmp%UCuts(4)%skip(i)) cycle
       d1=ThePrimAmp%UCuts(4)%Coeff(i,0)
       d5=ThePrimAmp%UCuts(4)%Coeff(i,4)
 
@@ -182,10 +182,11 @@ contains
          res(1) = res(1)+d5*dcmplx(-1d0/6d0,0d0)
 !  	  print *, qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,0)
          enddo
-
+!         print *, 'res4', res(-1)
 
 !     3 cut
       do i=1,N3
+         if (ThePrimAmp%UCuts(3)%skip(i)) cycle
       c1=ThePrimAmp%UCuts(3)%Coeff(i,0)
       c8=ThePrimAmp%UCuts(3)%Coeff(i,7)
 
@@ -273,9 +274,11 @@ contains
 
          enddo
 
-
+!      print *, 'res3', res(-1)
 !     2 cut
       do i=1,N2
+         if (ThePrimAmp%UCuts(2)%skip(i)) cycle
+
 !      if (tagdcut(i,1).eq.666) then
          if (ThePrimAmp%UCuts(2)%tagcuts(i) .eq. 666) then
       !-----buble off the light cone
@@ -376,9 +379,8 @@ contains
 !--------contribution to the rational part
 
          res(1) = res(1) +b10*dcmplx(-0.5d0*(m12+m22-s11/3d0),0d0)
-
-         enddo
-
+      enddo
+!      print *, 'res2',res(-1)
 
 ! print *, "checker",qlI2(m_stop**2,0d0,m_stop**2,m_stop**2,-1)
 ! print *, "checker",qlI2(m_stop**2,0d0,m_stop**2,m_stop**2,0)
@@ -402,6 +404,7 @@ contains
 
 !     1 cut
       do i=1,N1
+         if (ThePrimAmp%UCuts(1)%skip(i)) cycle
          a1=ThePrimAmp%UCuts(1)%Coeff(i,0)
          m12=ThePrimAmp%IntPart(ThePrimAmp%UCuts(1)%CutProp(i,1))%Mass2
 ! print *, "A0: ",i,a1,dcmplx(m12,0d0)
