@@ -1039,8 +1039,15 @@ END SUBROUTINE
             tag_f = 99
           endif
 
-          if ( (tag_f .eq. 1 .or. tag_f .eq. 2) .and. (Lab_ex(l2c(1)) .eq. 'zee') .and. (Lab_ex(l2c(2)-1) .eq. 'zee') ) then
+!          if ( (tag_f .eq. 1 .or. tag_f .eq. 2) .and. (Lab_ex(l2c(1)) .eq. 'zee') .and. (Lab_ex(l2c(2)-1) .eq. 'zee') ) then
+          if ( (TreeProcs(1)%NumPart .eq. 3) .and. ( abs(TreeProcs(1)%PartType(1)) .eq. Bot_ .or. abs(TreeProcs(1)%PartType(1)) .eq. Chm_ )&
+               & .and. ( abs(TreeProcs(1)%PartType(3)) .eq. Bot_ .or. abs(TreeProcs(1)%PartType(3)) .eq. Chm_) &
+               & .and. ( TreeProcs(1)%PartType(2) .eq. Z0_) ) then
              tag_Z=1
+          elseif ( (TreeProcs(2)%NumPart .eq. 3) .and. ( abs(TreeProcs(2)%PartType(1)) .eq. Bot_ .or. abs(TreeProcs(2)%PartType(1)) .eq. Chm_ )&
+               & .and. ( abs(TreeProcs(2)%PartType(3)) .eq. Bot_ .or. abs(TreeProcs(2)%PartType(3)) .eq. Chm_) &
+               & .and. ( TreeProcs(2)%PartType(2) .eq. Z0_) ) then
+             tag_Z = 1
           else
              tag_Z=0
           endif

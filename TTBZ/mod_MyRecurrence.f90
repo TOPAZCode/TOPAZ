@@ -1114,13 +1114,8 @@ integer :: rIn,rOut,i,counter
          rOut=NumGlu(1)+NumGlu(2)+n3a
 
 ! This prevents color issues with a Z on the quark loop, see RR notes
-         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) ) then
-            print *, rOut-rIn
-            print *, n1b+NumGlu(2)+n3a, NumGlu(0)
-            pause
-!         if (rOut-rIn .eq. 1) then
-            cycle
-         endif
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) ) cycle
+
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
@@ -4039,6 +4034,8 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
     (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  ) then
 
 !   print *, 'in iii', BosonVertex
+!   pause
+   
    
    
 !     (III)
@@ -4193,7 +4190,7 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
        (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.3)  ) then
 
 !     (IV)
-!   print *, 'in iv'
+!   print *, 'in iv', BosonVertex
 !   pause
       do n1a=0,NumGlu(1)
       do n3a=0,NumGlu(3)
