@@ -1112,6 +1112,15 @@ integer :: rIn,rOut,i,counter
          n3a = NumGlu(3)-n3b
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+n3a
+
+! This prevents color issues with a Z on the quark loop, see RR notes
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) ) then
+            print *, rOut-rIn
+            print *, n1b+NumGlu(2)+n3a, NumGlu(0)
+            pause
+!         if (rOut-rIn .eq. 1) then
+            cycle
+         endif
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
@@ -3196,7 +3205,11 @@ END FUNCTION
             couplVQQ_right = couplZTT_right_dyn
       else
             couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
+!            couplVQQ_left  = 0d0 ! massless quark-Z couplings are set in mod_CrossSection
             couplVQQ_right = one ! 
+!            couplVQQ_right = 0d0
+!         couplVQQ_left=couplZDD_left!+couplZDD_right
+!         couplVQQ_right=couplZDD_left!+couplZDD_right
 
       endif
 
@@ -4036,7 +4049,13 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
  
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+n3a
+
+! This means that all the ext gluons are on this lines, 
+! and we must remove this to prevent color issues with a Z on the quark loop, see RR notes
+         if ( tag_Z .eq. 1 .and. n1b+NumGlu(2)+n3a .eq. NumGlu(0) ) cycle
+
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
+
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
          if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
@@ -4046,6 +4065,7 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
             ! radiate V off Fer4
             rIn =NumGlu(1)+NumGlu(2)+n3a+1
             rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+
             ubar1(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n3b+n4a,n3b,n4a/) )
             PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)

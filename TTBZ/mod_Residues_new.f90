@@ -132,6 +132,7 @@
           else
             tag_f = 99
           endif
+          tag_Z=0
 
 !------------ next loop
 !!          corr. to arguments of amps in eq.(18) for ext. momenta
@@ -394,7 +395,7 @@ END SUBROUTINE
           else
             tag_f = 99
           endif
-
+          tag_Z=0
 
 
 !         set momentum vector for last particle
@@ -737,6 +738,7 @@ END SUBROUTINE
           else
             tag_f = 99
           endif
+          tag_Z=0
 
 !     amplitudes for different space dimensions
 !         set momentum vector for last particle
@@ -1037,6 +1039,12 @@ END SUBROUTINE
             tag_f = 99
           endif
 
+          if ( (tag_f .eq. 1 .or. tag_f .eq. 2) .and. (Lab_ex(l2c(1)) .eq. 'zee') .and. (Lab_ex(l2c(2)-1) .eq. 'zee') ) then
+             tag_Z=1
+          else
+             tag_Z=0
+          endif
+
 
 !         set momentum vector for last particle
           if( TreeProcs(1)%PartType(TreeProcs(1)%NumPart).eq.Glu_ ) then
@@ -1273,6 +1281,13 @@ END SUBROUTINE
             tag_f = 3
           else
             tag_f = 99
+          endif
+
+
+          if ( (tag_f .eq. 1 .or. tag_f .eq. 2) .and.  ( any(Lab_ex(1:NumExtParticles) .eq. 'zee')) ) then
+             tag_Z=1
+          else
+             tag_Z=0
           endif
 
           if( lv(5).eq.0d0 ) then
