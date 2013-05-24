@@ -38,7 +38,9 @@ makeDep = $(ConfigFile) \
 
 
 # fastjet stuff
-FASTJET_CONFIG=/home/schulze/usr/local/bin/fastjet-config
+#FASTJET_CONFIG=/home/schulze/usr/local/bin/fastjet-config
+
+FASTJET_CONFIG=/home/raoul/Work/fastjet-install/bin/fastjet-config
 CXXFLAGS += $(shell $(FASTJET_CONFIG) --cxxflags)
 FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
 
@@ -74,10 +76,9 @@ OPPObj = $(ObjectDir)/mod_NVBasis.o \
          $(ObjectDir)/mod_UCuts_new.o \
          $(ObjectDir)/mod_NVBasis128.o \
          $(ObjectDir)/mod_Residues128.o \
-         $(ObjectDir)/mod_UCuts128.o
-
-
-
+         $(ObjectDir)/mod_UCuts128.o \
+         $(ObjectDir)/mod_Residues128_new.o \
+         $(ObjectDir)/mod_UCuts128_new.o 
 
 DipoleDepTTB = $(Here)/dipoles/mod_Dipoles_GGTTBG.f90 \
             $(Here)/dipoles/mod_Dipoles_GGTTBG_noDK.f90 \
@@ -256,20 +257,21 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(Here)/MadGraph/ddb_Zprime_ttb.o \
 				  $(Here)/MadGraph/uub_Zprime_ttb.o \
 				  $(Here)/MadGraph/switchmom.o \
-				  $(HOME)/lib/HELAS-3.0/coupsm.o \
-				  $(HOME)/lib/HELAS-3.0/oxxxxx.o \
-				  $(HOME)/lib/HELAS-3.0/vxxxxx.o \
-				  $(HOME)/lib/HELAS-3.0/ixxxxx.o \
-				  $(HOME)/lib/HELAS-3.0/fvixxx.o \
-				  $(HOME)/lib/HELAS-3.0/jvvxxx.o \
-				  $(HOME)/lib/HELAS-3.0/jgggxx.o \
-				  $(HOME)/lib/HELAS-3.0/jioxxx.o \
-				  $(HOME)/lib/HELAS-3.0/iovxxx.o \
-				  $(HOME)/lib/HELAS-3.0/fvoxxx.o \
-				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
-				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a \
+				  $(HOME)/Lib/HELAS-3.0/coupsm.o \
+				  $(HOME)/Lib/HELAS-3.0/oxxxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/vxxxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/ixxxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/fvixxx.o \
+				  $(HOME)/Lib/HELAS-3.0/jvvxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/jgggxx.o \
+				  $(HOME)/Lib/HELAS-3.0/jioxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/iovxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/fvoxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/vvvxxx.o \
+				  $(HOME)/Lib/HELAS-3.0/libdhelas3.ifc90.a \
 				  $(Here)/MadGraph/gg_ttbz.o \
- 				  $(Here)/MadGraph/gg_ttbzg.o
+				  $(Here)/MadGraph/uub_ttbz.o \
+				  $(Here)/MadGraph/ddb_ttbz.o
 #				  $(Here)/MadGraph/gg_ttb.o \
 #				  $(Here)/MadGraph/gg_ttba.o \
 #				  $(Here)/MadGraph/gg_tbtga.o \
@@ -400,8 +402,6 @@ all: $(allObjects)
 clean:
 	rm -f ./modules/*.mod
 	rm -f ./objects/*.o
-
-	
 
 
 # ------------------------------------------------------------
@@ -595,17 +595,21 @@ $(OPPObj): $(OPPDep) $(makeDep)
 	fpp @quadprec.cfg mod_NVBasis.f90  mod_NVBasis128.f90
 	fpp @quadprec.cfg mod_Residues.f90 mod_Residues128.f90
 	fpp @quadprec.cfg mod_UCuts.f90    mod_UCuts128.f90
+	fpp @quadprec.cfg mod_Residues_new.f90  mod_Residues128_new.f90
+	fpp @quadprec.cfg mod_UCuts_new.f90     mod_UCuts128_new.f90
 	@echo " compiling OPP (64bit) "
 	$(fcomp) -c mod_NVBasis.f90 -o $(ObjectDir)/mod_NVBasis.o
 	$(fcomp) -c mod_Residues.f90 -o $(ObjectDir)/mod_Residues.o
-	$(fcomp) -c mod_UCuts.f90 -o $(ObjectDir)/mod_UCuts.o
 	$(fcomp) -c mod_Residues_new.f90 -o $(ObjectDir)/mod_Residues_new.o
+	$(fcomp) -c mod_UCuts.f90 -o $(ObjectDir)/mod_UCuts.o
 	$(fcomp) -c mod_UCuts_new.f90 -o $(ObjectDir)/mod_UCuts_new.o
 	@echo " compiling OPP (128bit) "
 	$(fcomp) -r16 -c mod_NVBasis128.f90 -o $(ObjectDir)/mod_NVBasis128.o
 	$(fcomp) -r16 -c mod_Residues128.f90 -o $(ObjectDir)/mod_Residues128.o
+	$(fcomp) -r16 -c mod_Residues128_new.f90 -o $(ObjectDir)/mod_Residues128_new.o
 	$(fcomp) -r16 -c mod_UCuts128.f90 -o $(ObjectDir)/mod_UCuts128.o
-	rm mod_NVBasis128.f90 mod_Residues128.f90 mod_UCuts128.f90
+	$(fcomp) -r16 -c mod_UCuts128_new.f90 -o $(ObjectDir)/mod_UCuts128_new.o
+	rm mod_NVBasis128.f90 mod_Residues128.f90 mod_UCuts128.f90 mod_UCuts128_new.f90 mod_Residues128_new.f90
 
 
 
