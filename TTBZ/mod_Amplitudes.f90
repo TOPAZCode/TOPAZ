@@ -1028,11 +1028,17 @@ type(BornAmplitude) :: TheBornAmp
 complex(8) :: rdiv(1:2)
 real(8) :: CheckPoles
 
-      if(cdabs(rdiv(1)).eq.0d0 .or.cdabs(TheBornAmp%Result).lt.1d-13 ) then
-        CheckPoles = 0d0
-        return
-      endif
-      CheckPoles = cdabs( ThePrimAmp%Result(-1)/TheBornAmp%Result/rdiv(1)-1d0 )
+if (cdabs(rdiv(1)).eq.0d0 .or.cdabs(TheBornAmp%Result).lt.1d-13 ) then
+   CheckPoles=0d0
+   return
+endif
+
+if ( cdabs(rdiv(1)) .lt. 1d-13) then
+   CheckPoles = cdabs( ThePrimAmp%Result(-1)/TheBornAmp%Result)
+   return
+endif
+
+CheckPoles = cdabs( ThePrimAmp%Result(-1)/TheBornAmp%Result/rdiv(1)-1d0 )
 
 END FUNCTION
 
