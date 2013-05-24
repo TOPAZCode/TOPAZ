@@ -3199,13 +3199,8 @@ END FUNCTION
             couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
             couplVQQ_right = couplZTT_right_dyn
       else
-            couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
-!            couplVQQ_left  = 0d0 ! massless quark-Z couplings are set in mod_CrossSection
-            couplVQQ_right = one ! 
-!            couplVQQ_right = 0d0
-!         couplVQQ_left=couplZDD_left!+couplZDD_right
-!         couplVQQ_right=couplZDD_left!+couplZDD_right
-
+         couplVQQ_left=couplZQQ_left_dyn
+         couplVQQ_right=couplZQQ_right_dyn
       endif
 
 
