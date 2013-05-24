@@ -120,7 +120,7 @@ type(PrimitiveAmplitude),allocatable, target :: PrimAmps(:)
 type(BornAmplitude),allocatable, target :: BornAmps(:)
 
 integer, public :: NumExtParticles,NumHelicities,NumPrimAmps,NumBornAmps
-
+integer, public :: tag_Z
 integer h1,h2,h3,h4,h5,h6,ih
 
 
@@ -5741,14 +5741,17 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
       PrimAmps(1)%NumSisters = 0
+      PrimAmp1_15234=1
 
       PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
       PrimAmps(2)%AmpType = 1
       PrimAmps(2)%NumSisters = 0
+      PrimAmp1_15243=2
 
       PrimAmps(3)%ExtLine = (/1,3,5,2,4/)
       PrimAmps(3)%AmpType = 1
       PrimAmps(3)%NumSisters = 1
+      PrimAmp1_13524=3
       allocate( PrimAmps(3)%Sisters(1:PrimAmps(3)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(3)%Sisters(1) = 4
@@ -5763,6 +5766,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(5)%ExtLine = (/1,4,5,2,3/)
       PrimAmps(5)%AmpType = 1
       PrimAmps(5)%NumSisters = 1
+      PrimAmp1_14523=5
       allocate( PrimAmps(5)%Sisters(1:PrimAmps(5)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(5)%Sisters(1) = 6
@@ -5777,6 +5781,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(7)%ExtLine = (/1,5,3,4,2/)
       PrimAmps(7)%AmpType = 1
       PrimAmps(7)%NumSisters = 2
+      PrimAmp1_15342=7
       allocate( PrimAmps(7)%Sisters(1:PrimAmps(7)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(7)%Sisters(1) = 8
@@ -5801,6 +5806,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(10)%ExtLine = (/1,5,4,3,2/)
       PrimAmps(10)%AmpType = 1
       PrimAmps(10)%NumSisters = 2
+      PrimAmp1_15432=10
       allocate( PrimAmps(10)%Sisters(1:PrimAmps(10)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(10)%Sisters(1) = 11
@@ -5828,6 +5834,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(13)%AmpType=2
       PrimAmps(13)%NumSisters=2
       PrimAmps(13)%FermLoopPart=Chm_
+      PrimAmp2_12534=13
       allocate( PrimAmps(13)%Sisters(1:PrimAmps(13)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(13)%Sisters(1) = 14
@@ -5855,6 +5862,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(16)%AmpType=2
       PrimAmps(16)%NumSisters=2
       PrimAmps(16)%FermLoopPart=Chm_
+      PrimAmp2_12543=16
       allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(16)%Sisters(1) = 17
@@ -5883,6 +5891,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(19)%AmpType=2
       PrimAmps(19)%NumSisters=0
       PrimAmps(19)%FermLoopPart=Chm_
+      PrimAmp2_15234=19
       allocate( PrimAmps(19)%Sisters(1:PrimAmps(19)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
@@ -5891,6 +5900,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(20)%AmpType=2
       PrimAmps(20)%NumSisters=0
       PrimAmps(20)%FermLoopPart=Chm_
+      PrimAmp2_15243=20
       allocate( PrimAmps(20)%Sisters(1:PrimAmps(20)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
@@ -5900,6 +5910,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(21)%AmpType=2
       PrimAmps(21)%NumSisters=2
       PrimAmps(21)%FermLoopPart=Bot_
+      PrimAmp2m_12534=21
       allocate( PrimAmps(21)%Sisters(1:PrimAmps(21)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(21)%Sisters(1) = 22
@@ -5927,6 +5938,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(24)%AmpType=2
       PrimAmps(24)%NumSisters=2
       PrimAmps(24)%FermLoopPart=Bot_
+      PrimAmp2m_12543=24
       allocate( PrimAmps(24)%Sisters(1:PrimAmps(24)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
       PrimAmps(24)%Sisters(1) = 25
@@ -5955,6 +5967,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(27)%AmpType=2
       PrimAmps(27)%NumSisters=0
       PrimAmps(27)%FermLoopPart=Bot_
+      PrimAmp2m_15234=27
       allocate( PrimAmps(27)%Sisters(1:PrimAmps(27)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
@@ -5963,6 +5976,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
       PrimAmps(28)%AmpType=2
       PrimAmps(28)%NumSisters=0
       PrimAmps(28)%FermLoopPart=Bot_
+      PrimAmp2m_15243=28
       allocate( PrimAmps(28)%Sisters(1:PrimAmps(28)%NumSisters), stat=AllocStatus )
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
@@ -8317,14 +8331,15 @@ implicit none
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
             do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
-!            j = 0
-!            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
+            j = 0
+            do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) .and. (j+1 .lt. NPrimAmp))
   ! M: Shouldn't it be enough to loop over sisters only, instead of all other primitives? Would be saver because all existing PrimAmps have 0 sisters.
             
-            do j=1,NewPrimAmp%NumSisters
+!            do j=1,NewPrimAmp%NumSisters
                
-!                  j = j+1
-                  OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j))
+                  j = j+1
+!                  OldPrimAmp => PrimAmps(NewPrimAmp%Sisters(j))
+                  OldPrimAmp => PrimAmps(j)
                   if (NewPrimAmp%UCuts(NPoint)%skip(NCut)) cycle
                   OldNCut=0
 !                  do OldNcut=1,OldPrimAmp%UCuts(Npoint)%NumCuts
