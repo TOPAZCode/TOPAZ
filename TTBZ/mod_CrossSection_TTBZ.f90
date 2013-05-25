@@ -47,9 +47,9 @@ include 'vegas_common.f'
 
 
 ! RR : here you can set the coupling of the Z to the light quarks in the currents
- ZQcoupl=1           ! left- and right-handed (default)
+! ZQcoupl=1           ! left- and right-handed (default)
 ! ZQcoupl=2           ! up and down
-! ZQcoupl=3           !vector and axial-vector
+ ZQcoupl=3           !vector and axial-vector
 DPtol=1d-4
 QPtol=1d-4
 
@@ -547,10 +547,10 @@ ELSEIF( Correction.EQ.1 ) THEN
                & PrimAmps(PrimAmp2m_12534)%Result + &
                & PrimAmps(PrimAmp2m_15234)%Result
 
-          FermionLoopPartAmp(2,-2:1)=2d0*(couplZUU_left+couplZDD_left+couplZUU_right+couplZDD_right)*PrimAmps(PrimAmp2_12534)%Result + &
-               & nf_light * PrimAmps(PrimAmp2_15234)%Result + &
-               & PrimAmps(PrimAmp2m_12534)%Result + &
-               PrimAmps(PrimAmp2m_15234)%Result
+          FermionLoopPartAmp(2,-2:1)=2d0*(couplZUU_left+couplZDD_left+couplZUU_right+couplZDD_right)*PrimAmps(PrimAmp2_12543)%Result + &
+               & nf_light * PrimAmps(PrimAmp2_15243)%Result + &
+               & PrimAmps(PrimAmp2m_12543)%Result + &
+               PrimAmps(PrimAmp2m_15243)%Result
 
        endif
        
@@ -764,7 +764,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
 !      print *, 'bosonic loops:'
-!      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
 !      print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
 !      pause
 
@@ -791,6 +791,14 @@ ELSEIF( Correction.EQ.1 ) THEN
 !    stop
     
 ENDIF
+print *, 'bos DP', NLO_Res_UnPol(-2)
+print *, 'bos SP', NLO_Res_UnPol(-1)
+print *, 'bos CC', NLO_Res_UnPol(0)
+print *, 'bos rat', NLO_Res_UnPol(1)
+print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)
+print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)
+print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)
+print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)
 print *, 'No. times QP used : ', useQP
 print *, 'No. times QP fails: ', pole_skipped
 stop
