@@ -123,6 +123,8 @@ integer, public :: NumExtParticles,NumHelicities,NumPrimAmps,NumBornAmps
 integer, public :: tag_Z
 integer h1,h2,h3,h4,h5,h6,ih
 
+integer, public :: tag_Z
+
 
 contains
 
@@ -5713,6 +5715,7 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
+
    ELSEIF( Correction.EQ.1 ) THEN
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
       BornAmps(2)%ExtLine = (/1,5,2,4,3/)
@@ -7661,7 +7664,6 @@ type(TreeProcess),pointer :: TheTree
                   TheTree%NumV = TheTree%NumV + 1
                   LastQuark=0
                   do j=1, NPart-1   
-                     
                      if (IsAQuark(TheTree%PartType(j))) then
                         LastQuark=LastQuark+1
                      endif

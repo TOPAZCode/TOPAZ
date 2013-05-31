@@ -113,7 +113,6 @@
           res=dcmplx(0d0,0d0)
 
 !DEC$ IF (_DebugUseMyAmps==0)
-
           if( any(Lab_in(l5c(1:5)).eq.'glu') ) then
             tag_f = 0
           elseif( all(Lab_in(l5c(1:5)).eq.'top') .or. all(Lab_in(l5c(1:5)).eq.'str') ) then

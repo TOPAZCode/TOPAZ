@@ -269,7 +269,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,2,rdiv(2),rdiv(1))
-          call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
+!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp-6),rdiv,(/EHat/))
       enddo
       FermionLoopPartAmp(7,-2:1) = Nf_light*PrimAmps(7)%Result(-2:1) + PrimAmps(9)%Result(-2:1)
       FermionLoopPartAmp(8,-2:1) = Nf_light*PrimAmps(8)%Result(-2:1) + PrimAmps(10)%Result(-2:1)
@@ -294,6 +294,7 @@ IF( Correction.EQ.0 ) THEN
 
 ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
+
 !  CT contributions                           ! beta        !top WFRC
    NLO_Res_UnPol(-1) = NLO_Res_UnPol(-1) + (-11d0/3d0*3d0 - 3d0*4d0/3d0 )*LO_Res_Unpol
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-3d0*4d0/3d0)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu) contrib. from  top WFRC

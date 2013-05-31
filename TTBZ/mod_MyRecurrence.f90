@@ -4021,9 +4021,6 @@ endif
 
 
 
-
-
-
 if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType)      .AND.  &
     (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
     (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  ) then
@@ -4180,6 +4177,9 @@ if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3
       enddo
    enddo
 !endif
+
+
+
 elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) .AND.  &
        (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) .AND. &
        (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.3)  ) then

@@ -236,7 +236,6 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       FermionLoopPartAmp(1,-2:1) = nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1)  &
                                  +            PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
-
                                  + sumQlight/Q_top *( PrimAmps(PrimAmp2_12534)%Result(-2:1) &
                                                    + PrimAmps(PrimAmp2_12354)%Result(-2:1) &
                                                    + PrimAmps(PrimAmp2_12345)%Result(-2:1) &

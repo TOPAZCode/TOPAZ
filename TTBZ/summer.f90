@@ -22,15 +22,17 @@ real(8):: factor =1d10
       op=5
   elseif( trim(operation).eq.'rebin' ) then
       op=6
+  elseif( trim(operation).eq.'readlhe' ) then
+      op=7
   else
-      print *, "operation not available (add,avg,sumbins,mul,quo,rebin)",trim(operation)
+      write(*,*) "operation not available (add,avg,sumbins,mul,quo,rebin,readlhe)",trim(operation)
       stop
   endif
 
 ! check for invalid arguments
-  if( (op.lt.3 .and. NumArgs.le.3) .or. (op.eq.3 .and. NumArgs.ne.3) .or. (op.eq.4 .and. NumArgs.ne.4) .or. (op.eq.5 .and. NumArgs.le.3) .or. NumArgs.gt.49) then
+  if( (op.lt.3 .and. NumArgs.le.3) .or. (op.eq.3 .and. NumArgs.ne.3) .or. (op.eq.4 .and. NumArgs.ne.4) .or. (op.eq.5 .and. NumArgs.le.3)  & 
+                                   .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3)  .or. NumArgs.gt.49) then
     print *, "invalid number of arguments",op,NumArgs
-    print *, "the first argument specifies the operation, the last argument is the output file"
     stop
   endif
 
@@ -45,6 +47,7 @@ real(8):: factor =1d10
       enddo
       call add_avg(NumArgs,op)
       print *, "output written to "//trim(filename_out)
+
   elseif( op.eq.2 ) then
       call GetArg(NumArgs,filename_out)
       open(unit=10,file=trim(filename_out),form='formatted',access='sequential',status='replace') ! open output file (last one in arguments list)
@@ -55,6 +58,7 @@ real(8):: factor =1d10
       enddo
       call add_avg(NumArgs,op)
       print *, "output written to "//trim(filename_out)
+
   elseif( op.eq.3 ) then
       print *, "summing up histogram bins"
       call GetArg(2,filename_in)
@@ -62,6 +66,7 @@ real(8):: factor =1d10
       call GetArg(3,iHisto_str)
       read(iHisto_str,"(I2)") iHisto
       call sum_histobins(NumArgs,iHisto)
+
   elseif( op.eq.4 ) then
       call GetArg(NumArgs,filename_out)
       open(unit=10,file=trim(filename_out),form='formatted',access='sequential',status='replace') ! open output file (last one in arguments list)
@@ -72,6 +77,7 @@ real(8):: factor =1d10
       print *, "multiply histogram with ",factor
       call multiply_histo(NumArgs,factor)
       print *, "output written to "//trim(filename_out)
+
   elseif( op.eq.5 ) then
       call GetArg(NumArgs,filename_out)
       open(unit=10,file=trim(filename_out),form='formatted',access='sequential',status='replace') ! open output file (last one in arguments list)
@@ -94,6 +100,14 @@ real(8):: factor =1d10
       call GetArg(5,nrebin_str)
       read(nrebin_str,"(I2)") nrebin
       call rebinning(iHisto,nrebin)
+
+  elseif( op.eq.7 ) then
+      print *, "reading lhe event file"
+      call GetArg(2,filename_in)
+      open(unit=12,file=trim(filename_in),form='formatted',access='sequential')  ! open input file
+      call GetArg(3,filename_out)
+      open(unit=13,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
+      call readlhe()
   endif
 
 
@@ -342,5 +356,30 @@ character :: dummy*(1)
 
 END SUBROUTINE
 
+
+
+
+SUBROUTINE readlhe()
+implicit none
+character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
+integer :: NumArgs,NArg
+integer,parameter :: MaxFiles=50
+integer :: NHisto(1:MaxFiles)=-999999,Hits(1:MaxFiles)=-999999
+real(8) :: BinVal(1:MaxFiles)=-1d-99,Value(1:MaxFiles)=-1d-99,Error(1:MaxFiles)=-1d-99
+real(8) :: SumValue,factor
+character :: dummy*(1)
+
+
+  do while(.not.eof(12))  ! loop over all events
+
+      read(unit=12,fmt="(A)") dummy
+      if(dummy(1:1).eq."#") cycle
+      backspace(unit=12) ! go to the beginning of the line
+      read(unit=12,fmt=fmt1) NHisto(NArg),dummy,BinVal(NArg),dummy,Value(NArg),dummy,Error(NArg),dummy,Hits(NArg),dummy
+
+  enddo
+
+
+END SUBROUTINE
 
 

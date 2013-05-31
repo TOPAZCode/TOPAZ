@@ -20,7 +20,7 @@ contains
 !-------------------------------------------------------------
 !    ordering of the momenta in the p-array:
 !     outgoing convention:
-!     bar t = 1, photon =2, t=3 ,  incoming glue=4,
+!     bar t = 1, Z =2, t=3 ,  incoming glue=4,
 !     5=incoming glue
 !-----------------------------------------------------------
 
@@ -28,75 +28,75 @@ contains
       use ModIntDipoles
       use ModAmplitudes
       implicit none
-      real(dp), intent(in) :: p(4,5),MomDK(1:4,1:6),z
+      real(dp), intent(in) :: p(4,5),MomDK(1:4,1:8),z
       real(dp), intent(out) :: res(1:3)
       real(dp) :: dipsoft,dipfini,dipplus,AP(1:3),CA
       type(Particle),save :: ExtParticles(1:5)
       type(TreeProcess),save :: TreeAmpsDip(1:2)
-      complex(dp) :: Bm(1:2),mtrsq
-      complex(dp) :: AM(1:2,1:2)
+      complex(dp) :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1),mtrsq
       integer :: iTree,i1,i2,i3,i4,i5,i,j,i6,n
-      integer :: hel(1:5),emi , Nmax(5)
+      integer :: hel(1:5),emi , Nmax(5),N2Jump
       character(2) :: diptype
       real(dp) :: C(1:2,1:2),epcorr
       logical, save :: first_time = .true.
-      real,parameter :: PhotonCouplCorr=2d0
 
       res(1:3) = zero
       CA=3d0
 
        if( first_time ) then
-             call InitTrees(2,3,2,TreeAmpsDip)
-             call InitProcess_TbTGGG(ExtParticles(1:5))
+             call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
+             call InitProcess_TbTGGZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
              do iTree=1,2
-             call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
+                call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
              first_time=.false.
       endif
 
-      AM = (zero,zero) ! first, the ``amplitude matrix'' is set to zero
+      BM = (zero,zero) ! first, the ``amplitude matrix'' is set to zero
 
 !--- after momentum mapping -- sum over colors and polarizations
 
-         Nmax = 1
-
-        if (TopDecays.ge.1) then
-            Nmax(1) = -1
-            Nmax(3) = -1
+        Nmax = 1
+        if (TopDecays.ge.1) then ! Top decays
+              Nmax(3) = -1
+              Nmax(1) = -1
+        endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
         endif
 
        do i1=-1,Nmax(1),2
-         do i2 = -1,Nmax(2),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
            do i3 = -1,Nmax(3),2
              do i4 = -1,Nmax(4),2
                do i5 = -1,Nmax(5),2
 
-          hel(1) = i1
-          hel(2) = i2
-          hel(3) = i3
-          hel(4) = i4
-          hel(5) = i5
 
-  call GenerateEvent52((/p(1:4,1),p(1:4,3),p(1:4,4),p(1:4,5),p(1:4,2)/), &
-  momDK(1:4,1:6),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+           hel(1) = i1
+           hel(2) = i2
+           hel(3) = i3
+           hel(4) = i4
+           hel(5) = i5
 
-          do i6 = 1,2
-              call EvalTree2(TreeAmpsDip(i6),Bm(i6))
-          enddo
 
-          do i=1,2
-          do j=1,2
-              AM(i,j) = AM(i,j) + Bm(i)*dconjg(Bm(j))
-          enddo
-          enddo
+    call SetPolarization((/p(1:4,1),p(1:4,3),p(1:4,4),p(1:4,5),p(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+
+
+      do i6 = 1,2
+         call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      enddo
+
 
       enddo
       enddo
       enddo
       enddo
       enddo
+
+
 
 
    do n=1,12
@@ -104,14 +104,27 @@ contains
      mtrsq = (zero,zero)
      call cc_gg_ttgamg_soft(n,C)
 
+       do i1=-1,Nmax(1),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
+           do i3 = -1,Nmax(3),2
+             do i4 = -1,Nmax(4),2
+               do i5 = -1,Nmax(5),2
+
      do i=1,2
      do j=1,2
-          mtrsq = mtrsq + C(i,j)*real(AM(i,j),dp)
+          mtrsq = mtrsq + C(i,j)*Bm(i1,i,i2,i3,i4,i5)*dconjg(Bm(i1,j,i2,i3,i4,i5))
      enddo
      enddo
 
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+
+
 ! spin & color avg., color convention adjustment
-      mtrsq = mtrsq * alpha_s4Pi**2 * alpha4Pi * Q_top**2 /4d0/64d0 * PhotonCouplCorr
+      mtrsq = mtrsq * alpha_s4Pi**2 * alpha4Pi /4d0/64d0
 
 
       if(n.eq.1) then
@@ -217,12 +230,24 @@ contains
 !    eval tree
      mtrsq = (zero,zero)
      call  cc_gg_ttgam(C)
+       do i1=-1,Nmax(1),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
+           do i3 = -1,Nmax(3),2
+             do i4 = -1,Nmax(4),2
+               do i5 = -1,Nmax(5),2
+
      do i=1,2
      do j=1,2
-          mtrsq = mtrsq + C(i,j)*AM(i,j)
+          mtrsq = mtrsq + C(i,j)*Bm(i1,i,i2,i3,i4,i5)*dconjg(Bm(i1,j,i2,i3,i4,i5))
      enddo
      enddo
-     mtrsq = mtrsq * alpha_s4Pi**2 * alpha4Pi * Q_top**2 /4d0/64d0 * PhotonCouplCorr
+
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+     mtrsq = mtrsq * alpha_s4Pi**2 * alpha4Pi /4d0/64d0
 
 
 ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
@@ -340,6 +365,85 @@ contains
        C(2,2) = 64.0_dp/3.0_dp
 
       end subroutine cc_gg_ttgam
+
+
+
+SUBROUTINE InitProcess_TbTGGZ(ExtParticles)
+use ModProcess
+implicit none
+type(Particle) :: ExtParticles(:)
+
+  ExtParticles(1)%PartType = ATop_
+  ExtParticles(1)%ExtRef   = 1
+  ExtParticles(1)%Mass = m_Top
+  ExtParticles(1)%Mass2= ExtParticles(1)%Mass**2
+
+  ExtParticles(2)%PartType = Top_
+  ExtParticles(2)%ExtRef   = 2
+  ExtParticles(2)%Mass = m_Top
+  ExtParticles(2)%Mass2= ExtParticles(2)%Mass**2
+
+  ExtParticles(3)%PartType = Glu_
+  ExtParticles(3)%ExtRef   = 3
+  ExtParticles(3)%Mass = 0d0
+  ExtParticles(3)%Mass2= 0d0
+
+  ExtParticles(4)%PartType = Glu_
+  ExtParticles(4)%ExtRef   = 4
+  ExtParticles(4)%Mass = 0d0
+  ExtParticles(4)%Mass2= 0d0
+
+  ExtParticles(5)%PartType = Z0_
+  ExtParticles(5)%ExtRef   = 5
+  ExtParticles(5)%Mass = m_Z
+  ExtParticles(5)%Mass2= ExtParticles(5)%Mass**2
+
+
+RETURN
+END SUBROUTINE InitProcess_TbTGGZ
+
+
+
+SUBROUTINE SetPolarization(Mom,MomDK,Hel,ExtParticles)
+use ModMisc
+use ModProcess
+use ModTopDecay
+use ModZDecay
+implicit none
+type(Particle) :: ExtParticles(1:5)
+real(8) :: Mom(1:4,1:5),MomDK(1:4,1:8)
+integer :: Hel(1:5)
+
+     ExtParticles(1)%Mom(1:4) = dcmplx(Mom(1:4,1))   ! HERE WAS A BUG: this was inside the (TopDecays.ge.1) condition
+     ExtParticles(2)%Mom(1:4) = dcmplx(Mom(1:4,2))
+     if (TopDecays.ge.1) then
+        call TopDecay(ExtParticles(1),DK_LO,MomDK(1:4,1:3))
+        call TopDecay(ExtParticles(2),DK_LO,MomDK(1:4,4:6))
+     else
+        call vSpi(ExtParticles(1)%Mom(1:4),ExtParticles(1)%Mass,Hel(1),ExtParticles(1)%Pol(1:4))
+        call ubarSpi(ExtParticles(2)%Mom(1:4),ExtParticles(2)%Mass,Hel(2),ExtParticles(2)%Pol(1:4))
+    endif
+
+
+     ExtParticles(5)%Mom(1:4) = dcmplx(Mom(1:4,5))
+     ExtParticles(5)%Helicity = Hel(5)
+     if (ZDecays.ge.1) then
+          call ZDecay(ExtParticles(5),DK_LO,MomDK(1:4,7:8))
+     else
+          call pol_massSR(ExtParticles(5)%Mom(1:4),ExtParticles(5)%Mass,ExtParticles(5)%Helicity,ExtParticles(5)%Pol(1:4))
+    endif
+
+    ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
+    call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
+
+    ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
+    call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))
+
+
+! ExtParticles(3)%Pol(1:4)=ExtParticles(3)%Mom(1:4); print *, "check gauge inv. in dipoles"
+
+RETURN
+END SUBROUTINE
 
 
 
