@@ -123,7 +123,6 @@ integer, public :: NumExtParticles,NumHelicities,NumPrimAmps,NumBornAmps
 integer, public :: tag_Z
 integer h1,h2,h3,h4,h5,h6,ih
 
-integer, public :: tag_Z
 
 
 contains

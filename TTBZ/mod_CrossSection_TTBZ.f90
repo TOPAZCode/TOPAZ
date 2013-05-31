@@ -802,10 +802,10 @@ ELSEIF( Correction.EQ.1 ) THEN
    enddo
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
-!      print *, 'bosonic loops:'
-!      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-!      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-!      print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+      print *, 'bosonic loops:'
+      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+      print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
 !      PAUSE
 !      print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
 !      pause
@@ -823,11 +823,11 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
       enddo
       enddo
-!      print *, 'fermionic loops:'
-!      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-!      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-!      print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-!      pause
+      print *, 'fermionic loops:'
+      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+      print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+      pause
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
 
 !      print *, useQP, pole_skipped

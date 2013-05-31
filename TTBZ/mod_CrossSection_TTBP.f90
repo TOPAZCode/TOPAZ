@@ -42,6 +42,7 @@ include 'vegas_common.f'
 
 
 EvalCS_1L_ttbggp = 0d0
+!print *, 'COMPARISON OF gg -> ttb+photon through (massive) fermions loops, in mod_CrosssSection_TTBP'
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.(2d0*m_Top+pT_pho_cut)  ) then
@@ -105,7 +106,9 @@ IF( Correction.EQ.0 ) THEN
 ELSEIF( Correction.EQ.1 ) THEN
 
    do iHel=nHel(1),nHel(2)
+!   do iHel=1,NumHelicities
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
+!      print *, 'hel', iHel, Helicities(iHel,1:5)
       call SetPolarizations()
       do iPrimAmp=1,12
           call EvalTree(BornAmps(iPrimAmp))
@@ -213,6 +216,11 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
       enddo
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
+!      print *,'Bosonic loops'
+!      print *, 'color-summed DP', NLO_Res_Pol(-2)/LO_Res_Pol
+!      print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
+!      print *, 'color-summed FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))
+!      pause
 
 
 
@@ -229,6 +237,20 @@ ELSEIF( Correction.EQ.1 ) THEN
           call SingCut(PrimAmps(iPrimAmp))
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+
+! print *, "This is for the check of ttb+Z(=>photon)"
+ !print *, "P LO",iHel,cdabs( BornAmps(1)%Result     )
+!print *, "P LO",iHel,BornAmps(1)%Result     
+! print *, "P VI",iHel,cdabs( PrimAmps(iPrimAmp)%Result(-2) )
+! print *, "P VI",iHel,cdabs( PrimAmps(iPrimAmp)%Result(-1) )
+! print *, "P VI",iHel,cdabs( PrimAmps(iPrimAmp)%Result(+0) )
+! print *, "P VI",iHel,cdabs( PrimAmps(iPrimAmp)%Result(+1) )
+!
+! print *, "P VI",iHel, PrimAmps(iPrimAmp)%Result(-2)/BornAmps(1)%Result 
+! print *, "P VI",iHel, PrimAmps(iPrimAmp)%Result(-1) /BornAmps(1)%Result 
+! print *, "P VI",iHel, PrimAmps(iPrimAmp)%Result(+0) /BornAmps(1)%Result 
+! print *, "P VI",iHel, PrimAmps(iPrimAmp)%Result(+1) /BornAmps(1)%Result 
+! pause
 
           PrimAmps(iPrimAmp)%Result(-2:1) = -(0d0,1d0)*PrimAmps(iPrimAmp)%Result(-2:1) !minus is from closed fermion loop
 !           call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,rdiv(2),rdiv(1))
@@ -396,6 +418,11 @@ ELSEIF( Correction.EQ.1 ) THEN
           NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + Col1L_ttbggp(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
       enddo
       enddo
+!      print *, 'fermionic loops:'
+!      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+!      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+!      print *, 'color-summed FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))
+!      PAUSE
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
    enddo! helicity loop
 ENDIF
