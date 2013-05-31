@@ -4220,9 +4220,11 @@ elseif( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
                endif
             endif
             if( Quarks(4)%PartType.lt.0 ) then
-               ubar0(:) = vbqg(ubar1,eps2)
+!               ubar0(:) = vbqg(ubar1,eps2)
+               ubar0(:) = vgbq(eps2,ubar1)
             else
-               ubar0(:) = vqg(ubar1,eps2)
+!               ubar0(:) = vqg(ubar1,eps2)
+               ubar0(:) = vgq(eps2,ubar1)
             endif
             PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)+Boson%Mom
             if(n1a.ge.1 .or. n4b.ge.1) then
