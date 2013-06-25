@@ -3944,8 +3944,8 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
       NumPrimAmps = 2
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
-!       NumPrimAmps = 14
-!       NumBornAmps = 2
+       NumPrimAmps = 8               ! this does not include the ferm loop prims
+       NumBornAmps = 8
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -6034,10 +6034,73 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0  ! ttbZ
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(2)%ExtLine = (/1,2,3,5,4/)
    ELSEIF( Correction.EQ.1 ) THEN
+
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
       BornAmps(2)%ExtLine = (/1,2,3,5,4/)
+      BornAmps(3)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(4)%ExtLine = (/1,2,3,5,4/)
+      BornAmps(5)%ExtLine = (/1,5,4,3,2/)
+      BornAmps(6)%ExtLine = (/1,4,3,5,2/)
+      BornAmps(7)%ExtLine = (/1,5,2,3,4/)
+      BornAmps(8)%ExtLine = (/1,2,3,5,4/)
 
-      call Error("need more work here:MasterProcess.EQ.18 ")
+      PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
+      PrimAmps(1)%AmpType = 1
+      PrimAmps(1)%NumSisters = 0
+      PrimAmp1_15234=1
+      allocate( PrimAmps(1)%Sisters(1:PrimAmps(1)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(2)%ExtLine = (/1,2,3,5,4/)
+      PrimAmps(2)%AmpType = 1
+      PrimAmps(2)%NumSisters = 0
+      PrimAmp1_12354=2
+      allocate( PrimAmps(2)%Sisters(1:PrimAmps(2)%NumSisters), stat=AllocStatus )
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(3)%ExtLine = (/1,5,2,4,3/)
+      PrimAmp1_15243 = 3
+      PrimAmps(3)%AmpType = 1
+      PrimAmps(3)%NumSisters = 0
+      allocate( PrimAmps(3)%Sisters(1:PrimAmps(3)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(4)%ExtLine = (/1,2,4,5,3/)
+      PrimAmp1_12453 = 4
+      PrimAmps(4)%AmpType = 1
+      PrimAmps(4)%NumSisters = 0
+      allocate( PrimAmps(4)%Sisters(1:PrimAmps(4)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+PrimAmps(5)%ExtLine = (/1,5,4,3,2/)
+      PrimAmp3_15432 = 5
+      PrimAmps(5)%AmpType = 3
+      PrimAmps(5)%NumSisters = 0
+      allocate( PrimAmps(5)%Sisters(1:PrimAmps(5)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+
+      PrimAmps(6)%ExtLine = (/1,4,5,3,2/)
+      PrimAmp3_14532 = 6
+      PrimAmps(6)%AmpType = 3
+      PrimAmps(6)%NumSisters = 0
+      allocate( PrimAmps(6)%Sisters(1:PrimAmps(6)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(7)%ExtLine = (/1,5,2,3,4/)
+      PrimAmp4_15234 = 7
+      PrimAmps(7)%AmpType = 4
+      PrimAmps(7)%NumSisters = 0
+      allocate( PrimAmps(7)%Sisters(1:PrimAmps(7)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(8)%ExtLine = (/1,2,5,3,4/)
+      PrimAmp4_12534 = 8
+      PrimAmps(8)%AmpType = 4
+      PrimAmps(8)%NumSisters = 0
+      allocate( PrimAmps(8)%Sisters(1:PrimAmps(8)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      print *, ' NO FERMION LOOPS INCLUDED YET!'
 
    ENDIF
 
@@ -6734,7 +6797,8 @@ IF( Correction.EQ.1 ) THEN
 
      print *, 'calling remove dupl cuts'
 ! this ONLY finds the usual duplicates, not the unusual ones that we encounter in the fermion loop primitives     
-     call remove_duplicate_cuts()
+!     call remove_duplicate_cuts()
+     call remove_duplicate_cuts_better()
 ! find subtractions     
 
      print *, 'FindSubtractions'
@@ -8372,6 +8436,61 @@ implicit none
       enddo             ! NPoint
 
     end SUBROUTINE REMOVE_DUPLICATE_CUTS
+
+subroutine REMOVE_DUPLICATE_CUTS_BETTER()
+use ModMisc
+use ModParameters
+implicit none
+! Routine to remove duplicate cuts from different parent diagrams
+!      type(PrimitiveAmplitude)          :: P
+type(PrimitiveAmplitude),pointer :: NewPrimAmp, OldPrimAmp
+integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp,OldNcut,NumSisters,NewNCut
+integer                          :: NewTree,OldTree,ZinNewTree,ZinOldTree
+logical                          :: are_equiv,AllTreesEquiv
+
+do NPrimAmp=1,NumPrimAmps! the way we compare is (2 vs. 1), (3 vs. 1,2), (4 vs. 1,2,3), ...
+   OldPrimAmp => PrimAmps(NPrimAmp)
+   NumSisters  = OldPrimAmp%NumSisters
+   if (NumSisters .eq. 0) cycle
+   do j=NPrimAmp+1,OldPrimAmp%Sisters(NumSisters)
+      NewPrimAmp => PrimAmps(j)
+      
+! safety net
+      if ( OldPrimAmp%AmpType .ne. NewPrimAmp%AmpType) cycle
+      
+      do NPoint = 1,5
+         do NCut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts
+            
+            OldNCut=0
+            do while (OldNCut .lt. OldPrimAmp%UCuts(NPoint)%NumCuts .and. &
+                 & (NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) )
+!.and. &
+!                 NewPrimAmp%UCuts(NPoint)%skip(NewNCut+1) .eq. .false.)
+               OldNCut=OldNCut+1
+               if ( OldPrimAmp%UCuts(Npoint)%skip(OldNCut) .eq. .true.) cycle
+               if ( OldPrimAmp%UCuts(Npoint)%NumCuts .ne. NewPrimAmp%UCuts(Npoint)%NumCuts) cycle !  M: why is this condition required ?
+
+               Nequivtrees = 0
+               ! This should always be true, put in as a additional safety net
+               if (all(NewPrimAmp%UCuts(Npoint)%CutProp(NCut,:) .eq. OldPrimAmp%UCuts(Npoint)%CutProp(OldNCut,:))) then  
+
+                  do NTree = 1,Npoint
+                     call ARE_TREES_EQUIV(NewPrimAmp%UCuts(Npoint)%TreeProcess(NCut,Ntree),OldPrimAmp%UCuts(Npoint)%TreeProcess(OldNCut,Ntree),are_equiv)
+                     if (are_equiv) Nequivtrees = Nequivtrees+1
+                  enddo
+               endif
+
+               if (Nequivtrees == Npoint) then                        ! all trees equivalent = duplicate cut!
+                  NewPrimAmp%UCuts(Npoint)%skip(NCut) = .true.
+               else
+                  NewPrimAmp%UCuts(Npoint)%skip(NCut) = .false.
+               endif
+            enddo     ! NewNCut
+         enddo        ! NCut
+      enddo           ! NPoint
+   enddo              ! j NewPrimAmp => PrimAmps(j)
+enddo
+end subroutine REMOVE_DUPLICATE_CUTS_BETTER
 
 
     SUBROUTINE REMOVE_CYCLIC_DUPLICATES()

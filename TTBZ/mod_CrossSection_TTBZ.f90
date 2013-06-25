@@ -53,7 +53,6 @@ include 'vegas_common.f'
 DPtol=1d-4
 QPtol=1d-4
 
-
 EvalCS_1L_ttbggZ = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -234,8 +233,8 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !   do iHel=nHel(1),nHel(2)
    do iHel=1,NumHelicities
-      useQP=0
-      pole_skipped=0
+!      useQP=0
+!      pole_skipped=0
       QPredo=-1
 !      print *, 'Helicity', iHel
 !      print *, 'Born...'
@@ -255,7 +254,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 
-       LO_Res_Pol = (0d0,0d0)   ! MARKUS: has to be disabled for now because NumBornAmps counts more than just 1,2.
+      LO_Res_Pol = (0d0,0d0)   ! MARKUS: has to be disabled for now because NumBornAmps counts more than just 1,2.
        do jPrimAmp=1,2
           do iPrimAmp=1,2
            LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
@@ -982,7 +981,7 @@ implicit none
 real(8) ::  EvalCS_1L_ttbqqbZ,yRnd(1:VegasMxDim),VgsWgt,xE
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1)
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
-integer :: iHel,iPrimAmp,jPrimAmp,tmphel
+integer :: iHel,iPrimAmp,jPrimAmp,tmphel,APrimAmp,ListPrimAmps(4)
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
 real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv,ZDKMatel,Msq_T_BWENU
 complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4)
@@ -1141,10 +1140,13 @@ IF( CORRECTION.EQ.0 ) THEN
            call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
 ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
            call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
-                  
-        do iPrimAmp=1,NumBornAmps
-            call EvalTree(BornAmps(iPrimAmp))
-        enddo
+
+      ! RR -- not sure about this -- recheck
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one                  
+      do iPrimAmp=1,NumBornAmps
+         call EvalTree(BornAmps(iPrimAmp))
+      enddo
 
 ! RR : this checks the f_4fV current
         print *,BornAmps(1)%Result
@@ -1184,33 +1186,102 @@ IF( CORRECTION.EQ.0 ) THEN
 
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
-   stop " This correction not yet implemented for this process"
-!   do iHel=nHel(1),nHel(2)
-!      call HelCrossing(Helicities(iHel,1:NumExtParticles))
-!      call SetPolarizations()
-!      do iPrimAmp=1,10
-!          call EvalTree(BornAmps(iPrimAmp))
-!      enddo
-!
-!        LOPartAmp(up) = BornAmps(1)%Result + Q_up/Q_top * BornAmps(2)%Result
-!        LOPartAmp(dn) = BornAmps(1)%Result + Q_dn/Q_top * BornAmps(2)%Result
-!        LO_Res_Pol = ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
-!        LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
-!
-!
+!   stop " This correction not yet implemented for this process"
+   do npdf=1,2
+      if (npdf .eq. 1) then
+         PDFFac(1:2)=PDFFac_a(1:2)
+      elseif (npdf .eq. 2) then
+         PDFFac(1:2)=PDFFac_b(1:2)
+         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+      endif
+         
+      !   do iHel=nHel(1),nHel(2)
+      do iHel=1,NumHelicities
+         call HelCrossing(Helicities(iHel,1:NumExtParticles))
+         call SetPolarizations()
+         if( ZDecays.gt.0 ) then
+            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be done more elegantly in mod_process
+            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+            call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
+      endif
+
+      if (npdf .eq. 2) then
+         ! change helicities of the massless quarks for the couplings to Z          
+         Helicities(iHel,3)=-Helicities(iHel,3)
+         Helicities(iHel,4)=-Helicities(iHel,4)
+      endif
+
+      call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
+      ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
+      call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+
+      ! RR -- not sure about this -- see if works for LO
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one
+
+      do iPrimAmp=1,NumBornAmps
+          call EvalTree(BornAmps(iPrimAmp))
+      enddo
+
+      LO_Res_Pol = (0d0,0d0)
+               
+      if (Zdecays .eq. 0) then
+         LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU )
+         LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD )
+      elseif( Zdecays.lt.10 ) then
+         LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL )
+         LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
+      elseif( Zdecays.gt.10 ) then
+         LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+         LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+      endif
+
+      LO_Res_Pol =  ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
+
+      LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
+
+
 !! ------------ bosonic loops --------------
-!      do iPrimAmp=1,10
-!          call SetKirill(PrimAmps(iPrimAmp))
-!          call PentCut(PrimAmps(iPrimAmp))
-!          call QuadCut(PrimAmps(iPrimAmp))
-!          call TripCut(PrimAmps(iPrimAmp))
-!          call DoubCut(PrimAmps(iPrimAmp))
-!          call SingCut(PrimAmps(iPrimAmp))
-!          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+
+! since there are no sisters, I think we can do this in the usual way...
+
+      do iPrimAmp=1,NumPrimAmps
+         call SetKirill(PrimAmps(iPrimAmp))
+         call PentCut(PrimAmps(iPrimAmp))
+         call QuadCut(PrimAmps(iPrimAmp))
+         call TripCut(PrimAmps(iPrimAmp))
+         call DoubCut(PrimAmps(iPrimAmp))
+         call SingCut(PrimAmps(iPrimAmp))
+         call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+      enddo
+! the prims are nevertheless not true prims, since not EW gauge inv, so now combine them:
+          PrimAmps(1)%Result=PrimAmps(1)%Result+PrimAmps(2)%Result
+          PrimAmps(3)%Result=PrimAmps(3)%Result+PrimAmps(4)%Result
+          PrimAmps(5)%Result=PrimAmps(5)%Result+PrimAmps(6)%Result
+          PrimAmps(7)%Result=PrimAmps(7)%Result+PrimAmps(8)%Result
+
+          ListPrimAmps=(/1,3,5,7/)
+          do iPrimAmp=1,4
+             APrimAmp=ListPrimAmps(iPrimAmp)
+             call RenormalizeUV(PrimAmps(APrimAmp),BornAmps(APrimAmp),MuRen**2)
+             PrimAmps(APrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(APrimAmp)%Result(-2:1)
+             call OneLoopDiv(PrimAmps(APrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
+
+
+             print *, 'APrimAmp',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)
+             print *, 'BornAmp', APrimAmp,BornAmps(APrimAmp)%Result
+             print *, 'fin', PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1)
+             print *, 'fin/Born', (PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1))/BornAmps(APrimAmp)%Result
+             print *, 'DP',APrimAmp,PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
+             print *, 'SP',APrimAmp,PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
+             print *, 'CC',APrimAmp,PrimAmps(APrimAmp)%Result(0)/BornAmps(APrimAmp)%Result
+             print *, 'R',APrimAmp,PrimAmps(APrimAmp)%Result(1)/BornAmps(APrimAmp)%Result
+             print *, rdiv(1:2)
+             pause
+
+       enddo
+
 !
-!          call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
-!          PrimAmps(iPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(iPrimAmp)%Result(-2:1)
-!          call OneLoopDiv(PrimAmps(iPrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
 !!           call WritePrimAmpResult(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv,(/EHat/))
 !!DEC$ IF (_QuadPrecImpr==1)
 !          AccPoles = CheckPoles(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),rdiv(1:2))
@@ -1289,11 +1360,12 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 !                                             + dreal(LOPartAmp(dn)*dconjg(FermionPartAmp(dn,-2:1)))*PDFFac(dn) )
 !      NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 !
-!   enddo!helicity loop
-!  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+    enddo!helicity loop
+ enddo ! npdf
+  call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
 !! print *, "mom swap deactivated"
 ENDIF
-
+stop
 
 
 
