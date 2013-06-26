@@ -47,6 +47,7 @@ FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
 
 PDFObj = $(PDFDir)/mstwpdf.o \
          $(PDFDir)/mrst2001lo.o \
+         $(PDFDir)/mrst2001.o \
          $(PDFDir)/cteq2mrst.o \
          $(PDFDir)/Cteq66Pdf.o \
          $(PDFDir)/CT10Pdf.o
@@ -254,24 +255,23 @@ DipoleObjZprime = $(ObjectDir)/mod_Dipoles_ZprimeTTB.o \
 
 
 MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
-				  $(Here)/MadGraph/ddb_Zprime_ttb.o \
-				  $(Here)/MadGraph/uub_Zprime_ttb.o \
 				  $(Here)/MadGraph/switchmom.o \
-				  $(HOME)/Lib/HELAS-3.0/coupsm.o \
-				  $(HOME)/Lib/HELAS-3.0/oxxxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/vxxxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/ixxxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/fvixxx.o \
-				  $(HOME)/Lib/HELAS-3.0/jvvxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/jgggxx.o \
-				  $(HOME)/Lib/HELAS-3.0/jioxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/iovxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/fvoxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/vvvxxx.o \
-				  $(HOME)/Lib/HELAS-3.0/libdhelas3.ifc90.a \
+				  $(HOME)/lib/HELAS-3.0/coupsm.o \
+				  $(HOME)/lib/HELAS-3.0/oxxxxx.o \
+				  $(HOME)/lib/HELAS-3.0/vxxxxx.o \
+				  $(HOME)/lib/HELAS-3.0/ixxxxx.o \
+				  $(HOME)/lib/HELAS-3.0/fvixxx.o \
+				  $(HOME)/lib/HELAS-3.0/jvvxxx.o \
+				  $(HOME)/lib/HELAS-3.0/jgggxx.o \
+				  $(HOME)/lib/HELAS-3.0/jioxxx.o \
+				  $(HOME)/lib/HELAS-3.0/iovxxx.o \
+				  $(HOME)/lib/HELAS-3.0/fvoxxx.o \
+				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
+				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a \
 				  $(Here)/MadGraph/gg_ttbz.o \
-				  $(Here)/MadGraph/uub_ttbz.o \
-				  $(Here)/MadGraph/ddb_ttbz.o
+				  $(Here)/MadGraph/gg_ttbzg.o
+# 				  $(Here)/MadGraph/uub_ttbz.o \
+# 				  $(Here)/MadGraph/ddb_ttbz.o
 #				  $(Here)/MadGraph/gg_ttb.o \
 #				  $(Here)/MadGraph/gg_ttba.o \
 #				  $(Here)/MadGraph/gg_tbtga.o \
@@ -395,7 +395,7 @@ all: $(allObjects)
 	@echo " executable file is " $(Exec)
 	@echo " "
 # 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) #$(MadGraphObj)
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 

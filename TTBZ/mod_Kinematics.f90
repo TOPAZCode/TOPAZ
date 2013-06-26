@@ -517,12 +517,14 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
 
 ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
 
-    Rsep_jet    = 0.4d0         !*0d0
-    pT_bjet_cut = 25d0*GeV      !*0d0
-    eta_bjet_cut= 2.5d0         !*1d2
-    pT_lep_cut  = 25d0*GeV      !*0d0
-    pT_miss_cut = 50d0*GeV      !*0d0
-    eta_lep_cut = 2.5d0         !*1d2
+print *, "removing all cuts for ObsSet=52"
+
+    Rsep_jet    = 0.4d0         *0d0
+    pT_bjet_cut = 25d0*GeV      *0d0
+    eta_bjet_cut= 2.5d0         *1d2
+    pT_lep_cut  = 25d0*GeV      *0d0
+    pT_miss_cut = 50d0*GeV      *0d0
+    eta_lep_cut = 2.5d0         *1d2
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
@@ -4719,14 +4721,14 @@ real(8) :: Mom(1:4,1:5),TmpMom(1:4)
 ! real(8) :: vel,parx,theta ! for checks
 integer :: Pcol1,Pcol2,Steps
 real(8) :: SingDepth,velo,parx
-real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+real(8),parameter :: NPr=4, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 
 !  generate PS: massless + massless --> massless + massive(M) + massive(anti-top) + massive(top)
   call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
-!    Pcol1= 1 -1
+!    Pcol1= 3 -1
 !    Pcol2= 3 -1
 !    SingDepth = 1d-16
 !    Steps = 20
@@ -10047,9 +10049,9 @@ real(8) :: pdf(-6:6,1:2)
 !   MRSW PDFS
 IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
-!             call mrstlo(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+            call mrstlo(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
 !             call mrs96(x1,PDFScale,2,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-            call GetAllPDFs("mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
+!             call GetAllPDFs("mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
             dnv(1) = 0d0
@@ -10064,9 +10066,9 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
             glu(1) = 0d0
         endif
         if( x2.lt.1d0 ) then
-!             call mrstlo(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+            call mrstlo(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
 !             call mrs96(x2,PDFScale,2,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-            call GetAllPDFs("mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
+!             call GetAllPDFs("mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
             dnv(2) = 0d0
@@ -10083,7 +10085,8 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
 ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
 !             call mrst2004(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-            call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
+            call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+!             call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
             dnv(1) = 0d0
@@ -10099,7 +10102,8 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         endif
         if( x2.lt.1d0 ) then
 !             call mrst2004(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-            call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
+            call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+!             call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
             dnv(2) = 0d0

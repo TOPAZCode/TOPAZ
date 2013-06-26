@@ -1,4 +1,3 @@
-
       subroutine mrstlo(x,q,mode,upv,dnv,usea,dsea,str,chm,bot,glu)
 C***************************************************************C
 C								C

@@ -12,10 +12,16 @@ real(8), public :: alpha_frag,beta_frag,delta_frag
 real(8), public :: Lambda_QCD
 logical, public :: unweighted
 logical, public :: HelSampling
+logical, public :: FirstLOThenVI
 integer, public :: DKRE_switch
 integer(8), public, save :: EvalCounter=0
 integer(8), public, save :: PSCutCounter=0
 integer(8), public, save :: SkipCounter=0
+
+integer,public, save :: pole_skipped=0
+integer,public, save :: useQP=0
+
+
 real(8),public,save :: maxWgt=0d0
 integer, allocatable :: Crossing(:)
 real(8), public :: MuRen, MuFac, MuFrag, AvgFactor
@@ -433,9 +439,16 @@ ELSEIF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.2) ) THEN
 ELSEIF(  PDFSet.EQ.1 .AND. (NLOPARAM.EQ.1 .OR. NLOPARAM.EQ.0)) THEN
   Lambda_QCD = 0.167d0/100d0
   alpha_s = 0.13939d0
+
+alpha_s = 0.13; print *, "change alpha_s for MSTR pdfs (comparison with Kirill)"
+
 ELSEIF( PDFSet.EQ.1 .AND. (NLOPARAM.EQ.2) ) THEN
    Lambda_QCD = 0.226235d0/100d0
    alpha_s=0.12018D0
+
+alpha_s = 0.119; print *, "change alpha_s for MRST pdfs (comparison with Kirill)"
+
+
 ELSE
   print *, "alpha_s not set"
 ENDIF
@@ -498,7 +511,8 @@ ENDIF
                              )
     BrZtoEE = alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/ZWidth
 !     print *, "Z->ee branching using calculated LO total width",BrZtoEE
-!     print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
+    print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
+    print *, "sw2",sw**2
 !     pause
 
 

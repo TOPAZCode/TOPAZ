@@ -1,4 +1,4 @@
-MODULE ModCrossSection_TTBZ
+  MODULE ModCrossSection_TTBZ
 use ModTopDecay
 implicit none
 
@@ -21,7 +21,7 @@ use ModAmplitudes
 use ModMyRecurrence
 use ModParameters
 use ModZDecay
-!use ModIntDipoles_GGTTBGZ
+use ModIntDipoles_GGTTBGZ
 implicit none
 real(8) ::  EvalCS_1L_ttbggZ,yRnd(1:VegasMxDim),VgsWgt
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),FermionLoopPartAmp(1:3,-2:1)
@@ -40,10 +40,9 @@ real(8) :: QPtol,DPtol
 integer :: NBin(1:NumMaxHisto),NHisto,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
 integer :: ZQcoupl,jj,lastSister
 integer :: QPredo(1:8,1:5)
-integer,save :: pole_skipped=0
-integer,save :: useQP=0
 include 'misc/global_import'
 include 'vegas_common.f'
+
 
 
 ! RR : here you can set the coupling of the Z to the light quarks in the currents
@@ -53,16 +52,13 @@ include 'vegas_common.f'
 DPtol=1d-4
 QPtol=1d-4
 
+
 EvalCS_1L_ttbggZ = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-!   print *, 'x1,2', yRnd(1:2)
-!   print *, 'ehat', Ehat
-!   pause
-!   return
 
-!   if( EHat.le.2d0*m_Top+M_Z  ) then
-   if( EHat.le.2d0*m_Top+M_Z  .or. Ehat .ge. 1000d0*GeV) then
+
+   if( EHat.le.2d0*m_Top+M_Z ) then
       EvalCS_1L_ttbggZ = 0d0
       return
    endif
@@ -214,13 +210,12 @@ IF( Correction.EQ.0 ) THEN
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
 
       endif
-      do iPrimAmp=1,NumBornAmps
+      do iPrimAmp=1,2!  set this explicitely to avoid a problem with warm-up run for Correction=1 
           call EvalTree(BornAmps(iPrimAmp))
       enddo
       LO_Res_Pol = (0d0,0d0)
-      do jPrimAmp=1,NumBornAmps
-
-      do iPrimAmp=1,NumBornAmps
+      do jPrimAmp=1,2
+      do iPrimAmp=1,2
           LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
       enddo
       enddo
@@ -233,8 +228,8 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !   do iHel=nHel(1),nHel(2)
    do iHel=1,NumHelicities
-!      useQP=0
-!      pole_skipped=0
+!       useQP=0
+!       pole_skipped=0
       QPredo=-1
 !      print *, 'Helicity', iHel
 !      print *, 'Born...'
@@ -254,7 +249,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 
 
-      LO_Res_Pol = (0d0,0d0)   ! MARKUS: has to be disabled for now because NumBornAmps counts more than just 1,2.
+       LO_Res_Pol = (0d0,0d0)   ! MARKUS: has to be disabled for now because NumBornAmps counts more than just 1,2.
        do jPrimAmp=1,2
           do iPrimAmp=1,2
            LO_Res_Pol = LO_Res_Pol + ColLO_ttbgg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result*dconjg(BornAmps(jPrimAmp)%Result)
@@ -331,7 +326,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! QP 
           if ( AccPoles .gt. DPtol ) then
              useQP=useQP+1
-             print *, 'QP'
+!              print *, 'QP'
 !             QPredo(iPrimAmp,1)=APrimAmp
 !             QPredo(iPrimAmp,2:PrimAmps(APrimAmp)%NumSisters+1)=PrimAmps(APrimAmp)%Sisters(1:PrimAmps(APrimAmp)%NumSisters)
              if (PrimAmps(APrimAmp)%NumSisters .gt. 0) then
@@ -383,9 +378,13 @@ ELSEIF( Correction.EQ.1 ) THEN
 !             print *, 'accpoles after QP', accpoles 
 !          pause          
              if ( AccPoles .gt. QPtol) then
-                print *, 'QP fails: ', AccPoles
+!                 print *, 'QP fails: ', AccPoles
                 PrimAmps(APrimAmp)%Result=0d0
                 pole_skipped=pole_skipped+1
+                SkipCounter = SkipCounter + 1
+                
+                RETURN ! reject the whole event instead of just this primamp
+                
              endif
           endif
 !
@@ -533,9 +532,12 @@ ELSEIF( Correction.EQ.1 ) THEN
 !             print *, 'accpoles after QP', accpoles 
 !          pause
              if ( AccPoles .gt. QPtol) then
-                print *, 'QP fails: ', AccPoles
+!                 print *, 'QP fails: ', AccPoles
                 PrimAmps(APrimAmp)%Result=0d0
                 pole_skipped=pole_skipped+1
+                
+                RETURN ! reject the whole event instead of just this primamp                
+                
              endif
           endif
 !
@@ -716,7 +718,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !             print *, 'accpoles after QP', accpoles 
              if ( AccPoles .gt. QPtol) then
-                print *, 'QP fails: ', AccPoles
+!                 print *, 'QP fails: ', AccPoles
                 PrimAmps(APrimAmp)%Result=0d0
                 pole_skipped=pole_skipped+1
              endif
@@ -801,10 +803,10 @@ ELSEIF( Correction.EQ.1 ) THEN
    enddo
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
-      print *, 'bosonic loops:'
-      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-      print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+!       print *, 'bosonic loops:'
+!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+!       print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
 !      PAUSE
 !      print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
 !      pause
@@ -822,11 +824,11 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
       enddo
       enddo
-      print *, 'fermionic loops:'
-      print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-      print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-      print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-      pause
+!       print *, 'fermionic loops:'
+!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+!       print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+!       pause
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
 
 !      print *, useQP, pole_skipped
@@ -875,33 +877,41 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor * alpha4Pi
 !   print *, 'boson',NLO_Res_UnPol(0:1)
 !   print *, 'ferm',NLO_Res_UnPol_Ferm(0:1)
-   print *, 'PreFac', PreFac
+!    print *, 'PreFac', PreFac
    EvalCS_1L_ttbggZ = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
-  print *, 'ds', EvalCS_1L_ttbggZ
+!    print *, 'ds', EvalCS_1L_ttbggZ
 
 
 ELSEIF( CORRECTION.EQ.3 ) THEN
 
-! print *, "1-loop eps2:",(NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2) )* PreFac,  (NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2))/(alpha_sOver2Pi*RunFactor*LO_Res_Unpol)
-! print *, "1-loop eps1:",(NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) )* PreFac,  (NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/(alpha_sOver2Pi*RunFactor*LO_Res_Unpol)
-! print *, "tree virt",LO_Res_Unpol/RunFactor**2
+! NLO_Res_UnPol      = NLO_Res_UnPol      * PreFac
+! NLO_Res_UnPol_Ferm = NLO_Res_UnPol_Ferm * PreFac
+! LO_Res_Unpol       = LO_Res_Unpol       * PreFac
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    IF( TOPDECAYS.GE.1 ) THEN
-       xE = yRnd(16+HelSampling)
+       xE = yRnd(18+HelSampling)
    ELSEIF( TOPDECAYS.EQ.0 ) THEN
        xE = yRnd(8+HelSampling)
    ENDIF
+
+! xe=0.3d0
+
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
 
-!   call EvalIntDipoles_GGTTBGP((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:11),xE,HOp(1:3))
+  call EvalIntDipoles_GGTTBGZ((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:13),xE,HOp(1:3))
    HOp(1:3) = HOp(1:3)*RunFactor**3 * PreFac
    EvalCS_1L_ttbggZ = HOp(1)    * pdf(0,1)  * pdf(0,2)   &
                     + HOp(2)/xE * pdf_z(0,1)* pdf(0,2)   &
                     + HOp(3)/xE * pdf(0,1)  * pdf_z(0,2)
 
-! print *, "real singularitites",EvalCS_1L_ttbggZ
+! print *, "1L check",NLO_Res_UnPol(-2)                           /(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
+! print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) )/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
+! print *, "ID check", EvalCS_1L_ttbggZ/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
 ! pause
+
+
+
 ENDIF
 
 
@@ -942,7 +952,7 @@ ENDIF
         print *, MomExt(1:4,:)
         print *, "SKIP EVENT!!!!!"
         EvalCS_1L_ttbggZ = 0d0
-        pause
+!         pause
         return
    endif
 
@@ -950,13 +960,13 @@ ENDIF
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbggZ)
    enddo
+   EvalCounter = EvalCounter + 1 
 
 
    EvalCS_1L_ttbggZ = EvalCS_1L_ttbggZ/VgsWgt
 
 RETURN
 END FUNCTION
-
 
 
 
@@ -1599,6 +1609,7 @@ include "vegas_common.f"
 
 
   EvalCS_Real_ttbgggZ= 0d0
+  DipoleResult = 0d0
   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
   if( EHat.le.2d0*m_Top+M_Z) then
       EvalCS_Real_ttbgggZ = 0d0
@@ -1616,6 +1627,7 @@ include "vegas_common.f"
    call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
    ISFac = MomCrossing(MomExt)
+
 
    PSWgt2 = 1d0
    PSWgt3 = 1d0
@@ -1635,6 +1647,7 @@ ENDIF
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
        EvalCS_Real_ttbgggZ = 0d0
+       SkipCounter = SkipCounter + 1
        return
    endif
 
@@ -1643,7 +1656,6 @@ ENDIF
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
-
 
    if( applyPSCut ) then
        EvalCS_Real_ttbgggZ = 0d0
@@ -1656,11 +1668,9 @@ ENDIF
               if( ExtParticle(6)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
               call ZDecay(ExtParticle(6),DK_LO,MomExt(1:4,13:14))
           endif
-
           do iPrimAmp=1,NumBornAmps
               call EvalTree(BornAmps(iPrimAmp))
           enddo
-
 
           LO_Res_Pol = (0d0,0d0)
           do jPrimAmp=1,6
@@ -1677,12 +1687,13 @@ ENDIF
         do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ttbgggZ)
         enddo
+        EvalCounter = EvalCounter + 1
 endif!applyPSCut
-
 
 
     PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
     call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),PreFac,DipoleResult)
+! DipoleResult=0d0
 !      sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
 ! !      sij = MomExt(1,3)**2
 !      print *,  sij/EHat**2,EvalCS_Real_ttbgggZ,DipoleResult,(1d0+EvalCS_Real_ttbgggZ/DipoleResult)
@@ -1715,7 +1726,6 @@ endif!applyPSCut
 !    stop
        
 
-
     EvalCS_Real_ttbgggZ = (EvalCS_Real_ttbgggZ + DipoleResult)/VgsWgt
 RETURN
 END FUNCTION
@@ -1732,11 +1742,11 @@ use ModKinematics
 use ModAmplitudes
 use ModProcess
 use ModMisc
-use ModDipoles_QQBTTBGP
-use ModDipoles_QGTTBQP
-use ModDipoles_QBGTTBQBP
+use ModDipoles_QQBTTBGZ
+use ModDipoles_QGTTBQZ
+use ModDipoles_QBGTTBQBZ
 implicit none
-real(8) ::  EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgp,yRnd(1:VegasMxDim),VgsWgt,DipoleResult(1:2)
+real(8) ::  EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,yRnd(1:VegasMxDim),VgsWgt,DipoleResult(1:2)
 complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto),NPDF
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ISFac,RunFactor,PreFac,PreFacDip
@@ -1752,7 +1762,7 @@ include "vegas_common.f"
 
 
 EvalCS_Real_ttbqqbgZ= 0d0
-EvalCS_Dips_ttbqqbgp= 0d0
+EvalCS_Dips_ttbqqbgZ= 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if( EHat.le.2d0*m_Top+pT_pho_cut ) then
@@ -1863,20 +1873,20 @@ endif!applyPSCut
 
     PreFacDip = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi*PhotonCouplCorr /PSWgt2/PSWgt3
     IF( PROCESS.EQ.30 ) THEN
-        call EvalDipoles_QQBTTBGP((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:18),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ELSEIF( PROCESS.EQ.24 ) THEN
-        call EvalDipoles_QGTTBQP((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),MomExt(1:4,3),-MomExt(1:4,2)/),yRnd(11:18),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),MomExt(1:4,3),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ELSEIF( PROCESS.EQ.26 ) THEN
-        call EvalDipoles_QBGTTBQBP((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:18),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ENDIF
-    EvalCS_Dips_ttbqqbgp = EvalCS_Dips_ttbqqbgp + DipoleResult(1) + DipoleResult(2)
+    EvalCS_Dips_ttbqqbgZ = EvalCS_Dips_ttbqqbgZ + DipoleResult(1) + DipoleResult(2)
 
   ENDDO! loop over a<-->b pdfs
 
 
 !      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
 !      sij = MomExt(1,3)**2
-!      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgp,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgp)
+!      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)
 !      pause
 
 
@@ -1931,7 +1941,7 @@ endif!applyPSCut
 !        print *, "MG/ME ratio: ", MadGraph_tree/dble(LO_Res_Unpol)
 !        pause
 
-    EvalCS_Real_ttbqqbgZ = (EvalCS_Real_ttbqqbgZ + EvalCS_Dips_ttbqqbgp) /VgsWgt
+    EvalCS_Real_ttbqqbgZ = (EvalCS_Real_ttbqqbgZ + EvalCS_Dips_ttbqqbgZ) /VgsWgt
 
 END FUNCTION
 

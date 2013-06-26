@@ -10,7 +10,7 @@
       private
 
       integer, parameter  :: dp = selected_real_kind(15)
-      real(dp), private :: yRnDK(1:10), Wgt_ext
+      real(dp), private :: yRnDK(1:10), Wgt_ext(1:2)
       real(dp), parameter, private  :: Momzero(1:4)=0d0
 
       public :: EvalDipoles_QQBTTBGZ
@@ -30,11 +30,11 @@
       subroutine EvalDipoles_QQBTTBGZ(p,yRnDk1,Wgt,sum_dip)
       real(dp), intent(out) ::  sum_dip(2)
       real(dp), intent(in) :: p(4,6)
-      real(dp), intent(in) :: yRnDK1(1:10), Wgt
+      real(dp), intent(in) :: yRnDK1(1:10), Wgt(1:2)
       integer, parameter :: ndip = 12
       integer, parameter :: in1 = 4
       integer, parameter :: in2 = 5
-      real(dp) :: res
+      real(dp) :: res(2)
       integer ::  dip(ndip,3)
       data dip(1,1)/6/, dip(1,2)/1/, dip(1,3)/3/
       data dip(2,1)/6/, dip(2,2)/1/, dip(2,3)/4/
@@ -112,7 +112,7 @@
        real(dp), intent(in) :: mi,mj,mk
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res
+       real(dp), intent(out) :: res(2)
        complex(dp) :: cres
        integer :: oh(6,5)
        real(dp) :: mij
@@ -455,7 +455,7 @@
 !------- fill in histograms --- this  is not going to
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res)
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
          enddo
 
 
@@ -470,7 +470,7 @@
        real(dp), intent(in) :: mi,mj,ma
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res
+       real(dp), intent(out) :: res(2)
        complex(dp) :: cres
        integer :: oh(6,5)
        real(dp) :: mij
@@ -773,7 +773,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res)
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
          enddo
 
 
@@ -788,7 +788,7 @@
        real(dp), intent(in) :: mi,mj,ma
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res
+       real(dp), intent(out) :: res(2)
        complex(dp) :: cres
        real(dp) :: mij
        real(dp) :: C(2,2)
@@ -1114,7 +1114,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res)
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
          enddo
 
          endif ! -- ! passed cuts
@@ -1129,7 +1129,7 @@
        real(dp), intent(in) :: mi,ma,mb
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
-       real(dp), intent(out) :: res
+       real(dp), intent(out) :: res(2)
        complex(dp) :: cres
        real(dp) :: mij
        real(dp) :: C(2,2)
@@ -1442,7 +1442,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res)
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
          enddo
 
          endif !  for passed cuts
