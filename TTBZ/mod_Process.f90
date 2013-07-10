@@ -2681,6 +2681,33 @@ ELSEIF( PROCESS.EQ.81 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho ! tt
   ENDIF
 
 
+ELSEIF( PROCESS.EQ.82 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho ! ttbPhoton
+  IF( CORRECTION.EQ.0 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      NDim = NDim + 5    ! PS integration
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSEIF( CORRECTION.EQ.1 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
 
 ELSE
     call Error("Process not available")
@@ -3943,8 +3970,8 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
       NumPrimAmps = 2
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
-       NumPrimAmps = 8               ! this does not include the ferm loop prims
-       NumBornAmps = 8
+       NumPrimAmps = 10               ! this does not include the ferm loop prims
+       NumBornAmps = 10
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -3988,10 +4015,10 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
           allocate(Helicities(1:NumHelicities,1:NumExtParticles))  ! extra for Z decay
           ! for now, use all helicities. might be able to use some clever tricks later though...
           sig_tb=+1;sig_t=+1;
-          Helicities(1,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
-          Helicities(2,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(1,1:5) = (/sig_tb,sig_t,+1,-1,-1/)
+          Helicities(2,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
           Helicities(3,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
-          Helicities(4,1:5) =(/sig_tb,sig_t,-1,+1,-1/)
+          Helicities(4,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
 
           sig_tb=+1;sig_t=-1;
           Helicities(5,1:5) = (/sig_tb,sig_t,+1,-1,+1/)
@@ -4011,6 +4038,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
           Helicities(15,1:5) = (/sig_tb,sig_t,-1,+1,+1/)
           Helicities(16,1:5) = (/sig_tb,sig_t,-1,+1,-1/)
        else
+
         NumHelicities = 48
         allocate(Helicities(1:NumHelicities,1:NumExtParticles))
         sig_tb=+1; sig_t =+1;
@@ -4160,14 +4188,14 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
 
     ExtParticle(1)%PartType = ATop_
     ExtParticle(2)%PartType = Top_
-    ExtParticle(3)%PartType = AChm_
-    ExtParticle(4)%PartType = Chm_
+    ExtParticle(3)%PartType = AStr_
+    ExtParticle(4)%PartType = Str_
     ExtParticle(5)%PartType = Glu_
     ExtParticle(6)%PartType = Z0_
 
     IF( Correction.EQ.2 ) THEN
-      NumPrimAmps = 10
-      NumBornAmps = 10
+      NumPrimAmps = 8
+      NumBornAmps = 8
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -6070,34 +6098,49 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0  ! ttbZ
       PrimAmps(4)%NumSisters = 0
       allocate( PrimAmps(4)%Sisters(1:PrimAmps(4)%NumSisters), stat=AllocStatus )      
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
-PrimAmps(5)%ExtLine = (/1,5,4,3,2/)
+
+      PrimAmps(5)%ExtLine = (/1,5,4,3,2/)
       PrimAmp3_15432 = 5
       PrimAmps(5)%AmpType = 3
       PrimAmps(5)%NumSisters = 0
       allocate( PrimAmps(5)%Sisters(1:PrimAmps(5)%NumSisters), stat=AllocStatus )      
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
-
-      PrimAmps(6)%ExtLine = (/1,4,5,3,2/)
-      PrimAmp3_14532 = 6
+      PrimAmps(6)%ExtLine = (/1,4,3,5,2/)! MARKUS: new primamp with Z on bottom
+      PrimAmp3_14352 = 6
       PrimAmps(6)%AmpType = 3
       PrimAmps(6)%NumSisters = 0
       allocate( PrimAmps(6)%Sisters(1:PrimAmps(6)%NumSisters), stat=AllocStatus )      
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
-      PrimAmps(7)%ExtLine = (/1,5,2,3,4/)
-      PrimAmp4_15234 = 7
+      PrimAmps(7)%ExtLine = (/1,2,5,3,4/)
+      PrimAmp4_12534 = 7
       PrimAmps(7)%AmpType = 4
       PrimAmps(7)%NumSisters = 0
       allocate( PrimAmps(7)%Sisters(1:PrimAmps(7)%NumSisters), stat=AllocStatus )      
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
-      PrimAmps(8)%ExtLine = (/1,2,5,3,4/)
-      PrimAmp4_12534 = 8
+      PrimAmps(8)%ExtLine = (/1,2,3,4,5/) ! MARKUS: new primamp with Z on bottom
+      PrimAmp4_12345 = 8
       PrimAmps(8)%AmpType = 4
       PrimAmps(8)%NumSisters = 0
       allocate( PrimAmps(8)%Sisters(1:PrimAmps(8)%NumSisters), stat=AllocStatus )      
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(9)%ExtLine = (/1,4,5,3,2/)
+      PrimAmp3_14532 = 9
+      PrimAmps(9)%AmpType = 3
+      PrimAmps(9)%NumSisters = 0
+      allocate( PrimAmps(9)%Sisters(1:PrimAmps(9)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
+      PrimAmps(10)%ExtLine = (/1,5,2,3,4/)
+      PrimAmp4_15234 = 10
+      PrimAmps(10)%AmpType = 4
+      PrimAmps(10)%NumSisters = 0
+      allocate( PrimAmps(10)%Sisters(1:PrimAmps(10)%NumSisters), stat=AllocStatus )      
+      if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
+
 
       print *, ' NO FERMION LOOPS INCLUDED YET!'
 
@@ -6164,9 +6207,6 @@ ELSEIF( MasterProcess.EQ.20 ) THEN
       BornAmps(8)%ExtLine = (/1,2,3,6,5,4/)
       PrimAmp1_123654 = 8
    ENDIF
-
-
-
 
 
 
@@ -6359,14 +6399,14 @@ ENDIF
             TheTree%NumV = 0
             counterQ = 0
             counterG = 0
-
             do NPart=1,TheTree%NumPart
                   TheTree%PartType(NPart) = ExtParticle( TheBornAmp%ExtLine(NPart) )%PartType
                   if( IsAQuark(TheTree%PartType(NPart)) ) then
                      TheTree%NumQua = TheTree%NumQua + 1
                      counterQ = counterQ + 1
                      QuarkPos(counterQ) = counterQ + counterG
-                     LastQuark = NPart! only required for BosonVertex below
+!                      LastQuark = NPart! only required for BosonVertex below  THIS WAS A BUG
+                     LastQuark = counterQ! only required for BosonVertex below
                   elseif( IsAScalar(TheTree%PartType(NPart)) ) then
                      TheTree%NumSca = TheTree%NumSca + 1
                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
@@ -6379,7 +6419,7 @@ ENDIF
                      if( abs(TheTree%PartType(NPart)).eq.abs(Z0_) ) TheTree%NumV = TheTree%NumV + 1
                      if( abs(TheTree%PartType(NPart)).eq.abs(Pho_)) TheTree%NumV = TheTree%NumV + 1
 !                     TheTree%BosonVertex = TheTree%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
-                     TheTree%BosonVertex = LastQuark! this variable specifies to which quark flavor the vector boson couples
+                     TheTree%BosonVertex = LastQuark! this variable specifies the position of the boson wrt. to the quark lines
                   endif
             enddo
 
@@ -6516,6 +6556,7 @@ ENDIF
 
            enddo
    enddo
+
 
 
 IF( Correction.EQ.1 ) THEN

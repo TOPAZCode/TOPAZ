@@ -991,7 +991,7 @@ implicit none
 real(8) ::  EvalCS_1L_ttbqqbZ,yRnd(1:VegasMxDim),VgsWgt,xE
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1)
 complex(8) :: BosonicPartAmp(1:2,-2:1),FermionPartAmp(1:2,-2:1),mydummy(1:2),LOPartAmp(1:2)
-integer :: iHel,iPrimAmp,jPrimAmp,tmphel,APrimAmp,ListPrimAmps(4)
+integer :: iHel,iPrimAmp,jPrimAmp,tmphel,APrimAmp,ListPrimAmps(1:6)
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
 real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv,ZDKMatel,Msq_T_BWENU
 complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4)
@@ -1033,7 +1033,7 @@ IF( TOPDECAYS.NE.0 ) THEN
    NRndHel=16
 ENDIF
 
-IF( ZDECAYS.NE.0 ) THEN
+IF( ZDECAYS.NE.0 .AND. ZDECAYS.NE.-2 ) THEN
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
    PSWgt = PSWgt * PSWgt4
 ENDIF
@@ -1090,7 +1090,7 @@ ENDIF
 ! we still need this for the massless qqZ couplings
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
 
-   if ( ZDecays .lt. 10) then
+   if ( ZDecays.lt.10 .and. ZDecays.gt.0 ) then
       propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
    elseif (ZDecays .gt. 10) then 
       propZ=cone/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
@@ -1099,7 +1099,7 @@ ENDIF
 
    call setPDFs(eta1,eta2,MuFac,pdf)
 
-IF( PROCESS.EQ.72 ) THEN
+   IF( PROCESS.EQ.72 ) THEN
       PDFFac_a(up) = pdf(Up_,1)*pdf(AUp_,2) + pdf(Chm_,1)*pdf(AChm_,2)
       PDFFac_a(dn) = pdf(Dn_,1)*pdf(ADn_,2) + pdf(Str_,1)*pdf(AStr_,2) + pdf(Bot_,1)*pdf(ABot_,2)
       PDFFac_b(up) = pdf(Up_,2)*pdf(AUp_,1) + pdf(Chm_,2)*pdf(AChm_,1)
@@ -1131,10 +1131,9 @@ IF( CORRECTION.EQ.0 ) THEN
 !    do iHel=nHel(1),nHel(2)
     do iHel=1,NumHelicities
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
-
         call SetPolarizations()
         
-        if( ZDecays.ne.0 ) then
+        if( ZDecays.gt.0 ) then
            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
            call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
@@ -1156,14 +1155,21 @@ IF( CORRECTION.EQ.0 ) THEN
       couplZQQ_right_dyn=one                  
       do iPrimAmp=1,NumBornAmps
          call EvalTree(BornAmps(iPrimAmp))
+! run  ./TOPAZ Collider=1 TopDK=0 ZDK=-2 Process=82 Correction=0 NLOParam=1 ObsSet=51  VegasNc0=1000 VegasNc1=1000
+! run ./TOPAZ Collider=1 TopDK=0 Process=22 Correction=0 NLOParam=1 ObsSet=21  VegasNc0=1000 VegasNc1=1000
+! if( ExtParticle(3)%Helicity*ExtParticle(4)%Helicity.eq.+1 ) cycle
+! print *, ExtParticle(1)%Helicity,ExtParticle(2)%Helicity,ExtParticle(3)%Helicity,ExtParticle(4)%Helicity,ExtParticle(5)%Helicity
+! print *, BornAmps(iPrimAmp)%ExtLine
+! print *, "BornAmp",iPrimAmp,BornAmps(iPrimAmp)%Result
+! pause
       enddo
 
 ! RR : this checks the f_4fV current
-        print *,BornAmps(1)%Result
-        print *, BornAmps(2)%Result
-        print *, BornAmps(1)%Result+ BornAmps(2)%Result
-        print *, BornAmps(3)%Result
-        pause
+!         print *,BornAmps(1)%Result
+!         print *, BornAmps(2)%Result
+!         print *, BornAmps(1)%Result+ BornAmps(2)%Result
+!         print *, BornAmps(3)%Result
+!         pause
 
         LO_Res_Pol = (0d0,0d0)
 
@@ -1231,7 +1237,16 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
       do iPrimAmp=1,NumBornAmps
           call EvalTree(BornAmps(iPrimAmp))
+! run  ./TOPAZ Collider=1 TopDK=0 ZDK=-2 Process=82 Correction=0 NLOParam=1 ObsSet=51  VegasNc0=1000 VegasNc1=1000
+! run ./TOPAZ Collider=1 TopDK=0 Process=22 Correction=0 NLOParam=1 ObsSet=21  VegasNc0=1000 VegasNc1=1000
+! if( ExtParticle(3)%Helicity*ExtParticle(4)%Helicity.eq.+1 ) cycle
+! print *, ExtParticle(1)%Helicity,ExtParticle(2)%Helicity,ExtParticle(3)%Helicity,ExtParticle(4)%Helicity,ExtParticle(5)%Helicity
+! print *, BornAmps(iPrimAmp)%ExtLine
+! print *, "BornAmp",iPrimAmp,BornAmps(iPrimAmp)%Result
+! pause
       enddo
+
+
 
       LO_Res_Pol = (0d0,0d0)
                
@@ -1265,29 +1280,32 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
       enddo
 ! the prims are nevertheless not true prims, since not EW gauge inv, so now combine them:
-          PrimAmps(1)%Result=PrimAmps(1)%Result+PrimAmps(2)%Result
-          PrimAmps(3)%Result=PrimAmps(3)%Result+PrimAmps(4)%Result
-          PrimAmps(5)%Result=PrimAmps(5)%Result+PrimAmps(6)%Result
-          PrimAmps(7)%Result=PrimAmps(7)%Result+PrimAmps(8)%Result
+          PrimAmps(1)%Result =PrimAmps(PrimAmp1_15234)%Result+PrimAmps(PrimAmp1_12354)%Result
+          PrimAmps(3)%Result =PrimAmps(PrimAmp1_15243)%Result+PrimAmps(PrimAmp1_12453)%Result
+          PrimAmps(5)%Result =PrimAmps(PrimAmp3_15432)%Result+PrimAmps(PrimAmp3_14352)%Result  !MARKUS: is this really required?
+          PrimAmps(7)%Result =PrimAmps(PrimAmp4_12534)%Result+PrimAmps(PrimAmp4_12345)%Result  !MARKUS: is this really required?
+          PrimAmps(9)%Result =PrimAmps(PrimAmp3_14532)%Result
+          PrimAmps(10)%Result=PrimAmps(PrimAmp4_12345)%Result
 
-          ListPrimAmps=(/1,3,5,7/)
-          do iPrimAmp=1,4
+          ListPrimAmps=(/1,3,5,7,9,10/)
+          do iPrimAmp=1,6
              APrimAmp=ListPrimAmps(iPrimAmp)
+! print *, "PrimAmpType",APrimAmp,PrimAmps(APrimAmp)%AmpType
              call RenormalizeUV(PrimAmps(APrimAmp),BornAmps(APrimAmp),MuRen**2)
              PrimAmps(APrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(APrimAmp)%Result(-2:1)
              call OneLoopDiv(PrimAmps(APrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
 
 
-             print *, 'APrimAmp',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)
-             print *, 'BornAmp', APrimAmp,BornAmps(APrimAmp)%Result
-             print *, 'fin', PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1)
-             print *, 'fin/Born', (PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1))/BornAmps(APrimAmp)%Result
-             print *, 'DP',APrimAmp,PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
-             print *, 'SP',APrimAmp,PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
-             print *, 'CC',APrimAmp,PrimAmps(APrimAmp)%Result(0)/BornAmps(APrimAmp)%Result
-             print *, 'R',APrimAmp,PrimAmps(APrimAmp)%Result(1)/BornAmps(APrimAmp)%Result
-             print *, rdiv(1:2)
-             pause
+!              print *, 'APrimAmp',APrimAmp,PrimAmps(APrimAmp)%Result(-2:1)
+!              print *, 'BornAmp', APrimAmp,BornAmps(APrimAmp)%Result
+!              print *, 'fin', PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1)
+!              print *, 'fin/Born', (PrimAmps(APrimAmp)%Result(0)+PrimAmps(APrimAmp)%Result(1))/BornAmps(APrimAmp)%Result
+!              print *, 'DP',APrimAmp,PrimAmps(APrimAmp)%Result(-2)/BornAmps(APrimAmp)%Result
+!              print *, 'SP',APrimAmp,PrimAmps(APrimAmp)%Result(-1)/BornAmps(APrimAmp)%Result
+!              print *, 'CC',APrimAmp,PrimAmps(APrimAmp)%Result(0)/BornAmps(APrimAmp)%Result
+!              print *, 'R',APrimAmp,PrimAmps(APrimAmp)%Result(1)/BornAmps(APrimAmp)%Result
+!              print *, rdiv(1:2)
+!              pause
 
        enddo
 
@@ -1375,7 +1393,6 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
 !! print *, "mom swap deactivated"
 ENDIF
-stop
 
 
 
@@ -1383,7 +1400,6 @@ IF( CORRECTION.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
    EvalCS_1L_ttbqqbZ = LO_Res_Unpol * PreFac
-
 
 ELSEIF( CORRECTION.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
@@ -1514,7 +1530,7 @@ ENDIF
 
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: uub->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
-!if (ZDecays .eq. 0) then 
+! if (ZDecays .eq. 0) then 
 !   MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
 !   MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
 !   MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
@@ -1528,18 +1544,16 @@ ENDIF
 !   call SDDB_TTBZ(MG_MOM,MadGraph_tree)
 !   print *, "MadGraph hel.amp ddb:", MadGraph_tree
 !   print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
-!else
+! else
 !   print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
 !   print *, "MG/ME ratio uub: ", 0.287320393640445d-12/(LO_Res_Unpol/(100d0)**4)
 !   print *, "MG/ME ratio ddb: ", 0.189323066770051d-12/(LO_Res_Unpol/(100d0)**4)
 !   print *, "MG/ME ratio ubu: ", 0.184639487297707d-12/(LO_Res_Unpol/(100d0)**4)
 !   print *, "MG/ME ratio dbd: ", 0.819198133023360d-13/(LO_Res_Unpol/(100d0)**4)
 !   !        print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**2)
-!   
-!
 !   print *, ""
-!endif
-!   stop
+! endif
+! pause
 
    if( IsNan(EvalCS_1L_ttbqqbZ) ) then
         print *, "NAN:",EvalCS_1L_ttbqqbZ
@@ -1742,82 +1756,115 @@ use ModKinematics
 use ModAmplitudes
 use ModProcess
 use ModMisc
+use ModZDecay
 use ModDipoles_QQBTTBGZ
 use ModDipoles_QGTTBQZ
 use ModDipoles_QBGTTBQBZ
 implicit none
 real(8) ::  EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,yRnd(1:VegasMxDim),VgsWgt,DipoleResult(1:2)
-complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
+complex(8) :: LO_Res_Pol,LO_Res_Unpol,PropZ,LOPartAmp(1:4,1:2)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto),NPDF
-real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ISFac,RunFactor,PreFac,PreFacDip
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,RunFactor,PreFac,PreFacDip,pZsq
 real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac(1:2),PDFFac_a(1:2),PDFFac_b(1:2)
-real(8) :: MomExt(1:4,1:12),sij,pdf(-6:6,1:2)
-real(8) :: MG_MOM(0:3,1:6)
-real(8) :: MadGraph_tree
+real(8) :: MomExt(1:4,1:14),sij,pdf(-6:6,1:2),MZ_Inv,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
+real(8) :: MG_MOM(0:3,1:6),MadGraph_tree
 logical :: applyPSCut,applySingCut
 real(8),parameter :: PhotonCouplCorr=2d0
-integer,parameter :: up=1, dn=2
 include "vegas_common.f"
 
+yrnd(1)=0.1d0
+yrnd(2)=0.07d0
+print *, "fixing yrnd"
 
 
-EvalCS_Real_ttbqqbgZ= 0d0
-EvalCS_Dips_ttbqqbgZ= 0d0
+   EvalCS_Real_ttbqqbgZ= 0d0
+   EvalCS_Dips_ttbqqbgZ= 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-   if( EHat.le.2d0*m_Top+pT_pho_cut ) then
+   if( EHat.le.2d0*m_Top+M_Z ) then
       EvalCS_Real_ttbqqbgZ = 0d0
       return
    endif
    FluxFac = 1d0/(2d0*EHat**2)
 
-   call EvalPhaseSpace_2to4(EHat,yRnd(3:10),MomExt(1:4,1:6),PSWgt)
-   call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
-   call CheckSing(MomExt,applySingCut)
-   if( applySingCut ) then
-       EvalCS_Real_ttbqqbgZ = 0d0
-       return
+   if( ZDecays.le.10 ) then  ! decaying on-shell Z
+      MZ_Inv = m_Z
+   elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+      call Error("need to implement phase space for off-shell Z's")
+      ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
    endif
+
+   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:7),MomExt(1:4,1:6),PSWgt)! q qb gluon Z tb t
+   call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
    PSWgt2 = 1d0
    PSWgt3 = 1d0
-   IF( TopDecays.GE.1 ) THEN
-       call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)
-       call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
-       PSWgt = PSWgt * PSWgt2*PSWgt3
-   ENDIF
-   call Kinematics_TTBARPHOTON(1,MomExt(1:4,1:12),(/5,6,4,1,2,3,7,8,9,10,11,12/),applyPSCut,NBin)
-
-   call setPDFs(eta1,eta2,MuFac,pdf)
-   IF( PROCESS.EQ.30 ) THEN
-      PDFFac_a(up) = pdf(Up_,1)*pdf(AUp_,2) + pdf(Chm_,1)*pdf(AChm_,2)
-      PDFFac_a(dn) = pdf(Dn_,1)*pdf(ADn_,2) + pdf(Str_,1)*pdf(AStr_,2) + pdf(Bot_,1)*pdf(ABot_,2)
-      PDFFac_b(up) = pdf(Up_,2)*pdf(AUp_,1) + pdf(Chm_,2)*pdf(AChm_,1)
-      PDFFac_b(dn) = pdf(Dn_,2)*pdf(ADn_,1) + pdf(Str_,2)*pdf(AStr_,1) + pdf(Bot_,2)*pdf(ABot_,1)
-   ELSEIF( PROCESS.EQ.24 ) THEN
-      PDFFac_a(up) = pdf(Up_,1)*pdf(0,2) + pdf(Chm_,1)*pdf(0,2)
-      PDFFac_a(dn) = pdf(Dn_,1)*pdf(0,2) + pdf(Str_,1)*pdf(0,2) + pdf(Bot_,1)*pdf(0,2)
-      PDFFac_b(up) = pdf(Up_,2)*pdf(0,1) + pdf(Chm_,2)*pdf(0,1)
-      PDFFac_b(dn) = pdf(Dn_,2)*pdf(0,1) + pdf(Str_,2)*pdf(0,1) + pdf(Bot_,2)*pdf(0,1)
-   ELSEIF( PROCESS.EQ.26 ) THEN
-      PDFFac_a(up) = pdf(AUp_,1)*pdf(0,2) + pdf(AChm_,1)*pdf(0,2)
-      PDFFac_a(dn) = pdf(ADn_,1)*pdf(0,2) + pdf(AStr_,1)*pdf(0,2) + pdf(ABot_,1)*pdf(0,2)
-      PDFFac_b(up) = pdf(AUp_,2)*pdf(0,1) + pdf(AChm_,2)*pdf(0,1)
-      PDFFac_b(dn) = pdf(ADn_,2)*pdf(0,1) + pdf(AStr_,2)*pdf(0,1) + pdf(ABot_,2)*pdf(0,1)
-   ENDIF
+   PSWgt4 = 1d0
+IF( TopDecays.GE.1 ) THEN
+   call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(11:14),.false.,MomExt(1:4,7:9),PSWgt2)
+   call EvalPhasespace_TopDecay(MomExt(1:4,6),yRnd(15:18),.false.,MomExt(1:4,10:12),PSWgt3)
+   PSWgt = PSWgt * PSWgt2*PSWgt3
+   call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,7:9))
+   call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,10:12))
+ENDIF
+IF( ZDECAYS.NE.0 ) THEN
+   call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,4),yRnd(19:20),MomExt(1:4,13:14),PSWgt4)
+   PSWgt = PSWgt * PSWgt4
+ENDIF
 
 
+   call CheckSing(MomExt,applySingCut)
+   if( applySingCut ) then
+       EvalCS_Real_ttbqqbgZ = 0d0
+       SkipCounter = SkipCounter + 1
+       return
+   endif
+
+
+   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
-   DO NPDF=1,2
+
+! we still need this for the massless qqZ couplings
+   pZsq=MomExt(1,4)*MomExt(1,4)-MomExt(2,4)*MomExt(2,4)-MomExt(3,4)*MomExt(3,4)-MomExt(4,4)*MomExt(4,4)
+
+   if ( ZDecays .lt. 10) then
+      propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
+   elseif (ZDecays .gt. 10) then 
+      propZ=cone/(pZsq-m_Z**2+ci*Ga_ZExp*m_Z)
+   endif
+   propZ=pZsq*propZ
+
+
+   call setPDFs(eta1,eta2,MuFac,pdf)
+   IF( PROCESS.EQ.76 ) THEN
+      PDFFac_a(Up_) = pdf(Up_,1)*pdf(AUp_,2) + pdf(Chm_,1)*pdf(AChm_,2)
+      PDFFac_a(Dn_) = pdf(Dn_,1)*pdf(ADn_,2) + pdf(Str_,1)*pdf(AStr_,2) + pdf(Bot_,1)*pdf(ABot_,2)
+      PDFFac_b(Up_) = pdf(Up_,2)*pdf(AUp_,1) + pdf(Chm_,2)*pdf(AChm_,1)
+      PDFFac_b(Dn_) = pdf(Dn_,2)*pdf(ADn_,1) + pdf(Str_,2)*pdf(AStr_,1) + pdf(Bot_,2)*pdf(ABot_,1)
+   ELSEIF( PROCESS.EQ.73 ) THEN
+      PDFFac_a(Up_) = pdf(Up_,1)*pdf(0,2) + pdf(Chm_,1)*pdf(0,2)
+      PDFFac_a(Dn_) = pdf(Dn_,1)*pdf(0,2) + pdf(Str_,1)*pdf(0,2) + pdf(Bot_,1)*pdf(0,2)
+      PDFFac_b(Up_) = pdf(Up_,2)*pdf(0,1) + pdf(Chm_,2)*pdf(0,1)
+      PDFFac_b(Dn_) = pdf(Dn_,2)*pdf(0,1) + pdf(Str_,2)*pdf(0,1) + pdf(Bot_,2)*pdf(0,1)
+   ELSEIF( PROCESS.EQ.74 ) THEN
+      PDFFac_a(Up_) = pdf(AUp_,1)*pdf(0,2) + pdf(AChm_,1)*pdf(0,2)
+      PDFFac_a(Dn_) = pdf(ADn_,1)*pdf(0,2) + pdf(AStr_,1)*pdf(0,2) + pdf(ABot_,1)*pdf(0,2)
+      PDFFac_b(Up_) = pdf(AUp_,2)*pdf(0,1) + pdf(AChm_,2)*pdf(0,1)
+      PDFFac_b(Dn_) = pdf(ADn_,2)*pdf(0,1) + pdf(AStr_,2)*pdf(0,1) + pdf(ABot_,2)*pdf(0,1)
+   ENDIF
+
+
+!    DO NPDF=1,2
+   DO NPDF=1,1; print *, "restricting npdf"
         if(npdf.eq.1) then
-              PDFFac(1:2) = PDFFac_a(1:2)
-!               PDFFac(1:2) = PDFFac_a(1:2) + PDFFac_b(1:2)
+!               PDFFac(1:2) = PDFFac_a(1:2)
+              PDFFac(1:2) = (/1d0,0d0/); print *, "setting pdfs to one"
         elseif(npdf.eq.2) then
               PDFFac(1:2) = PDFFac_b(1:2)
               call swapMom(MomExt(1:4,1),MomExt(1:4,2))
         endif
-        ISFac = MomCrossing(MomExt(1:4,1:6))
+        ISFac = MomCrossing(MomExt)
         IF( TopDecays.GE.1 ) THEN
           call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,7:9))
           call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,10:12))
@@ -1825,58 +1872,77 @@ EvalCS_Dips_ttbqqbgZ= 0d0
 
 
 if( applyPSCut ) then
-            EvalCS_Real_ttbqqbgZ = 0d0
+        EvalCS_Real_ttbqqbgZ = 0d0
 else
         LO_Res_Unpol = (0d0,0d0)
         do iHel=1,NumHelicities
           call HelCrossing(Helicities(iHel,1:NumExtParticles))
           call SetPolarizations()
+          if( ZDecays.ne.0 ) then
+              if( ExtParticle(6)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+              call ZDecay(ExtParticle(6),DK_LO,MomExt(1:4,13:14))
+              call ZGamLCoupl(1,Helicities(iHel,6),couplZLL,couplGLL)  ! charged lept
+          endif
+          if (npdf .eq. 2) then
+! change helicities of the massless quarks for the couplings to Z          
+            Helicities(iHel,3)=-Helicities(iHel,3)
+            Helicities(iHel,4)=-Helicities(iHel,4)
+          endif
+
+          call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
+! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
+          call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+          couplZQQ_left_dyn=one
+          couplZQQ_right_dyn=one
 
           do iPrimAmp=1,NumBornAmps
               call EvalTree(BornAmps(iPrimAmp))
           enddo
+          if (Zdecays .eq. 0) then
+            LOPartAmp(1,Up_:Dn_) = BornAmps(PrimAmp1_162345)%Result * (/1d0,1d0/) &
+                                 + BornAmps(PrimAmp1_123645)%Result * (/couplZUU,couplZDD/)
+            LOPartAmp(2,Up_:Dn_) = BornAmps(PrimAmp1_165234)%Result * (/1d0,1d0/)  &
+                                 + BornAmps(PrimAmp1_152364)%Result * (/couplZUU,couplZDD/)
+            LOPartAmp(3,Up_:Dn_) = BornAmps(PrimAmp1_162534)%Result * (/1d0,1d0/)  &
+                                 + BornAmps(PrimAmp1_125364)%Result * (/couplZUU,couplZDD/)
+            LOPartAmp(4,Up_:Dn_) = BornAmps(PrimAmp1_162354)%Result * (/1d0,1d0/)  &
+                                 + BornAmps(PrimAmp1_123654)%Result * (/couplZUU,couplZDD/)
+!           elseif( Zdecays.lt.10 ) then
+!             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL )
+!             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
+!           elseif( Zdecays.gt.10 ) then
+!             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+!             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+          endif
 
-          Q_in = Q_up
-          PartAmp(1) = BornAmps(PrimAmp1_162345)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123645)%Result
-          PartAmp(3) = BornAmps(PrimAmp1_162534)%Result + Q_in/Q_top*BornAmps(PrimAmp1_125364)%Result
-          PartAmp(2) = BornAmps(PrimAmp1_156234)%Result + BornAmps(PrimAmp1_165234)%Result + Q_in/Q_top*BornAmps(PrimAmp1_152364)%Result
-          PartAmp(4) = BornAmps(PrimAmp1_162354)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123564)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123654)%Result
+
           LO_Res_Pol = (0d0,0d0)
           do jPrimAmp=1,4
           do iPrimAmp=1,4
-              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * PartAmp(iPrimAmp) * dconjg(PartAmp(jPrimAmp))
+              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * &
+                           ( LOPartAmp(iPrimAmp,Up_)*dconjg(LOPartAmp(jPrimAmp,Up_))*PDFFac(Up_) &
+                           + LOPartAmp(iPrimAmp,Dn_)*dconjg(LOPartAmp(jPrimAmp,Dn_))*PDFFac(Dn_) )
           enddo
           enddo
-          LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol * PDFFac(1)
+          LO_Res_Unpol = LO_Res_Unpol + LO_Res_Pol
 
-          Q_in = Q_dn
-          PartAmp(1) = BornAmps(PrimAmp1_162345)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123645)%Result
-          PartAmp(3) = BornAmps(PrimAmp1_162534)%Result + Q_in/Q_top*BornAmps(PrimAmp1_125364)%Result
-          PartAmp(2) = BornAmps(PrimAmp1_156234)%Result + BornAmps(PrimAmp1_165234)%Result + Q_in/Q_top*BornAmps(PrimAmp1_152364)%Result
-          PartAmp(4) = BornAmps(PrimAmp1_162354)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123564)%Result + Q_in/Q_top*BornAmps(PrimAmp1_123654)%Result
-          LO_Res_Pol = (0d0,0d0)
-          do jPrimAmp=1,4
-          do iPrimAmp=1,4
-              LO_Res_Pol = LO_Res_Pol + ColLO_ttbqqbg(iPrimAmp,jPrimAmp) * PartAmp(iPrimAmp) * dconjg(PartAmp(jPrimAmp))
-          enddo
-          enddo
-          LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol * PDFFac(2)
         enddo!helicity loop
 
-        LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi  *PhotonCouplCorr
+        LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 *alpha4Pi
         EvalCS_Real_ttbqqbgZ = EvalCS_Real_ttbqqbgZ + dble(LO_Res_Unpol*PreFac)
 
         do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol*PreFac))
         enddo
+        EvalCounter = EvalCounter + 1
 endif!applyPSCut
 
-    PreFacDip = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi*PhotonCouplCorr /PSWgt2/PSWgt3
-    IF( PROCESS.EQ.30 ) THEN
+    PreFacDip = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3
+    IF( PROCESS.EQ.76 ) THEN
         call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
-    ELSEIF( PROCESS.EQ.24 ) THEN
+    ELSEIF( PROCESS.EQ.73 ) THEN
         call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),MomExt(1:4,3),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
-    ELSEIF( PROCESS.EQ.26 ) THEN
+    ELSEIF( PROCESS.EQ.74 ) THEN
         call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ENDIF
     EvalCS_Dips_ttbqqbgZ = EvalCS_Dips_ttbqqbgZ + DipoleResult(1) + DipoleResult(2)
@@ -1884,62 +1950,37 @@ endif!applyPSCut
   ENDDO! loop over a<-->b pdfs
 
 
-!      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+     sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
 !      sij = MomExt(1,3)**2
-!      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)
-!      pause
+     print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)
+     pause
 
 
-! !      MADGRAPH CHECK: ddb->ttbgp
-!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!        MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
-!        MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
-!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-!        MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
-!        call coupsm(0)
-!        call SDDB_TTBGA(MG_MOM,MadGraph_tree)
-!        LO_Res_Unpol = LO_Res_Unpol * 100d0**(-4)
-!        print *, ""
-!        print *, "My tree:         ", LO_Res_Unpol
-!        print *, "MadGraph hel.amp:", MadGraph_tree
-!        print *, "MG/ME ratio: ", MadGraph_tree/dble(LO_Res_Unpol)
-!        pause
+!      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
+!      MADGRAPH CHECK: qqb->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
+! if (ZDecays .eq. 0) then
+!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!       MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
+!       MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
+!       MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+!       MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
+!       call coupsm(0)
+!       call SUUB_TTBGZ(MG_MOM(0:3,1:6),MadGraph_tree)
+! !       call SDDB_TTBGZ(MG_MOM(0:3,1:6),MadGraph_tree)
+! !       call SDG_TTBDZ(MG_MOM,MadGraph_tree)
+!       print *, ""
+! !       print *, alpha_s*RunFactor,m_top,m_z,couplZUU_left,couplZUU_right,couplZDD_left,couplZDD_right,couplZTT_left,couplZTT_right
+!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**2
+!       print *, "MadGraph hel.amp:", MadGraph_tree
+!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**4)
+!       pause
+!    else
+!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+!       print *, "MG/ME ratio: ", 0.872680470745814d-13/(LO_Res_Unpol/(100d0)**4)
+!    endif
 
 
-! !      MADGRAPH CHECK: ug->ttbup
-!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!        MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
-!        MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
-!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-!        MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
-!        call coupsm(0)
-!        call SUG_TTBUA(MG_MOM,MadGraph_tree)
-!        LO_Res_Unpol = LO_Res_Unpol * 100d0**(-4)
-!        print *, ""
-!        print *, "My tree:         ", LO_Res_Unpol
-!        print *, "MadGraph hel.amp:", MadGraph_tree
-!        print *, "MG/ME ratio: ", MadGraph_tree/dble(LO_Res_Unpol)
-!        pause
-
-
-
-! !      MADGRAPH CHECK: dbg->ttbdbp
-!        MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!        MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!        MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
-!        MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
-!        MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
-!        MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
-!        call coupsm(0)
-!        call SDBG_TTBDBA(MG_MOM,MadGraph_tree)
-!        LO_Res_Unpol = LO_Res_Unpol * 100d0**(-4)
-!        print *, ""
-!        print *, "My tree:         ", LO_Res_Unpol
-!        print *, "MadGraph hel.amp:", MadGraph_tree
-!        print *, "MG/ME ratio: ", MadGraph_tree/dble(LO_Res_Unpol)
-!        pause
 
     EvalCS_Real_ttbqqbgZ = (EvalCS_Real_ttbqqbgZ + EvalCS_Dips_ttbqqbgZ) /VgsWgt
 

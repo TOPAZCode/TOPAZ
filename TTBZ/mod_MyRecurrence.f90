@@ -64,7 +64,7 @@ private    :: Cache_cur_g_2f_Dv4,Cache_cur_g_2f_Dv6,Cache_cur_g_2f_Dv8,Cache_cur
 
 public  :: cur_g,cur_f_2f,cur_g_2f,cur_f_4f,cur_g_4f,cur_f_6f,cur_f_2f_massCT,cur_f_4f_massCT
 public  :: cur_f_2fW
-public  :: cur_f_2fV,cur_g_2fV,cur_f_4fV,cur_g_4fV,cur_f_6fV
+public  :: cur_f_2fV,cur_g_2fV,cur_f_4fV,cur_g_4fV,cur_f_6fV,cur_f_2fV_massCT,cur_f_4fV_massCT
 public  :: cur_g_2s,cur_g_ssff,cur_g_ffss,  cur_s_2s,cur_s_ssffss,cur_s_sffsss,cur_s_sssffs,cur_s_4s,cur_s_ssff,cur_s_sffs,  cur_f_ffss,cur_f_fssf,cur_f_fffssf,cur_f_fssfff,  cur_s_2s_massCT
 public  :: cur_s_sssffs_CLOSEDLOOPCONTRIB,cur_s_sffsss_CLOSEDLOOPCONTRIB
 public  :: SetDim,InitCurrCache
@@ -2094,7 +2094,6 @@ integer :: rIn,rOut,i,counter
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(3)%Mom + Quarks(4)%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
          Eps2 = Eps2*PropFac1
-
          do n1a=0,NumGlu(1)
             n1b = NumGlu(1)-n1a
             ! Fer2
@@ -2120,7 +2119,6 @@ integer :: rIn,rOut,i,counter
                spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom1)*(2d0*Quarks(2)%Mass) + (sc_(PMom1,PMom1)+Quarks(2)%Mass2)*spiUDr )*PropFac1**2
                spiUDr(:) = ( spb2_(spiUDr,PMom1)+Quarks(2)%Mass*spiUDr(:) )*PropFac1
             endif
-
             TmpExtRef = -1
             TmpQuark(1)%Mom  => PMom1(:)
             TmpQuark(1)%Pol  => spiDr(:)
@@ -2239,6 +2237,331 @@ END FUNCTION
 
 
 
+
+
+FUNCTION cur_f_4fV_massCT(Gluons,Quarks,Quark1PartType,Boson,BosonVertex,NumGlu) result(res)           ! Quarks(:) does not include the OFF-shell quark
+implicit none
+integer :: NumGlu(0:4),Quark1PartType
+type(PtrToParticle) :: Gluons(1:),Quarks(2:4),Boson
+integer :: BosonVertex
+integer,target :: TmpExtRef
+complex(8) :: res(1:Ds),tmp(1:Ds)
+complex(8) :: ubar1(1:Ds)
+complex(8),target :: ubar0(1:Ds)
+complex(8),target :: spiDr(1:Ds),spiUDr(1:Ds)
+complex(8) :: eps1(1:Dv)
+complex(8) :: eps2(1:Dv)
+type(PtrToParticle) :: TmpGluons(1:NumGlu(1)+NumGlu(4)),TmpQuark(1:1)
+complex(8) :: PropFac1,PropFac2
+complex(8),target :: pmom1(1:Dv)
+complex(8) :: pmom2(1:Dv)
+integer :: n1a,n1b,n2a,n2b,n3a,n3b,n4a,n4b
+integer :: rIn,rOut,i,counter
+
+
+!DEC$ IF (_DebugCheckMyImpl1==1)
+    if( NumGlu(0)-NumGlu(1)-NumGlu(2)-NumGlu(3)-NumGlu(4).ne.0 ) print *, "wrong number of gluons in cur_f_4f"
+    if(Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. Quark1PartType.ne.-Quarks(2)%PartType ) print *,"wrong flavor in cur_f_4f (1)"
+    if(Quarks(2)%PartType.eq.-Quarks(3)%PartType .and. Quark1PartType.ne.-Quarks(4)%PartType ) print *,"wrong flavor in cur_f_4f (2)"
+!DEC$ ENDIF
+
+   Res(:)=(0d0,0d0)
+!   if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. abs(BosonVertex).eq.abs(Quark1PartType)) then
+if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. (BosonVertex.eq.1 .or. BosonVertex.eq.2 .or. BosonVertex.eq.4) ) then
+!DEC$ IF (_DebugGeneralChecks==1)
+    if( Quarks(3)%Mass.ne.0d0 .or. Quarks(4)%Mass.ne.0d0 ) print *, "CT insertions for massive quarks 3,4 not implemented"
+!DEC$ ENDIF
+
+      if( Quarks(2)%PartType.lt.0 ) then
+         call Error("In 4fV_massCT: wrong quark")
+      endif
+
+      do n2a=0,NumGlu(2)
+      do n4a=0,NumGlu(4)
+         n2b = NumGlu(2)-n2a
+         n4b = NumGlu(4)-n4a
+
+         rIn =NumGlu(1)+n2a+1
+         rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+         Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(3:4),(/1+n2b+NumGlu(3)+n4a,n2b,NumGlu(3),n4a/))
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(3)%Mom + Quarks(4)%Mom
+         PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+         if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
+         Eps2 = Eps2*PropFac1
+         do n1a=0,NumGlu(1)
+
+!           (I) Z on top <--> n1b=1
+            n1b = NumGlu(1)-n1a
+            rIn =n1a+1
+            rOut=NumGlu(1)+n2a
+            spiUDr(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,Boson,(/n2a+n1b,n1b,n2a/) )! checked against ttbphoton
+            spiDr(:) = cur_f_2fV_massCT(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,Boson,(/n2a+n1b,n1b,n2a/) )
+            !if(n1b.ge.1 .or. n2a.ge.1) then
+            PMom2(:) = Quarks(2)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
+            PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
+            if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) then
+               PropFac2=(0d0,0d0)
+            endif
+            spiDr(:)  = ( spb2_(spiDr,PMom2)+Quarks(2)%Mass*spiDr(:) )*PropFac2
+            spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom2)*(2d0*Quarks(2)%Mass) + (sc_(PMom2,PMom2)+Quarks(2)%Mass2)*spiUDr )*PropFac2**2
+            spiUDr(:) = ( spb2_(spiUDr,PMom2)+Quarks(2)%Mass*spiUDr(:) )*PropFac2
+            spiDr(:)  = vqg(spiDr, eps2)
+            spiUDr(:) = vqg(spiUDr,eps2)
+
+
+            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
+            if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
+               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) then
+                  cycle
+               endif
+               spiDr(:)  = ( spb2_(spiDr,PMom1)+Quarks(2)%Mass*spiDr(:) )*PropFac1
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom1)*(2d0*Quarks(2)%Mass) + (sc_(PMom1,PMom1)+Quarks(2)%Mass2)*spiUDr )*PropFac1**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom1)+Quarks(2)%Mass*spiUDr(:) )*PropFac1
+            endif
+
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => spiDr(:)
+            TmpQuark(1)%Mass => Quarks(2)%Mass
+            TmpQuark(1)%Mass2=> Quarks(2)%Mass2
+            TmpExtRef = -1
+            TmpQuark(1)%ExtRef => TmpExtRef
+            TmpQuark(1)%PartType => Quarks(2)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+            if( n1a.ge.1 .or. n4b.ge.1 ) then
+              TmpQuark(1)%Pol  => spiUDr(:)
+              tmp(:) = cur_f_2f_massCT(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+              Res(:) = Res(:) + tmp(:)
+            endif
+
+
+!           (II) Z on bottom <--> n1a=1
+            rIn =n1a+1
+            rOut=NumGlu(1)+n2a
+            spiUDr(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,(/n2a+n1b,n1b,n2a/) )! checked against ttbphoton
+            spiDr(:)=(0d0,0d0)
+            if(n1b.ge.1 .or. n2a.ge.1) then
+               spiDr(:)  = cur_f_2f_massCT(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,(/n2a+n1b,n1b,n2a/)) ! current dressed with mass CT's
+               PMom2(:) = Quarks(2)%Mom + SumMom(Gluons,rIn,rOut) ! can be moved outside the n1a-loop
+               PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom2)+Quarks(2)%Mass*spiDr(:) )*PropFac2
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom2)*(2d0*Quarks(2)%Mass) + (sc_(PMom2,PMom2)+Quarks(2)%Mass2)*spiUDr )*PropFac2**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom2)+Quarks(2)%Mass*spiUDr(:) )*PropFac2
+               spiDr(:)  = vqg(spiDr, eps2)
+               if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) cycle
+            endif
+            spiUDr(:) = vqg(spiUDr,eps2)
+
+            PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+            !if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom1)+Quarks(2)%Mass*spiDr(:) )*PropFac1
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom1)*(2d0*Quarks(2)%Mass) + (sc_(PMom1,PMom1)+Quarks(2)%Mass2)*spiUDr )*PropFac1**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom1)+Quarks(2)%Mass*spiUDr(:) )*PropFac1
+               if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) then
+                  cycle
+               endif
+            !endif
+
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => spiDr(:)
+            TmpQuark(1)%Mass => Quarks(2)%Mass
+            TmpQuark(1)%Mass2=> Quarks(2)%Mass2
+            TmpExtRef = -1
+            TmpQuark(1)%ExtRef => TmpExtRef
+            TmpQuark(1)%PartType => Quarks(2)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            tmp(:) = cur_f_2fV(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+            if( n1a.ge.1 .or. n4b.ge.1 ) then
+                TmpQuark(1)%Pol  => spiUDr(:)
+                tmp(:) = cur_f_2fV_massCT(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
+                Res(:) = Res(:) + tmp(:)
+            endif
+         enddo
+      enddo
+   enddo
+
+
+
+elseif ( Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType .and. (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4) ) then
+!DEC$ IF (_DebugGeneralChecks==1)
+    if( Quarks(2)%Mass.ne.0d0 .or. Quarks(3)%Mass.ne.0d0 ) print *, "CT insertions for massive quarks 2,3 not implemented"
+!DEC$ ENDIF
+
+      do n1a=0,NumGlu(1)
+      do n3a=0,NumGlu(3)
+         n1b = NumGlu(1)-n1a
+         n3b = NumGlu(3)-n3a
+
+         rIn =n1a+1
+         rOut=NumGlu(1)+NumGlu(2)+n3a
+         Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
+         PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
+         PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
+         Eps2 = Eps2*PropFac1
+
+         do n4a=0,NumGlu(4)
+            n4b = NumGlu(4)-n4a
+
+
+!           (I) Z on top <--> n3b=1
+            rIn =NumGlu(1)+NumGlu(2)+n3a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+            spiUDr(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n4a+n3b,n3b,n4a/))          ! undressed current
+!             spiDr(:) = (0d0,0d0)
+!             if(n3b.ge.1 .or. n4a.ge.1) then
+               spiDr(:)  = cur_f_2fV_massCT(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n4a+n3b,n3b,n4a/))   ! current dressed with mass CT's
+               PMom2(:)  = Quarks(4)%Mom + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
+               PropFac2  = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom2)+Quarks(4)%Mass*spiDr(:) )*PropFac2
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom2)*(2d0*Quarks(4)%Mass) + (sc_(PMom2,PMom2)+Quarks(4)%Mass2)*spiUDr )*PropFac2**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom2)+Quarks(4)%Mass*spiUDr(:) )*PropFac2
+               spiDr(:)  = vgq(eps2,spiDr)
+!             endif
+            spiUDr(:) = vgq(eps2,spiUDr)
+
+            PMom1 = Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
+            if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1  = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom1)+Quarks(4)%Mass*spiDr(:) )*PropFac1
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom1)*(2d0*Quarks(4)%Mass) + (sc_(PMom1,PMom1)+Quarks(4)%Mass2)*spiUDr )*PropFac1**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom1)+Quarks(4)%Mass*spiUDr(:) )*PropFac1
+            endif
+
+            TmpExtRef = -1
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => spiDr(:)
+            TmpQuark(1)%Mass => Quarks(4)%Mass
+            TmpQuark(1)%Mass2=> Quarks(4)%Mass2
+            TmpQuark(1)%ExtRef  => TmpExtRef
+            TmpQuark(1)%PartType=> Quarks(4)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+
+            tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+            if( n1a.ge.1 .or. n4b.ge.1 ) then
+              TmpQuark(1)%Pol  => spiUDr(:)
+              tmp(:) = cur_f_2f_massCT(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
+              Res(:) = Res(:) + tmp(:)
+            endif
+
+
+
+
+!           (I) Z on bottom <--> n1a=1
+            rIn =NumGlu(1)+NumGlu(2)+n3a+1
+            rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
+            spiUDr(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/n4a+n3b,n3b,n4a/))          ! undressed current
+            spiDr(:) = (0d0,0d0)
+            if(n3b.ge.1 .or. n4a.ge.1) then
+               spiDr(:)  = cur_f_2f_massCT(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/n4a+n3b,n3b,n4a/))   ! current dressed with mass CT's
+               PMom2(:)  = Quarks(4)%Mom + SumMom(Gluons,rIn,rOut)
+               PropFac2  = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom2)+Quarks(4)%Mass*spiDr(:) )*PropFac2
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom2)*(2d0*Quarks(4)%Mass) + (sc_(PMom2,PMom2)+Quarks(4)%Mass2)*spiUDr )*PropFac2**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom2)+Quarks(4)%Mass*spiUDr(:) )*PropFac2
+               spiDr(:)  = vgq(eps2,spiDr)
+            endif
+            spiUDr(:) = vgq(eps2,spiUDr)
+
+            PMom1 = Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
+!             if(n1a.ge.1 .or. n4b.ge.1) then
+               PropFac1  = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
+               spiDr(:)  = ( spb2_(spiDr,PMom1)+Quarks(4)%Mass*spiDr(:) )*PropFac1
+               spiDr(:)  = spiDr(:) + ( spb2_(spiUDr,PMom1)*(2d0*Quarks(4)%Mass) + (sc_(PMom1,PMom1)+Quarks(4)%Mass2)*spiUDr )*PropFac1**2
+               spiUDr(:) = ( spb2_(spiUDr,PMom1)+Quarks(4)%Mass*spiUDr(:) )*PropFac1
+!             endif
+
+            TmpExtRef = -1
+            TmpQuark(1)%Mom  => PMom1(:)
+            TmpQuark(1)%Pol  => spiDr(:)
+            TmpQuark(1)%Mass => Quarks(4)%Mass
+            TmpQuark(1)%Mass2=> Quarks(4)%Mass2
+            TmpQuark(1)%ExtRef  => TmpExtRef
+            TmpQuark(1)%PartType=> Quarks(4)%PartType
+            counter=1
+            rIn =1
+            rOut=n1a
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+            rIn =NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
+            rOut=NumGlu(0)
+            do i=rIn,rOut
+              call CopyParticlePtr(Gluons(i),TmpGluons(counter))
+              counter=counter+1
+            enddo
+
+            tmp(:) = cur_f_2fV(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
+            Res(:) = Res(:) + tmp(:)
+            if( n1a.ge.1 .or. n4b.ge.1 ) then
+              TmpQuark(1)%Pol  => spiUDr(:)
+              tmp(:) = cur_f_2fV_massCT(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
+              Res(:) = Res(:) + tmp(:)
+            endif
+
+         enddo
+      enddo
+      enddo
+
+
+
+elseif ( Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType .and. (BosonVertex.eq.2) ) then
+
+      if( NumGlu(0).eq.0 ) then 
+            Res(:) = 0d0
+      else
+            call Error("Mass counter term not computed for this current") 
+      endif
+
+else
+   call Error("Mass counter term not computed for this current") 
+
+
+   endif
+
+return
+END FUNCTION
 
 
 
@@ -2682,8 +3005,6 @@ END FUNCTION
 
            res = res + tmp
         enddo
-
-
 
         do m=1,ng1
            k1 = sum(k(:,1:m),dim=2)
@@ -3465,8 +3786,11 @@ endif
          call Error('Mass counter-term for massless particle!')
       endif
 
-      if (ngluon == 0) then
+
+! MARKUS: remove this because we always need a CT insertion when there is a V boson
+      if( ngluon == 0 .and. CTIns.eq..false. ) then
          res = vbqV(sp,eV,couplVQQ_left,couplVQQ_right)
+
       else
 
        res = (0d0,0d0)
@@ -3474,12 +3798,12 @@ endif
           k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
           e1=g(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon))
           k1sq=sc_(k1,k1)
-           
+          
           k2 = sum(k(:,1:ng1+m),dim=2)
           k2 = k2 + p +  kV
           k2sq = sc_(k2,k2)-mass**2
           sp2 = fVmCT(e(:,1:ng1+m),k(:,1:ng1+m),sp,p,mass,QuarkFlavor,eV,kV,ng1,.false.)
-
+          
           if (CTIns) then
              sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
               
@@ -3525,11 +3849,11 @@ endif
 
            k2 = sum(k(:,m+1:ngluon),dim=2)
            k2 = k2 + p + kV
+
            k2sq = sc_(k2,k2) - mass**2
            ms1 = ng1 - m
            sp2=fVmCT(e(:,m+1:ngluon),k(:,m+1:ngluon),sp,p,mass,QuarkFlavor,eV,kV,ms1,.false.)
-
-!           if (ng2 > 0.or.m < ng1) then
+!            if (ng2 > 0.or.m < ng1) then
                if (CTIns) then
                   sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2
 
@@ -3548,9 +3872,9 @@ endif
                else
                   sp2 = spb2_(sp2,k2)+mass*sp2
                endif
- !          else
- !              if(CTIns) cycle
- !          endif
+!            else
+!               if(CTIns) cycle
+!            endif
 
            tmp = vgq(e1,sp2)
 
@@ -3573,12 +3897,14 @@ endif
            res = res + tmp
         enddo
 
+
+
+
 ! now the additional bit from the V
            sp2 = fmCT(e,k,sp,p,mass,FerFla,FerFla,ms,.false.)
            k2 = sum(k(:,1:ngluon),dim=2)
            k2 = k2 + p
            k2sq = sc_(k2,k2)  - mass**2
-
            if (CTins) then
               sp3=czero
               sp2 = spb2_(sp2,k2)*(2d0*mass)+ (sc_(k2,k2)+mass**2)*sp2

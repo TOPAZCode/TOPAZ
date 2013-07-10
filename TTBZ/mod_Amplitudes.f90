@@ -74,7 +74,7 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
                      !TheTreeAmp%NumQua = TheTreeAmp%NumQua + 1   ! this is suppoed to be done outside this subroutine
                      counterQ = counterQ + 1
                      QuarkPos(counterQ) = counterQ + counterG
-                     LastQuark = NPart! only required for BosonVertex below
+                     LastQuark = counterQ! only required for BosonVertex below
                   elseif( IsAScalar(TheTreeAmp%PartType(NPart)) ) then
 !                      TheTreeAmp%NumSca = TheTreeAmp%NumSca + 1   ! this is suppoed to be done outside this subroutine
                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
@@ -86,7 +86,8 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
                      if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Wp_) ) TheTreeAmp%NumW = TheTreeAmp%NumW + 1
                      if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Z0_) ) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
                      if( abs(TheTreeAmp%PartType(NPart)).eq.abs(Pho_)) TheTreeAmp%NumV = TheTreeAmp%NumV + 1
-                     TheTreeAmp%BosonVertex = TheTreeAmp%PartType(LastQuark)! this variable specifies to which quark flavor the vector boson couples
+!                      TheTreeAmp%BosonVertex = TheTreeAmp%PartType(LastQuark)! this variable specifies the position of the boson wrt. to the quark lines
+                     TheTreeAmp%BosonVertex = LastQuark
                   endif
             enddo
 
@@ -576,11 +577,9 @@ real(8) :: Mu2Ren
              ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
              res(-1) = res(-1) + ResMCT*3d0/2d0
              res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
-
           elseif ( TheBornAmp%TreeProc%NumV .eq. 1 ) then
              ResSpi = cur_f_2fV_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:2),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%Boson,TheBornAmp%TreeProc%NumGlu)
              ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
-
              res(-1) = res(-1) + ResMCT*3d0/2d0
              res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
 
@@ -594,8 +593,25 @@ real(8) :: Mu2Ren
              ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
              res(-1) = res(-1) + ResMCT*3d0/2d0
              res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+
+! this one is called by ttb+photon
+! print *, "ExtLine",TheBornAmp%ExtLine
+! print *, "massct",ResMCT * dsqrt(2d0)
+! pause
+
           else
-             call Error("these mass cts not implemented yet!")
+
+             ResSpi = cur_f_4fV_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Quarks(2:4),TheBornAmp%TreeProc%Quarks(1)%PartType,TheBornAmp%TreeProc%Boson,TheBornAmp%TreeProc%BosonVertex,TheBornAmp%TreeProc%NumGlu)
+             ResMCT = psp1_(ResSpi,TheBornAmp%TreeProc%Quarks(1)%Pol(1:4)) * TheBornAmp%TreeProc%Quarks(1)%Mass
+             res(-1) = res(-1) + ResMCT*3d0/2d0
+             res(0)  = res(0)  + ResMCT*( 5d0/2d0-3d0*dlog(TheBornAmp%TreeProc%Quarks(1)%Mass2/Mu2Ren)*0.5d0 )
+
+! this one is called by ttb+Z
+! print *, "ExtLine",TheBornAmp%ExtLine
+! print *, "massct",ResMCT
+! pause
+
+
           endif
        elseif( TheBornAmp%TreeProc%NumQua.eq.0 .and. TheBornAmp%TreeProc%NumSca.eq.2 ) then
           ResSpi(1) = cur_s_2s_massCT(TheBornAmp%TreeProc%Gluons,TheBornAmp%TreeProc%Scalars(2:2),TheBornAmp%TreeProc%NumGlu)

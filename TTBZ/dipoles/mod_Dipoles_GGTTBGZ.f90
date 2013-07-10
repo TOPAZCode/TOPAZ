@@ -19,7 +19,7 @@
       contains
 
 !  we have a list of dipoles that we need to go through
-!  We label things as 0-> bar t(p1)+ gamma(2) + t(3) + g(p4)+g(p5)+g(p6)
+!  We label things as 0-> bar t(p1)+ Z(2) + t(3) + g(p4)+g(p5)+g(p6)
 !  and we  assume that gluons in the initial state have momenta p4 and p5,
 
 

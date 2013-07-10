@@ -1,0 +1,59 @@
+qqb --> ttb+z(=photon)
+./TOPAZ Collider=1 TopDK=0 ZDK=-2 Process=82 Correction=1 NLOParam=2 ObsSet=51  VegasNc0=1000 VegasNc1=1000
+
+print out in mod_Amplitudes:SUBROUTINE EvalMassCTs for the first helicity
+ print *, "ExtLine",TheBornAmp%ExtLine
+ print *, "massct",ResMCT * dsqrt(2d0)
+ pause
+
+
+ PrimAmpType                      1
+ ExtLine           1           5           2           3           4
+ massct (-1.210232468403597E-004,-1.669107163270188E-004)
+
+ PrimAmpType                      1
+ ExtLine           1           5           2           4           3
+ massct (1.210232468403597E-004,1.669107163270188E-004)
+
+ PrimAmpType                      3
+ ExtLine           1           5           4           3           2
+ massct (-1.210232468403600E-004,-1.669107163270192E-004)
+
+ PrimAmpType                      3
+ ExtLine           1           4           5           3           2
+ massct (0.000000000000000E+000,0.000000000000000E+000)
+
+
+
+
+
+
+qqb --> ttb+photon
+./TOPAZ Collider=1 TopDK=0 Process=22 Correction=1 NLOParam=2 ObsSet=21 VegasNc0=1000 VegasNc1=1000
+
+print out in mod_Amplitudes:SUBROUTINE EvalMassCTs for the first helicity
+ print *, "ExtLine",TheBornAmp%ExtLine
+ print *, "massct",ResMCT
+ pause
+
+
+ PrimAmpType           1
+ ExtLine           1           5           2           3           4
+ massct (-1.210232468403600E-004,-1.669107163270191E-004)
+
+ PrimAmpType           1
+ ExtLine           1           5           2           4           3
+ massct (1.210232468403600E-004,1.669107163270191E-004)
+
+ PrimAmpType           3
+ ExtLine           1           5           4           3           2
+ massct (-1.580100449557259E-004,-2.175612299570161E-004)
+
+ PrimAmpType           3
+ ExtLine           1           4           3           5           2
+ massct (3.698679811536619E-005,5.065051362999743E-005)
+
+ Sum of PrimAmpType=3: -0.00012102324684035971, -0.00016691071632701867
+
+
+

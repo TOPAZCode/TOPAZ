@@ -1,4 +1,4 @@
-! this is the file to subtract dipoles for qq->tt+g+gamma amplitudes
+! this is the file to subtract dipoles for qq->tt+g+Z amplitudes
       module ModDipoles_QQBTTBGZ
       use ModAmplitudes
       use ModProcess
@@ -9,18 +9,17 @@
       implicit none
       private
 
+      public :: EvalDipoles_QQBTTBGZ
       integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private :: yRnDK(1:10), Wgt_ext(1:2)
+
       real(dp), parameter, private  :: Momzero(1:4)=0d0
-
-      public :: EvalDipoles_QQBTTBGZ
-
       logical, parameter :: invert_alphaCut = .false.
 
       contains
 
 !  we have a list of dipoles that we need to go through
-!  We label things as 0-> bar t(p1)+ gamma(p2) + t(p3) + qb(p4)+q(p5)+g(p6)
+!  We label things as 0-> bar t(p1)+ Z(p2) + t(p3) + qb(p4)+q(p5)+g(p6)
 !  and we  assume that quarks in the initial state have momenta p4 and p5,
 
 
@@ -157,7 +156,7 @@
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
              do iTree=1,2
-             call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
+              call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
              first_time=.false.
       endif
@@ -204,7 +203,6 @@
                 return
             endif
         endif
-
         vijk  = vel(pij,pk)
         tvijk = vel(pijt,pkt)
         viji  = vel(pij,pi)
@@ -222,7 +220,7 @@
           q(:,1) = p(:,1)
           fl(1) = 'qm'
           q(:,2) = p(:,2)
-          fl(2) = 'gm'
+          fl(2) = 'gm'   ! z boson
           q(:,3) = p(:,3)
           fl(3) = 'qm'
           q(:,4) = p(:,4)
@@ -258,6 +256,8 @@
           call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
           PSWgt1 = PSWgt1 * PSWgt3
        ENDIF
+
+
 
 
 !----------------- ini   ini     final   top   top, real
@@ -333,10 +333,9 @@
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
    endif
 
-   if (pos.eq.2) then    ! photons
-      print *, 'error, pos = 2, photon'
+   if (pos.eq.2) then    ! z
+      print *, 'error, pos = 2, z boson'
       stop
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
    endif
 
    if (pos.eq.3) then
@@ -354,7 +353,7 @@
 
 
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+        call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
       enddo
 
 
@@ -372,7 +371,7 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
@@ -507,7 +506,7 @@
 
 
        if( first_time ) then
-             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitTrees(4,0,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
@@ -515,7 +514,9 @@
              call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
              first_time=.false.
-       endif
+      endif
+
+
 
 !       momentum mapping
         pi=p(:,i)
@@ -551,7 +552,7 @@
         endif
 
           fl(1) = 'qm'
-          fl(2) = 'gm'   ! photon
+          fl(2) = 'gm'   ! z boson
           fl(3) = 'qm'
           fl(4) = 'qu'
           fl(5) = 'qu'
@@ -571,11 +572,10 @@
 !----- now generate the top decay products
 
        if (TopDecays.ge.1) then
-         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false., &
-  MomDK(1:4,1:3),PSWgt1)
-         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false., &
-  MomDK(1:4,4:6),PSWgt2)
+         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
+         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
        elseif(TopDecays.eq.0) then
+         MomDK = 0d0
          PSWgt1 = one
          PSWgt2 = one
        else
@@ -583,40 +583,52 @@
           pause
        endif
 
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
 
-!-----initial   initial       final  top      top
 
-  call Kinematics_TTBARPHOTON(0, &
- (/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero, &
-    MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3), &
-    MomDK(1:4,4),MomDK(1:4,5),MomDK(1:4,6)/), &
-    (/4,5,3,1,2,6,7,8,9,10,11,12/), &
-    Not_Passed_Cuts,NBin(1:NumHistograms) &
-    )
+
+
+
+!----------------- ini   ini     final   top   top, real
+
+
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+
 
 
      if(Not_Passed_Cuts.eq..false.) then
 
 
         call cc_qq_ttgamg_soft(n,C)
-         Nmax = 1
 
+        Nmax = 1
         if (TopDecays.ge.1) then ! Top decays
-               Nmax(3) = -1
-               Nmax(1) = -1
-        if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1               ! helicity index below
-               Nmax(1) = 1
+              Nmax(3) = -1
+              Nmax(1) = -1
+              if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1               ! helicity index below
+                  Nmax(1) = 1
+              endif
         endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
         endif
-
-!--- after momentum mapping -- sum over colors and polarizations
 
        do i1=-1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
-             do i3 = -1,Nmax(3),2
-               do i4 = -1,Nmax(4),2
-                 do i5=-1,Nmax(5),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
+           do i3 = -1,Nmax(3),2
+             do i4 = -1,Nmax(4),2
+               do i5 = -1,Nmax(5),2
 
            hel(1) = i1
            hel(2) = i2
@@ -648,7 +660,7 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
       if (pos.eq.1) then
        if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -695,7 +707,7 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
@@ -825,7 +837,7 @@
 
 
        if( first_time ) then
-             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitTrees(4,0,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
@@ -834,6 +846,7 @@
              enddo
              first_time=.false.
       endif
+
 
 
 !       momentum mapping
@@ -892,11 +905,10 @@
 
 
        if (TopDecays.ge.1) then
-         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false., &
-  MomDK(1:4,1:3),PSWgt1)
-         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false., &
-  MomDK(1:4,4:6),PSWgt2)
+         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
+         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
        elseif(TopDecays.eq.0) then
+         MomDK = 0d0
          PSWgt1 = one
          PSWgt2 = one
        else
@@ -904,15 +916,27 @@
           pause
        endif
 
-!----------------- initial   initial        final top      top
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
 
-  call Kinematics_TTBARPHOTON(0, &
- (/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero, &
-    MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3), &
-    MomDK(1:4,4),MomDK(1:4,5),MomDK(1:4,6)/), &
-    (/4,5,3,1,2,6,7,8,9,10,11,12/), &
-    Not_Passed_Cuts,NBin(1:NumHistograms) &
-    )
+
+
+
+
+!----------------- ini   ini     final   top   top, real
+
+
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+
+
 
      if(Not_Passed_Cuts.eq..false.) then
 
@@ -920,22 +944,25 @@
 
 !--- after momentum mapping -- sum over colors and polarizations
 
-         Nmax = 1
-
+        Nmax = 1
         if (TopDecays.ge.1) then ! Top decays
-               Nmax(3) = -1
-               Nmax(1) = -1
-          if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1           ! helicity index below
-               Nmax(1) = 1
-          endif
+              Nmax(3) = -1
+              Nmax(1) = -1
+              if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1               ! helicity index below
+                  Nmax(1) = 1
+              endif
+        endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
         endif
 
-       do i1 = -1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
-             do i3 = -1,Nmax(3),2
-                do i4 = -1,Nmax(4),2
-                   do i5 = -1,Nmax(5),2
+       do i1=-1,Nmax(1),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
+           do i3 = -1,Nmax(3),2
+             do i4 = -1,Nmax(4),2
+               do i5 = -1,Nmax(5),2
 
 
            hel(1) = i1
@@ -971,15 +998,7 @@
 
 
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
-
-
-!       print *, "if dipole"
-!       print *, ExtParticles(1)%Mom(1:4).dot.ExtParticles(1)%Mom(1:4)
-!       print *, ExtParticles(2)%Mom(1:4).dot.ExtParticles(2)%Mom(1:4)
-!       print *, ExtParticles(3)%Mom(1:4).dot.ExtParticles(3)%Mom(1:4)
-!       print *, ExtParticles(4)%Mom(1:4).dot.ExtParticles(4)%Mom(1:4)
-!       print *, ExtParticles(5)%Mom(1:4).dot.ExtParticles(5)%Mom(1:4)
+    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
 
 
 
@@ -1032,7 +1051,7 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
@@ -1168,7 +1187,7 @@
 
 
        if( first_time ) then
-             call InitTrees(4,1,2,TreeAmpsDip,NumBoson=1)
+             call InitTrees(4,0,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTQbQZ(ExtParticles(1:5))
              TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
              TreeAmpsDip(2)%PartRef(1:5) = (/1,2,3,5,4/)
@@ -1177,6 +1196,7 @@
              enddo
              first_time=.false.
       endif
+
 
 
 !       momentum mapping
@@ -1237,11 +1257,10 @@
         enddo
 
        if (TopDecays.ge.1) then
-         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false., &
-  MomDK(1:4,1:3),PSWgt1)
-         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false., &
-  MomDK(1:4,4:6),PSWgt2)
+         call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
+         call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
        elseif(TopDecays.eq.0) then
+         MomDK = 0d0
          PSWgt1 = one
          PSWgt2 = one
        else
@@ -1249,15 +1268,26 @@
           pause
        endif
 
-!-----------------     initial   initial       final  top      top
+       if( ZDecays.le.10 ) then  ! decaying on-shell Z
+            MZ_Inv = m_Z
+       elseif( ZDecays.gt.10 ) then  ! decaying off-shell Z
+            call Error("need to implement phase space for off-shell Z's")
+            ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
+       endif
+       IF( ZDECAYS.NE.0 ) THEN
+          call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
+          PSWgt1 = PSWgt1 * PSWgt3
+       ENDIF
 
-  call Kinematics_TTBARPHOTON(0, &
- (/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero, &
-    MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3), &
-    MomDK(1:4,4),MomDK(1:4,5),MomDK(1:4,6)/), &
-    (/4,5,3,1,2,6,7,8,9,10,11,12/), &
-    Not_Passed_Cuts,NBin(1:NumHistograms) &
-    )
+
+
+
+
+!----------------- ini   ini     final   top   top, real
+
+
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+
 
      if(Not_Passed_Cuts.eq..false.) then
 
@@ -1265,22 +1295,25 @@
 
 !--- after momentum mapping -- sum over colors and polarizations
 
-         Nmax = 1
-
+        Nmax = 1
         if (TopDecays.ge.1) then ! Top decays
-               Nmax(3) = -1
-               Nmax(1) = -1
-        if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1           ! helicity index below
-               Nmax(1) = 1
+              Nmax(3) = -1
+              Nmax(1) = -1
+              if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1               ! helicity index below
+                  Nmax(1) = 1
+              endif
         endif
+        N2Jump = 1
+        if (ZDecays.ge.1) then ! Z decays
+            N2jump=2
         endif
 
        do i1=-1,Nmax(1),2
-          do i2 = -1,Nmax(2),2
-             do i3 = -1,Nmax(3),2
-                do i4 = -1,Nmax(4),2
-                     do i5=-1,Nmax(5),2
+         do i2 = -1,Nmax(2),N2Jump! Z boson
+           do i3 = -1,Nmax(3),2
+             do i4 = -1,Nmax(4),2
+               do i5 = -1,Nmax(5),2
 
            hel(1) = i1
            hel(2) = i2
@@ -1313,7 +1346,8 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+
 
      if (pos.eq.1) then
       if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -1363,7 +1397,7 @@
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
@@ -1464,76 +1498,76 @@
 
 
       if(n.eq.1) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp
-      C(2,1)=-8.0_dp/3.0_dp
-      C(2,2)=-8.0_dp/3.0_dp
+      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp/Q_top
+      C(2,1)=-8.0_dp/3.0_dp/Q_top
+      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.2) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp
-      C(2,1)=16.0_dp/3.0_dp
-      C(2,2)=16.0_dp/3.0_dp
+      C(1,1)=16.0_dp/3.0_dp/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp/Q_top
+      C(2,1)=16.0_dp/3.0_dp/Q_top
+      C(2,2)=16.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.3) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp
-      C(2,1)=56.0_dp/3.0_dp
-      C(2,2)=56.0_dp/3.0_dp
+      C(1,1)=56.0_dp/3.0_dp/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp/Q_top
+      C(2,1)=56.0_dp/3.0_dp/Q_top
+      C(2,2)=56.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.4) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp
-      C(2,1)=-8.0_dp/3.0_dp
-      C(2,2)=-8.0_dp/3.0_dp
+      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp/Q_top
+      C(2,1)=-8.0_dp/3.0_dp/Q_top
+      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.5) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp
-      C(2,1)=56.0_dp/3.0_dp
-      C(2,2)=56.0_dp/3.0_dp
+      C(1,1)=56.0_dp/3.0_dp/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp/Q_top
+      C(2,1)=56.0_dp/3.0_dp/Q_top
+      C(2,2)=56.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.6) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp
-      C(2,1)=16.0_dp/3.0_dp
-      C(2,2)=16.0_dp/3.0_dp
+      C(1,1)=16.0_dp/3.0_dp/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp/Q_top
+      C(2,1)=16.0_dp/3.0_dp/Q_top
+      C(2,2)=16.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.7) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp
-      C(2,1)=16.0_dp/3.0_dp
-      C(2,2)=16.0_dp/3.0_dp
+      C(1,1)=16.0_dp/3.0_dp/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp/Q_top
+      C(2,1)=16.0_dp/3.0_dp/Q_top
+      C(2,2)=16.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.8) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp
-      C(2,1)=56.0_dp/3.0_dp
-      C(2,2)=56.0_dp/3.0_dp
+      C(1,1)=56.0_dp/3.0_dp/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp/Q_top
+      C(2,1)=56.0_dp/3.0_dp/Q_top
+      C(2,2)=56.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.9) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp
-      C(2,1)=-8.0_dp/3.0_dp
-      C(2,2)=-8.0_dp/3.0_dp
+      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp/Q_top
+      C(2,1)=-8.0_dp/3.0_dp/Q_top
+      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.10) then
-      C(1,1)=56.0_dp/3.0_dp
-      C(1,2)=56.0_dp/3.0_dp
-      C(2,1)=56.0_dp/3.0_dp
-      C(2,2)=56.0_dp/3.0_dp
+      C(1,1)=56.0_dp/3.0_dp/Q_top**2
+      C(1,2)=56.0_dp/3.0_dp/Q_top
+      C(2,1)=56.0_dp/3.0_dp/Q_top
+      C(2,2)=56.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.11) then
-      C(1,1)=16.0_dp/3.0_dp
-      C(1,2)=16.0_dp/3.0_dp
-      C(2,1)=16.0_dp/3.0_dp
-      C(2,2)=16.0_dp/3.0_dp
+      C(1,1)=16.0_dp/3.0_dp/Q_top**2
+      C(1,2)=16.0_dp/3.0_dp/Q_top
+      C(2,1)=16.0_dp/3.0_dp/Q_top
+      C(2,2)=16.0_dp/3.0_dp/Q_top**2
       endif
       if(n.eq.12) then
-      C(1,1)=-8.0_dp/3.0_dp
-      C(1,2)=-8.0_dp/3.0_dp
-      C(2,1)=-8.0_dp/3.0_dp
-      C(2,2)=-8.0_dp/3.0_dp
+      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,2)=-8.0_dp/3.0_dp/Q_top
+      C(2,1)=-8.0_dp/3.0_dp/Q_top
+      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
       endif
 
 
