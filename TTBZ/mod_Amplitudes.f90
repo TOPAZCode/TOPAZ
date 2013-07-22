@@ -305,7 +305,12 @@ integer :: i,j,Order(1:6)
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  4 quarks, no scalars
           if( TreeProc%PartType(1).eq.Glu_ ) then
-              Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
+             if( TreeProc%NumV.eq.0 ) then
+                Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
+              elseif( TreeProc%NumV.eq.1 ) then
+
+                 Res(1:Dv) = cur_g_4fV( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:5) )
+              endif
 ! print *, "CHECK POINT cur_g_4f"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom+ TreeProc%Quarks(3)%Mom+ TreeProc%Quarks(4)%Mom)
 ! pause
@@ -383,7 +388,11 @@ integer :: i,j,Order(1:6)
 !----------------------------------------
       elseif( TreeProc%NumQua.eq.6  .and. TreeProc%NumSca.eq.0) then!  6 quarks, no scalars
           if( IsAQuark(TreeProc%PartType(1)) ) then
-              Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f )
+             if (TreeProc%NumV .eq. 0) then
+                Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f )
+             elseif( TreeProc%NumV.eq.1 ) then
+                Res(1:Ds) = cur_f_6fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:6),tag_f )
+             endif
           else
               call Error("requested current is not available 6q")
           endif
