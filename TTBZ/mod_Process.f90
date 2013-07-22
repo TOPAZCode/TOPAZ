@@ -3966,6 +3966,8 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     ExtParticle(4)%PartType = Str_
     ExtParticle(5)%PartType = Z0_
 
+    if( Process.ge.81 .and. Process.le.89 ) ExtParticle(5)%PartType = Pho_
+
     IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5) THEN
       NumPrimAmps = 2
       NumBornAmps = 2
@@ -6068,8 +6070,11 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0  ! ttbZ
       BornAmps(4)%ExtLine = (/1,2,3,5,4/)
       BornAmps(5)%ExtLine = (/1,5,4,3,2/)
       BornAmps(6)%ExtLine = (/1,4,3,5,2/)
-      BornAmps(7)%ExtLine = (/1,5,2,3,4/)
+! note that BornAmps 7 and 8 both give the same as 2, so use only one of these when looking at (virtual) primitive 7+8...
+      BornAmps(7)%ExtLine = (/1,2,3,5,4/)
       BornAmps(8)%ExtLine = (/1,2,3,5,4/)
+      BornAmps(9)%ExtLine = (/1,4,5,3,2/)
+      BornAmps(10)%ExtLine = (/1,5,2,3,4/)
 
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
       PrimAmps(1)%AmpType = 1
