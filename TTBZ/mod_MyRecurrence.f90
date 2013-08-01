@@ -994,11 +994,12 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_4f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_4f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f,tag_Z) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
 integer :: NumGlu(0:4),Quark1PartType
 type(PtrToParticle) :: Gluons(1:),Quarks(2:4)
 integer :: tag_f
+integer, optional :: tag_Z
 integer,target :: TmpExtRef
 complex(8) :: res(1:Ds),tmp(1:Ds)
 complex(8) :: ubar1(1:Ds)
@@ -1019,8 +1020,11 @@ integer :: rIn,rOut,i,counter
     if(Quarks(2)%PartType.eq.-Quarks(3)%PartType .and. Quark1PartType.ne.-Quarks(4)%PartType ) print *,"wrong flavor in cur_f_4f (2)"
 !DEC$ ENDIF
 
-
    Res(:)=(0d0,0d0)
+
+   if (.not. present(tag_Z) ) then
+      tag_Z=0
+   endif
 
    if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType ) then
 !     (I)
@@ -1114,7 +1118,13 @@ integer :: rIn,rOut,i,counter
          rOut=NumGlu(1)+NumGlu(2)+n3a
 
 ! This prevents color issues with a Z on the quark loop, see RR notes
-         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) ) cycle
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) &
+              .and. Quarks(4)%ExtRef .eq. -1) then
+            cycle
+         endif
+
+            
+
 
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
@@ -1227,7 +1237,7 @@ complex(8) :: PMom4(1:Dv)
             nf=NumGlu(5)-ne
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -1300,7 +1310,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0,0)
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Quarks(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
@@ -1499,9 +1509,9 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_6f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_6f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f,tag_Z) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
-integer :: NumGlu(0:6),Quark1PartType,tag_f
+integer :: NumGlu(0:6),Quark1PartType,tag_f,tag_Z
 type(PtrToParticle) :: Gluons(1:),Quarks(2:6)
 integer,target :: TmpPartType,TmpExtRef
 complex(8) :: Res(1:Ds),tmp(1:Ds)
@@ -1621,6 +1631,11 @@ integer :: rIn,rOut,i,counter
 
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a
+
+! preventing color issues with Z on the loop, see RR notes 05-22-2013
+!note: only tested for zero gluons
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a .eq. NumGlu(0)) ) cycle
+
          Eps2 = cur_g_4f(Gluons(rIn:rOut),Quarks(2:5),(/1+n1b+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a,n1b,NumGlu(2),NumGlu(3),NumGlu(4),n5a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Quarks(5)%Mom
          PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
@@ -1684,7 +1699,9 @@ integer :: rIn,rOut,i,counter
             tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),Quark1PartType,(/counter-1,n1a,n6b/) )
 
             Res(:) = Res(:) + tmp(:)
+
 !             Res2(:) = Res2(:) + tmp(:)
+            
 !             print *, "2",tmp(:)
          enddo
       enddo
@@ -1724,7 +1741,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
 
             if( Quark1PartType.eq.-Quarks(2)%PartType) then
@@ -1838,6 +1855,8 @@ integer :: rIn,rOut,i,counter
             counter=1
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+n3a
+
+            
             Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
             PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
             PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
@@ -1846,7 +1865,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom
 
             if( Quark1PartType.eq.-Quarks(4)%PartType ) then
@@ -1940,6 +1959,8 @@ integer :: rIn,rOut,i,counter
       enddo
       enddo
     endif
+!    print *, 'res', res
+!    pause
 !     Res(:) = Res1(:)+Res2(:)+Res3(:)+Res4(:)
 !     print *, "Res1:",Res1(1:4)
 !     print *, "Res2:",Res2(1:4)
@@ -2433,7 +2454,6 @@ elseif ( Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
 
 
 !           (I) Z on top <--> n3b=1
-            if (BosonVertex .eq. 3 .or. BosonVertex .eq. 4) then
                rIn =NumGlu(1)+NumGlu(2)+n3a+1
                rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
                spiUDr(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n4a+n3b,n3b,n4a/))          ! undressed current
@@ -2486,9 +2506,7 @@ elseif ( Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
                   Res(:) = Res(:) + tmp(:)
                endif
 
-            endif
 
-            if (BosonVertex .eq. 1 .or. BosonVertex .eq. 4) then
                !           (I) Z on bottom <--> n1a=1
                rIn =NumGlu(1)+NumGlu(2)+n3a+1
                rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
@@ -2541,7 +2559,6 @@ elseif ( Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quar
                   tmp(:) = cur_f_2fV_massCT(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
                   Res(:) = Res(:) + tmp(:)
                endif
-            endif
             enddo
          enddo
       enddo
@@ -4109,11 +4126,11 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_4fV(Gluons,Quarks,Quark1PartType,Boson,BosonVertex,NumGlu,tag_f) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_4fV(Gluons,Quarks,Quark1PartType,Boson,BosonVertex,NumGlu,tag_f,tag_Z) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
 integer :: NumGlu(0:4),Quark1PartType
 type(PtrToParticle) :: Gluons(1:),Quarks(2:4),Boson
-integer :: tag_f,BosonVertex
+integer :: tag_f,BosonVertex,tag_Z
 integer,target :: TmpExtRef
 complex(8) :: res(1:Ds),tmp(1:Ds)
 complex(8) :: ubar1(1:Ds)
@@ -4596,7 +4613,7 @@ complex(8) :: PMom4(1:Dv)
             nf=NumGlu(5)-ne
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -4670,7 +4687,7 @@ complex(8) :: PMom4(1:Dv)
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
             BosonVertex_mod = BosonVertex  + 1
 !            if (BosonVertex .eq. 1) BosonVertex_mod=BosonVertex
-            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,Boson,BosonVertex_mod,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0)
+            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,Boson,BosonVertex_mod,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0,0)
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Quarks(3)%Mom + Boson%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
@@ -4747,7 +4764,7 @@ complex(8) :: PMom4(1:Dv)
             rIn = NumGlu(1)+nc+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
             BosonVertex_mod=BosonVertex
-            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,Boson,BosonVertex_mod,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
+            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,Boson,BosonVertex_mod,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Boson%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -4822,7 +4839,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0,0)
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Quarks(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
@@ -4904,7 +4921,7 @@ complex(8) :: PMom4(1:Dv)
                 nf=NumGlu(5)-ne
                 rIn = NumGlu(1)+nc+1
                 rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-                u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,Boson, BosonVertex,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
+                u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,Boson, BosonVertex,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0,0)
                 PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Boson%Mom
                 PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
                 if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -4976,7 +4993,7 @@ complex(8) :: PMom4(1:Dv)
              nf=NumGlu(5)-ne
              rIn = NumGlu(1)+nc+1
              rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+ne
-             u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0)
+             u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quarks(1)%PartType,(/nd+NumGlu(3)+NumGlu(4)+ne,nd,NumGlu(3),NumGlu(4),ne/),0,0)
              PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
              PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(1)%Mass2)
              if( abs(sc_(PMom2,PMom2) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -5050,7 +5067,7 @@ complex(8) :: PMom4(1:Dv)
        rIn = na+1
        rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
        BosonVertex_mod=BosonVertex+1
-       u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,Boson,BosonVertex_mod,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0)
+       u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,Boson,BosonVertex_mod,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0,0)
        PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Quarks(3)%Mom + Boson%Mom
        PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
        if ( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) then
@@ -5223,7 +5240,7 @@ complex(8) :: PMom4(1:Dv)
 
             rIn = na+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(1:3),Quarks(4)%PartType,(/nb+NumGlu(2)+NumGlu(3)+nc,nb,NumGlu(2),NumGlu(3),nc/),0,0)
             PMom2 =  SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom + Quarks(2)%Mom + Quarks(3)%Mom
             PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
             if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
@@ -5688,13 +5705,15 @@ integer :: rIn,rOut,i,counter
 
 
 !   (B)
-    if( Quark1PartType.eq.-Quarks(6)%PartType .AND. (Quarks(2)%PartType.eq.-Quarks(5)%PartType .or. Quarks(2)%PartType.eq.-Quarks(3)%PartType) &
-        .AND. (Quarks(6)%ExtRef.ne.-1 .or. tag_f.ne.1) &
-      ) then
+!! RR -- I think that only times this will be called in ttbZ will be color-zero in any case (tadpoles), so I'm going to just comment it out.
+!! I imagine that if implemented correctly, then the it would return zero for ttbZ for kinematic reasons, but there doesn't seem to be any poin in coding it up for now...
 
-      call Error("This 6fV(B) current is not yet implemented")
-
-    endif
+!    if( Quark1PartType.eq.-Quarks(6)%PartType .AND. (Quarks(2)%PartType.eq.-Quarks(5)%PartType .or. Quarks(2)%PartType.eq.-Quarks(3)%PartType) &
+!        .AND. (Quarks(6)%ExtRef.ne.-1 .or. tag_f.ne.1) &
+!      ) then
+!      call Error("This 6fV(B) current is not yet implemented")
+!
+!    endif
 
 !   (C)
     if( Quarks(5)%PartType.eq.-Quarks(6)%PartType .AND. &
@@ -5720,7 +5739,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
 
             if( Quark1PartType.eq.-Quarks(2)%PartType) then
@@ -5842,7 +5861,7 @@ integer :: rIn,rOut,i,counter
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
             BosonVertex_mod = BosonVertex
-            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,Boson,BosonVertex_mod,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0)
+            u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,Boson,BosonVertex_mod,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Boson%Mom
 
             if( Quark1PartType.eq.-Quarks(2)%PartType) then
@@ -5961,7 +5980,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),Quark1PartType,(/n1b+NumGlu(2)+NumGlu(3)+n4a,n1b,NumGlu(2),NumGlu(3),n4a/),0,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
 
             if( Quark1PartType.eq.-Quarks(2)%PartType) then
@@ -6084,7 +6103,7 @@ endif
 
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom
 
             if( Quark1PartType.eq.-Quarks(4)%PartType ) then
@@ -6120,7 +6139,33 @@ endif
                 TmpQuark(1)%Mass => Quarks(4)%Mass
                 TmpQuark(1)%Mass2=> Quarks(4)%Mass2
             elseif(Quark1PartType.eq.-Quarks(6)%PartType) then
-                call Error("Not yet implemented in cur cur_f_6fV D")
+               if( Quarks(6)%PartType.lt.0 ) then
+                  PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                  if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                  u1 = (-spi2_(PMom2,u1) + Quarks(6)%Mass*u1 )*PropFac2
+                  ubar0 = vgbq(eps2,u1)       ! re-checked
+                  rIn = n1a+1
+                  rOut= NumGlu(1)+NumGlu(2)+n3a
+                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
+                  if( n1a.ge.1 .or. n6b.ge.1 .or. BosonVertex.eq.1 .or. BosonVertex.eq.6 ) then
+                      PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                      if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                      ubar0 = (-spi2_(PMom2,ubar0) + Quarks(6)%Mass*ubar0 )*PropFac2
+                  endif
+                elseif( Quarks(6)%PartType.gt.0 ) then
+                  PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                  if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                  u1 = ( spb2_(u1,PMom2) + Quarks(6)%Mass*u1 )*PropFac2
+                  ubar0 = vgq(eps2,u1)       ! re-checked
+                  rIn = n1a+1
+                  rOut= NumGlu(1)+NumGlu(2)+n3a
+                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom 
+                  if( n1a.ge.1 .or. n6b.ge.1  .or. BosonVertex.eq.1 .or. BosonVertex.eq.6 ) then
+                      PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                      if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                      ubar0 = ( spb2_(ubar0,PMom2) + Quarks(6)%Mass*ubar0 )*PropFac2
+                  endif
+                endif
             endif
             TmpExtRef = -1
             TmpQuark(1)%ExtRef => TmpExtRef
@@ -6176,7 +6221,7 @@ endif
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
             BosonVertex_mod = BosonVertex
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom
 
             if( Quark1PartType.eq.-Quarks(4)%PartType ) then
@@ -6207,13 +6252,39 @@ endif
                       ubar0 = ( spb2_(ubar0,PMom2) + Quarks(4)%Mass*ubar0 )*PropFac2
                   endif
                 endif
-                TmpQuark(1)%Mom  => PMom2(:)
-                TmpQuark(1)%Pol  => ubar0(:)
-                TmpQuark(1)%Mass => Quarks(4)%Mass
-                TmpQuark(1)%Mass2=> Quarks(4)%Mass2
             elseif(Quark1PartType.eq.-Quarks(6)%PartType) then
-                call Error("Not yet implemented in cur cur_f_6fV D")
+               if( Quarks(6)%PartType.lt.0 ) then
+                  PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                  if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                  u1 = (-spi2_(PMom2,u1) + Quarks(6)%Mass*u1 )*PropFac2
+                  ubar0 = vgbq(eps2,u1)       ! re-checked
+                  rIn = n1a+1
+                  rOut= NumGlu(1)+NumGlu(2)+n3a
+                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom+  Boson%Mom
+                  if( n1a.ge.1 .or. n6b.ge.1 ) then
+                      PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                      if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                      ubar0 = (-spi2_(PMom2,ubar0) + Quarks(6)%Mass*ubar0 )*PropFac2
+                  endif
+                elseif( Quarks(6)%PartType.gt.0 ) then
+                  PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                  if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                  u1 = ( spb2_(u1,PMom2) + Quarks(6)%Mass*u1 )*PropFac2
+                  ubar0 = vgq(eps2,u1)       ! re-checked
+                  rIn = n1a+1
+                  rOut= NumGlu(1)+NumGlu(2)+n3a
+                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Boson%Mom
+                  if( n1a.ge.1 .or. n6b.ge.1 ) then
+                      PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
+                      if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
+                      ubar0 = ( spb2_(ubar0,PMom2) + Quarks(6)%Mass*ubar0 )*PropFac2
+                  endif
+                endif
             endif
+            TmpQuark(1)%Mom  => PMom2(:)
+            TmpQuark(1)%Pol  => ubar0(:)
+            TmpQuark(1)%Mass => Quarks(4)%Mass
+            TmpQuark(1)%Mass2=> Quarks(4)%Mass2
             TmpExtRef = -1
             TmpQuark(1)%ExtRef => TmpExtRef
             TmpPartType = -Quark1PartType
@@ -6265,7 +6336,7 @@ endif
          rIn = NumGlu(1)+NumGlu(2)+n3a+1
          rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
          BosonVertex_mod=BosonVertex-2
-         u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,Boson,BosonVertex_mod,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f)
+         u1 = cur_f_4fV(Gluons(rIn:rOut),Quarks(4:6),Quark1PartType,Boson,BosonVertex_mod,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),tag_f,0)
          PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom+Boson%Mom
 
             if( Quark1PartType.eq.-Quarks(4)%PartType ) then
@@ -7463,7 +7534,7 @@ integer :: rIn,rOut,i,counter
 
             rIn = NumGlu(1)+NumGlu(2)+n3a+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
-            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),-Quarks(4)%PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),2)
+            u1 = cur_f_4f(Gluons(rIn:rOut),Quarks(2:4),-Quarks(4)%PartType,(/n3b+NumGlu(4)+NumGlu(5)+n6a,n3b,NumGlu(4),NumGlu(5),n6a/),2,0)
             PMom2  = SumMom(Gluons,rIn,rOut)  + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom
 
                 if( Quarks(4)%PartType.lt.0 ) then
