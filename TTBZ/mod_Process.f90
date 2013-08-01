@@ -120,7 +120,7 @@ type(PrimitiveAmplitude),allocatable, target :: PrimAmps(:)
 type(BornAmplitude),allocatable, target :: BornAmps(:)
 
 integer, public :: NumExtParticles,NumHelicities,NumPrimAmps,NumBornAmps
-integer, public :: tag_Z
+!integer, public :: tag_Z
 integer h1,h2,h3,h4,h5,h6,ih
 
 
@@ -3972,8 +3972,8 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
       NumPrimAmps = 2
       NumBornAmps = 2
     ELSEIF( Correction.EQ.1 ) THEN
-       NumPrimAmps = 10               ! this does not include the ferm loop prims
-       NumBornAmps = 10
+       NumPrimAmps = 18
+       NumBornAmps = 18
     ENDIF
     allocate(PrimAmps(1:NumPrimAmps))
     allocate(BornAmps(1:NumPrimAmps))
@@ -6147,7 +6147,62 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN! tb t qb q Z0  ! ttbZ
       if( AllocStatus .ne. 0 ) call Error("Memory allocation for Sisters")
 
 
-      print *, ' NO FERMION LOOPS INCLUDED YET!'
+! ferm loops begin here    
+      PrimAmps(11)%ExtLine=(/1,2,5,3,4/)
+      PrimAmps(11)%AmpType=2
+      PrimAmps(11)%NumSisters=0
+      PrimAmps(11)%FermLoopPart=Chm_
+      PrimAmp2_12534=11
+      allocate( PrimAmps(11)%Sisters(1:PrimAmps(11)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(12)%ExtLine=(/1,2,3,4,5/)
+      PrimAmps(12)%AmpType=2
+      PrimAmps(12)%NumSisters=0
+      PrimAmps(12)%FermLoopPart=Chm_
+      PrimAmp2_12345=12
+      allocate( PrimAmps(12)%Sisters(1:PrimAmps(12)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(13)%ExtLine=(/1,2,5,3,4/)
+      PrimAmps(13)%AmpType=2
+      PrimAmps(13)%NumSisters=0
+      PrimAmps(13)%FermLoopPart=Bot_
+      PrimAmp2m_12534=13
+      allocate( PrimAmps(13)%Sisters(1:PrimAmps(13)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(14)%ExtLine=(/1,2,3,4,5/)
+      PrimAmps(14)%AmpType=2
+      PrimAmps(14)%NumSisters=0
+      PrimAmps(14)%FermLoopPart=Bot_
+      PrimAmp2m_12345=14
+      allocate( PrimAmps(14)%Sisters(1:PrimAmps(14)%NumSisters), stat=AllocStatus )  
+
+      PrimAmps(15)%ExtLine=(/1,5,2,3,4/)
+      PrimAmps(15)%AmpType=2
+      PrimAmps(15)%NumSisters=0
+      PrimAmps(15)%FermLoopPart=Chm_
+      PrimAmp2_15234=15
+      allocate( PrimAmps(15)%Sisters(1:PrimAmps(15)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(16)%ExtLine=(/1,5,2,3,4/)
+      PrimAmps(16)%AmpType=2
+      PrimAmps(16)%NumSisters=0
+      PrimAmps(16)%FermLoopPart=Bot_
+      PrimAmp2m_15234=16
+      allocate( PrimAmps(16)%Sisters(1:PrimAmps(16)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(17)%ExtLine=(/1,2,3,5,4/)
+      PrimAmps(17)%AmpType=2
+      PrimAmps(17)%NumSisters=0
+      PrimAmps(17)%FermLoopPart=Chm_
+      PrimAmp2_12354=17
+      allocate( PrimAmps(17)%Sisters(1:PrimAmps(17)%NumSisters), stat=AllocStatus )
+
+      PrimAmps(18)%ExtLine=(/1,2,3,5,4/)
+      PrimAmps(18)%AmpType=2
+      PrimAmps(18)%NumSisters=0
+      PrimAmps(18)%FermLoopPart=Bot_
+      PrimAmp2m_12354=18
+      allocate( PrimAmps(18)%Sisters(1:PrimAmps(18)%NumSisters), stat=AllocStatus )
 
    ENDIF
 
