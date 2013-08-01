@@ -18,7 +18,7 @@
        implicit none
        include 'misc/global_import'
        integer Ds,i,tag_pol
-       integer j,j1,j2,tag_f
+       integer j,j1,j2,tag_f,tag_Z
        integer i1,i2,i3,i4,ia,ib,j3,j4,j5
        double complex lv(5)
        double complex k1(4),k2(4),k3(4),k4(4)
@@ -185,11 +185,11 @@
             tag_f = 99
           endif
 
-            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(6,8,Nj3,Nj4,POL3,BPOL4,tag_f,TreeProcs(3),mur3)
-            call new_ampl(6,8,Nj4,Nj5,POL4,BPOL5,tag_f,TreeProcs(4),mur4)
-            call new_ampl(6,8,Nj5,Nj1,POL5,BPOL1,tag_f,TreeProcs(5),mur5)
+            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(6,8,Nj3,Nj4,POL3,BPOL4,tag_f,tag_Z,TreeProcs(3),mur3)
+            call new_ampl(6,8,Nj4,Nj5,POL4,BPOL5,tag_f,tag_Z,TreeProcs(4),mur4)
+            call new_ampl(6,8,Nj5,Nj1,POL5,BPOL1,tag_f,tag_Z,TreeProcs(5),mur5)
 !DEC$ ENDIF
 
 
@@ -267,11 +267,11 @@
             call ampl(TreeProcs(5),8,16,Nj5,Nj1,POL5,q5(1:5),lab1,l5c(5),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur5)
 
 !DEC$ ELSE
-            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(8,16,Nj3,Nj4,POL3,BPOL4,tag_f,TreeProcs(3),mur3)
-            call new_ampl(8,16,Nj4,Nj5,POL4,BPOL5,tag_f,TreeProcs(4),mur4)
-            call new_ampl(8,16,Nj5,Nj1,POL5,BPOL1,tag_f,TreeProcs(5),mur5)
+            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(8,16,Nj3,Nj4,POL3,BPOL4,tag_f,tag_Z,TreeProcs(3),mur3)
+            call new_ampl(8,16,Nj4,Nj5,POL4,BPOL5,tag_f,tag_Z,TreeProcs(4),mur4)
+            call new_ampl(8,16,Nj5,Nj1,POL5,BPOL1,tag_f,tag_Z,TreeProcs(5),mur5)
 !DEC$ ENDIF
 
 
@@ -326,7 +326,7 @@ END SUBROUTINE
        implicit none
        include 'misc/global_import'
        integer Ds,i,tag_pol
-       integer j,j1,j2, tag_f
+       integer j,j1,j2, tag_f,tag_Z
        integer i1,i2,i3,ia,ib,j3,j4
        double complex lv(5)
        double complex vpol1(16),vpol2(16)
@@ -471,10 +471,10 @@ END SUBROUTINE
             lab2=Lab_in(l4c(1))
             call ampl(TreeProcs(4),4,4,Nj4,Nj1,POL4,q4(1:5),lab1,l4c(4),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur4)
 !DEC$ ELSE
-            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(4,4,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(4,4,Nj3,Nj4,POL3,BPOL4,tag_f,TreeProcs(3),mur3)
-            call new_ampl(4,4,Nj4,Nj1,POL4,BPOL1,tag_f,TreeProcs(4),mur4)
+            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(4,4,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(4,4,Nj3,Nj4,POL3,BPOL4,tag_f,tag_Z,TreeProcs(3),mur3)
+            call new_ampl(4,4,Nj4,Nj1,POL4,BPOL1,tag_f,tag_Z,TreeProcs(4),mur4)
 !DEC$ ENDIF
 
 
@@ -548,10 +548,10 @@ END SUBROUTINE
             lab2=Lab_in(l4c(1))
             call ampl(TreeProcs(4),6,8,Nj4,Nj1,POL4,q4(1:5),lab1,l4c(4),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur4)
 !DEC$ ELSE
-            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(6,8,Nj3,Nj4,POL3,BPOL4,tag_f,TreeProcs(3),mur3)
-            call new_ampl(6,8,Nj4,Nj1,POL4,BPOL1,tag_f,TreeProcs(4),mur4)
+            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(6,8,Nj3,Nj4,POL3,BPOL4,tag_f,tag_Z,TreeProcs(3),mur3)
+            call new_ampl(6,8,Nj4,Nj1,POL4,BPOL1,tag_f,tag_Z,TreeProcs(4),mur4)
 !DEC$ ENDIF
 
 
@@ -615,10 +615,10 @@ END SUBROUTINE
             lab2=Lab_in(l4c(1))
             call ampl(TreeProcs(4),8,16,Nj4,Nj1,POL4,q4(1:5),lab1,l4c(4),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur4)
 !DEC$ ELSE
-            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(8,16,Nj3,Nj4,POL3,BPOL4,tag_f,TreeProcs(3),mur3)
-            call new_ampl(8,16,Nj4,Nj1,POL4,BPOL1,tag_f,TreeProcs(4),mur4)
+            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(8,16,Nj3,Nj4,POL3,BPOL4,tag_f,tag_Z,TreeProcs(3),mur3)
+            call new_ampl(8,16,Nj4,Nj1,POL4,BPOL1,tag_f,tag_Z,TreeProcs(4),mur4)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -674,7 +674,7 @@ END SUBROUTINE
        implicit none
        include 'misc/global_import'
        integer Ds,i,tag_pol,pos,pos1,pos2
-       integer j,j1,j2,tag_f
+       integer j,j1,j2,tag_f,tag_Z
        integer i1,i2,ia,ib,j3,n34,lmatch34(50)
        integer lmatch35(50)
        double complex lv(5),lvt(5)
@@ -790,9 +790,9 @@ END SUBROUTINE
             ib=Npoint
             call ampl(TreeProcs(3),4,4,Nj3,Nj1,POL3,q3(1:5),lab1,l3c(3),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur3)
 !DEC$ ELSE
-            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(4,4,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(4,4,Nj3,Nj1,POL3,BPOL1,tag_f,TreeProcs(3),mur3)
+            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(4,4,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(4,4,Nj3,Nj1,POL3,BPOL1,tag_f,tag_Z,TreeProcs(3),mur3)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -851,9 +851,9 @@ END SUBROUTINE
             ib=Npoint
             call ampl(TreeProcs(3),6,8,Nj3,Nj1,POL3,q3(1:5),lab1,l3c(3),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur3)
 !DEC$ ELSE
-            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(6,8,Nj3,Nj1,POL3,BPOL1,tag_f,TreeProcs(3),mur3)
+            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(6,8,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(6,8,Nj3,Nj1,POL3,BPOL1,tag_f,tag_Z,TreeProcs(3),mur3)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -912,9 +912,9 @@ END SUBROUTINE
             lab2=Lab_in(l3c(1))
             call ampl(TreeProcs(3),8,16,Nj3,Nj1,POL3,q3(1:5),lab1,l3c(3),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur3)
 !DEC$ ELSE
-            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,TreeProcs(2),mur2)
-            call new_ampl(8,16,Nj3,Nj1,POL3,BPOL1,tag_f,TreeProcs(3),mur3)
+            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(8,16,Nj2,Nj3,POL2,BPOL3,tag_f,tag_Z,TreeProcs(2),mur2)
+            call new_ampl(8,16,Nj3,Nj1,POL3,BPOL1,tag_f,tag_Z,TreeProcs(3),mur3)
 !DEC$ ENDIF
 
 
@@ -971,7 +971,7 @@ END SUBROUTINE
        integer j,j1,j2,lpos(2),lpos2(3),pos3
        integer i1,ia,ib,n24,n23
        integer lmatch25(50),lmatch24(50),lmatch23(50)
-       integer tag_f
+       integer tag_f,tag_Z
        double complex lv(5),lvt(5),e(1)
        double complex v45(4),vprop(5),propX,r1,r2,krefa(4)
        double complex d(5),c(10),re
@@ -1096,8 +1096,8 @@ END SUBROUTINE
             lab2=Lab_in(l2c(1))
             call ampl(TreeProcs(2),4,4,Nj2,Nj1,POL2,q2(1:5),lab1,l2c(2),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur2)
 !DEC$ ELSE
-            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(4,4,Nj2,Nj1,POL2,BPOL1,tag_f,TreeProcs(2),mur2)
+            call new_ampl(4,4,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(4,4,Nj2,Nj1,POL2,BPOL1,tag_f,tag_Z,TreeProcs(2),mur2)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -1149,8 +1149,8 @@ END SUBROUTINE
             lab2=Lab_in(l2c(1))
             call ampl(TreeProcs(2),6,8,Nj2,Nj1,POL2,q2(1:5),lab1,l2c(2),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur2)
 !DEC$ ELSE
-            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(6,8,Nj2,Nj1,POL2,BPOL1,tag_f,TreeProcs(2),mur2)
+            call new_ampl(6,8,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(6,8,Nj2,Nj1,POL2,BPOL1,tag_f,tag_Z,TreeProcs(2),mur2)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -1198,8 +1198,8 @@ END SUBROUTINE
             lab2=Lab_in(l2c(1))
             call ampl(TreeProcs(2),8,16,Nj2,Nj1,POL2,q2(1:5),lab1,l2c(2),tag_f,ia,ib,BPOL1,q1(1:5),lab2,mur2)
 !DEC$ ELSE
-            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,TreeProcs(1),mur1)
-            call new_ampl(8,16,Nj2,Nj1,POL2,BPOL1,tag_f,TreeProcs(2),mur2)
+            call new_ampl(8,16,Nj1,Nj2,POL1,BPOL2,tag_f,tag_Z,TreeProcs(1),mur1)
+            call new_ampl(8,16,Nj2,Nj1,POL2,BPOL1,tag_f,tag_Z,TreeProcs(2),mur2)
 !DEC$ ENDIF
 
             do j1=1,Nj1
@@ -1254,7 +1254,7 @@ END SUBROUTINE
        include 'misc/global_import'
        integer Nj1
        integer Ds,i,tag_pol,pos,pos1,pos2,pos3,pos4
-       integer j,j1,lpos(3),lpos1(2),lpos3(4),tag_f
+       integer j,j1,lpos(3),lpos1(2),lpos3(4),tag_f,tag_Z
        integer ib,n14,n13,n12,n15
        integer l1c(1),im
        integer lmatch14(50),lmatch13(50)
@@ -1337,7 +1337,7 @@ END SUBROUTINE
             lab2=Lab_in(l1c(1))
             call ampl(TreeProcs(1),4,4,Nj1,Nj1,POL1,q1(1:5),lab1,l1c(1),tag_f,1,ib,BPOL1,q1(1:5),lab2,mur1)
 !DEC$ ELSE
-            call new_ampl(4,4,Nj1,Nj1,POL1,BPOL1,tag_f,TreeProcs(1),mur1)
+            call new_ampl(4,4,Nj1,Nj1,POL1,BPOL1,tag_f,tag_Z,TreeProcs(1),mur1)
 !DEC$ ENDIF
 
 
