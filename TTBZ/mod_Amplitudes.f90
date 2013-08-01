@@ -185,13 +185,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res)
+SUBROUTINE new_calc_ampl(Dv,Ds,tag_f,tag_Z,TreeProc,Res)
 use ModMyRecurrence
 use ModMyWeylRecurrence
 use ModProcess
 use ModParameters
 implicit none
-integer :: Dv,Ds,tag_f,n
+integer :: Dv,Ds,tag_f,tag_Z,n
 complex(8) :: Res(1:Ds)
 type(TreeProcess) :: TreeProc
 logical :: Boson
@@ -316,9 +316,9 @@ integer :: i,j,Order(1:6)
 ! pause
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
              if( TreeProc%NumV.eq.0 ) then
-                Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f )
+                Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f,tag_Z )
              elseif( TreeProc%NumV.eq.1 ) then
-                Res(1:Ds) = cur_f_4fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:4),tag_f )
+                Res(1:Ds) = cur_f_4fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:4),tag_f,tag_Z )
              endif
           else
              call Error("requested current is not available 4q")
@@ -389,7 +389,7 @@ integer :: i,j,Order(1:6)
       elseif( TreeProc%NumQua.eq.6  .and. TreeProc%NumSca.eq.0) then!  6 quarks, no scalars
           if( IsAQuark(TreeProc%PartType(1)) ) then
              if (TreeProc%NumV .eq. 0) then
-                Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f )
+                Res(1:Ds) = cur_f_6f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:6),tag_f,tag_Z)
              elseif( TreeProc%NumV.eq.1 ) then
                 Res(1:Ds) = cur_f_6fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:6),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:6),tag_f )
              endif
@@ -410,12 +410,12 @@ END SUBROUTINE
 
 
 
-SUBROUTINE new_ampl(Dv,Ds,Nj1,Nj2,POLI,BPOLF,tag_f,TreeProc,mur)
+SUBROUTINE new_ampl(Dv,Ds,Nj1,Nj2,POLI,BPOLF,tag_f,tag_Z,TreeProc,mur)
 use ModProcess
 use ModMisc
 use ModParameters
 implicit none
-integer ::  Dv,Ds,Nj1,Nj2,tag_f
+integer ::  Dv,Ds,Nj1,Nj2,tag_f,tag_Z
 complex(8),target :: POLI(8,16),BPOLF(8,16)
 complex(8) :: mur(10,10)
 integer :: j2,j1,i
@@ -423,10 +423,11 @@ complex(8) :: vg(Dv), vs(Ds)
 complex(8) :: Res(1:Ds)
 type(TreeProcess) :: TreeProc
 
+
     if( TreeProc%PartType(TreeProc%NumPart).eq.Glu_ ) then
             do j2=1,Nj2
                    TreeProc%Gluons(TreeProc%NumGlu(0))%Pol => BPOLF(j2,1:Dv)
-                   call new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res(1:Dv))
+                   call new_calc_ampl(Dv,Ds,tag_f,tag_Z,TreeProc,Res(1:Dv))
                    if( TreeProc%PartType(1).eq.Glu_) then
                       do j1=1,Nj1
                         mur(j1,j2) = sc_(POLI(j1,1:Dv),Res(1:Dv))
@@ -445,7 +446,7 @@ type(TreeProcess) :: TreeProc
     elseif( IsAQuark(TreeProc%PartType(TreeProc%NumPart)) ) then
             do j2=1,Nj2
                    TreeProc%Quarks(TreeProc%NumQua)%Pol => BPOLF(j2,1:Ds)
-                   call new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res(1:Ds))
+                   call new_calc_ampl(Dv,Ds,tag_f,tag_Z,TreeProc,Res(1:Ds))
 !                   if (Ds .eq. 4 .and. TreeProc%NumGlu(0) .eq. 1 .and. TreeProc%NumV .eq. 0 .and. TreeProc%NumQua .eq. 2) then
 !                      print *, 'res',Res(1:4)
 !                      print *, 'p',TreeProc%Quarks(2)%Mom(1:4)
@@ -485,7 +486,7 @@ type(TreeProcess) :: TreeProc
     elseif( IsAScalar(TreeProc%PartType(TreeProc%NumPart)) ) then
             do j2=1,Nj2
                    TreeProc%Scalars(TreeProc%NumSca)%Pol => BPOLF(j2,1:Ds)
-                   call new_calc_ampl(Dv,Ds,tag_f,TreeProc,Res(1:Ds))
+                   call new_calc_ampl(Dv,Ds,tag_f,tag_Z,TreeProc,Res(1:Ds))
                    if( TreeProc%PartType(1).eq.Glu_) then
                       do j1=1,Nj1
                          mur(j1,j2) = sc_(POLI(j1,1:Dv),Res(1:Dv))
@@ -523,7 +524,7 @@ implicit none
 type(BornAmplitude) :: TheBornAmp
 complex(8) :: Res(1:4)
 
-   call new_calc_ampl(4,4,0,TheBornAmp%TreeProc,Res(1:4))
+   call new_calc_ampl(4,4,0,0,TheBornAmp%TreeProc,Res(1:4))
 
    if( IsAQuark(TheBornAmp%TreeProc%PartType(1)) ) then
       TheBornAmp%Result = psp1_(Res(1:4),ExtParticle(TheBornAmp%ExtLine(1))%Pol(1:4))
@@ -548,7 +549,7 @@ implicit none
 type(TreeProcess) :: TheTreeProcess
 complex(8) :: Pol(1:4),Res
 
-   call new_calc_ampl(4,4,0,TheTreeProcess,Pol(1:4))
+   call new_calc_ampl(4,4,0,0,TheTreeProcess,Pol(1:4))
 
    if( IsAQuark(TheTreeProcess%PartType(1)) ) then
       Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))  ! assumes that first particle is an Quark!!!!
