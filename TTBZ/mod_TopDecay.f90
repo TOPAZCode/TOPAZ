@@ -208,7 +208,7 @@ IF( Topol.eq.DK_LO ) THEN! leading order
         TopDKProd(3)%Mom(1:4) = dcmplx(Mom(1:4,2)+Mom(1:4,3))!  W+
         call ubarSpi_Weyl(TopDKProd(2)%Mom(1:4),-1,TopDKProd(2)%Pol(1:4))
         TopDKProd(3)%Pol(1:4) = WPolVec(WPlus,Wp_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
-        call new_calc_ampl(4,4,0,TopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(0),TopQuark%Pol(1:4))
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
         TopQuark%Pol(5:16)= (0d0,0d0)
@@ -219,7 +219,7 @@ IF( Topol.eq.DK_LO ) THEN! leading order
         ATopDKProd(3)%Mom(1:4) = dcmplx(Mom(1:4,2)+Mom(1:4,3))!  W-
         call vSpi_Weyl(ATopDKProd(2)%Mom(1:4),+1,ATopDKProd(2)%Pol(1:4))
         ATopDKProd(3)%Pol(1:4) = WPolVec(WMinus,Wm_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
-        call new_calc_ampl(4,4,0,ATopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) = ( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -329,7 +329,7 @@ ELSEIF( Topol.eq.DK_RE_T ) THEN! real emission from top quark line!   DK_RE_T=DK
         call ubarSpi_Weyl(TopDKProd(2)%Mom(1:4),-1,TopDKProd(2)%Pol(1:4))
         TopDKProd(3)%Pol(1:4) = WPolVec(WPlus,Wp_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
         call pol_mless(TopDKProd(4)%Mom(1:4),GluonHel,TopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,TopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
 
@@ -344,7 +344,7 @@ ELSEIF( Topol.eq.DK_RE_T ) THEN! real emission from top quark line!   DK_RE_T=DK
         call vSpi_Weyl(ATopDKProd(2)%Mom(1:4),+1,ATopDKProd(2)%Pol(1:4))
         ATopDKProd(3)%Pol(1:4) = WPolVec(WMinus,Wm_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
         call pol_mless(ATopDKProd(4)%Mom(1:4),GluonHel,ATopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,ATopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
 
@@ -1094,7 +1094,7 @@ ELSEIF( Topol.eq.DKJ_RE_TT ) THEN! two gluon emission from top quark line (gg)
         TopDKProd(3)%Pol(1:4) = WPolVec(WPlus,Wp_DKmode,Mom(1:4,2:3),WDK_LO)  * WProp * g_weak/dsqrt(2d0)
         call pol_mless(TopDKProd(4)%Mom(1:4),GluonHel,TopDKProd(4)%Pol(1:4))
         call pol_mless(TopDKProd(5)%Mom(1:4),Gluon2Hel,TopDKProd(5)%Pol(1:4))
-        call new_calc_ampl(4,4,0,TopDKAmp(PartAmp+1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(PartAmp+1),TopQuark%Pol(1:4))
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
         TopQuark%Pol(5:16)= (0d0,0d0)
@@ -1109,7 +1109,7 @@ ELSEIF( Topol.eq.DKJ_RE_TT ) THEN! two gluon emission from top quark line (gg)
         ATopDKProd(3)%Pol(1:4) = WPolVec(WMinus,Wm_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
         call pol_mless(ATopDKProd(4)%Mom(1:4),GluonHel,ATopDKProd(4)%Pol(1:4))
         call pol_mless(ATopDKProd(5)%Mom(1:4),Gluon2Hel,ATopDKProd(5)%Pol(1:4))
-        call new_calc_ampl(4,4,0,ATopDKAmp(PartAmp+1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(PartAmp+1),TopQuark%Pol(1:4))
         TopQuark%Pol(1:4) =( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
         TopQuark%Pol(5:16)= (0d0,0d0)
@@ -1162,7 +1162,7 @@ ELSEIF( Topol.eq.DKJ_RE2_TT ) THEN! qqbar emission from top quark line (qqb)!  c
         call vSpi_Weyl(dcmplx(Mom(1:4,4)),+GluonHel,Spi(1:4))
         call ubarSpi_Weyl(dcmplx(Mom(1:4,5)),-GluonHel,BarSpi(1:4))
         TopDKProd(4)%Pol(1:4) = vbqq_Weyl(4,BarSpi(1:4),Spi(1:4)) * (0d0,-1d0)/( TopDKProd(4)%Mom(1:4).dot.TopDKProd(4)%Mom(1:4) )
-        call new_calc_ampl(4,4,0,TopDKAmp(4),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(4),TopQuark%Pol(1:4))
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
         TopQuark%Pol(5:16)= (0d0,0d0)
@@ -1176,7 +1176,7 @@ ELSEIF( Topol.eq.DKJ_RE2_TT ) THEN! qqbar emission from top quark line (qqb)!  c
         call vSpi_Weyl(dcmplx(Mom(1:4,4)),+GluonHel,Spi(1:4))
         call ubarSpi_Weyl(dcmplx(Mom(1:4,5)),-GluonHel,BarSpi(1:4))
         ATopDKProd(4)%Pol(1:4) = vbqq_Weyl(4,BarSpi(1:4),Spi(1:4)) * (0d0,-1d0)/( ATopDKProd(4)%Mom(1:4).dot.ATopDKProd(4)%Mom(1:4) )
-        call new_calc_ampl(4,4,0,ATopDKAmp(4),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(4),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1235,7 +1235,7 @@ ELSEIF( Topol.eq.DKJ_1LQ_T ) THEN! gluon emission from top quark line and virtua
         TopDKProd(3)%Pol(1:4) = WPolVec(WPlus,Wp_DKmode,Mom(1:4,2:3),WDK_LO)* WProp * g_weak/dsqrt(2d0)
         TopDKProd(3)%Pol(1:4) = TopDKProd(3)%Pol(1:4) * (v_factor + int_dip_factor)
         call pol_mless(TopDKProd(4)%Mom(1:4),GluonHel,TopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,TopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1251,7 +1251,7 @@ ELSEIF( Topol.eq.DKJ_1LQ_T ) THEN! gluon emission from top quark line and virtua
         ATopDKProd(3)%Pol(1:4) = ATopDKProd(3)%Pol(1:4) * (v_factor + int_dip_factor)
 
         call pol_mless(ATopDKProd(4)%Mom(1:4),GluonHel,ATopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,ATopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1396,7 +1396,7 @@ call Wto3Jet_init
         Wcurr(1:4) = (-WCurr(1:4) + (WCurr(1:4).dot.WMom(1:4))/m_W**2 * WMom(1:4))
         TopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0) * dsqrt(2.d0)! x 2 flavor (jets )
 
-        call new_calc_ampl(4,4,0,TopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1420,7 +1420,7 @@ call Wto3Jet_init
 
         ATopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0) * dsqrt(2.d0) ! x 2 jets
 
-        call new_calc_ampl(4,4,0,ATopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) = ( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1494,7 +1494,7 @@ ELSEIF( Topol.eq.DKJ_RE_TQ ) THEN! gluon emission from top quark line and from W
         call ampl_w_qbqg((/Mom(1:4,2),Mom(1:4,3),Mom(1:4,4)/),GluonHel,Wcurr(1:4))
         TopDKProd(3)%Pol(1:4) = WProp*g2_weak/2d0 * dsqrt(alpha_s4Pi*CF*RunAlphaS(NLOParam,MuRen))* dsqrt(NFlav*Nc) * Wcurr(1:4)
         call pol_mless(TopDKProd(4)%Mom(1:4),Gluon2Hel,TopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,TopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
 
@@ -1510,7 +1510,7 @@ ELSEIF( Topol.eq.DKJ_RE_TQ ) THEN! gluon emission from top quark line and from W
         call ampl_w_qbqg((/Mom(1:4,3),Mom(1:4,2),Mom(1:4,4)/),GluonHel,Wcurr(1:4))
         ATopDKProd(3)%Pol(1:4) = WProp*g2_weak/2d0 * dsqrt(alpha_s4Pi*CF*RunAlphaS(NLOParam,MuRen))* dsqrt(NFlav*Nc) * Wcurr(1:4)
         call pol_mless(ATopDKProd(4)%Mom(1:4),Gluon2Hel,ATopDKProd(4)%Pol(1:4))
-        call new_calc_ampl(4,4,0,ATopDKAmp(1),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(1),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top * coupl_sqrt
 
@@ -1615,7 +1615,7 @@ call Wto3Jet_init
         Wmom(1:4) = Mom(1:4,2)+Mom(1:4,3)+Mom(1:4,4) +Mom(1:4,5)
         Wcurr(1:4) = (-WCurr(1:4) + (WCurr(1:4).dot.WMom(1:4))/m_W**2 * WMom(1:4))
         TopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0) * dsqrt(2.d0) ! x 2 jets
-        call new_calc_ampl(4,4,0,TopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1638,7 +1638,7 @@ call Wto3Jet_init
         Wcurr(1:4) = (-WCurr(1:4) + (WCurr(1:4).dot.WMom(1:4))/m_W**2 * WMom(1:4))
         ATopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0)* dsqrt(2.d0) ! x 2 jets
 
-        call new_calc_ampl(4,4,0,ATopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) = ( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1695,7 +1695,7 @@ ELSEIF( Topol.eq.DKJ_RE2_QQ ) THEN! 4 quark emissions from  W+/-, non-identical 
         Wcurr(1:4) = Wcurr(1:4) *ne * dsqrt(2.d0)  & ! * correct for use ob vbqq_weyl
                     * g_weak/dsqrt(2.d0) * (RunAlphaS(NLOParam,MuRen)*alpha_S*4.d0*Pi) !1  W-coupling & 2  QCD-vertices
         TopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0) !*dsqrt(3.d0) * dsqrt(2.d0) ! x 3 qqb flavors, x 2 q'qb flavors  -> multiply this outside, now
-        call new_calc_ampl(4,4,0,TopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,TopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) =( spb2_Weyl(TopQuark%Pol(1:4),TopQuark%Mom(1:4)) + m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
@@ -1710,7 +1710,7 @@ ELSEIF( Topol.eq.DKJ_RE2_QQ ) THEN! 4 quark emissions from  W+/-, non-identical 
         Wcurr(1:4) = Wcurr(1:4) *ne * dsqrt(2.d0)  & ! * correct for use ob vbqq_weyl
                     * g_weak/dsqrt(2.d0) * (RunAlphaS(NLOParam,MuRen)*alpha_S*4.d0*Pi) !1  W-coupling & 2  QCD-vertices
         ATopDKProd(3)%Pol(1:4) = Wcurr* WProp * g_weak/dsqrt(2d0) !*dsqrt(3.d0) * dsqrt(2.d0)! 3 quark flavors, x 2 q'qb flavors -> multiply this outside, now
-        call new_calc_ampl(4,4,0,ATopDKAmp(0),TopQuark%Pol(1:4))
+        call new_calc_ampl(4,4,0,0,ATopDKAmp(0),TopQuark%Pol(1:4))
 
         TopQuark%Pol(1:4) = ( spi2_Weyl(TopQuark%Mom(1:4),TopQuark%Pol(1:4)) - m_Top*TopQuark%Pol(1:4) ) * NWAFactor_Top
         TopQuark%Pol(1:4) = WeylToDirac(TopQuark%Pol(1:4))
