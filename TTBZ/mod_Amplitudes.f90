@@ -551,6 +551,14 @@ complex(8) :: Pol(1:4),Res
 
    call new_calc_ampl(4,4,0,0,TheTreeProcess,Pol(1:4))
 
+
+! print *, "check",TheTreeProcess%Quarks(1)%Mom(1)
+! print *, "check",TheTreeProcess%Quarks(2)%Mom(1)
+! print *, "check",TheTreeProcess%Quarks(3)%Mom(1)
+! print *, "check",TheTreeProcess%Quarks(4)%Mom(1)
+! print *, "check",TheTreeProcess%Boson%Mom(1)
+! pause
+
    if( IsAQuark(TheTreeProcess%PartType(1)) ) then
       Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))  ! assumes that first particle is an Quark!!!!
    else

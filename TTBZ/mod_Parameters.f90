@@ -96,16 +96,16 @@ real(8), public, parameter :: T3_dn    =-1d0/2d0
 real(8), public, parameter :: T3_nu    =+1d0/2d0
 real(8), public, parameter :: T3_el    =-1d0/2d0
 
-real(8), public, parameter :: couplZUU_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up
-real(8), public, parameter :: couplZUU_right = -sw/cw*Q_up
+real(8), public, parameter :: couplZUU_left  = -sw/cw*Q_up +  1d0/sw/cw * T3_up
+real(8), public, parameter :: couplZUU_right = -sw/cw*Q_up  
 real(8), public, parameter :: couplZDD_left  = -sw/cw*Q_dn + 1d0/sw/cw * T3_dn
 real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
 ! for check against ttb+photon
-! real(8), public, parameter :: couplZUU_left  = Q_up
-! real(8), public, parameter :: couplZUU_right = Q_up
-! real(8), public, parameter :: couplZDD_left  = Q_dn
-! real(8), public, parameter :: couplZDD_right = Q_dn
+! real(8), public, parameter :: couplZUU_left  = Q_up  *1d0
+! real(8), public, parameter :: couplZUU_right = Q_up  *(-1d0)
+! real(8), public, parameter :: couplZDD_left  = Q_dn  *0d0
+! real(8), public, parameter :: couplZDD_right = Q_dn  *0d0
 
 real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
 real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up

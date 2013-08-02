@@ -2709,6 +2709,35 @@ ELSEIF( PROCESS.EQ.82 ) THEN !   3_Glu  + 4_Glu  --> 1_ATop + 2_Top + 5_Pho ! tt
   ENDIF
 
 
+ELSEIF( PROCESS.EQ.86 ) THEN !   3_Str  + 4_AStr --> 5_Glu  + 1_ATop + 2_Top + 6_Pho
+  IF( CORRECTION.EQ.2 ) THEN
+      NumExtParticles = 6
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/5,6,-1,-2,3,4/)
+      MasterProcess=20
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 8    ! t tbar glu photon PS integration
+      NDim = NDim + 2    ! shat integration
+      VegasNc0_default = 1000000
+      VegasNc1_default = 1000000
+  ELSEIF( CORRECTION.EQ.3 ) THEN
+      NumExtParticles = 5
+      allocate(Crossing(1:NumExtParticles))
+      allocate(ExtParticle(1:NumExtParticles))
+      Crossing(:) = (/4,5,-1,-2,3/)
+      MasterProcess=18
+      AvgFactor = SpinAvg * QuarkColAvg**2
+      NDim = NDim + 5    ! t tbar photon PS integration
+      NDim = NDim + 2    ! shat integration
+      NDim = NDim + 1    ! x integration
+      VegasNc0_default = 100000
+      VegasNc1_default = 100000
+  ELSE
+      call Error("Correction to this process is not available")
+  ENDIF
+
+
 ELSE
     call Error("Process not available")
 ENDIF
@@ -3796,7 +3825,6 @@ ELSEIF( MASTERPROCESS.EQ.17 ) THEN   ! ttbZ
     ExtParticle(3)%PartType = Glu_
     ExtParticle(4)%PartType = Glu_
     ExtParticle(5)%PartType = Z0_
-    
     if( Process.ge.81 .and. Process.le.89 ) ExtParticle(5)%PartType = Pho_
 
     IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
@@ -3965,6 +3993,7 @@ ELSEIF( MASTERPROCESS.EQ.18 ) THEN  ! ttbZ
     ExtParticle(3)%PartType = AStr_
     ExtParticle(4)%PartType = Str_
     ExtParticle(5)%PartType = Z0_
+    if( Process.ge.81 .and. Process.le.89 ) ExtParticle(5)%PartType = Pho_
 
     if( Process.ge.81 .and. Process.le.89 ) ExtParticle(5)%PartType = Pho_
 
@@ -4115,6 +4144,7 @@ ELSEIF( MASTERPROCESS.EQ.19 ) THEN
     ExtParticle(4)%PartType = Glu_
     ExtParticle(5)%PartType = Glu_
     ExtParticle(6)%PartType = Z0_
+    if( Process.ge.81 .and. Process.le.89 ) ExtParticle(6)%PartType = Pho_
 
     IF( Correction.EQ.2 ) THEN
       NumPrimAmps = 6
@@ -4194,6 +4224,7 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
     ExtParticle(4)%PartType = Str_
     ExtParticle(5)%PartType = Glu_
     ExtParticle(6)%PartType = Z0_
+    if( Process.ge.81 .and. Process.le.89 ) ExtParticle(6)%PartType = Pho_
 
     IF( Correction.EQ.2 ) THEN
       NumPrimAmps = 8
@@ -4248,6 +4279,26 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
       do h5=-1,1,2
       do h6=-1,1,1! Z boson hel
           if( ih.ge.97 ) cycle
+          Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
+          ih=ih+1
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+      enddo
+
+    ELSEIF( TOPDECAYS.EQ.0 .AND. ZDECAYS.EQ.-2 ) then!   ttbPhoton
+    NumHelicities = 64
+    allocate(Helicities(1:NumHelicities,1:NumExtParticles))
+      ih=1
+      do h1=-1,1,2
+      do h2=-1,1,2
+      do h3=-1,1,2
+      do h4=-1,1,2
+      do h5=-1,1,2
+      do h6=-1,1,2! Z boson hel
+          if( ih.ge.65 ) cycle
           Helicities(ih,1:6) = (/h1,h2,h3,h4,h5,h6/)
           ih=ih+1
       enddo

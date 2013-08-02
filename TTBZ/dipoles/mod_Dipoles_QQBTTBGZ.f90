@@ -6,6 +6,7 @@
       use ModMisc
       use ModKinematics
       use ModIntDipoles
+      use ModZDecay
       implicit none
       private
 
@@ -82,23 +83,28 @@
 
       if (j.ne.in1.and.j.ne.in2.and.k.ne.in1.and.k.ne.in2) then
         call dipff(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+! print *, "ff",n,res
       endif
 
       if ((j.ne.in1.and.j.ne.in2).and.(k.eq.in1.or.k.eq.in2)) then
         call dipfi(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+! print *, "fi",n,res
       endif
 
 
       if ( (k.ne.in1.and.k.ne.in2).and.(j.eq.in1.or.j.eq.in2)) then
         call dipif(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+! print *, "if",n,res
       endif
 
       if ( (j.eq.in1.and.k.eq.in2).or.(j.eq.in2.and.k.eq.in1)) then
         call dipii(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+! print *, "ii",n,res
       endif
 
       sum_dip = sum_dip + res
       enddo
+! pause
 
       end subroutine
 
@@ -112,7 +118,7 @@
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
        real(dp), intent(out) :: res(2)
-       complex(dp) :: cres
+       complex(dp) :: cres(2)
        integer :: oh(6,5)
        real(dp) :: mij
        real(dp) :: C(2,2)
@@ -133,10 +139,10 @@
        type(TreeProcess),save :: TreeAmpsDip(1:2)
        complex(8)        :: ResAmpsDip_mt(-1:1,1:2)
        integer :: c1, c2, j1
-       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
-       complex(8)        :: Am(-1:1,-1:1,1:2,1:2)
-       complex(dp) :: POL1(-1:1,4)
-       real(dp) ::  pjetout(4,5), weight
+       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_up(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_dn(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
+       complex(8)        :: Am_up(-1:1,-1:1,1:2,1:2),Am_dn(-1:1,-1:1,1:2,1:2)
+       complex(dp) :: POL1(-1:1,4),propZ
+       real(dp) ::  pjetout(4,5), weight,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms)
        real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
@@ -146,7 +152,7 @@
 
        res = zero
        cres = (0d0,0d0)
-       Bm =   (0d0,0d0)
+       Bm =   (0d0,0d0); Bm_up =   (0d0,0d0); Bm_dn =   (0d0,0d0)
        weight = zero    ! this weight is the 0 if counterevent fails to pass
                         ! jet cuts
 
@@ -234,6 +240,7 @@
           pos = j
        endif
 
+
        if (TopDecays.ge.1) then
          call EvalPhasespace_TopDecay(q(1:4,1),yRnDk(1:4),.false.,MomDK(1:4,1:3),PSWgt1)
          call EvalPhasespace_TopDecay(q(1:4,3),yRnDk(5:8),.false.,MomDK(1:4,4:6),PSWgt2)
@@ -252,7 +259,7 @@
             call Error("need to implement phase space for off-shell Z's")
             ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
        endif
-       IF( ZDECAYS.NE.0 ) THEN
+       IF( ZDECAYS.GT.0 ) THEN
           call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
           PSWgt1 = PSWgt1 * PSWgt3
        ENDIF
@@ -264,7 +271,6 @@
 
 
   call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
-
 
 
 
@@ -284,7 +290,7 @@
               endif
         endif
         N2Jump = 1
-        if (ZDecays.ge.1) then ! Z decays
+        if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
 
@@ -327,6 +333,7 @@
            endif
 
     call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
 
 
    if (pos.eq.1) then
@@ -352,8 +359,36 @@
    endif
 
 
+      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one
+
+      if ( ZDecays .lt. 10) then
+          propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)  * MZ_Inv**2
+      elseif (ZDecays .gt. 10) then 
+          propZ=cone/(MZ_Inv**2-m_Z**2+ci*Ga_ZExp*m_Z)   * MZ_Inv**2
+      endif
+
       do i6 = 1,2
-        call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          if( i6.eq.1 ) then 
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+          else
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZUU
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZDD
+
+              if( Zdecays.gt.0 .and. Zdecays.lt.10 ) then
+                  Bm_up(i1,i6,i2,i3,i4,i5)=Bm_up(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+                  Bm_dn(i1,i6,i2,i3,i4,i5)=Bm_dn(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+              elseif( Zdecays.gt.10 ) then
+    !             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+    !             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+                  call Error("Zdecays.gt.10 not yet implemented")
+              endif
+          endif
+
       enddo
 
 
@@ -369,16 +404,14 @@
             do c1 = 1,2
                do c2 = 1,2
 
-       Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
+       Am_up(i1,j1,c1,c2) = (0.0_dp,0.0_dp); Am_dn(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
       do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
-
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
-
+         Am_up(i1,j1,c1,c2) = Am_up(i1,j1,c1,c2) + Bm_up(i1,c1,i2,i3,i4,i5)*conjg(Bm_up(j1,c2,i2,i3,i4,i5))
+         Am_dn(i1,j1,c1,c2) = Am_dn(i1,j1,c1,c2) + Bm_dn(i1,c1,i2,i3,i4,i5)*conjg(Bm_dn(j1,c2,i2,i3,i4,i5))
       enddo
       enddo
       enddo
@@ -434,9 +467,8 @@
            do i4=1,2
            do i1 = -1,1,2
            do i2 = -1,1,2
-
-      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-
+              cres(1) = cres(1) + C(i3,i4)*Am_up(i1,i2,i3,i4)*HH(i1,i2)
+              cres(2) = cres(2) + C(i3,i4)*Am_dn(i1,i2,i3,i4)*HH(i1,i2)
           enddo
           enddo
           enddo
@@ -470,7 +502,7 @@
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
        real(dp), intent(out) :: res(2)
-       complex(dp) :: cres
+       complex(dp) :: cres(2)
        integer :: oh(6,5)
        real(dp) :: mij
        real(dp) :: C(2,2)
@@ -489,10 +521,10 @@
        type(Particle),save :: ExtParticles(1:5)
        type(TreeProcess),save :: TreeAmpsDip(1:2)
        complex(8)        :: ResAmpsDip_mt(-1:1,1:2)
-       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
-       complex(8)        :: Am(-1:1,-1:1,1:2,1:2)
-       complex(dp) :: POL1(-1:1,4)
-       real(dp) ::  pjetout(4,5), weight
+       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_up(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_dn(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
+       complex(8)        :: Am_up(-1:1,-1:1,1:2,1:2),Am_dn(-1:1,-1:1,1:2,1:2)
+       complex(dp) :: POL1(-1:1,4),propZ
+       real(dp) ::  pjetout(4,5), weight,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
@@ -501,7 +533,7 @@
 
        res = zero
        cres = (0d0,0d0)
-       Bm =   (0d0,0d0)
+       Bm =   (0d0,0d0); Bm_up =   (0d0,0d0); Bm_dn =   (0d0,0d0)
        weight = zero
 
 
@@ -589,7 +621,7 @@
             call Error("need to implement phase space for off-shell Z's")
             ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
        endif
-       IF( ZDECAYS.NE.0 ) THEN
+       IF( ZDECAYS.GT.0 ) THEN
           call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
           PSWgt1 = PSWgt1 * PSWgt3
        ENDIF
@@ -620,7 +652,7 @@
               endif
         endif
         N2Jump = 1
-        if (ZDecays.ge.1) then ! Z decays
+        if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
 
@@ -661,6 +693,7 @@
            endif
 
     call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
 
       if (pos.eq.1) then
        if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -670,8 +703,6 @@
       if (pos.eq.2) then
          print *, 'pos eq 2, something is wrong'
          stop
-       if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
-       if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
       endif
 
 
@@ -690,8 +721,37 @@
        if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%QUARKS(4)%pOL(1:4)
       endif
 
+
+      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one
+
+      if ( ZDecays .lt. 10) then
+          propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)  * MZ_Inv**2
+      elseif (ZDecays .gt. 10) then 
+          propZ=cone/(MZ_Inv**2-m_Z**2+ci*Ga_ZExp*m_Z)   * MZ_Inv**2
+      endif
+
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          if( i6.eq.1 ) then 
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+          else
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZUU
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZDD
+
+              if( Zdecays.gt.0 .and. Zdecays.lt.10 ) then
+                  Bm_up(i1,i6,i2,i3,i4,i5)=Bm_up(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+                  Bm_dn(i1,i6,i2,i3,i4,i5)=Bm_dn(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+              elseif( Zdecays.gt.10 ) then
+    !             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+    !             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+                  call Error("Zdecays.gt.10 not yet implemented")
+              endif
+          endif
+
       enddo
 
       enddo
@@ -705,16 +765,14 @@
             do c1 = 1,2
                do c2 = 1,2
 
-       Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
+       Am_up(i1,j1,c1,c2) = (0.0_dp,0.0_dp); Am_dn(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
       do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
-
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
-
+         Am_up(i1,j1,c1,c2) = Am_up(i1,j1,c1,c2) + Bm_up(i1,c1,i2,i3,i4,i5)*conjg(Bm_up(j1,c2,i2,i3,i4,i5))
+         Am_dn(i1,j1,c1,c2) = Am_dn(i1,j1,c1,c2) + Bm_dn(i1,c1,i2,i3,i4,i5)*conjg(Bm_dn(j1,c2,i2,i3,i4,i5))
       enddo
       enddo
       enddo
@@ -762,14 +820,10 @@
 
       do i1 = -1,1,2
          do i2 = -1,1,2
-
         do i3=1,2
            do i4=1,2
-
-
-      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-
-
+              cres(1) = cres(1) + C(i3,i4)*Am_up(i1,i2,i3,i4)*HH(i1,i2)
+              cres(2) = cres(2) + C(i3,i4)*Am_dn(i1,i2,i3,i4)*HH(i1,i2)
              enddo
            enddo
            enddo
@@ -801,7 +855,7 @@
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
        real(dp), intent(out) :: res(2)
-       complex(dp) :: cres
+       complex(dp) :: cres(2)
        real(dp) :: mij
        real(dp) :: C(2,2)
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
@@ -820,10 +874,10 @@
        type(TreeProcess), save :: TreeAmpsDip(1:2)
        complex(8)        :: ResAmpsDip_mt(-1:1,1:2)
        integer :: c1, c2, j1
-       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
-       complex(8)        :: Am(-1:1,-1:1,1:2,1:2)
-       complex(dp) :: POL1(-1:1,4)
-       real(dp) ::  pjetout(4,5), weight
+       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_up(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_dn(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
+       complex(8)        :: Am_up(-1:1,-1:1,1:2,1:2),Am_dn(-1:1,-1:1,1:2,1:2)
+       complex(dp) :: POL1(-1:1,4),propZ
+       real(dp) ::  pjetout(4,5), weight,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
@@ -832,7 +886,7 @@
 
        res = zero
        cres = (0d0,0d0)
-       Bm = (0d0,0d0)
+       Bm =   (0d0,0d0); Bm_up =   (0d0,0d0); Bm_dn =   (0d0,0d0)
        weight = zero
 
 
@@ -922,7 +976,7 @@
             call Error("need to implement phase space for off-shell Z's")
             ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
        endif
-       IF( ZDECAYS.NE.0 ) THEN
+       IF( ZDECAYS.GT.0 ) THEN
           call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
           PSWgt1 = PSWgt1 * PSWgt3
        ENDIF
@@ -954,9 +1008,18 @@
               endif
         endif
         N2Jump = 1
-        if (ZDecays.ge.1) then ! Z decays
+        if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
+
+
+! print *, "Dip",n
+! print *, "TB",TreeAmpsDip(1)%QUARKS(1)%Mom(1:4)
+! print *, "T ",TreeAmpsDip(1)%QUARKS(2)%Mom(1:4)
+! print *, "QB",TreeAmpsDip(1)%QUARKS(3)%Mom(1:4)
+! print *, "Q ",TreeAmpsDip(1)%QUARKS(4)%Mom(1:4)
+! print *, "Z ",TreeAmpsDip(1)%Boson%Mom(1:4)
+! pause
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -970,6 +1033,7 @@
            hel(3) = i3
            hel(4) = i4
            hel(5) = i5
+
 
            if (pos.eq.1) then
              hel(1) = i1
@@ -998,7 +1062,8 @@
 
 
 
-    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+       call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+       if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
 
 
 
@@ -1011,8 +1076,6 @@
        if (pos.eq.2) then
           print *, 'priehali, pos = 2'
           stop
-      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
-      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
       endif
 
 
@@ -1033,8 +1096,35 @@
       if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%QUARKS(4)%pOL(1:4)
       endif
 
+      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one
+
+      if ( ZDecays .lt. 10) then
+          propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)    * MZ_Inv**2
+      elseif (ZDecays .gt. 10) then 
+          propZ=cone/(MZ_Inv**2-m_Z**2+ci*Ga_ZExp*m_Z)   * MZ_Inv**2
+      endif
+
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          if( i6.eq.1 ) then 
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+          else
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZUU
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZDD
+
+              if( Zdecays.gt.0 .and. Zdecays.lt.10 ) then
+                  Bm_up(i1,i6,i2,i3,i4,i5)=Bm_up(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+                  Bm_dn(i1,i6,i2,i3,i4,i5)=Bm_dn(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+              elseif( Zdecays.gt.10 ) then
+    !             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+    !             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+                  call Error("Zdecays.gt.10 not yet implemented")
+              endif
+          endif
       enddo
 
       enddo
@@ -1049,16 +1139,15 @@
             do c1 = 1,2
                do c2 = 1,2
 
-       Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
+       Am_up(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
+       Am_dn(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
       do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
-
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
-
+         Am_up(i1,j1,c1,c2) = Am_up(i1,j1,c1,c2) +  Bm_up(i1,c1,i2,i3,i4,i5)*conjg(Bm_up(j1,c2,i2,i3,i4,i5))
+         Am_dn(i1,j1,c1,c2) = Am_dn(i1,j1,c1,c2) +  Bm_dn(i1,c1,i2,i3,i4,i5)*conjg(Bm_dn(j1,c2,i2,i3,i4,i5))
       enddo
       enddo
       enddo
@@ -1117,9 +1206,8 @@
          do i2 = -1,1,2
            do i3=1,2
              do i4=1,2
-
-      cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-
+                cres(1) = cres(1) + C(i3,i4)*Am_up(i1,i2,i3,i4)*HH(i1,i2)
+                cres(2) = cres(2) + C(i3,i4)*Am_dn(i1,i2,i3,i4)*HH(i1,i2)
             enddo
            enddo
           enddo
@@ -1149,7 +1237,7 @@
        character, intent(in) :: fl1*2,fl2*2
        real(dp), intent(in) :: p(4,6)
        real(dp), intent(out) :: res(2)
-       complex(dp) :: cres
+       complex(dp) :: cres(2)
        real(dp) :: mij
        real(dp) :: C(2,2)
        real(dp) ::  pi(4), pj(4), pk(4), pkt(4), pij(4), qq(4), qqij(4)
@@ -1169,11 +1257,11 @@
        type(Particle),save :: ExtParticles(1:5)
        type(TreeProcess),save :: TreeAmpsDip(1:2)
        integer :: c1, c2, j1
-       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
-       complex(8)        :: Am(-1:1,-1:1,1:2,1:2)
+       complex(8)        :: Bm(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_up(-1:1,1:2,-1:1,-1:1,-1:1,-1:1), Bm_dn(-1:1,1:2,-1:1,-1:1,-1:1,-1:1)
+       complex(8)        :: Am_up(-1:1,-1:1,1:2,1:2),Am_dn(-1:1,-1:1,1:2,1:2)
        complex(8)        :: ResAmpsDip_mt(-1:1,1:2)
-       complex(dp) :: POL1(-1:1,4)
-       real(dp) ::  pjetout(4,5), weight
+       complex(dp) :: POL1(-1:1,4),propZ
+       real(dp) ::  pjetout(4,5), weight,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
        integer :: Njet
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
@@ -1183,7 +1271,7 @@
 
        res = zero
        cres = (0d0,0d0)
-       Bm = (0d0,0d0)
+       Bm =   (0d0,0d0); Bm_up =   (0d0,0d0); Bm_dn =   (0d0,0d0)
 
 
        if( first_time ) then
@@ -1274,7 +1362,7 @@
             call Error("need to implement phase space for off-shell Z's")
             ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell!
        endif
-       IF( ZDECAYS.NE.0 ) THEN
+       IF( ZDECAYS.GT.0 ) THEN
           call EvalPhasespace_ZDecay(MZ_Inv,q(1:4,2),yRnDk(9:10),MomDK(1:4,7:8),PSWgt3)
           PSWgt1 = PSWgt1 * PSWgt3
        ENDIF
@@ -1305,9 +1393,16 @@
               endif
         endif
         N2Jump = 1
-        if (ZDecays.ge.1) then ! Z decays
+        if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
+
+! print *, "TB",dreal( TreeAmpsDip(1)%QUARKS(1)%Mom(1:4) )
+! print *, "T ",dreal( TreeAmpsDip(1)%QUARKS(2)%Mom(1:4) )
+! print *, "QB",dreal( TreeAmpsDip(1)%QUARKS(3)%Mom(1:4) )
+! print *, "Q ",dreal( TreeAmpsDip(1)%QUARKS(4)%Mom(1:4) )
+! print *, "Z ",dreal( TreeAmpsDip(1)%Boson%Mom(1:4) )
+! pause
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -1347,6 +1442,13 @@
            endif
 
     call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+    if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
+
+! print *, hel(4),hel(5)
+! print *, TreeAmpsDip(1)%QUARKS(3)%pol(1:4)
+! print *, TreeAmpsDip(1)%QUARKS(4)%pol(1:4)
+! ! print *, TreeAmpsDip(1)%boson%pol(1:4)
+! pause
 
 
      if (pos.eq.1) then
@@ -1364,8 +1466,6 @@
        if (pos.eq.2) then
           print *, 'pos = 2, something is wrong'
           stop
-      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
-      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%gLUONS(1)%pOL(1:4)
       endif
 
       if (pos.eq.4) then
@@ -1379,8 +1479,36 @@
       endif
 
 
+      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      couplZQQ_left_dyn=one
+      couplZQQ_right_dyn=one
+
+      if ( ZDecays .lt. 10) then
+          propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)    * MZ_Inv**2
+      elseif (ZDecays .gt. 10) then 
+          propZ=cone/(MZ_Inv**2-m_Z**2+ci*Ga_ZExp*m_Z)   * MZ_Inv**2
+      endif
+
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+          if( i6.eq.1 ) then 
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)
+          else
+              Bm_up(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZUU
+              Bm_dn(i1,i6,i2,i3,i4,i5)=Bm(i1,i6,i2,i3,i4,i5)*couplZDD
+
+              if( Zdecays.gt.0 .and. Zdecays.lt.10 ) then
+                  Bm_up(i1,i6,i2,i3,i4,i5)=Bm_up(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+                  Bm_dn(i1,i6,i2,i3,i4,i5)=Bm_dn(i1,i6,i2,i3,i4,i5)*propZ*couplZLL
+              elseif( Zdecays.gt.10 ) then
+    !             LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+    !             LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+                  call Error("Zdecays.gt.10 not yet implemented")
+              endif
+          endif
+
       enddo
 
       enddo
@@ -1395,16 +1523,14 @@
              do c1 = 1,2
                do c2 = 1,2
 
-       Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
+       Am_up(i1,j1,c1,c2) = (0.0_dp,0.0_dp); Am_dn(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
       do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
-
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
-
+         Am_up(i1,j1,c1,c2) = Am_up(i1,j1,c1,c2) + Bm_up(i1,c1,i2,i3,i4,i5)*conjg(Bm_up(j1,c2,i2,i3,i4,i5))
+         Am_dn(i1,j1,c1,c2) = Am_dn(i1,j1,c1,c2) + Bm_dn(i1,c1,i2,i3,i4,i5)*conjg(Bm_dn(j1,c2,i2,i3,i4,i5))
       enddo
       enddo
       enddo
@@ -1451,6 +1577,8 @@
       HH(-1,-1)=diag + offdiag*conjg(xm)*xm
       HH(1,1) = diag + offdiag*conjg(xp)*xp
 
+
+
       endif
 
 
@@ -1459,9 +1587,8 @@
          do i2 = -1,1,2
            do i3=1,2
              do i4=1,2
-
-       cres = cres + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-
+              cres(1) = cres(1) + C(i3,i4)*Am_up(i1,i2,i3,i4)*HH(i1,i2)
+              cres(2) = cres(2) + C(i3,i4)*Am_dn(i1,i2,i3,i4)*HH(i1,i2)
             enddo
           enddo
          enddo
@@ -1496,84 +1623,90 @@
       C = 0.0_dp
 
 
-
+      if(n.eq.0) then! 0= tree level correlation
+      C(1,1)=8.0_dp
+      C(1,2)=8.0_dp
+      C(2,1)=8.0_dp
+      C(2,2)=8.0_dp
+      endif
       if(n.eq.1) then
-      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
-      C(1,2)=-8.0_dp/3.0_dp/Q_top
-      C(2,1)=-8.0_dp/3.0_dp/Q_top
-      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,1)=-8.0_dp/3.0_dp
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.2) then
-      C(1,1)=16.0_dp/3.0_dp/Q_top**2
-      C(1,2)=16.0_dp/3.0_dp/Q_top
-      C(2,1)=16.0_dp/3.0_dp/Q_top
-      C(2,2)=16.0_dp/3.0_dp/Q_top**2
+      C(1,1)=16.0_dp/3.0_dp
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.3) then
-      C(1,1)=56.0_dp/3.0_dp/Q_top**2
-      C(1,2)=56.0_dp/3.0_dp/Q_top
-      C(2,1)=56.0_dp/3.0_dp/Q_top
-      C(2,2)=56.0_dp/3.0_dp/Q_top**2
+      C(1,1)=56.0_dp/3.0_dp
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.4) then
-      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
-      C(1,2)=-8.0_dp/3.0_dp/Q_top
-      C(2,1)=-8.0_dp/3.0_dp/Q_top
-      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,1)=-8.0_dp/3.0_dp
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.5) then
-      C(1,1)=56.0_dp/3.0_dp/Q_top**2
-      C(1,2)=56.0_dp/3.0_dp/Q_top
-      C(2,1)=56.0_dp/3.0_dp/Q_top
-      C(2,2)=56.0_dp/3.0_dp/Q_top**2
+      C(1,1)=56.0_dp/3.0_dp
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.6) then
-      C(1,1)=16.0_dp/3.0_dp/Q_top**2
-      C(1,2)=16.0_dp/3.0_dp/Q_top
-      C(2,1)=16.0_dp/3.0_dp/Q_top
-      C(2,2)=16.0_dp/3.0_dp/Q_top**2
+      C(1,1)=16.0_dp/3.0_dp
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.7) then
-      C(1,1)=16.0_dp/3.0_dp/Q_top**2
-      C(1,2)=16.0_dp/3.0_dp/Q_top
-      C(2,1)=16.0_dp/3.0_dp/Q_top
-      C(2,2)=16.0_dp/3.0_dp/Q_top**2
+      C(1,1)=16.0_dp/3.0_dp
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.8) then
-      C(1,1)=56.0_dp/3.0_dp/Q_top**2
-      C(1,2)=56.0_dp/3.0_dp/Q_top
-      C(2,1)=56.0_dp/3.0_dp/Q_top
-      C(2,2)=56.0_dp/3.0_dp/Q_top**2
+      C(1,1)=56.0_dp/3.0_dp
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.9) then
-      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
-      C(1,2)=-8.0_dp/3.0_dp/Q_top
-      C(2,1)=-8.0_dp/3.0_dp/Q_top
-      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,1)=-8.0_dp/3.0_dp
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
       if(n.eq.10) then
-      C(1,1)=56.0_dp/3.0_dp/Q_top**2
-      C(1,2)=56.0_dp/3.0_dp/Q_top
-      C(2,1)=56.0_dp/3.0_dp/Q_top
-      C(2,2)=56.0_dp/3.0_dp/Q_top**2
+      C(1,1)=56.0_dp/3.0_dp
+      C(1,2)=56.0_dp/3.0_dp
+      C(2,1)=56.0_dp/3.0_dp
+      C(2,2)=56.0_dp/3.0_dp
       endif
       if(n.eq.11) then
-      C(1,1)=16.0_dp/3.0_dp/Q_top**2
-      C(1,2)=16.0_dp/3.0_dp/Q_top
-      C(2,1)=16.0_dp/3.0_dp/Q_top
-      C(2,2)=16.0_dp/3.0_dp/Q_top**2
+      C(1,1)=16.0_dp/3.0_dp
+      C(1,2)=16.0_dp/3.0_dp
+      C(2,1)=16.0_dp/3.0_dp
+      C(2,2)=16.0_dp/3.0_dp
       endif
       if(n.eq.12) then
-      C(1,1)=-8.0_dp/3.0_dp/Q_top**2
-      C(1,2)=-8.0_dp/3.0_dp/Q_top
-      C(2,1)=-8.0_dp/3.0_dp/Q_top
-      C(2,2)=-8.0_dp/3.0_dp/Q_top**2
+      C(1,1)=-8.0_dp/3.0_dp
+      C(1,2)=-8.0_dp/3.0_dp
+      C(2,1)=-8.0_dp/3.0_dp
+      C(2,2)=-8.0_dp/3.0_dp
       endif
 
 
 
 
       end subroutine
+
 
 
 
@@ -1603,22 +1736,26 @@ integer :: Hel(1:5)
      ExtParticles(5)%Helicity = Hel(5)
      if (ZDecays.ge.1) then
           call ZDecay(ExtParticles(5),DK_LO,MomDK(1:4,7:8))
-     else
+     elseif (ZDecays.eq.0) then
           call pol_massSR(ExtParticles(5)%Mom(1:4),ExtParticles(5)%Mass,ExtParticles(5)%Helicity,ExtParticles(5)%Pol(1:4))
+     elseif (ZDecays.eq.-2) then
+         call pol_mless(ExtParticles(5)%Mom(1:4),ExtParticles(5)%Helicity,ExtParticles(5)%Pol(1:4))
     endif
 
+
+
+
     ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
-    call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
+    ExtParticles(3)%Helicity = Hel(3)
+    call vSpi(ExtParticles(3)%Mom(1:4),ExtParticles(3)%Mass,Hel(3),ExtParticles(3)%Pol(1:4))
 
     ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
-    call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))
+    ExtParticles(4)%Helicity = Hel(4)
+    call ubarSpi(ExtParticles(4)%Mom(1:4),ExtParticles(4)%Mass,Hel(4),ExtParticles(4)%Pol(1:4))
 
-
-! ExtParticles(3)%Pol(1:4)=ExtParticles(3)%Mom(1:4); print *, "check gauge inv. in dipoles"
 
 RETURN
 END SUBROUTINE
-
 
 
 
@@ -1651,10 +1788,10 @@ type(Particle) :: ExtParticles(:)
   ExtParticles(4)%Mass2= 0d0
 
   ExtParticles(5)%PartType = Z0_
+  if( Process.eq.86 ) ExtParticles(5)%PartType = Pho_
   ExtParticles(5)%ExtRef   = 5
   ExtParticles(5)%Mass = m_Z
   ExtParticles(5)%Mass2= ExtParticles(5)%Mass**2
-
 
 RETURN
 END SUBROUTINE

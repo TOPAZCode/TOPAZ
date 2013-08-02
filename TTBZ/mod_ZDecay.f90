@@ -44,6 +44,8 @@ complex(8) :: couplZFF_right,couplZFF_left,couplZFF
 !DEC$ ENDIF
 
 
+
+
    if( ZDecays.lt.10 ) then! on-shell Z boson
        PropZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
    elseif( ZDecays.gt.10 ) then! off-shell Z boson
@@ -71,6 +73,7 @@ complex(8) :: couplZFF_right,couplZFF_left,couplZFF
    if( ZDecays.lt.10  ) then  ! Z is on-shell
       couplZTT_left_dyn  = couplZTT_left *PropZ *couplZFF
       couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF
+
    elseif( ZDecays.gt.10 ) then  ! Z is off-shell
       couplZTT_left_dyn  = couplZTT_left *PropZ *couplZFF + Q_Top*PropPhoton*Q_el
       couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF + Q_Top*PropPhoton*Q_el
@@ -141,6 +144,8 @@ END SUBROUTINE
 ! QType = (u,d,c,s,t,b), QHel is quark helicity
 ! Can modify it to allow BSM ttZ couplings, F_V-F_A for LH top, F_V+F_A for RH
     use ModParameters
+    use ModMisc
+    implicit none
     integer, intent(in)     :: QType, QHel
     real(8), intent(out)     :: couplZQQ, couplGQQ
 
@@ -151,7 +156,7 @@ END SUBROUTINE
        elseif (QHel .eq. 1) then
           couplZQQ=couplZUU_right
        else
-          stop "Error in ZDecay: QHel undefined"
+          call Error("Error in ZDecay: QHel undefined",QHel)
        endif
        couplGQQ=Q_up
     elseif ( mod(QType,2) .eq. 0) then      ! down-type quark
@@ -160,11 +165,11 @@ END SUBROUTINE
        elseif (QHel .eq. 1) then
           couplZQQ=couplZDD_right
        else
-          stop "Error in ZDecay: QHel undefined"
+          call Error("Error in ZDecay: QHel undefined",QHel)
        endif    
        couplGQQ=Q_dn
     else
-       stop "Error in ZDecay: QType undefined"
+       call Error("Error in ZDecay: QType undefined",QHel)
     endif
 
   end subroutine ZGamQcoupl

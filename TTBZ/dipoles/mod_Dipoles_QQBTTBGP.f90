@@ -74,7 +74,6 @@
       sum_dip = zero
 
             do n=1,ndip
-!             do n=1,4
 
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor
@@ -111,8 +110,9 @@
       endif
 
         sum_dip = sum_dip + res
-!         print *, n,res
+! print *, n,res
         enddo
+! pause
 
       end subroutine
 
@@ -1287,11 +1287,18 @@
         if (TopDecays.ge.1) then ! Top decays
                Nmax(3) = -1
                Nmax(1) = -1
-        if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
-               Nmax(pos) = -1           ! helicity index below
-               Nmax(1) = 1
+            if (pos.eq.4.or.pos.eq.5) then  ! this is needed because of swappping
+                  Nmax(pos) = -1           ! helicity index below
+                  Nmax(1) = 1
+            endif
         endif
-        endif
+
+! print *, "TB",dreal( TreeAmpsDip(1)%QUARKS(1)%Mom(1:4) )
+! print *, "T ",dreal( TreeAmpsDip(1)%QUARKS(2)%Mom(1:4) )
+! print *, "QB",dreal( TreeAmpsDip(1)%QUARKS(3)%Mom(1:4) )
+! print *, "Q ",dreal( TreeAmpsDip(1)%QUARKS(4)%Mom(1:4) )
+! print *, "Z ",dreal( TreeAmpsDip(1)%GLUONS(1)%Mom(1:4) )
+! pause
 
        do i1=-1,Nmax(1),2
           do i2 = -1,Nmax(2),2
@@ -1454,6 +1461,8 @@
 
 
          res = one/xiab/two/scr(pa,pi)*real(cres,dp)
+
+
 
 !-------- account for all the weights, change the sing
          res = (-1d0)*res*PSWgt1*PSwgt2*Wgt_ext

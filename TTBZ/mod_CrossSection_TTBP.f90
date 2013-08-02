@@ -1267,7 +1267,6 @@ integer,parameter :: up=1, dn=2
 include "vegas_common.f"
 
 
-
 EvalCS_Real_ttbqqbgp= 0d0
 EvalCS_Dips_ttbqqbgp= 0d0
 
@@ -1312,6 +1311,12 @@ EvalCS_Dips_ttbqqbgp= 0d0
       PDFFac_b(up) = pdf(AUp_,2)*pdf(0,1) + pdf(AChm_,2)*pdf(0,1)
       PDFFac_b(dn) = pdf(ADn_,2)*pdf(0,1) + pdf(AStr_,2)*pdf(0,1) + pdf(ABot_,2)*pdf(0,1)
    ENDIF
+
+
+! PDFFac_a(up) = 1d0; print *, "setting pdfs to one"
+! PDFFac_a(dn) = 0d0
+! PDFFac_b(up) = 0d0
+! PDFFac_b(dn) = 0d0
 
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
@@ -1370,6 +1375,11 @@ else
           LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol * PDFFac(2)
         enddo!helicity loop
 
+
+! print *, "real unpol p",LO_Res_UnPol* Q_top**2  *PhotonCouplCorr
+! pause
+
+
         LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * Q_top**2*alpha4Pi  *PhotonCouplCorr
         EvalCS_Real_ttbqqbgp = EvalCS_Real_ttbqqbgp + dble(LO_Res_Unpol*PreFac)
 
@@ -1392,7 +1402,7 @@ endif!applyPSCut
 
 
 !      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
-!      sij = MomExt(1,3)**2
+! !      sij = MomExt(1,3)**2
 !      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgp,EvalCS_Dips_ttbqqbgp,(1d0+EvalCS_Real_ttbqqbgp/EvalCS_Dips_ttbqqbgp)
 !      pause
 
