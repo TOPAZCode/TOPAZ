@@ -997,7 +997,7 @@ integer :: iHel,iPrimAmp,jPrimAmp,tmphel,APrimAmp,ListPrimAmps(1:12),LocalSister
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
 real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv,ZDKMatel,Msq_T_BWENU,p12Z(1:4),p34Z(1:4)
 complex(8) :: s12Z,s34Z,fermloop_fin(1:2)
-complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4),light_quark_coupl(1:2)
+complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4),light_quark_coupl(1:2),top_quark_coupl
 logical :: applyPSCut
 real(8) :: DPtol, QPtol
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
@@ -1153,15 +1153,15 @@ ENDIF
    call SetPropagators()
    call setPDFs(eta1,eta2,MuFac,pdf)
 
-   IF( PROCESS.EQ.82 ) THEN
+   IF( PROCESS .EQ. 72 .OR. PROCESS.EQ.82 ) THEN
       PDFFac_a(up) = pdf(Up_,1)*pdf(AUp_,2) + pdf(Chm_,1)*pdf(AChm_,2)
       PDFFac_a(dn) = pdf(Dn_,1)*pdf(ADn_,2) + pdf(Str_,1)*pdf(AStr_,2) + pdf(Bot_,1)*pdf(ABot_,2)
       PDFFac_b(up) = pdf(Up_,2)*pdf(AUp_,1) + pdf(Chm_,2)*pdf(AChm_,1)
       PDFFac_b(dn) = pdf(Dn_,2)*pdf(ADn_,1) + pdf(Str_,2)*pdf(AStr_,1) + pdf(Bot_,2)*pdf(ABot_,1)
    ENDIF
 !! RR remove
-   PDFFac_a=1d0
-   PDFFac_b=1d0
+!   PDFFac_a=1d0
+!   PDFFac_b=1d0
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
@@ -1175,7 +1175,7 @@ ENDIF
 !------------ LO --------------
    
 IF( CORRECTION.EQ.0 ) THEN
-   do npdf=2,2
+   do npdf=1,2
       if (npdf .eq. 1) then
          PDFFac(1:2)=PDFFac_a(1:2)
       elseif (npdf .eq. 2) then
@@ -1183,7 +1183,8 @@ IF( CORRECTION.EQ.0 ) THEN
          call swapMom(MomExt(1:4,1),MomExt(1:4,2))
          ISFac = MomCrossing(MomExt)
      endif
-
+         
+    ISFac = MomCrossing(MomExt)
     call SetPropagators()
 
 !    do iHel=nHel(1),nHel(2)
@@ -1265,7 +1266,7 @@ IF( CORRECTION.EQ.0 ) THEN
    print *, 'unpol',LO_Res_UnPol
    pause
  enddo! npdf loop
-!   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
 print * , "remove swap"
 
 
@@ -1273,6 +1274,7 @@ print * , "remove swap"
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
    do npdf=1,2
+      print *, 'npdf=', npdf
 !    do npdf=1,1; print *, "only npdf=1"
       if (npdf .eq. 1) then
          PDFFac(1:2)=PDFFac_a(1:2)
@@ -1282,7 +1284,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          ISFac = MomCrossing(MomExt)
       endif
 !       PDFFac(1:2)=(/1d0,1d0/); print *, "setting pdfs to one"
-
+      call SetPropagators()
 
       !   do iHel=nHel(1),nHel(2)
       do iHel=1,NumHelicities
@@ -1296,11 +1298,11 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
             call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
       endif
 
-!       if (npdf .eq. 2) then  ! MARKUS: removed this
-!          ! change helicities of the massless quarks for the couplings to Z          
-!          Helicities(iHel,3)=-Helicities(iHel,3)
-!          Helicities(iHel,4)=-Helicities(iHel,4)
-!       endif
+       if (npdf .eq. 2) then  ! MARKUS: removed this
+          ! change helicities of the massless quarks for the couplings to Z          
+          Helicities(iHel,3)=-Helicities(iHel,3)
+          Helicities(iHel,4)=-Helicities(iHel,4)
+       endif
 
       call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
       ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
@@ -1321,11 +1323,11 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
            LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU )
            LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD )
         elseif( Zdecays.lt.10 .and. Zdecays .gt. 0 ) then
-           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL )
-           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
+           LOPartAmp(up)=(BornAmps(1)%Result+BornAmps(2)%Result* couplZUU)*propZ*couplZLL 
+           LOPartAmp(dn)=(BornAmps(1)%Result+BornAmps(2)%Result* couplZDD)*propZ*couplZLL 
         elseif( Zdecays.gt.10 ) then
-           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
-           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+           LOPartAmp(up)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+           LOPartAmp(dn)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
         elseif (Zdecays .eq. -2)  then    ! this is the photon comparison
            LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*Q_up
            LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*Q_dn
@@ -1341,18 +1343,23 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
 
 
+!! RR TODO : CHECK THESE COUPLINGS!
       if (Zdecays .eq. 0) then
          light_quark_coupl(up)= couplZUU 
          light_quark_coupl(dn)= couplZDD 
+         top_quark_coupl  = (1d0,0d0)
       elseif( Zdecays.lt.10 .and. Zdecays .gt. 0 ) then
          light_quark_coupl(up)= couplZUU*propZ*couplZLL 
          light_quark_coupl(dn)= couplZDD*propZ*couplZLL 
+         top_quark_coupl  = propZ*couplZLL 
       elseif( Zdecays.gt.10 ) then
          light_quark_coupl(up)= couplZUU*propZ*couplZLL + couplGUU*couplGLL 
          light_quark_coupl(dn)= couplZDD*propZ*couplZLL + couplGDD*couplGLL 
+         top_quark_coupl = propZ*couplZLL + couplGLL 
       elseif (Zdecays .eq. -2)  then    ! this is the photon comparison
          light_quark_coupl(up)= Q_up
          light_quark_coupl(dn)= Q_dn
+         top_quark_coupl  = (1d0,0d0)
       endif
 
 
@@ -1417,8 +1424,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
             print *, 'AGAIN, ADDING 1.5 TO RDIV(1)'
             rdiv(1)=rdiv(1)+1.5d0
          endif
-         AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
 
+         AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
          if ( AccPoles .gt. DPtol ) then
             useQP=useQP+1
             PrimAmps(APrimAmp)%Result=(0d0,0d0)
@@ -1453,17 +1460,17 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
        
 
       BosonicPartAmp(up,-2:1)=  &
-                             +   Nc * ( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
-                             - 2d0/Nc*( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
-                             - 1d0/Nc*( PrimAmps(PrimAmp3_15432)%Result(-2:1) + PrimAmps(PrimAmp4_15234)%Result(-2:1) &
+                             +   Nc * ( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
+                             - 2d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
+                             + top_quark_coupl*PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
+                             - 1d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp3_15432)%Result(-2:1) + top_quark_coupl*PrimAmps(PrimAmp4_15234)%Result(-2:1) &
                              +light_quark_coupl(up)*(PrimAmps(PrimAmp4_12534)%Result(-2:1)+PrimAmps(PrimAmp3_14532)%Result(-2:1)) )
 
       BosonicPartAmp(dn,-2:1)=  &
-                             +   Nc * ( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
-                             - 2d0/Nc*( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
-                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
-                             - 1d0/Nc*( PrimAmps(PrimAmp3_15432)%Result(-2:1)  + PrimAmps(PrimAmp4_15234)%Result(-2:1) &
+                             +   Nc * ( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
+                             - 2d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
+                             + top_quark_coupl*PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
+                             - 1d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp3_15432)%Result(-2:1)  + top_quark_coupl*PrimAmps(PrimAmp4_15234)%Result(-2:1) &
                              + light_quark_coupl(dn)*(PrimAmps(PrimAmp4_12534)%Result(-2:1)+PrimAmps(PrimAmp3_14532)%Result(-2:1)) )
       
       NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(BosonicPartAmp(up,-2:1)))*PDFFac(up) &
@@ -1568,18 +1575,18 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       enddo
 
 ! omitted at present : Z on light quark loops
-      FermionPartAmp(up,-2:1) = Nf_light*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
+      FermionPartAmp(up,-2:1) = Nf_light*top_quark_coupl*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
           + Nf_light*light_quark_coupl(up)*PrimAmps(PrimAmp2_12354)%Result(-2:1) & 
-           + PrimAmps(PrimAmp2m_15234)%Result(-2:1)  &
+           + top_quark_coupl*PrimAmps(PrimAmp2m_15234)%Result(-2:1)  &
            + light_quark_coupl(up)*PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-           + PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
+           + top_quark_coupl*PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
 
 
-      FermionPartAmp(dn,-2:1) = Nf_light*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
+      FermionPartAmp(dn,-2:1) = Nf_light*top_quark_coupl*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
            + Nf_light*light_quark_coupl(dn)*PrimAmps(PrimAmp2_12354)%Result(-2:1) &
-           + PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
+           + top_quark_coupl*PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
            + light_quark_coupl(dn)*PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-           + PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
+           + top_quark_coupl*PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
 
       ! light loops with Z on LOOP
       ! first, pick the coupling of the Z to the LIGHT LOOP quarks: LEFT / UP / VECTOR
@@ -1718,6 +1725,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       if (abs(LO_Res_Pol) .ge.1d-10) then
          print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
       endif
+!      pause
 !      stop
       
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
