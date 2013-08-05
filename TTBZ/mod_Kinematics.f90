@@ -32,7 +32,7 @@ type(Histogram),allocatable   :: Histo(:)
 !type(Histogram2D),allocatable :: Histo2D(:)
 
 real(8) :: pT_jet_cut, pT_bjet_cut, pT_lep_cut, Rsep_jet, Rsep_LepJet, pT_miss_cut, eta_sepa_cut, MInv_jets_cut, eta_lep_cut, eta_jet_cut, eta_bjet_cut, HT_cut, pT_hardestjet_cut
-real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut, Mttbar_cut
+real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut, Mttbar_cut,Rsep_jetlep
 
 real(8),public ::MInv_LB
 
@@ -517,7 +517,33 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
 
 ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
 
-print *, "removing all cuts for ObsSet=52"
+
+    Rsep_jet    = 0.4d0 
+    pT_bjet_cut = 25d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_lep_cut  = 25d0*GeV
+    pT_miss_cut = 50d0*GeV
+    eta_lep_cut = 2.5d0 
+
+
+
+ELSEIF( ObsSet.EQ.53 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar decays and di-lept. Z decay )
+
+
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 20d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut  = 20d0*GeV
+    eta_jet_cut = 2.5d0
+
+    pT_lep_cut  = 15d0*GeV
+    pT_miss_cut = 20d0*GeV
+    eta_lep_cut = 2.5d0
+    Rsep_jetlep = 0.4d0
+
+
+ELSEIF( ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay ) same as 52 but no cuts
+
 
     Rsep_jet    = 0.4d0         *0d0
     pT_bjet_cut = 25d0*GeV      *0d0
@@ -525,6 +551,20 @@ print *, "removing all cuts for ObsSet=52"
     pT_lep_cut  = 25d0*GeV      *0d0
     pT_miss_cut = 50d0*GeV      *0d0
     eta_lep_cut = 2.5d0         *1d2
+
+
+ELSEIF( ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar decays and di-lept. Z decay ) same as 53 but no cuts
+
+    Rsep_jet    = 0.4d0         *0d0
+    pT_bjet_cut = 20d0*GeV      *0d0
+    eta_bjet_cut= 2.5d0         *1d2
+    pT_jet_cut  = 20d0*GeV      *0d0
+    eta_jet_cut = 2.5d0         *1d2
+
+    pT_lep_cut  = 15d0*GeV      *0d0 
+    pT_miss_cut = 20d0*GeV      *0d0 
+    eta_lep_cut = 2.5d0         *1d2
+    Rsep_jetlep = 0.4d0         *0d0
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
@@ -3319,7 +3359,7 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
 
 
 
-ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
           if(abs(TopDecays).ne.1)  call Error("TopDecays needs to be 1")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
           NumHistograms = 3
@@ -3345,6 +3385,40 @@ ELSEIF( ObsSet.EQ.52 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decay
           Histo(3)%BinSize= 0.25d0/4d0
           Histo(3)%LowVal = 0d0
           Histo(3)%SetScale= 1d0
+
+
+
+
+
+
+ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+          if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 1")
+          if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
+          NumHistograms = 3
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT(lep+)"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal =  0d0*GeV
+          Histo(1)%SetScale= 100d0
+
+          Histo(2)%Info   = "pT(Z(l+,l-))"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 50d0*GeV
+          Histo(2)%LowVal =  0d0*GeV
+          Histo(2)%SetScale= 100d0
+
+          Histo(3)%Info   = "phi(l+,l-)"
+          Histo(3)%NBins  = 15    *4d0
+          Histo(3)%BinSize= 0.25d0/4d0
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0
+
+
 
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -6823,10 +6897,10 @@ real(8) :: MomJet(1:4,1:7),MomJet_CHECK(1:4,1:7)
 real(8) :: MomHadr(1:4,0:8)
 real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
 logical :: applyPSCut
-integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree
+integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree,leptj(1:3),i,j
 real(8) :: nZLept,s12,s13,s14,s23,s24,s34
-real(8) :: pT_lepM,pT_lepP,ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
-real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP
+real(8) :: pT_lep(4),ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
+real(8) :: eta_ATop,eta_Top,eta_lep(1:4)
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,mT_bln(1:2),pT_Z
 real(8) :: R_lj(1:5),R_PlepM,pT_lept,ET_lept,mT,dPhiLL
 integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z
@@ -7002,7 +7076,7 @@ if( ObsSet.eq.51) then! ttb+Z production without top decays at Tevatron & LHC
 
 
 
-elseif( ObsSet.eq.52) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
 
 
 !     s12 = dabs( get_MInv(Mom(1:4,lepM)+Mom(1:4,lepP))-M_Z )
@@ -7019,10 +7093,10 @@ elseif( ObsSet.eq.52) then! set of observables for ttb+Z ( di-lept. ttbar decays
     eta_jet(1) = get_ETA(Mom(1:4,b))
     eta_jet(2) = get_ETA(Mom(1:4,bbar))
 
-    pT_LepP  = get_PT(Mom(1:4,ferm_Z))
-    pT_LepM  = get_PT(Mom(1:4,Aferm_Z))
-    eta_LepP  = get_ETA(Mom(1:4,ferm_Z))
-    eta_LepM  = get_ETA(Mom(1:4,Aferm_Z))
+    pT_Lep(1)  = get_PT(Mom(1:4,ferm_Z))
+    pT_Lep(2)  = get_PT(Mom(1:4,Aferm_Z))
+    eta_Lep(1)  = get_ETA(Mom(1:4,ferm_Z))
+    eta_Lep(2)  = get_ETA(Mom(1:4,Aferm_Z))
 
     pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
 
@@ -7043,12 +7117,12 @@ elseif( ObsSet.eq.52) then! set of observables for ttb+Z ( di-lept. ttbar decays
         RETURN
     endif
 
-    if( pT_lepM.lt.pT_lep_cut .OR. pT_lepP.lt.pT_lep_cut ) then
+    if( pT_lep(1).lt.pT_lep_cut .OR. pT_lep(2).lt.pT_lep_cut ) then
         applyPSCut = .true.
         RETURN
     endif
 
-    if( abs(eta_lepM).gt.eta_lep_cut .OR. abs(eta_lepP).gt.eta_lep_cut) then
+    if( abs(eta_lep(1)).gt.eta_lep_cut .OR. abs(eta_lep(2)).gt.eta_lep_cut) then
        applyPSCut = .true.
         RETURN
     endif
@@ -7061,9 +7135,108 @@ elseif( ObsSet.eq.52) then! set of observables for ttb+Z ( di-lept. ttbar decays
 
 
 ! binning
-    NBin(1) = WhichBin(1,pT_LepP)
+    NBin(1) = WhichBin(1,pT_Lep(1))
     NBin(2) = WhichBin(2,pT_Z)
     NBin(3) = WhichBin(3,dphill)
+
+
+
+
+
+elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+
+!     Rsep_jetlep = 0.4d0
+
+! request at least four jets where two are b-jets
+    NObsJet_Tree = 4
+    if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    pT_jet(1) = get_PT(MomJet(1:4,1))
+    pT_jet(2) = get_PT(MomJet(1:4,2))
+    pT_jet(3) = get_PT(MomJet(1:4,3))
+    pT_jet(4) = get_PT(MomJet(1:4,4))
+    eta_jet(1) = get_ETA(MomJet(1:4,1))
+    eta_jet(2) = get_ETA(MomJet(1:4,2))
+    eta_jet(3) = get_ETA(MomJet(1:4,3))
+    eta_jet(4) = get_ETA(MomJet(1:4,4))
+
+
+    pT_Lep(1)  = get_PT(Mom(1:4,LepP))
+    eta_Lep(1) = get_ETA(Mom(1:4,LepP))
+
+    pT_Lep(2)  = get_PT(Mom(1:4,ferm_Z))
+    eta_Lep(2) = get_ETA(Mom(1:4,ferm_Z))
+
+    pT_Lep(3)  = get_PT(Mom(1:4,Aferm_Z))
+    eta_Lep(3) = get_ETA(Mom(1:4,Aferm_Z))
+
+    pT_miss = get_PT(Mom(1:4,nu))
+
+    pT_Z  = get_PT(Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z))
+
+    DphiLL = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,Aferm_Z))  )
+    if( DphiLL.gt.Pi ) DphiLL=2d0*Pi-DphiLL
+
+
+
+    
+
+! check cuts
+    if( pT_jet(1).lt.pT_bjet_cut .OR. pT_jet(2).lt.pT_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_jet(1)).gt.eta_bjet_cut .OR. abs(eta_jet(2)).gt.eta_bjet_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_jet(3).lt.pT_jet_cut .OR. pT_jet(4).lt.pT_jet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_jet(3)).gt.eta_jet_cut .OR. abs(eta_jet(4)).gt.eta_jet_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( pT_lep(1).lt.pT_lep_cut .OR. pT_lep(2).lt.pT_lep_cut .OR. pT_lep(3).lt.pT_lep_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_lep(1)).gt.eta_lep_cut .OR. abs(eta_lep(2)).gt.eta_lep_cut  .OR. abs(eta_lep(3)).gt.eta_lep_cut ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_miss.lt.pT_miss_cut ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    leptj = (/ LepP,ferm_Z,Aferm_Z /)
+    do i=1,4
+    do j=1,3
+      if( get_R( MomJet(1:4,i),Mom(1:4,leptj(j)) ) .lt. Rsep_jetlep ) then 
+        applyPSCut = .true.
+        RETURN
+      endif
+    enddo
+    enddo
+
+! binning
+    NBin(1) = WhichBin(1,pT_Lep(1))
+    NBin(2) = WhichBin(2,pT_Z)
+    NBin(3) = WhichBin(3,dphill)
+
 
 
 
