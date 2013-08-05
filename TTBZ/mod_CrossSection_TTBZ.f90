@@ -198,7 +198,7 @@ ENDIF
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
-!   call BSM_Z_coupl()
+
 !------------ LO --------------
 IF( Correction.EQ.0 ) THEN
 !   do iHel=nHel(1),nHel(2)
@@ -843,18 +843,18 @@ ELSEIF( Correction.EQ.1 ) THEN
 !    stop
     
 ENDIF
-print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
-print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
-print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
-print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
-print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
-print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
-print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
-print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
-print *, 'No. times QP used : ', useQP
-print *, 'No. times QP fails: ', pole_skipped
-stop
-
+!print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
+!print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
+!print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
+!print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
+!print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
+!print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
+!print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
+!print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
+!print *, 'No. times QP used : ', useQP
+!print *, 'No. times QP fails: ', pole_skipped
+!stop
+!
 IF( Correction.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
@@ -1176,6 +1176,8 @@ ENDIF
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
+   
+
 !------------ LO --------------
    
 IF( CORRECTION.EQ.0 ) THEN
@@ -1467,20 +1469,20 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       
       NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(BosonicPartAmp(up,-2:1)))*PDFFac(up) &
            + dreal(LOPartAmp(dn)*dconjg(BosonicPartAmp(dn,-2:1)))*PDFFac(dn) )
-!      print *, 'bosonic loops:'
-!      print *, 'LO up',LOPartAmp(up)
-!      print *, 'LO dn', LOPartAmp(dn)
-!      print *, 'NLO up',BosonicPartAmp(up,-2:1)
-!      print *, 'up rat',BosonicPartAmp(up,-2:1)/LOPartAmp(up)
-!      print *, 'NLO dn',BosonicPartAmp(dn,-2:1)
-!      print *, 'dn rat',BosonicPartAmp(dn,-2:1)/LOPartAmp(dn)
-!      print *, 'res pol', NLO_Res_pol
-!      if (abs(LO_Res_Pol) .ge.1d-10) then
-!         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
-!      endif
+      print *, 'bosonic loops:'
+      print *, 'LO up',LOPartAmp(up)
+      print *, 'LO dn', LOPartAmp(dn)
+      print *, 'NLO up',BosonicPartAmp(up,-2:1)
+      print *, 'up rat',BosonicPartAmp(up,-2:1)/LOPartAmp(up)
+      print *, 'NLO dn',BosonicPartAmp(dn,-2:1)
+      print *, 'dn rat',BosonicPartAmp(dn,-2:1)/LOPartAmp(dn)
+      print *, 'res pol', NLO_Res_pol
+      if (abs(LO_Res_Pol) .ge.1d-10) then
+         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
+      endif
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
-!      pause
+      pause
 
 !88 continue
 !! ------------ fermionic loops --------------
@@ -1694,33 +1696,39 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       endif
 ! QP check end
       
-      
-      if (ZQcoupl .eq. 1) then 
-         FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + (2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-         FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + (2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-      elseif (ZQcoupl .eq. 2) then
-         FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + 3d0 * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-         FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + 3d0 * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-      elseif (ZQcoupl .eq. 3) then
-         FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + (-2d0*couplZUU_left-3d0*couplZDD_left+2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-!testanom         FermionPartAmp(up,-2:1) =  (-2d0*couplZUU_left-2d0*couplZDD_left+2d0*couplZUU_right+2d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
-         FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + (-2d0*couplZUU_left-3d0*couplZDD_left+2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+      if (ZDecays .gt. 0) then
+         PrimAmps(PrimAmp2_12534)%Result(:) = PrimAmps(PrimAmp2_12534)%Result(:) * propZ * couplZLL
+         if (ZQcoupl .ne. 3) then
+            call Error("WARNING : Fermion loop with decaying Z on light quark loop -- propagator only calculated using AXIAL VECTOR coupling")
+         endif
       endif
-      
-      NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(FermionPartAmp(up,-2:1)))*PDFFac(up) &
-                                             + dreal(LOPartAmp(dn)*dconjg(FermionPartAmp(dn,-2:1)))*PDFFac(dn) )
-!      print *, 'fermionic loops:'
-!      print *, 'LO up', LOPartAmp(up)
-!      print *, 'LO dn', LOPartAmp(dn)
-!      print *, 'NLO up', FermionPartAmp(up,-2:1)
-!      print *, 'up rat', FermionPartAmp(up,-2:1)/LOPartAmp(up)
-!      print *, 'NLO dn', FermionPartAmp(dn,-2:1)
-!      print *, 'dn rat', FermionPartAmp(dn,-2:1)/LOPartAmp(dn)
-!      print *, 'res pol', NLO_Res_pol
-!      if (abs(LO_Res_Pol) .ge.1d-10) then
-!         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
-!      endif
-!!      pause
+
+     if (ZQcoupl .eq. 1) then 
+        FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + (2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+        FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + (2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+     elseif (ZQcoupl .eq. 2) then
+        FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + 3d0 * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+        FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + 3d0 * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+     elseif (ZQcoupl .eq. 3) then
+        FermionPartAmp(up,-2:1) = FermionPartAmp(up,-2:1) + (-2d0*couplZUU_left-3d0*couplZDD_left+2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+         FermionPartAmp(up,-2:1) =  (-2d0*couplZUU_left-2d0*couplZDD_left+2d0*couplZUU_right+2d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+        FermionPartAmp(dn,-2:1) = FermionPartAmp(dn,-2:1) + (-2d0*couplZUU_left-3d0*couplZDD_left+2d0*couplZUU_right+3d0*couplZDD_right) * PrimAmps(PrimAmp2_12534)%Result(-2:1)
+     endif
+     
+     NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(FermionPartAmp(up,-2:1)))*PDFFac(up) &
+                                            + dreal(LOPartAmp(dn)*dconjg(FermionPartAmp(dn,-2:1)))*PDFFac(dn) )
+      print *, 'fermionic loops:'
+      print *, 'LO up', LOPartAmp(up)
+      print *, 'LO dn', LOPartAmp(dn)
+      print *, 'NLO up', FermionPartAmp(up,-2:1)
+      print *, 'up rat', FermionPartAmp(up,-2:1)/LOPartAmp(up)
+      print *, 'NLO dn', FermionPartAmp(dn,-2:1)
+      print *, 'dn rat', FermionPartAmp(dn,-2:1)/LOPartAmp(dn)
+      print *, 'res pol', NLO_Res_pol
+      if (abs(LO_Res_Pol) .ge.1d-10) then
+         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
+      endif
+      pause
 !      stop
       
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
