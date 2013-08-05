@@ -24,7 +24,7 @@ contains
 !     5=incoming antiquark
 !-----------------------------------------------------------
 
-      subroutine EvalIntDipoles_QQBTTBGZ(p,MomDK,z,npdf,res)
+      subroutine EvalIntDipoles_QQBTTBGZ(p,MomDK,z,res)
       use ModIntDipoles
       use ModAmplitudes
       use ModZDecay
@@ -36,7 +36,7 @@ contains
       type(TreeProcess),save :: TreeAmpsDip(1:2)
       complex(dp) :: B(1:2),Bm(1:2,1:2),mtrsq(2)
       complex(dp) :: AM(1:2,1:2,1:2),propZ,MZ_Inv
-      integer :: iTree,i1,i2,i3,i4,i5,i,j,i6,n,npdf
+      integer :: iTree,i1,i2,i3,i4,i5,i,j,i6,n
       integer :: hel(1:5),emi , Nmax(5),N2Jump
       character(2) :: diptype
       real(dp) :: colcorr(1:2,1:2),epcorr,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
@@ -44,10 +44,6 @@ contains
 
       res(1:2,1:3) = zero
       CF=4d0/3d0
-      
-      if( npdf.eq.2 ) then
-            call swapMom(p(1:4,4),p(1:4,5))
-      endif
 
        if( first_time ) then
              call InitTrees(4,0,2,TreeAmpsDip,NumBoson=1)
@@ -88,15 +84,11 @@ contains
           hel(3) = i3
           hel(4) = i4
           hel(5) = i5
+
           call SetPolarization((/p(1:4,1),p(1:4,3),p(1:4,4),p(1:4,5),p(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
           if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
-          if( npdf.eq.1 ) then
-              call ZGamQcoupl(Up_,hel(4),couplZUU,couplGUU)
-              call ZGamQcoupl(Dn_,hel(4),couplZDD,couplGDD)
-          else
-              call ZGamQcoupl(Up_,-hel(4),couplZUU,couplGUU)
-              call ZGamQcoupl(Dn_,-hel(4),couplZDD,couplGDD)
-          endif
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
 
           couplZQQ_left_dyn=one
           couplZQQ_right_dyn=one
@@ -118,8 +110,8 @@ contains
                   Bm(up_,i6)=B(i6)
                   Bm(dn_,i6)=B(i6)
                   if( Zdecays.gt.0 .and. Zdecays.lt.10 ) then
-!                       Bm(up_,i6)=Bm(up_,i6)*propZ*couplZLL
-!                       Bm(dn_,i6)=Bm(dn_,i6)*propZ*couplZLL
+                      Bm(up_,i6)=Bm(up_,i6)*propZ*couplZLL
+                      Bm(dn_,i6)=Bm(dn_,i6)*propZ*couplZLL
                   endif
               else
                   Bm(up_,i6)=B(i6)*couplZUU
