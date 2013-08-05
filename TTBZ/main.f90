@@ -100,7 +100,11 @@ logical :: dirresult
    DKRE_switch=0
    iDipAlpha(1:5)=0
    DipAlpha2=1d0
-
+! default for BSM top-Z  couplings
+   AbsDelF1A=0d0
+   AbsDelF1V=0d0
+   RelDelF1A=0d0
+   RelDelF1V=0d0
 
    NumArgs = NArgs()-1
    do NArg=1,NumArgs
@@ -181,6 +185,14 @@ logical :: dirresult
     elseif( arg(1:8).eq."FileTag=" ) then
         read(arg(9:59),*)  FileTag
         if( FileTag.eq."." ) FileTag=""
+     elseif( arg(1:10) .eq. "AbsDelF1A=" ) then
+        read(arg(11:16),*) AbsDelF1A
+     elseif( arg(1:10) .eq. "AbsDelF1V=" ) then
+        read(arg(11:16),*) AbsDelF1V
+     elseif( arg(1:10) .eq. "RelDelF1A=" ) then
+        read(arg(11:16),*) RelDelF1A
+     elseif( arg(1:10) .eq. "RelDelF1V=" ) then
+        read(arg(11:16),*) RelDelF1V
     elseif( arg(1:9).eq."DipAlpha=" ) then
         read(arg(10:10),*) iDipAlpha(1)
         read(arg(11:11),*) iDipAlpha(2)
@@ -215,6 +227,18 @@ logical :: dirresult
    if (alpha_fi.ne.1d0) alpha_fi = DipAlpha2 * alpha_fi
    if (alpha_ff.ne.1d0) alpha_ff = DipAlpha2 * alpha_ff
 
+   if ( (AbsDelF1A .ne. 0d0 .and. RelDelF1A .ne. 0d0) .or. &
+        (AbsDelF1V .ne. 0d0 .and. RelDelF1V .ne. 0d0) ) then
+      print *, "Make up your mind! Abs or relative delta Z-top?"
+      stop
+   endif
+
+   DeltaF1A=RelDelF1A
+   DeltaF1V=RelDelF1V
+   if (AbsDelF1A .ne. 0d0 .or. AbsDelF1V .ne. 0d0 ) then
+      DeltaF1A=AbsDelF1A/(-couplZTT_left_SM+couplZTT_right_SM)
+      DeltaF1V=AbsDelF1V/(couplZTT_left_SM+couplZTT_right_SM)
+   endif
 
    alpha_DKTfi = alpha_DK; alpha_DKTff = alpha_DK; alpha_DKWff = alpha_DK;
    if(iDKAlpha(1).ne.0) then
@@ -434,6 +458,12 @@ integer TheUnit
         write(TheUnit,'(A,F10.5)') "# gR_Zpr(top_)=",gR_Zpr(top_)
         write(TheUnit,'(A,F10.5)') "# gL_Zpr(dn_)=",gL_Zpr(dn_)
         write(TheUnit,'(A,F10.5)') "# gR_Zpr(dn_)=",gR_Zpr(dn_)
+    endif
+    if ( ObsSet .ge. 50 .and. ObsSet .le. 59) then
+       write(TheUnit,'(A,F10.5)') '# SM tZ vector=',couplZTT_left+couplZTT_right
+       write(TheUnit,'(A,F10.5)') '# SM tZ axial=',-couplZTT_left+couplZTT_right
+       write(TheUnit,'(A,F10.5)') '# DeltaF1V=',DeltaF1V
+       write(TheUnit,'(A,F10.5)') '# DeltaF1A=',DeltaF1A
     endif
     if( m_Top.eq.m_SMTop ) then 
         write(TheUnit,'(A,F8.3,A)') "# m(top)=",m_Top *100d0, " GeV"
