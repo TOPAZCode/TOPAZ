@@ -71,12 +71,12 @@ complex(8) :: couplZFF_right,couplZFF_left,couplZFF
 
 
    if( ZDecays.lt.10  ) then  ! Z is on-shell
-      couplZTT_left_dyn  = couplZTT_left_dyn  * PropZ *couplZFF
-      couplZTT_right_dyn = couplZTT_right_dyn * PropZ *couplZFF
+      couplZTT_left_dyn  = couplZTT_left * PropZ *couplZFF
+      couplZTT_right_dyn = couplZTT_right * PropZ *couplZFF
 
    elseif( ZDecays.gt.10 ) then  ! Z is off-shell
-      couplZTT_left_dyn  = couplZTT_left_dyn * PropZ *couplZFF + Q_Top*PropPhoton*Q_el
-      couplZTT_right_dyn = couplZTT_right_dyn *PropZ *couplZFF + Q_Top*PropPhoton*Q_el
+      couplZTT_left_dyn  = couplZTT_left * PropZ *couplZFF + Q_Top*PropPhoton*Q_el
+      couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF + Q_Top*PropPhoton*Q_el
    endif
 
 
