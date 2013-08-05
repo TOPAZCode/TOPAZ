@@ -73,6 +73,12 @@ real(8), public, parameter :: m_BH    = 50d0*GeV! (vector)
 real(8), public, parameter :: m_Chi   =100d0*GeV! (Majorana)
 real(8), public, parameter :: Vev  = 246d0*GeV
 
+!!!! BSM top-Z couplings
+real(8), public :: DeltaF1A, DeltaF1V    !, DeltaF2A, DeltaF2V    ! later
+real(8), public :: AbsDelF1A, AbsDelF1V    !, DeltaF2A, DeltaF2V    ! later
+real(8), public :: RelDelF1A, RelDelF1V    !, DeltaF2A, DeltaF2V    ! later
+!!!
+
 !!! Zprime section !!!
 
 !real(8), public, parameter :: m_Zpr = 91.19d0*GeV ! Standard Z
@@ -107,12 +113,14 @@ real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 ! real(8), public, parameter :: couplZDD_left  = Q_dn  *0d0
 ! real(8), public, parameter :: couplZDD_right = Q_dn  *0d0
 
-real(8), public, parameter :: couplZTT_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quarks
-real(8), public, parameter :: couplZTT_right = -sw/cw*Q_up
+real(8), public, parameter :: couplZTT_left_SM  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quark
+real(8), public, parameter :: couplZTT_right_SM = -sw/cw*Q_up
 ! real(8), public, parameter :: couplZTT_left  = Q_up!  This is for the check against ttb+photon.
 ! real(8), public, parameter :: couplZTT_right = Q_up
 ! real(8), public, parameter :: couplZTT_left  = 1d0!  This is for the check against ttb+photon.
 ! real(8), public, parameter :: couplZTT_right = 1d0
+real(8), public, parameter ::  couplZTT_V_SM =  couplZTT_left_SM+couplZTT_right_SM
+real(8), public, parameter ::  couplZTT_A_SM = -couplZTT_left_SM+couplZTT_right_SM
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
@@ -120,7 +128,7 @@ real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
 real(8), public, parameter :: couplZNN_left  = -sw/cw*Q_nu + 1d0/sw/cw * T3_nu
 real(8), public, parameter :: couplZNN_right = -sw/cw*Q_nu
 
-complex(8), public :: couplZTT_left_dyn,couplZTT_right_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
+complex(8), public :: couplZTT_left,couplZTT_right,couplZTT_V,couplZTT_A,couplZTT_left_dyn,couplZTT_right_dyn,couplZTT_V_dyn,couplZTT_A_dyn!  these couplings are set dynamically (depending on whether the Z decays or not)
 complex(8), public :: couplZUU_left_dyn,couplZUU_right_dyn
 complex(8), public :: couplZDD_left_dyn,couplZDD_right_dyn
 complex(8), public :: couplZQQ_left_dyn,couplZQQ_right_dyn
@@ -494,9 +502,17 @@ ENDIF
 
 
 !   top quark-Z-boson coupling
+
+! first get (possibly BSM) top-Z coupl
+
+   couplZTT_V = couplZTT_V_SM * (1d0 + DeltaF1V)
+   couplZTT_A = couplZTT_A_SM * (1d0 + DeltaF1A)
+   couplZTT_left  = (couplZTT_V - couplZTT_A)/2d0
+   couplZTT_right = (couplZTT_V + couplZTT_A)/2d0
+
 !   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
-    couplZTT_left_dyn  = couplZTT_left
-    couplZTT_right_dyn = couplZTT_right
+   couplZTT_left_dyn  = couplZTT_left
+   couplZTT_right_dyn = couplZTT_right
     
     
 
