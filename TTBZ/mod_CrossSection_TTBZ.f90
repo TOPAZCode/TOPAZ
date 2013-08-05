@@ -198,6 +198,7 @@ ENDIF
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
+!   call BSM_Z_coupl()
 !------------ LO --------------
 IF( Correction.EQ.0 ) THEN
 !   do iHel=nHel(1),nHel(2)
@@ -997,8 +998,9 @@ integer :: iHel,iPrimAmp,jPrimAmp,tmphel,APrimAmp,ListPrimAmps(1:12),LocalSister
 real(8) :: EHat,RunFactor,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,AccPoles,HOp(1:2,1:3),pdf_z(-6:6,1:2)
 real(8) :: MomExt(1:4,1:14),MomZl(1:4), MomZa(1:4),pZsq,MZ_Inv,ZDKMatel,Msq_T_BWENU,p12Z(1:4),p34Z(1:4)
 complex(8) :: s12Z,s34Z,fermloop_fin(1:2)
-complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4),light_quark_coupl(1:2),top_quark_coupl
+complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4),light_quark_coupl(1:2)
 logical :: applyPSCut
+logical, save :: first=.true.
 real(8) :: DPtol, QPtol
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
@@ -1020,7 +1022,8 @@ include "vegas_common.f"
 ! ZQcoupl=1           ! left- and right-handed (default)
 ! ZQcoupl=2           ! up and down
  ZQcoupl=3           !vector and axial-vector
-
+ if (first) then
+   print *, '=============================================================================='
    if (ZQcoupl .eq. 1) then
       print * , 'using left and right handed couplings in the currents' 
    elseif (ZQcoupl .eq. 2) then  
@@ -1031,8 +1034,9 @@ include "vegas_common.f"
       print *, 'Error: ZQcoupl not set' 
       stop
    endif
-   print *, '========================================='
-
+   print *, '=============================================================================='
+   first=.false.
+endif
 
   DPtol=1d-4
   QPtol=1d-4
@@ -1192,11 +1196,11 @@ IF( CORRECTION.EQ.0 ) THEN
        call HelCrossing(Helicities(iHel,1:NumExtParticles))
        call SetPolarizations()
         
-!         if( ZDecays.gt.0 ) then
-!            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
-!            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
-!            call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
-!         endif
+         if( ZDecays.gt.0 ) then
+            if( ExtParticle(5)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
+            call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
+            call ZGamLCoupl(1,Helicities(iHel,5),couplZLL,couplGLL)  ! charged lept
+         endif
 
 
        if (npdf .eq. 2) then
@@ -1205,9 +1209,9 @@ IF( CORRECTION.EQ.0 ) THEN
           Helicities(iHel,4)=-Helicities(iHel,4)
        endif
 
-           call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
-! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
-           call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+       call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
+       ! one could here add a routine for the anomalous ttZ coupling, or modify this one. For now, use this for ttZ coupl
+       call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
  
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one                  
@@ -1235,46 +1239,37 @@ IF( CORRECTION.EQ.0 ) THEN
 
         LO_Res_Pol = (0d0,0d0)
 
-! Amp 1 has the Z coupl in the currents
-! Amp 2 has the Z/gamma attached to the massless line, which could be up or down
-!        BornAmps(2)%Result=BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL)
-!        BornAmps(2)%Result=BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL)
-
-! these are actually just different flavor structures, same color structure, so
-! add them
-!        BornAmps(1)%Result=BornAmps(1)%Result+BornAmps(2)%Result
 
       if (Zdecays .eq. 0) then
-         LOPartAmp(up)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZUU )
-         LOPartAmp(dn)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZDD )
-      elseif( Zdecays.lt.10 ) then
-         LOPartAmp(up)=BornAmps(1)%Result*propZ*couplZLL + BornAmps(2)%Result*( couplZUU*propZ*couplZLL )!  MARKUS: *propZ*couplZLL was missing for BornAmps(1)
-         LOPartAmp(dn)=BornAmps(1)%Result*propZ*couplZLL + BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
+         LOPartAmp(up)=BornAmps(1)%Result + BornAmps(2)%Result*couplZUU
+         LOPartAmp(dn)=BornAmps(1)%Result + BornAmps(2)%Result*couplZDD
+      elseif( ZDecays .ge. 1 .and. Zdecays.lt.10 ) then
+!         LOPartAmp(up)=BornAmps(1)%Result*propZ*couplZLL + BornAmps(2)%Result*( couplZUU*propZ*couplZLL )!  MARKUS: *propZ*couplZLL was missing for BornAmps(1)
+!         LOPartAmp(dn)=BornAmps(1)%Result*propZ*couplZLL + BornAmps(2)%Result*( couplZDD*propZ*couplZLL )
+         LOPartAmp(up)=BornAmps(1)%Result + BornAmps(2)%Result*couplZUU*propZ*couplZLL 
+         LOPartAmp(dn)=BornAmps(1)%Result + BornAmps(2)%Result*couplZDD*propZ*couplZLL 
       elseif( Zdecays.gt.10 ) then
-         LOPartAmp(up)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
-         LOPartAmp(dn)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+         LOPartAmp(up)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+         LOPartAmp(dn)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
       endif
-
-        print *, 'up',LOPartAmp(up)
-        print *, 'dn',LOPartAmp(dn)
 
 
         LO_Res_Pol =  ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
 
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
    enddo!helicity loop
-   print *, 'unpol',LO_Res_UnPol
-   pause
+!   print *, 'unpol',LO_Res_UnPol
+!   pause
  enddo! npdf loop
    call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
-print * , "remove swap"
+!print * , "remove swap"
 
 
 
 !------------ 1 LOOP --------------
 ELSEIF( CORRECTION.EQ.1 ) THEN
    do npdf=1,2
-      print *, 'npdf=', npdf
+!      print *, 'npdf=', npdf
 !    do npdf=1,1; print *, "only npdf=1"
       if (npdf .eq. 1) then
          PDFFac(1:2)=PDFFac_a(1:2)
@@ -1288,7 +1283,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
       !   do iHel=nHel(1),nHel(2)
       do iHel=1,NumHelicities
-         print *, iHel, Helicities(iHel,1:NumExtParticles)
+!         print *, iHel, Helicities(iHel,1:NumExtParticles)
          call HelCrossing(Helicities(iHel,1:NumExtParticles))
          if ( Helicities(iHel,3)*Helicities(iHel,4) .eq. 1) cycle
          call SetPolarizations()
@@ -1323,11 +1318,11 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
            LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZUU )
            LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*( couplZDD )
         elseif( Zdecays.lt.10 .and. Zdecays .gt. 0 ) then
-           LOPartAmp(up)=(BornAmps(1)%Result+BornAmps(2)%Result* couplZUU)*propZ*couplZLL 
-           LOPartAmp(dn)=(BornAmps(1)%Result+BornAmps(2)%Result* couplZDD)*propZ*couplZLL 
+           LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*couplZUU*propZ*couplZLL 
+           LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*couplZDD*propZ*couplZLL 
         elseif( Zdecays.gt.10 ) then
-           LOPartAmp(up)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
-           LOPartAmp(dn)=BornAmps(1)%Result*( propZ*couplZLL + couplGLL ) + BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
+           LOPartAmp(up)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZUU*propZ*couplZLL + couplGUU*couplGLL )
+           LOPartAmp(dn)=BornAmps(1)%Result + BornAmps(2)%Result*( couplZDD*propZ*couplZLL + couplGDD*couplGLL )
         elseif (Zdecays .eq. -2)  then    ! this is the photon comparison
            LOPartAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result*Q_up
            LOPartAmp(dn)=BornAmps(1)%Result+BornAmps(2)%Result*Q_dn
@@ -1347,19 +1342,15 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       if (Zdecays .eq. 0) then
          light_quark_coupl(up)= couplZUU 
          light_quark_coupl(dn)= couplZDD 
-         top_quark_coupl  = (1d0,0d0)
       elseif( Zdecays.lt.10 .and. Zdecays .gt. 0 ) then
          light_quark_coupl(up)= couplZUU*propZ*couplZLL 
          light_quark_coupl(dn)= couplZDD*propZ*couplZLL 
-         top_quark_coupl  = propZ*couplZLL 
       elseif( Zdecays.gt.10 ) then
          light_quark_coupl(up)= couplZUU*propZ*couplZLL + couplGUU*couplGLL 
          light_quark_coupl(dn)= couplZDD*propZ*couplZLL + couplGDD*couplGLL 
-         top_quark_coupl = propZ*couplZLL + couplGLL 
       elseif (Zdecays .eq. -2)  then    ! this is the photon comparison
          light_quark_coupl(up)= Q_up
          light_quark_coupl(dn)= Q_dn
-         top_quark_coupl  = (1d0,0d0)
       endif
 
 
@@ -1421,7 +1412,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          APrimAmp=ListPrimAmps(iPrimAmp)
          call OneLoopDiv(PrimAmps(APrimAmp),MuRen**2,3,rdiv(2),rdiv(1))
          if (APrimAmp .le. 4) then
-            print *, 'AGAIN, ADDING 1.5 TO RDIV(1)'
+!            print *, 'AGAIN, ADDING 1.5 TO RDIV(1)'
             rdiv(1)=rdiv(1)+1.5d0
          endif
 
@@ -1429,8 +1420,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          if ( AccPoles .gt. DPtol ) then
             useQP=useQP+1
             PrimAmps(APrimAmp)%Result=(0d0,0d0)
-            print *, 'using QP', AccPoles
-             
+!            print *, 'using QP', AccPoles
+             write(10,*) AccPoles
             do jPrimAmp=APrimAmp,APrimAmp+LocalSisters(iPrimAmp)
                call SetKirill(PrimAmps(jPrimAmp))
                call PentCut_128(PrimAmps(jPrimAmp))
@@ -1449,7 +1440,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
             enddo
 
             AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
-            print *, 'QP:', AccPoles
+!            print *, 'QP:', AccPoles
+            write(100,*) AccPoles
              if ( AccPoles .gt. QPtol ) then
                 print *, 'QP fails: ', AccPoles
                 PrimAmps(APrimAmp)%Result=0d0
@@ -1460,32 +1452,32 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
        
 
       BosonicPartAmp(up,-2:1)=  &
-                             +   Nc * ( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
-                             - 2d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
-                             + top_quark_coupl*PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
-                             - 1d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp3_15432)%Result(-2:1) + top_quark_coupl*PrimAmps(PrimAmp4_15234)%Result(-2:1) &
+                             +   Nc * ( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
+                             - 2d0/Nc*( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
+                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(up)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
+                             - 1d0/Nc*( PrimAmps(PrimAmp3_15432)%Result(-2:1) + PrimAmps(PrimAmp4_15234)%Result(-2:1) &
                              +light_quark_coupl(up)*(PrimAmps(PrimAmp4_12534)%Result(-2:1)+PrimAmps(PrimAmp3_14532)%Result(-2:1)) )
 
       BosonicPartAmp(dn,-2:1)=  &
-                             +   Nc * ( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
-                             - 2d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
-                             + top_quark_coupl*PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
-                             - 1d0/Nc*( top_quark_coupl*PrimAmps(PrimAmp3_15432)%Result(-2:1)  + top_quark_coupl*PrimAmps(PrimAmp4_15234)%Result(-2:1) &
+                             +   Nc * ( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) )&
+                             - 2d0/Nc*( PrimAmps(PrimAmp1_15234)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12354)%Result(-2:1) &
+                             + PrimAmps(PrimAmp1_15243)%Result(-2:1) + light_quark_coupl(dn)*PrimAmps(PrimAmp1_12453)%Result(-2:1) )  &
+                             - 1d0/Nc*( PrimAmps(PrimAmp3_15432)%Result(-2:1)  + PrimAmps(PrimAmp4_15234)%Result(-2:1) &
                              + light_quark_coupl(dn)*(PrimAmps(PrimAmp4_12534)%Result(-2:1)+PrimAmps(PrimAmp3_14532)%Result(-2:1)) )
       
       NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(BosonicPartAmp(up,-2:1)))*PDFFac(up) &
            + dreal(LOPartAmp(dn)*dconjg(BosonicPartAmp(dn,-2:1)))*PDFFac(dn) )
-      print *, 'bosonic loops:'
-      print *, 'LO up',LOPartAmp(up)
-      print *, 'LO dn', LOPartAmp(dn)
-      print *, 'NLO up',BosonicPartAmp(up,-2:1)
-      print *, 'up rat',BosonicPartAmp(up,-2:1)/LOPartAmp(up)
-      print *, 'NLO dn',BosonicPartAmp(dn,-2:1)
-      print *, 'dn rat',BosonicPartAmp(dn,-2:1)/LOPartAmp(dn)
-      print *, 'res pol', NLO_Res_pol
-      if (abs(LO_Res_Pol) .ge.1d-10) then
-         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
-      endif
+!      print *, 'bosonic loops:'
+!      print *, 'LO up',LOPartAmp(up)
+!      print *, 'LO dn', LOPartAmp(dn)
+!      print *, 'NLO up',BosonicPartAmp(up,-2:1)
+!      print *, 'up rat',BosonicPartAmp(up,-2:1)/LOPartAmp(up)
+!      print *, 'NLO dn',BosonicPartAmp(dn,-2:1)
+!      print *, 'dn rat',BosonicPartAmp(dn,-2:1)/LOPartAmp(dn)
+!      print *, 'res pol', NLO_Res_pol
+!      if (abs(LO_Res_Pol) .ge.1d-10) then
+!         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
+!      endif
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
 !      pause
@@ -1527,7 +1519,6 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
 
       PrimAmps(PrimAmp2m_12534)%Result = PrimAmps(PrimAmp2m_12534)%Result + PrimAmps(PrimAmp2m_12345)%Result
-      print *,  PrimAmps(PrimAmp2m_12534)%Result
 ! hack to get correct Born Amp to compare with heavy loop with Z on loop
       BornAmps(PrimAmp2m_12534)%Result = BornAmps(1)%Result
 ! I'd like to run this between 10 and 12, but OneLoopDiv gives me the wrong (?) SP for 10...
@@ -1544,10 +1535,11 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          if (AccPoles .gt. DPtol) then
             useQP=useQP+1
             PrimAmps(APrimAmp)%Result=(0d0,0d0)
-            print *, 'using QP', AccPoles
+            write(10,*) AccPoles
+!            print *, 'using QP', AccPoles
 
             do jPrimAmp=APrimAmp,APrimAmp+LocalSisters(iPrimAmp)
-               print *, jPrimAmp
+!               print *, jPrimAmp
                call SetKirill(PrimAmps(jPrimAmp))
                call PentCut_128(PrimAmps(jPrimAmp))
                call QuadCut_128(PrimAmps(jPrimAmp))
@@ -1564,7 +1556,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
                PrimAmps(APrimAmp)%Result(-2:1)=PrimAmps(APrimAmp)%Result(-2:1)+PrimAmps(APrimAmp+jPrimAmp)%Result(-2:1)
             enddo
             AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
-            print *, 'QP:', AccPoles
+!            print *, 'QP:', AccPoles
+            write(100,*) AccPoles
             if ( AccPoles .gt. QPtol ) then
                print *, 'QP fails: ', AccPoles
                PrimAmps(APrimAmp)%Result=0d0
@@ -1575,18 +1568,18 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       enddo
 
 ! omitted at present : Z on light quark loops
-      FermionPartAmp(up,-2:1) = Nf_light*top_quark_coupl*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
+      FermionPartAmp(up,-2:1) = Nf_light*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
           + Nf_light*light_quark_coupl(up)*PrimAmps(PrimAmp2_12354)%Result(-2:1) & 
-           + top_quark_coupl*PrimAmps(PrimAmp2m_15234)%Result(-2:1)  &
+           + PrimAmps(PrimAmp2m_15234)%Result(-2:1)  &
            + light_quark_coupl(up)*PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-           + top_quark_coupl*PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
+           + PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
 
 
-      FermionPartAmp(dn,-2:1) = Nf_light*top_quark_coupl*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
+      FermionPartAmp(dn,-2:1) = Nf_light*PrimAmps(PrimAmp2_15234)%Result(-2:1) &
            + Nf_light*light_quark_coupl(dn)*PrimAmps(PrimAmp2_12354)%Result(-2:1) &
-           + top_quark_coupl*PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
+           + PrimAmps(PrimAmp2m_15234)%Result(-2:1) &
            + light_quark_coupl(dn)*PrimAmps(PrimAmp2m_12354)%Result(-2:1) &
-           + top_quark_coupl*PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
+           + PrimAmps(PrimAmp2m_12534)%Result(-2:1) 
 
       ! light loops with Z on LOOP
       ! first, pick the coupling of the Z to the LIGHT LOOP quarks: LEFT / UP / VECTOR
@@ -1640,7 +1633,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
           couplZQQ_left_dyn =couplZDD_left
           couplZQQ_right_dyn=couplZDD_right
        elseif (ZQcoupl .eq. 3) then
-          print *, 'axial-vector loops'
+!          print *, 'axial-vector loops'
           couplZQQ_left_dyn=-one/two
           couplZQQ_right_dyn=one/two
        endif
@@ -1671,7 +1664,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       if (AccPoles .gt. DPtol) then
          useQP=useQP+1
          PrimAmps(APrimAmp)%Result=(0d0,0d0)
-         print *, 'using QP', AccPoles
+         write(10,*) AccPoles
+!         print *, 'using QP', AccPoles
          
          do jPrimAmp=APrimAmp,APrimAmp+LocalSisters(iPrimAmp)
             call SetKirill(PrimAmps(jPrimAmp))
@@ -1690,7 +1684,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
             PrimAmps(APrimAmp)%Result(-2:1)=PrimAmps(APrimAmp)%Result(-2:1)+PrimAmps(APrimAmp+jPrimAmp)%Result(-2:1)
          enddo
          AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
-         print *, 'QP:', AccPoles
+!         print *, 'QP:', AccPoles
+         write(100,*) AccPoles
          if ( AccPoles .gt. QPtol ) then
             print *, 'QP fails: ', AccPoles
             PrimAmps(APrimAmp)%Result=0d0
@@ -1714,18 +1709,18 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       
       NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(FermionPartAmp(up,-2:1)))*PDFFac(up) &
                                              + dreal(LOPartAmp(dn)*dconjg(FermionPartAmp(dn,-2:1)))*PDFFac(dn) )
-      print *, 'fermionic loops:'
-      print *, 'LO up', LOPartAmp(up)
-      print *, 'LO dn', LOPartAmp(dn)
-      print *, 'NLO up', FermionPartAmp(up,-2:1)
-      print *, 'up rat', FermionPartAmp(up,-2:1)/LOPartAmp(up)
-      print *, 'NLO dn', FermionPartAmp(dn,-2:1)
-      print *, 'dn rat', FermionPartAmp(dn,-2:1)/LOPartAmp(dn)
-      print *, 'res pol', NLO_Res_pol
-      if (abs(LO_Res_Pol) .ge.1d-10) then
-         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
-      endif
-!      pause
+!      print *, 'fermionic loops:'
+!      print *, 'LO up', LOPartAmp(up)
+!      print *, 'LO dn', LOPartAmp(dn)
+!      print *, 'NLO up', FermionPartAmp(up,-2:1)
+!      print *, 'up rat', FermionPartAmp(up,-2:1)/LOPartAmp(up)
+!      print *, 'NLO dn', FermionPartAmp(dn,-2:1)
+!      print *, 'dn rat', FermionPartAmp(dn,-2:1)/LOPartAmp(dn)
+!      print *, 'res pol', NLO_Res_pol
+!      if (abs(LO_Res_Pol) .ge.1d-10) then
+!         print *, 'NLO/LO', NLO_Res_Pol/LO_Res_Pol
+!      endif
+!!      pause
 !      stop
       
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
@@ -1739,12 +1734,12 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
 !! print *, "mom swap deactivated"
 ENDIF
- print *, 'time used QP : ',useQP
- print *, 'times QP failed : ', pole_skipped
- print *,  'LO Res UnPol', LO_Res_UnPol
- print *,  'NLO Res UnPol', NLO_Res_UnPol
- print *, 'ratio ', NLO_Res_UnPol/LO_Res_UnPol
- stop
+ !print *, 'time used QP : ',useQP
+ !print *, 'times QP failed : ', pole_skipped
+ !print *,  'LO Res UnPol', LO_Res_UnPol
+ !print *,  'NLO Res UnPol', NLO_Res_UnPol
+ !print *, 'ratio ', NLO_Res_UnPol/LO_Res_UnPol
+ !stop
 
 
 
@@ -1791,7 +1786,7 @@ LO_Res_Unpol       = LO_Res_Unpol       * PreFac
        xE = yRnd(8+HelSampling)
    ENDIF
 
-xe=0.3d0; print *, "fixed xE"
+xe=0.3d0!; print *, "fixed xE"
 
    call setPDFs(eta1/xE,eta2/xE,MuFac,pdf_z)
    IF( PROCESS.EQ.76 .OR. PROCESS.EQ.72 ) THEN!   72 is only for checking pole cancellation
@@ -1814,10 +1809,10 @@ xe=0.3d0; print *, "fixed xE"
                         +HOp(2,2)/xE * (pdf_z(Dn_,2)*pdf(ADn_,1)+pdf_z(Str_,2)*pdf(AStr_,1)+pdf_z(Bot_,2)*pdf(ABot_,1) ) &
                         +HOp(2,3)/xE * (pdf(Dn_,2)*pdf_z(ADn_,1)+pdf(Str_,2)*pdf_z(AStr_,1)+pdf(Bot_,2)*pdf_z(ABot_,1) )
 
-print *, "1L check",NLO_Res_UnPol(-2)                           /(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
-print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) )/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
-print *, "ID check", EvalCS_1L_ttbqqbZ/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
-pause
+!print *, "1L check",NLO_Res_UnPol(-2)                           /(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
+!print *, "1L check",( NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1) )/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
+!print *, "ID check", EvalCS_1L_ttbqqbZ/(alpha_sOver2Pi*RunFactor)/(LO_Res_Unpol)
+!pause
 
    ELSEIF( PROCESS.EQ.73 ) THEN
    stop " This correction not yet implemented for this process"
