@@ -9,10 +9,6 @@ public:: EvalIntDipoles_QGTTBQZ
 integer, parameter  :: dp = selected_real_kind(15)
 
 
-!       double precision, private, parameter :: NCol=3d0
-!       double precision, private, parameter :: TR=0.5d0
-!       double precision, private, parameter :: CA=2d0*TR*NCol
-!       double precision, private, parameter :: CF=TR*(NCol**2-1d0)/NCol
 
 contains
 
@@ -20,7 +16,7 @@ contains
 !-------------------------------------------------------------
 !    ordering of the momenta in the p-array:
 !     outgoing convention:
-!     bar t = 1, photon =2, t=3 ,  incoming quark=4,
+!     bar t = 1, Z =2, t=3 ,  incoming quark=4,
 !     5=incoming gluon
 !-----------------------------------------------------------
 
@@ -112,20 +108,6 @@ contains
 ! spin & color avg., color convention adjustment
       mtrsq(1) = mtrsq(1) * alpha_s4Pi**2 * alpha4Pi * Q_top**2 /4d0/64d0 * PhotonCouplCorr
       mtrsq(2) = mtrsq(1) ! here was a bug: this line was missing, q-> g splitting for down quarks
-
-
-! !      MADGRAPH CHECK: gg->ttbp
-!        MG_MOM(0:3,1) =-p(1:4,4)*100d0
-!        MG_MOM(0:3,2) =-p(1:4,5)*100d0
-!        MG_MOM(0:3,3) = p(1:4,3)*100d0
-!        MG_MOM(0:3,4) = p(1:4,1)*100d0
-!        MG_MOM(0:3,5) = p(1:4,2)*100d0
-!        call coupsm(0)
-!        call SGG_TTBA(MG_MOM,MadGraph_tree)
-!        print *,MadGraph_tree*(100d0)**2
-!        print *,mtrsq(1)
-!        print *, mtrsq(1)/MadGraph_tree/(100d0)**2
-!        pause
 
 
 
@@ -229,19 +211,6 @@ contains
       mtrsq = mtrsq * alpha_s4Pi**2 * alpha4Pi *Q_top**2 /4d0/9d0 * PhotonCouplCorr
 
 
-! !      MADGRAPH CHECK: qqb->ttbp
-!        MG_MOM(0:3,1) =-p(1:4,4)*100d0
-!        MG_MOM(0:3,2) =-p(1:4,5)*100d0
-!        MG_MOM(0:3,3) = p(1:4,3)*100d0
-!        MG_MOM(0:3,4) = p(1:4,1)*100d0
-!        MG_MOM(0:3,5) = p(1:4,2)*100d0
-!        call coupsm(0)
-!        call SDDB_TTBA(MG_MOM,MadGraph_tree)
-!        print *,MadGraph_tree*(100d0)**2
-!        print *,mtrsq(2)
-!        print *, mtrsq(2)/MadGraph_tree/(100d0)**2
-!        pause
-
 
       dipsoft =ii_gq(zero,zero,p,5,4,z,1) *2d0  ! factor 2d0 fixes normalization for ii_gq dipole
       dipfini =ii_gq(zero,zero,p,5,4,z,2) *2d0
@@ -274,6 +243,8 @@ contains
 
   return
   end subroutine
+
+
 
 
 

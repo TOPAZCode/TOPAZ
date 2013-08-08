@@ -67,6 +67,7 @@ logical :: dirresult
    XTopDecays=-100
    ZDecays=-100
    HelSampling=.false.
+   FirstLOThenVI=.false.
    m_Top=172d0*GeV
    m_STop=350d0*GeV
    m_HTop=500d0*GeV
@@ -358,6 +359,7 @@ logical :: dirresult
       GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
    endif
 
+
 return
 END SUBROUTINE
 
@@ -533,6 +535,8 @@ elseif( GridIO.eq.+1 ) then
   readin=.true.
   writeout=.false.
   ingridfile=GridFile(1:72)
+elseif( GridIO.eq.+2 ) then
+  FirstLOThenVI = .true.
 else
   readin=.false.
   writeout=.false.
@@ -1132,13 +1136,35 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.12 ) THEN
-IF( CORRECTION.LE.1 .AND. PROCESS.EQ.51 ) THEN
+IF( CORRECTION.EQ.0 .AND. PROCESS.EQ.51 ) THEN
   call vegas(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
     ncall= VegasNc1
     call InitHisto()
     call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+ELSEIF( CORRECTION.EQ.1 .AND. PROCESS.EQ.51 ) THEN
+
+  if( FirstLOThenVI ) then
+      CORRECTION=0
+      call vegas(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+
+      call InitHisto()
+      EvalCounter = 0
+      itmx = VegasIt1
+      ncall= VegasNc1
+      CORRECTION=1
+      call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+  else
+      call vegas(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+      if( warmup ) then
+        itmx = VegasIt1
+        ncall= VegasNc1
+        call InitHisto()
+        call vegas1(EvalCS_1L_ststbgg,VG_Result,VG_Error,VG_Chi2)
+      endif
   endif
 
 ELSEIF( CORRECTION.EQ.3 .AND. PROCESS.EQ.55 ) THEN
@@ -1180,7 +1206,7 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.13 ) THEN
-IF( CORRECTION.LE.1 .AND. PROCESS.EQ.52 ) THEN
+IF( CORRECTION.EQ.0 .AND. PROCESS.EQ.52 ) THEN
   call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
     itmx = VegasIt1
@@ -1188,6 +1214,29 @@ IF( CORRECTION.LE.1 .AND. PROCESS.EQ.52 ) THEN
     call InitHisto()
     call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
   endif
+
+ELSEIF( CORRECTION.EQ.1 .AND. PROCESS.EQ.52 ) THEN
+
+  if( FirstLOThenVI ) then
+      CORRECTION=0
+      call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+
+      call InitHisto()
+      EvalCounter = 0
+      itmx = VegasIt1
+      ncall= VegasNc1
+      CORRECTION=1
+      call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+  else
+      call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+      if( warmup ) then
+        itmx = VegasIt1
+        ncall= VegasNc1
+        call InitHisto()
+        call vegas1(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
+      endif
+  endif
+
 
 ELSEIF( CORRECTION.EQ.3 .AND. (PROCESS.EQ.56 .OR. PROCESS.EQ.53 .OR. PROCESS.EQ.54 ) ) THEN
   call vegas(EvalCS_1L_ststbqqb,VG_Result,VG_Error,VG_Chi2)
@@ -1387,27 +1436,55 @@ ENDIF
 
 IF( MASTERPROCESS.EQ.31 ) THEN
    IF( CORRECTION.EQ.1 .AND. PROCESS.EQ.41 ) THEN
-  call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
-  if( warmup ) then
-   itmx = VegasIt1
-   ncall= VegasNc1
-   call InitHisto()
-   call vegas1(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
-  endif
-ENDIF
+        if( FirstLOThenVI ) then
+
+            CORRECTION=0
+            call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+
+            call InitHisto()
+            EvalCounter = 0
+            itmx = VegasIt1
+            ncall= VegasNc1
+            CORRECTION=1
+            call vegas1(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+        else
+
+            call vegas(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+            if( warmup ) then
+            itmx = VegasIt1
+            ncall= VegasNc1
+            call InitHisto()
+            call vegas1(EvalCS_1L_HtHtbgg,VG_Result,VG_Error,VG_Chi2)
+            endif
+        endif
+  ENDIF
 ENDIF
 
 
 IF( MASTERPROCESS.EQ.32 ) THEN
    IF( CORRECTION.EQ.1 .AND. PROCESS.EQ.42 ) THEN
-  call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
-  if( warmup ) then
-   itmx = VegasIt1
-   ncall= VegasNc1
-   call InitHisto()
-   call vegas1(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
-  endif
-ENDIF
+
+       if( FirstLOThenVI ) then
+            CORRECTION=0
+            call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+
+            call InitHisto()
+            EvalCounter = 0
+            itmx = VegasIt1
+            ncall= VegasNc1
+            CORRECTION=1
+            call vegas1(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+        else
+
+            call vegas(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+            if( warmup ) then
+            itmx = VegasIt1
+            ncall= VegasNc1
+            call InitHisto()
+            call vegas1(EvalCS_1L_HtHtbqqb,VG_Result,VG_Error,VG_Chi2)
+            endif
+        endif
+  ENDIF
 ENDIF
 
 
@@ -1706,7 +1783,9 @@ ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
 !      print *, "check that in cteq2mrst.f ct10 is really called!"; stop
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
      call SetCtq6(4)  ! CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
+     PDFSetString = " CTEQ6L1 (cteq6l1.tbl)"
 !       call SetCtq6(3)  ! CTEQ6L  Leading Order            0.118**   326   226    cteq6l.tbl
+!       PDFSetString = " CTEQ6L (cteq6l.tbl)"
   ENDIF
 ENDIF
 

@@ -882,6 +882,8 @@ real(8) ::Mom(1:4),Get_ET,sinTheta
    sinTheta = dsqrt(1d0-Mom(4)**2/(Mom(2)**2+Mom(3)**2+Mom(4)**2)) ! = pT/|pVec|
    Get_ET = Mom(1) * sinTheta
 
+!    Get_ET =  Mom(1) * dsqrt( Mom(2)**2+Mom(3)**2 ) / dsqrt(Mom(2)**2+Mom(3)**2+Mom(4)**2)! above is in agreement with this definition from MCFM
+
 RETURN
 END FUNCTION
 

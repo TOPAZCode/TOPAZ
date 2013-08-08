@@ -1051,20 +1051,20 @@ endif!applyPSCut
 !      careful, alphas=0.13 only for NLOParam=0 PDFSet=2
 !      MADGRAPH CHECK: gg->ttbZ, mt=172, alpha_s=0.13 mZ=91.19
 if (ZDecays .eq. 0) then
-      MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-      MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-      MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
-      MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
-      MG_MOM(0:3,5) = MomExt(1:4,4)*100d0
-      MG_MOM(0:3,6) = MomExt(1:4,3)*100d0
-      call coupsm(0)
-      call SGG_TTBZG(MG_MOM,MadGraph_tree)
-      print *, ""
-      print *, alpha_s*RunFactor,m_top,m_z
-      print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
-      print *, "MadGraph hel.amp:", MadGraph_tree
-      print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**4)
-      pause
+!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!       MG_MOM(0:3,3) = MomExt(1:4,6)*100d0
+!       MG_MOM(0:3,4) = MomExt(1:4,5)*100d0
+!       MG_MOM(0:3,5) = MomExt(1:4,4)*100d0
+!       MG_MOM(0:3,6) = MomExt(1:4,3)*100d0
+!       call coupsm(0)
+!       call SGG_TTBZG(MG_MOM,MadGraph_tree)
+!       print *, ""
+!       print *, alpha_s*RunFactor,m_top,m_z
+!       print *, "My tree:         ", LO_Res_Unpol/(100d0)**4
+!       print *, "MadGraph hel.amp:", MadGraph_tree
+!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_Unpol)/(100d0)**4)
+!       pause
 endif
        
 

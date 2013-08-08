@@ -1289,8 +1289,7 @@
 
 !--- after momentum mapping -- sum over colors and polarizations
 
-         Nmax = 1
-
+        Nmax = 1
         if (TopDecays.ge.1) then ! Top decays
                Nmax(3) = -1
                Nmax(1) = -1

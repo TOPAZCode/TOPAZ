@@ -6424,33 +6424,27 @@ IF( Correction.EQ.1 ) THEN
 !          endif
 
 
-!          print *, "check2",ThePrimamp%AmpType
-!          print *, ThePrimAmp%FermLine1In,ThePrimAmp%FermLine1Out
-!          print *, ThePrimAmp%FermLine2In,ThePrimAmp%FermLine2Out
-!          print *, ThePrimAmp%ScaLine1In,ThePrimAmp%ScaLine1Out
-!          pause
-
          call InitUCuts(ThePrimAmp)
-         print *, 'cuts inited'
+!          print *, 'cuts inited'
       enddo! NPrimAmp
-      print *, 'calling remove dupl cuts'
-      call remove_duplicate_cuts()
+!       print *, 'calling remove dupl cuts'
+!       call remove_duplicate_cuts()
 
 !! RR printout to check id of duplicates !!
-    print *, ' PRINTOUT FOR DUPLICATES'
+!     print *, ' PRINTOUT FOR DUPLICATES'
 !    pause
-    do NPrimAmp=1,NumPrimAmps
-       print *, '-------------------------'
-       print *, '   Primitive ', NPrimAmp
-       print *, '-------------------------'
-       do NPoint=1,5
-          print *, 'number of cuts = ', NPoint
-          do NCut=1,PrimAmps(NPrimAmp)%UCuts(NPoint)%NumCuts
-             print *, ' cuts: ', NCut, PrimAmps(NPrimAmp)%UCuts(NPoint)%CutProp(NCut,1:NPoint),  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
+!     do NPrimAmp=1,NumPrimAmps
+!        print *, '-------------------------'
+!        print *, '   Primitive ', NPrimAmp
+!        print *, '-------------------------'
+!        do NPoint=1,5
+!           print *, 'number of cuts = ', NPoint
+!           do NCut=1,PrimAmps(NPrimAmp)%UCuts(NPoint)%NumCuts
+!              print *, ' cuts: ', NCut, PrimAmps(NPrimAmp)%UCuts(NPoint)%CutProp(NCut,1:NPoint),  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
 !             print *, 'skip ?',  PrimAmps(NPrimAmp)%UCuts(NPoint)%skip(NCut)
-          enddo
-       enddo
-    enddo
+!           enddo
+!        enddo
+!     enddo
 !    pause
 ! RR printout ends here
 
@@ -6703,7 +6697,7 @@ type(TreeProcess),pointer :: TheTree
    allocate( ThePrimAmp%UCuts(1)%Coeff_128(1:ThePrimAmp%UCuts(1)%NumCuts,0:0),     stat=AllocStatus)
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in ThePrimAmp%UCuts(1)")
 
-   print *, 'allocate skip'
+!    print *, 'allocate skip'
    allocate( ThePrimAmp%UCuts(5)%skip(1:ThePrimAmp%UCuts(5)%NumCuts),stat=AllocStatus )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 5")
    allocate( ThePrimAmp%UCuts(4)%skip(1:ThePrimAmp%UCuts(4)%NumCuts),stat=AllocStatus )
@@ -6714,7 +6708,7 @@ type(TreeProcess),pointer :: TheTree
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 2")
    allocate( ThePrimAmp%UCuts(1)%skip(1:ThePrimAmp%UCuts(1)%NumCuts),stat=AllocStatus )
    if( AllocStatus .ne. 0 ) call Error("Memory allocation in skip 1")
-   print *, 'done allocating skip'
+!    print *, 'done allocating skip'
 
 !  init pentcuts
    allocate(ThePrimAmp%UCuts(5)%TreeProcess(1:ThePrimAmp%UCuts(5)%NumCuts,1:5), stat=AllocStatus)
@@ -6837,12 +6831,12 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(5)%CutProp(NCut,3) = i3
            ThePrimAmp%UCuts(5)%CutProp(NCut,4) = i4
            ThePrimAmp%UCuts(5)%CutProp(NCut,5) = i5
-           print *, 'cuts:', NCut, ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
-           print *, 'tree 1:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:TheTree%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,2)%PartType(1:TheTree%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,3)%PartType(1:TheTree%NumPart)
-           print *, 'tree 4:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,4)%PartType(1:TheTree%NumPart)
-           print *, 'tree 5:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:TheTree%NumPart)
+!            print *, 'cuts:', NCut, ThePrimAmp%UCuts(5)%CutProp(NCut,1:5)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,1)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,2)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,3)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 4:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,4)%PartType(1:TheTree%NumPart)
+!            print *, 'tree 5:', ThePrimAmp%UCuts(5)%TreeProcess(NCut,5)%PartType(1:TheTree%NumPart)
            
            
            NCut = NCut + 1
@@ -6954,11 +6948,11 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(4)%CutProp(NCut,2) = i3
            ThePrimAmp%UCuts(4)%CutProp(NCut,3) = i4
            ThePrimAmp%UCuts(4)%CutProp(NCut,4) = i5
-           print *,'cuts', NCut, ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
-           print *, 'tree 1:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%NumPart)
-           print *, 'tree 4:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart)
+!            print *,'cuts', NCut, ThePrimAmp%UCuts(4)%CutProp(NCut,1:4)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,2)%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,3)%NumPart)
+!            print *, 'tree 4:', ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%PartType(1:ThePrimAmp%UCuts(4)%TreeProcess(NCut,4)%NumPart)
            ThePrimAmp%UCuts(4)%CutProp(NCut,1) = i2
            NCut = NCut + 1
    enddo
@@ -7049,11 +7043,11 @@ type(TreeProcess),pointer :: TheTree
            ThePrimAmp%UCuts(3)%CutProp(NCut,2) = i4
            ThePrimAmp%UCuts(3)%CutProp(NCut,3) = i5
 
-           print *, NCut, ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
-           print *, 'tree 1:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%NumPart)
-           print *, 'tree 3:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart)
-          
+!            print *, NCut, ThePrimAmp%UCuts(3)%CutProp(NCut,1:3)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,2)%NumPart)
+!            print *, 'tree 3:', ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%PartType(1:ThePrimAmp%UCuts(3)%TreeProcess(NCut,3)%NumPart)
+!           
 
            NCut = NCut + 1
    enddo
@@ -7097,7 +7091,8 @@ type(TreeProcess),pointer :: TheTree
 
 !          check for massless external leg at vertex 1
            MasslessExtLeg = .false.
-           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+!            if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
+           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(TheTree%PartRef(2))   )%Mass .le. 1d-10 ) then
                MasslessExtLeg = .true.
            endif
 
@@ -7128,7 +7123,8 @@ type(TreeProcess),pointer :: TheTree
 !          check for massless external leg at vertex 2
 ! RR bug fix?           
 !           if( NumVertPart.eq.1 .and. ExtParticle( TheTree%PartRef(2) )%Mass .le. 1d-10 ) then
-           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(i5) )%Mass .le. 1d-10 ) then
+!            if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(i5) )%Mass .le. 1d-10 ) then
+           if( NumVertPart.eq.1 .and. ExtParticle(  ThePrimAmp%ExtLine(TheTree%PartRef(2))   )%Mass .le. 1d-10 ) then  
                MasslessExtLeg = .true.
            endif
 
@@ -7153,9 +7149,9 @@ type(TreeProcess),pointer :: TheTree
                NCut = NCut + 1
            endif
 !           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2),  ThePrimAmp%IntPart(i4)%PartType,ThePrimAmp%IntPart(i5)%PartType
-           print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
-           print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
-           print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
+!            print *, 'cuts',NCut-1, ThePrimAmp%UCuts(2)%CutProp(NCut-1,1:2)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,1)%NumPart)
+!            print *, 'tree 2:', ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%PartType(1:ThePrimAmp%UCuts(2)%TreeProcess(NCut-1,2)%NumPart)
 
 
    enddo
@@ -7214,8 +7210,8 @@ type(TreeProcess),pointer :: TheTree
 !              set sing cut
                ThePrimAmp%UCuts(1)%CutProp(NCut,1) = i5
                NCut = NCut + 1
-           print *, NCut-1, ThePrimAmp%UCuts(1)%CutProp(NCut-1,1)
-           print *, 'tree 1:', ThePrimAmp%UCuts(1)%TreeProcess(NCut-1,1)%PartType(1:TheTree%NumPart)
+!            print *, NCut-1, ThePrimAmp%UCuts(1)%CutProp(NCut-1,1)
+!            print *, 'tree 1:', ThePrimAmp%UCuts(1)%TreeProcess(NCut-1,1)%PartType(1:TheTree%NumPart)
 
 
            endif
@@ -7229,7 +7225,7 @@ type(TreeProcess),pointer :: TheTree
 
    do NPoint=1,5
       do NCut=1,ThePrimAmp%UCuts(NPoint)%NumCuts
-          ThePrimAmp%UCuts(NPoint)%skip(NCut)=.false.
+         ThePrimAmp%UCuts(NPoint)%skip(NCut)=.false.
          do NTree=1,NPoint
 
             TheTree => ThePrimAmp%UCuts(NPoint)%TreeProcess(NCut,NTree)
@@ -7627,13 +7623,13 @@ END SUBROUTINE
       integer                          :: Npoint, NCut, NParent,j, NTree, Nequivtrees, NPrimAmp
       logical                          :: are_equiv
     
-      print *, 'in remove duplicate cuts'
+!       print *, 'in remove duplicate cuts'
     
       do NPrimAmp=2,NumPrimAmps
-         print *, NPrimAmp
+!          print *, NPrimAmp
          NewPrimAmp => PrimAmps(NPrimAmp)
          do Npoint = 1,5                                                  ! Over 5,4,3,2,1 cuts
-            do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts      ! over the number of n-cuts
+            do Ncut = 1, NewPrimAmp%UCuts(NPoint)%NumCuts                ! over the number of n-cuts
             j = 0
             do while ( ( NewPrimAmp%UCuts(Npoint)%skip(NCut) .eq. .false.) &
                     & .and. (j+1 .lt. NPrimAmp))
@@ -7665,6 +7661,8 @@ END SUBROUTINE
             enddo       ! Ncut
          enddo          ! NParent
       enddo             ! NPoint
+
+
     end SUBROUTINE REMOVE_DUPLICATE_CUTS
     
     

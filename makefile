@@ -36,8 +36,8 @@ cppcomp = g++
 Exec = ./TOPAZ
 
 
-makeDep = $(ConfigFile) \
-          makefile
+makeDep = $(ConfigFile)
+#           makefile
 
 
 PDFObj = $(PDFDir)/mstwpdf.o \
@@ -246,16 +246,28 @@ DipoleObjZprime = $(ObjectDir)/mod_Dipoles_ZprimeTTB.o \
 
 
 # FastJet stuff
-FASTJET_CONFIG=/home/schulze/usr/local/bin/fastjet-config
+FASTJET_CONFIG=/home/schulze/lib/fastjet-2.4.2/fastjet-config
 CXXFLAGS += $(shell $(FASTJET_CONFIG) --cxxflags)
 FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
 
 
-# MT2 Variable
+# MT2 Variable including the whole oxbridge library
 # See http://www.hep.phy.cam.ac.uk/~lester/mt2/
-MT2VarDep = $(Here)/MT2Variable/calcMT2.cpp
-MT2VarObj = $(MT2Dir)/calcMT2.o
-MT2FLAGS = -L /home/schulze/lib/MT2Lib/lib/ -loxbridgekinetics-1.0 -Xlinker -rpath /home/schulze/lib/MT2Lib/lib/
+# MT2VarDep = $(Here)/MT2Variable/calcMT2.cpp
+# MT2VarObj = $(MT2Dir)/calcMT2.o $(MT2Dir)/calcMT2_simpl.o
+# MT2FLAGS = -L /home/schulze/lib/MT2Lib/lib/ -loxbridgekinetics-1.0 -Xlinker -rpath /home/schulze/lib/MT2Lib/lib/
+
+# MT@ Variable. Minimal and fast version of canonical MT2 definition
+# MT2VarDep = $(Here)/MT2Variable/calcMT2_simpl.cpp
+# MT2VarObj = $(MT2Dir)/calcMT2_simpl.o $(MT2Dir)/mt2_bisect.o
+# MT2FLAGS = -Xlinker -rpath /home/schulze/lib/MT2Lib/lib/
+
+MT2VarObj =  $(MT2Dir)/mt2_bisect.o $(MT2Dir)/calcMT2_simpl.o
+# this flag links libstdc dynamically
+# MT2FLAGS =  -lstdc++ 
+
+# this flag links libstdc dynamically, but with explicit paths to libstdc++.so.5 instead of libstdc++.so.6 for compatibility on ANL condor cluster
+MT2FLAGS =  /usr/lib/libstdc++.so.5 /lib/tls/i686/cmov/libm.so.6 /lib/libgcc_s.so.1 /lib/tls/i686/cmov/libdl.so.2 /lib/ld-linux.so.2
 
 
 # MadGraph objects
@@ -400,13 +412,12 @@ all: $(allObjects)
 	@echo " linking"
 	@echo " executable file is " $(Exec)
 	@echo " "
-# 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MT2FLAGS) $(MT2VarObj)
 
 # additional objects:
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 # $(CubaLib)
-#  $(MT2VarObj) $(MT2FLAGS)
+# $(MT2FLAGS) $(MT2VarObj)
 # $(MadGraphObj)
 
 

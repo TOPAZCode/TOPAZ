@@ -180,6 +180,11 @@ contains
 !             if(xe.eq.-2) print *, "D0: ",i,d1,qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,xe)
          enddo
          res(1) = res(1)+d5*dcmplx(-1d0/6d0,0d0)
+
+if( IsNaN( cdabs(res(1)*res(0))  )) then
+    print *, "1",i,res(1),d1,d5
+endif
+
 !  	  print *, qlI4(s11,s22,s33,s44,s12,s23,m12,m22,m32,m42,mu2,0)
          enddo
 
@@ -241,7 +246,6 @@ contains
          MassSq= ExtParticle(1)%Mass2! this assumes that the first particle is always a top or stop
 
 
-
          if (dabs(s11-MassSq).lt.1D-6) then
          s11=MassSq
          endif
@@ -273,6 +277,9 @@ contains
          enddo
          res(1) = res(1) + c8*dcmplx(-0.5d0,0d0)
 
+if( IsNaN( cdabs(res(1)*res(0))  )) then
+    print *, "2",i,res(1),c1,c8
+endif
          enddo
 
 
@@ -317,6 +324,9 @@ contains
          enddo
          endif
 
+if( IsNaN( cdabs(res(0))  )) then
+    print *, "3",j,res(1),b1,b10
+endif
 
       if (tagdcut(i,1).eq.999) then
       !-----bubble on a light-cone
@@ -378,6 +388,9 @@ contains
 
          res(1) = res(1) +b10*dcmplx(-0.5d0*(m12+m22-s11/3d0),0d0)
 
+if( IsNaN( cdabs(res(1)*res(0))  )) then
+    print *, "4",j,res(1),b1,b10
+endif
          enddo
 
 
@@ -409,7 +422,14 @@ contains
 
          res(-1)=res(-1) + a1*dcmplx(m12,0d0)
          res(0)=res(0) + a1*dcmplx(m12*(1d0-dlog(m12/mu2)),0d0)
+
+
+if( IsNaN( cdabs(res(0))  )) then
+    print *, "5",j,res(1),a1
+endif
+
       enddo
+
 
        return
        END SUBROUTINE EvalMasterIntegrals

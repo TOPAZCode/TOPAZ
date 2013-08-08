@@ -70,6 +70,7 @@ contains
     If(QW .eq. 1) then
        call    vSpi_Weyl(klep_dn,+1,SpiLep_dn)     ! l+ or dn_bar
        call ubarSpi_Weyl(kneu_up,-1,SpiNeu_up)  ! nu or up
+
        ! Anti-Lepton + Neutrino
        if(WDK .eq. 1) then
           Wpolvec(1:4) = vbqq_Weyl(Dv,SpiNeu_up,SpiLep_dn)* coup

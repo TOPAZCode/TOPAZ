@@ -1325,6 +1325,15 @@ real(8) :: r1,r2,rtmp
 END SUBROUTINE
 
 
+SUBROUTINE swapint(r1,r2)
+implicit none
+integer :: r1,r2,rtmp
+
+  rtmp = r2
+  r2   = r1
+  r1   = rtmp
+
+END SUBROUTINE
 
 SUBROUTINE pT_order(N,Mom)
 implicit none

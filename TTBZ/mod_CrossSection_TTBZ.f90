@@ -1038,8 +1038,8 @@ include "vegas_common.f"
    first=.false.
 endif
 
-  DPtol=1d-4
-  QPtol=1d-4
+  DPtol=1d-3
+  QPtol=1d-3
   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
   if( EHat.le.2d0*m_Top+M_Z ) then
       EvalCS_1L_ttbqqbZ = 0d0
@@ -2161,7 +2161,7 @@ print *, "fixing yrnd"
       ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
    endif
 
-   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! q qb gluon Z tb t
+   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! q qb gluon Z tb t / q g q Z tb t
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
    PSWgt2 = 1d0
@@ -2185,11 +2185,9 @@ ENDIF
        return
    endif
 
-
    call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
-
 
    if ( ZDecays .lt. 10) then
       propZ = (1d0,0d0)/dsqrt(2d0*Ga_Zexp*m_Z)
@@ -2218,21 +2216,22 @@ ENDIF
    ENDIF
 
 
-   DO NPDF=1,2
-!    DO NPDF=2,2; print *, "restricting npdf"
+!    DO NPDF=1,2
+   DO NPDF=1,1; print *, "restricting npdf"
         if(npdf.eq.1) then
               PDFFac(1:2) = PDFFac_a(1:2)
-!               PDFFac(1:2) = (/1d0,1d0/); print *, "setting pdfs to one"
         elseif(npdf.eq.2) then
               PDFFac(1:2) = PDFFac_b(1:2)
               call swapMom(MomExt(1:4,1),MomExt(1:4,2))
         endif
+!         PDFFac(1:2) = (/1d0,0d0/); print *, "setting pdfs to one"
+
+
         ISFac = MomCrossing(MomExt)
         IF( TopDecays.GE.1 ) THEN
           call TopDecay(ExtParticle(1),DK_LO,MomExt(1:4,7:9))
           call TopDecay(ExtParticle(2),DK_LO,MomExt(1:4,10:12))
         ENDIF
-
 
 
 if( applyPSCut ) then
@@ -2249,14 +2248,18 @@ else
               call ZDecay(ExtParticle(6),DK_LO,MomExt(1:4,13:14))
               call ZGamLCoupl(1,Helicities(iHel,6),couplZLL,couplGLL)  ! charged lept
           endif
-!           if (npdf .eq. 2) then!! MARKUS: remove this otherwise dipoles dont cancel for npdf=2
-! ! change helicities of the massless quarks for the couplings to Z          
-!             Helicities(iHel,3)=-Helicities(iHel,3)
-!             Helicities(iHel,4)=-Helicities(iHel,4)
-!           endif
 
-          call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
-          call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+          if (npdf .eq. 2) then! change helicities of the massless quarks for the couplings to Z          
+            Helicities(iHel,3)=-Helicities(iHel,3)
+            Helicities(iHel,4)=-Helicities(iHel,4)
+          endif
+          if( Process.eq.76 .or. Process.eq.73 ) then!  Z coupling is defined wrt. to fermion (and not anti-fermion)
+              call ZGamQcoupl(Up_,Helicities(iHel,3),couplZUU,couplGUU)
+              call ZGamQcoupl(Dn_,Helicities(iHel,3),couplZDD,couplGDD)
+          elseif( Process.eq.74 ) then
+              call ZGamQcoupl(Up_,Helicities(iHel,4),couplZUU,couplGUU)
+              call ZGamQcoupl(Dn_,Helicities(iHel,4),couplZDD,couplGDD)
+          endif
           couplZQQ_left_dyn=one
           couplZQQ_right_dyn=one
 
@@ -2320,18 +2323,20 @@ endif!applyPSCut
     IF( PROCESS.EQ.76 .OR. PROCESS.EQ.86 ) THEN
         call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ELSEIF( PROCESS.EQ.73 ) THEN
-!         call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),MomExt(1:4,3),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+print *, "in1",-MomExt(1:4,1)
+print *, "in1",-MomExt(1:4,2)
+        call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ELSEIF( PROCESS.EQ.74 ) THEN
-!         call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
     ENDIF
     EvalCS_Dips_ttbqqbgZ = EvalCS_Dips_ttbqqbgZ + DipoleResult(1) + DipoleResult(2)
 
   ENDDO! loop over a<-->b pdfs
 
-!      sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
-! !      sij = MomExt(1,3)**2
-!      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)!,EvalCS_Dips_ttbqqbgZ/EvalCS_Real_ttbqqbgZ
-!      pause
+     sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
+!      sij = MomExt(1,3)**2
+     print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)!,EvalCS_Dips_ttbqqbgZ/EvalCS_Real_ttbqqbgZ
+     pause
 
 
 
@@ -2346,8 +2351,14 @@ endif!applyPSCut
 !       MG_MOM(0:3,6) = MomExt(1:4,4)*100d0
 !       call coupsm(0)
 !       call SUUB_TTBGZ(MG_MOM(0:3,1:6),MadGraph_tree)
-! !       call SDDB_TTBGZ(MG_MOM(0:3,1:6),MadGraph_tree)
-! !       call SDG_TTBDZ(MG_MOM,MadGraph_tree)
+!       call SDDB_TTBGZ(MG_MOM(0:3,1:6),MadGraph_tree)
+!       call SDG_TTBDZ(MG_MOM,MadGraph_tree)
+!       call SUG_TTBUZ(MG_MOM,MadGraph_tree)
+!       call SUBG_TTBUBZ(MG_MOM,MadGraph_tree)
+
+!       call swapMom(MG_MOM(0:3,1),MG_MOM(0:3,2))
+!       call SGUB_TTBUBZ(MG_MOM,MadGraph_tree)
+!       call SGDB_TTBDBZ(MG_MOM,MadGraph_tree)
 !       print *, ""
 ! !       print *, alpha_s*RunFactor,m_top,m_z,couplZUU_left,couplZUU_right,couplZDD_left,couplZDD_right,couplZTT_left,couplZTT_right
 !       print *, "My tree:         ", LO_Res_Unpol/(100d0)**2

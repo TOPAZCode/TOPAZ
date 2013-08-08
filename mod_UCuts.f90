@@ -274,6 +274,7 @@ include "misc/global_import"
 
     do CutNum = 1,TripCuts%NumCuts
       if (TripCuts%skip(CutNum)) then
+         print *, "SKIPPING CUT";pause
          TripCuts%Coeff(CutNum,:)=(0d0,0d0)
          cycle
       endif
@@ -282,7 +283,6 @@ include "misc/global_import"
 !DEC$ ENDIF
 
       TreeProcs => ThePrimAmp%UCuts(3)%TreeProcess(CutNum,1:3)
-
 ! def. of k's as in paper
 !       KMom(1,1:4) = IntPart(TripCuts%CutProp(CutNum,2))%Mom(1:4) - IntPart(TripCuts%CutProp(CutNum,1))%Mom(1:4)
 !       KMom(2,1:4) = IntPart(TripCuts%CutProp(CutNum,3))%Mom(1:4) - IntPart(TripCuts%CutProp(CutNum,2))%Mom(1:4)

@@ -1,4 +1,4 @@
-// gcc  -I /home/schulze/lib/MT2Lib/include/oxbridgekinetics-1.0/  -c calcMT2.cpp
+// gcc -I /home/schulze/lib/MT2Lib/include/oxbridgekinetics-1.0/  -c calcMT2.cpp
 
 #include "Mt2/ChengHanBisect_Mt2_332_Calculator.h"
 // #include <stdlib.h>
@@ -7,6 +7,9 @@
 extern "C"  {
     void  calcmt2_(double*, double*, double*, double*);
 }
+
+
+
 
 void  calcmt2_(double *pA, double *pB, double *pMiss, double *result){
   

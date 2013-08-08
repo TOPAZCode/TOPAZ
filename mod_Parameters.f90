@@ -12,6 +12,7 @@ real(8), public :: alpha_frag,beta_frag,delta_frag
 real(8), public :: Lambda_QCD
 logical, public :: unweighted
 logical, public :: HelSampling
+logical, public :: FirstLOThenVI
 integer, public :: DKRE_switch
 integer(8), public, save :: EvalCounter=0
 integer(8), public, save :: PSCutCounter=0
@@ -411,9 +412,6 @@ ENDIF
 IF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.1 .OR. NLOPARAM.EQ.0) ) THEN
   Lambda_QCD = 0.165d0*GeV
   alpha_s = 0.13d0  ! CTEQ6L1
-!   alpha_s = 0.118d0   ! CTEQ6L
-! print *, "SWITCHED TO WRONG ALPHA_S FOR CHINESE CHECK"
-
 ELSEIF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.2) ) THEN
   Lambda_QCD = 0.226235d0*GeV
   alpha_s = 0.118d0
@@ -494,11 +492,18 @@ ENDIF
    IChiStt(+1) = cR * m_Top/Vev
    IChiStt(-1) = cL * m_Top/Vev
 
+   cR =+0.163d0   ! ~cos(theta_t)!   this matches ATLAS-CONF-2013-037 analysis
+   cL =-0.987d0   ! ~sin(theta_t)
+   IChiStt(+1) = cR  * m_Top/Vev
+   IChiStt(-1) = cL  * m_Top/Vev
+
+
+
 !  stop-->Chi^0 + top partial width!
    Ga_Stop_ChiTop(0) = SqrtLambda(m_stop**2,m_top**2,m_chi**2)/(16d0*DblPi*m_stop**3) * & 
                   ( (IChiStt(+1)**2+IChiStt(-1)**2)*(m_stop**2-m_top**2-m_chi**2) - 4d0*(IChiStt(+1)*IChiStt(-1))*m_top*m_chi )
 
-IF( Process.ge.51 .and. Process.le.59 ) then
+IF( Process.ge.51 .and. Process.le.59 .and. ObsSet.ne.41  ) then
    if( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.350d0*GeV ) then
       Ga_Stop_ChiTop(1) = (-0.00649d0 -0.00172d0) * GeV
       call Error("remove alphas here")
@@ -509,19 +514,27 @@ IF( Process.ge.51 .and. Process.le.59 ) then
       call Error("remove alphas here")
    elseif( cR.eq.3d0/10d0 .and. cL.eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.100d0*GeV .and. m_stop.eq.500d0*GeV ) then
       Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-0.179269d0 -0.069456d0) * GeV
-   else
-      call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi")
+
+   elseif( cR.eq.-0.987d0 .and. cL.eq.+0.163d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.600d0*GeV ) then
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-3.3582d0 -1.6098d0) * GeV
+   elseif( cL.eq.-0.987d0 .and. cR.eq.+0.163d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.600d0*GeV ) then
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-3.3582d0 -1.6098d0) * GeV
+   elseif( cL.eq.-0.987d0 .and. cR.eq.+0.163d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.25d0*GeV .and. m_stop.eq.225d0*GeV ) then
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * ( -0.059605d0 -0.0052774d0 ) * GeV
+   elseif( cL.eq.-0.987d0 .and. cR.eq.+0.163d0 .and. m_top.eq.172d0*GeV .and. m_chi.eq.50d0*GeV .and. m_stop.eq.500d0*GeV ) then
+      Ga_Stop_ChiTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (-2.3085d0 -0.92644d0) * GeV
+!    else
+!       call Error("Ga_Stop_ChiTop(1) needs to be re-calcualted for the given cR,CL,m_Stop,m_top,m_Chi")
 !     ./TOPAZ Process=58 Collider=1 TopDK=4 XTopDK=3 NLOParam=2 Correction=4 ObsSet=43 VegasNc0=500000 VegasNc1=500000 MStop=3.00
    endif
 ENDIF
-
    Ga_Stop(:) = Ga_Stop_ChiTop(:)! assuming no other decay channel
    StopWidthExpansion   = -2d0*Ga_Stop(1)/Ga_Stop(0)
+
+
 IF( abs(XTOPDECAYS).EQ.3 .AND. NLOPARAM.EQ.2 .AND. CORRECTION.EQ.0 ) THEN
    WidthExpansion = WidthExpansion + StopWidthExpansion
 ENDIF
-
-
 
 
 IF( XTOPDECAYS.EQ.2 ) THEN
@@ -537,8 +550,10 @@ IF( XTOPDECAYS.EQ.2 ) THEN
    Ga_Htop_A0Top(1) = 0d0
    Ga_HTop(:) = Ga_Htop_A0Top(:)! assuming no other decay channel
 
-ELSEIF( XTOPDECAYS.EQ.1 ) THEN! HTop-BH-top
 
+
+
+ELSEIF( XTOPDECAYS.EQ.1 ) THEN! HTop-BH-top
 
 !  MY LO WIDTH for LH and RH couplings
   IBHTt(+1) = 3d0/10d0
@@ -551,16 +566,14 @@ ELSEIF( XTOPDECAYS.EQ.1 ) THEN! HTop-BH-top
 IF( Process.ge.41 .and. Process.le.49 ) then
    if( IBHTt(+1).eq.3d0/10d0 .and. IBHTt(-1).eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_BH.eq.50d0*GeV .and. m_HTop.eq.500d0*GeV ) then
       Ga_Htop_BHTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (  -3.59519d0 -8.99473951d0  ) * GeV
+   elseif( IBHTt(+1).eq.3d0/10d0 .and. IBHTt(-1).eq.1d0/10d0 .and. m_top.eq.172d0*GeV .and. m_BH.eq.50d0*GeV .and. m_HTop.eq.600d0*GeV ) then
+      Ga_Htop_BHTop(1) =  alpha_s*RunAlphaS(2,MuRen) * (  -5.5825d0 -23.662d0  ) * GeV
+
    else
-      call Error("Ga_Htop_BHTop(1) needs to be re-calcualted for the given IBHTt(+/-1),m_Htop,m_top,m_BH")
+!       call Error("Ga_Htop_BHTop(1) needs to be re-calcualted for the given IBHTt(+/-1),m_Htop,m_top,m_BH")
 !   ./TOPAZ Process=47 Collider=1 Correction=5 TopDK=1 ObsSet=32 XTopDK=1 MHTop=5.00 MTop=1.72 NLOParam=2 MuRen=5.00 MuFac=5.00 VegasNc0=1000000 VegasNc1=1000000
    endif
 ENDIF
-
-
-
-
-
 
 
 ! !  MCFM LO and NLO WIDTH for LH currents

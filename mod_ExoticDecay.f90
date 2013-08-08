@@ -634,10 +634,12 @@ IF( Topol.eq.DKX_STChi0_LO ) THEN! leading order
       call vMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,Spi(1:4))
       BarSpi(1:4) = TopQuark%Pol(1:4)
       Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
+! Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
    elseif( StopQuark%PartType.eq.AStop_ ) then
       call ubarMajoSpi(dcmplx(Mom(1:4,1)),m_Chi,ChiHel,BarSpi(1:4))
       Spi(1:4) = TopQuark%Pol(1:4)
       Spi(1:4) = (0d0,1d0)*( IChiStt(-1)*Chir(.true.,Spi(1:4)) + IChiStt(+1)*Chir(.false.,Spi(1:4)) )
+! Spi(1:4) = (0d0,1d0)*( IChiStt(+1)*Chir(.true.,Spi(1:4)) + IChiStt(-1)*Chir(.false.,Spi(1:4)) )
    endif
    StopQuark%Pol(1) = psp1_(BarSpi(1:4),Spi(1:4)) * NWAFactor_STop
 

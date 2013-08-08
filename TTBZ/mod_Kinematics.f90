@@ -4802,12 +4802,12 @@ real(8),parameter :: NPr=4, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
   call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
-!    Pcol1= 1 -1
-!    Pcol2= 3 -1
-!    SingDepth = 1d-16
-!    Steps = 20
-!    PSWgt = 1d0
-!    call gensing(4,EHat,(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing"
+   Pcol1= 1 -1
+   Pcol2= 3 -1
+   SingDepth = 1d-16
+   Steps = 20
+   PSWgt = 1d0
+   call gensing(4,EHat,(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing"
 
 
 !  particles on the beam axis:

@@ -84,8 +84,9 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
     pT_bjet_cut = 25d0*GeV      !*0d0
     eta_bjet_cut= 2.5d0         !*1d2
     pT_lep_cut  = 25d0*GeV      !*0d0
-    pT_miss_cut = 50d0*GeV      !*0d0
     eta_lep_cut = 2.5d0         !*1d2
+    pT_miss_cut = 50d0*GeV      !*0d0
+
 
 ELSEIF( ObsSet.EQ.4 ) THEN! ! set of observables for ttb production with hadr. Atop, lept. top decay
     Rsep_jet    = 0.5d0
@@ -391,38 +392,52 @@ ELSEIF( ObsSet.EQ.31 ) THEN! set of observables for HTHTbar + A0/BH production (
 ELSEIF( ObsSet.EQ.32 ) THEN! set of observables for HTHTbar + A0/BH production (di-lept. tops)
     Rsep_jet    = 0.4d0
 
-    pT_bjet_cut = 30d0*GeV 
+    pT_bjet_cut = 25d0*GeV 
     eta_bjet_cut= 2.5d0 
 
     pT_lep_cut  = 20d0*GeV  
     eta_lep_cut = 2.5d0 
-    pT_miss_cut = 25d0*GeV! note that this is ET and not pT
+    pT_miss_cut = 80d0*GeV! note that this is ET and not pT
+    MTW_cut     = 120d0*GeV  * 0d0!  note that this is MT2 and not MTW
 
 
 ELSEIF( ObsSet.EQ.33 ) THEN! set of observables for HTHTbar + A0/BH production (semi-hadr. tops)
     
 !     Rsep_jet    = 0.4d0
-!     pT_bjet_cut = 30d0*GeV
+!     pT_bjet_cut = 25d0*GeV
 !     eta_bjet_cut= 2.5d0
-!     pT_jet_cut = 30d0*GeV 
+!     pT_jet_cut = 25d0*GeV 
 !     eta_jet_cut= 2.5d0     
 !     pT_lep_cut  = 20d0*GeV  
-!     eta_lep_cut = 2.5d0      
-!     pT_miss_cut = 150d0*GeV! note that this is ET and not pT
-!     MTW_cut = 120d0*GeV
+!     eta_lep_cut = 2.5d0 
+!     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+!     MTW_cut = 0d0*GeV
+
+          Rsep_jet    = 0.4d0 
+          pT_bjet_cut = 25d0*GeV
+          pT_jet_cut  = 80d0*GeV
+          eta_bjet_cut= 2.5d0
+          eta_jet_cut = 2.5d0
+          pT_lep_cut  = 25d0*GeV
+          eta_lep_cut = 2.4d0
+          pT_miss_cut = 200d0*GeV
+          MTW_cut = 140d0*GeV
+          ! there's an additional cut on pTmiss/sqrt(HT)
 
 
 
-! !   these are the cuts for mstop/chi = 250/50 GeV analysis at the Tevatron
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 20d0*GeV
-    eta_bjet_cut= 2.0d0
-    pT_jet_cut = 20d0*GeV
-    eta_jet_cut= 2.0d0
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.0d0
-    pT_miss_cut = 0d0*GeV! note that this is ET and not pT
-    MTW_cut = 0d0*GeV
+! ! !   these are the cuts for mstop/chi = 250/50 GeV analysis at the Tevatron
+!     Rsep_jet    = 0.4d0
+!     pT_bjet_cut = 20d0*GeV
+!     eta_bjet_cut= 2.0d0
+!     pT_jet_cut = 20d0*GeV
+!     eta_jet_cut= 2.0d0
+!     pT_lep_cut  = 20d0*GeV
+!     eta_lep_cut = 2.0d0
+!     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+!     MTW_cut = 0d0*GeV
+
+
 
 
 
@@ -435,6 +450,9 @@ ELSEIF( ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + A0/BH production (
     pT_lep_cut  = 0d0*GeV  
     eta_lep_cut = 100d0 
     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+    MTW_cut     = 0d0!  note that this is MT2 and not MTW
+
 
 
 ELSEIF( ObsSet.EQ.35 ) THEN! set of observables for HTHTbar + A0/BH production (semi-hadr. tops) without acceptance cuts
@@ -463,6 +481,8 @@ ELSEIF( ObsSet.EQ.42 ) THEN! set of observables for STSTbar + Chi production (di
     pT_lep_cut  = 20d0*GeV       
     eta_lep_cut = 2.5d0            
     pT_miss_cut = 80d0*GeV      ! note that this is ET and not pT
+    MTW_cut     = 120d0*GeV  !* 0d0!  note that this is MT2 and not MTW
+
 
 
 ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops)
@@ -470,15 +490,41 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (se
 !  !these are the cuts for mstop/chi = 500/100 GeV analysis at 8TeV
  if( Collider_Energy.eq.8000d0*GeV .or. Collider_Energy.eq.14000d0*GeV ) then
 
-    Rsep_jet    = 0.4d0
-    pT_bjet_cut = 30d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_jet_cut = 30d0*GeV
-    eta_jet_cut= 2.5d0
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
-    pT_miss_cut = 150d0*GeV! note that this is ET and not pT
-    MTW_cut = 120d0*GeV
+     if( m_Stop.eq.600d0*GeV ) then!   ATLAS cuts for 600/50 scenario, see ATLAS-CONF-2013-037
+          Rsep_jet    = 0.4d0 
+          pT_bjet_cut = 25d0*GeV
+          pT_jet_cut  = 80d0*GeV
+          eta_bjet_cut= 2.5d0
+          eta_jet_cut = 2.5d0
+          pT_lep_cut  = 25d0*GeV
+          eta_lep_cut = 2.4d0
+          pT_miss_cut = 200d0*GeV
+          MTW_cut = 140d0*GeV
+          ! there's an additional cut on pTmiss/sqrt(HT)
+     elseif( m_Stop.eq.225d0*GeV ) then!   ATLAS cuts for 225/25 scenario, see ATLAS-CONF-2013-037
+          Rsep_jet    = 0.4d0 
+          pT_bjet_cut = 25d0*GeV
+          pT_jet_cut  = 80d0*GeV
+          eta_bjet_cut= 2.5d0
+          eta_jet_cut = 2.5d0
+          pT_lep_cut  = 25d0*GeV
+          eta_lep_cut = 2.4d0
+          pT_miss_cut = 100d0*GeV
+          MTW_cut = 60d0*GeV
+          ! there's an additional cut on pTmiss/sqrt(HT)
+     else
+          Rsep_jet    = 0.4d0
+          pT_bjet_cut = 30d0*GeV
+          eta_bjet_cut= 2.5d0
+          pT_jet_cut  = 30d0*GeV
+          eta_jet_cut = 2.5d0
+          pT_lep_cut  = 20d0*GeV
+          eta_lep_cut = 2.4d0
+          pT_miss_cut = 150d0*GeV! note that this is ET and not pT
+          MTW_cut = 120d0*GeV
+     endif
+
+
 
  elseif( Collider_Energy.eq.7000d0*GeV ) then
 !   these are the cuts for mstop/chi = 300/100 GeV analysis at 7TeV
@@ -498,19 +544,6 @@ ELSEIF( ObsSet.EQ.43 ) THEN! set of observables for STSTbar + Chi production (se
 
 
 
-! ! !   these are the cuts for mstop/chi = 250/50 GeV analysis at the Tevatron
-!     Rsep_jet    = 0.4d0
-!     pT_bjet_cut = 20d0*GeV
-!     eta_bjet_cut= 2.0d0
-!     pT_jet_cut = 20d0*GeV
-!     eta_jet_cut= 2.0d0
-!     pT_lep_cut  = 20d0*GeV
-!     eta_lep_cut = 2.0d0
-!     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
-!     MTW_cut = 0d0*GeV
-
-
-
 ELSEIF( ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di-lept. tops) without acceptance cuts
 
     Rsep_jet    = 0d0
@@ -519,6 +552,10 @@ ELSEIF( ObsSet.EQ.44 ) THEN! set of observables for STSTbar + Chi production (di
     pT_lep_cut  = 0d0*GeV
     eta_lep_cut = 100d0
     pT_miss_cut = 0d0*GeV! note that this is ET and not pT
+
+    MTW_cut     = 0d0!  note that this is MT2 and not MTW
+
+
 
 
 ELSEIF( ObsSet.EQ.45 ) THEN! set of observables for STSTbar + Chi production (semi-hadr. tops) without acceptance cuts
@@ -587,12 +624,12 @@ ELSEIF ( ObsSet.EQ.65 ) THEN ! Zprime, semi-hadronic top decay (for ATLAS analys
 ELSEIF ( ObsSet.EQ.66 ) THEN ! Zprime, semi-hadronic top decay (for CMS analysis: Roman Kogler)
 
 !   this is for electrons
-    pT_lep_cut  = 35d0*GeV
-    eta_lep_cut = 2.5d0
+!     pT_lep_cut  = 35d0*GeV
+!     eta_lep_cut = 2.5d0
 
 !   this is for muons
-!    pT_lep_cut  = 45d0*GeV
-!    eta_lep_cut = 2.1d0
+   pT_lep_cut  = 45d0*GeV
+   eta_lep_cut = 2.1d0
 
     Rsep_LepJet = 0.5d0
 !   pTrel is defined inside KinematicsZprimeTTB subroutine
@@ -901,9 +938,9 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
           Histo(7)%SetScale= 1d0
 
           Histo(8)%Info   = "DeltaPhi"
-          Histo(8)%NBins  = 65
-          Histo(8)%BinSize= 0.1d0
-          Histo(8)%LowVal = -3d0
+          Histo(8)%NBins  = 15
+          Histo(8)%BinSize= 0.25d0
+          Histo(8)%LowVal = 0d0
           Histo(8)%SetScale= 1d0
 
           Histo(9)%Info   = "E_bj1+E_bj2"
@@ -913,9 +950,9 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
           Histo(9)%SetScale= 100d0
 
           Histo(10)%Info   = "ET_miss"
-          Histo(10)%NBins  = 50
-          Histo(10)%BinSize= 5d0*GeV
-          Histo(10)%LowVal = 20d0*GeV
+          Histo(10)%NBins  = 40
+          Histo(10)%BinSize= 40d0*GeV
+          Histo(10)%LowVal = 40d0*GeV
           Histo(10)%SetScale= 100d0
 
           Histo(11)%Info   = "E_lep1+E_lep2"
@@ -979,9 +1016,9 @@ ELSEIF( ObsSet.EQ.3 ) THEN! set of observables for ttb production as signal proc
           Histo(20)%SetScale= 1d0
 
           Histo(21)%Info   = "m_T2"
-          Histo(21)%NBins  = 60
-          Histo(21)%BinSize= 2.5d0*GeV
-          Histo(21)%LowVal = 50d0*GeV
+          Histo(21)%NBins  = 40
+          Histo(21)%BinSize= 10d0*GeV
+          Histo(21)%LowVal = 0d0*GeV
           Histo(21)%SetScale= 100d0
 
 
@@ -3050,8 +3087,8 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
 
           Histo(3)%Info   = "ET_miss"
           Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 20d0*GeV
-          Histo(3)%LowVal = 20d0*GeV
+          Histo(3)%BinSize= 40d0*GeV
+          Histo(3)%LowVal = 40d0*GeV
           Histo(3)%SetScale= 100d0
 
           Histo(4)%Info   = "phi(l+,l-)"
@@ -3085,7 +3122,7 @@ ELSEIF( ObsSet.EQ.32 .OR. ObsSet.EQ.34 ) THEN! set of observables for HTHTbar + 
           Histo(8)%SetScale= 100d0
 
           Histo(9)%Info   = "MT2"
-          Histo(9)%NBins  = 50
+          Histo(9)%NBins  = 40
           Histo(9)%BinSize= 10d0*GeV
           Histo(9)%LowVal = 0d0
           Histo(9)%SetScale= 100d0
@@ -3201,7 +3238,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
 
           Histo(1)%Info   = "pT_LepP"
           Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 40d0*GeV
+          Histo(1)%BinSize= 20d0*GeV
           Histo(1)%LowVal = 20d0*GeV
           Histo(1)%SetScale= 100d0
 
@@ -3248,7 +3285,7 @@ ELSEIF( ObsSet.EQ.42 .OR. ObsSet.EQ.44 ) THEN! set of observables for STSTbar + 
           Histo(8)%SetScale= 100d0
 
           Histo(9)%Info   = "MT2"
-          Histo(9)%NBins  = 50
+          Histo(9)%NBins  = 40
           Histo(9)%BinSize= 10d0*GeV
           Histo(9)%LowVal = 0d0
           Histo(9)%SetScale= 100d0
@@ -3263,8 +3300,6 @@ ELSEIF( ObsSet.EQ.43 .OR. ObsSet.EQ.45 ) THEN! set of observables for STSTbar + 
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
-
-
 
           Histo(1)%Info   = "pT_LepP"
           Histo(1)%NBins  = 40
@@ -7358,23 +7393,29 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
     MInv_lepP_lepM = get_MInv( MomLept(1:4,1)+MomLept(1:4,3) )
 
 
-    if( get_MInv(MomLept(1:4,3)+MomJet(1:4,1)).lt.get_MInv( MomLept(1:4,3)+MomJet(1:4,2)) ) then 
-        MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,1) )
-        pA(2:4) = (/MomLept(2,1)+MomJet(2,2),MomLept(3,1)+MomJet(3,2), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,2)).dot.(MomLept(1:4,1)+MomJet(1:4,2)))) /)*100d0
-        pB(2:4) = (/MomLept(2,3)+MomJet(2,1),MomLept(3,3)+MomJet(3,1), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,1)).dot.(MomLept(1:4,3)+MomJet(1:4,1)))) /)*100d0
-    else
-        MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,2) )
-        pA(2:4) = (/MomLept(2,1)+MomJet(2,1),MomLept(3,1)+MomJet(3,1), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,1)).dot.(MomLept(1:4,1)+MomJet(1:4,1)))) /)*100d0
-        pB(2:4) = (/MomLept(2,3)+MomJet(2,2),MomLept(3,3)+MomJet(3,2), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,2)).dot.(MomLept(1:4,3)+MomJet(1:4,2)))) /)*100d0
-    endif
-
+!     if( get_MInv(MomLept(1:4,3)+MomJet(1:4,1)).lt.get_MInv( MomLept(1:4,3)+MomJet(1:4,2)) ) then 
+!         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,1) )
+!         pA(2:4) = (/MomLept(2,1)+MomJet(2,2),MomLept(3,1)+MomJet(3,2), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,2)).dot.(MomLept(1:4,1)+MomJet(1:4,2)))) /)*100d0
+!         pB(2:4) = (/MomLept(2,3)+MomJet(2,1),MomLept(3,3)+MomJet(3,1), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,1)).dot.(MomLept(1:4,3)+MomJet(1:4,1)))) /)*100d0
+!     else
+!         MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomJet(1:4,2) )
+!         pA(2:4) = (/MomLept(2,1)+MomJet(2,1),MomLept(3,1)+MomJet(3,1), sqrt(abs((MomLept(1:4,1)+MomJet(1:4,1)).dot.(MomLept(1:4,1)+MomJet(1:4,1)))) /)*100d0
+!         pB(2:4) = (/MomLept(2,3)+MomJet(2,2),MomLept(3,3)+MomJet(3,2), sqrt(abs((MomLept(1:4,3)+MomJet(1:4,2)).dot.(MomLept(1:4,3)+MomJet(1:4,2)))) /)*100d0
+!     endif
 !   ! calculate MT2 with pA,pB calculated above
-    pTInvis(2:4) = (/MomLept(2,2)+MomLept(2,4),MomLept(3,2)+MomLept(3,4),0d0/) *100d0
-!     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
+!     pTInvis(2:4) = (/MomLept(2,2)+MomLept(2,4),MomLept(3,2)+MomLept(3,4),0d0/) *100d0
+!     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) !   this is the call to the full MT2 library
+!     mT2=mT2/100d0
+
+
+    pA(2:4)      = (/0d0,MomLept(2,1),MomLept(3,1) /)*100d0
+    pB(2:4)      = (/0d0,MomLept(2,3),MomLept(3,3) /)*100d0
+    pTInvis(2:4) = (/0d0,MomLept(2,2)+MomLept(2,4),MomLept(3,2)+MomLept(3,4)/) *100d0
+    call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
     mT2=mT2/100d0
 
 
-!MInv_lepP_bjet = get_MInv( MomLept(1:4,3)+MomDK(1:4,4) )
+
 
     pT_ATop = get_PT(MomTops(1:4,1))
     pT_Top  = get_PT(MomTops(1:4,2))
@@ -7435,6 +7476,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
         applyPSCut = .true.
         RETURN
     endif
+
 
     if( abs(eta_bjet1).gt.eta_bjet_cut .OR. abs(eta_bjet2).gt.eta_bjet_cut) then
        applyPSCut = .true.
@@ -8334,7 +8376,7 @@ real(8) :: eta_ATop,eta_Top,eta_lepM,eta_lepP,m_lb
 real(8) :: pT_jet(1:7),eta_jet(1:7),m_X0,phi_ll,m_ll,MTW,MTeff
 integer :: Htbar,Ht,X0bar,X0,tbar,t,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,Lep,Neu,ib_lep,ib_had
 real(8) :: Stopness,rpT,H_T
-real(8) :: mT2,pA(2:4),pB(2:4),pTInvis(2:4),mA,mB! this is for MT2 calculation
+real(8) :: mT2,pA(2:4),pB(2:4),pTInvis(2:4),mA,mB,mMiss! this is for MT2 calculation
 
 
 
@@ -8545,7 +8587,8 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     eta_lepP = get_ETA(Mom(1:4,lepP))
 
     MomMiss(1:4) = Mom(1:4,nu)+Mom(1:4,nubar)+Mom(1:4,X0)+Mom(1:4,X0bar)
-    pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
+    pT_miss = get_pT( MomMiss(1:4) )
+!     pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
 
 
     phi_ll = dabs( Get_PHI(Mom(1:4,lepM)) - Get_PHI(Mom(1:4,lepP)) )
@@ -8562,6 +8605,44 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     H_T = pt_jet(1) + pt_jet(2) + MTW ! definition in accordance with ATLAS
 
 
+
+
+!     ! check point, should return mT2 = 412.62883811
+!     mA = 100d0
+!     mB = 150d0
+!     pA(2:4) = (/410d0,20d0,mA /)
+!     pB(2:4) = (/-210d0,-300d0,mB /)
+!     pTInvis(2:4) = (/-200d0,280d0,100d0/)
+
+!     mA = 0d0
+!     mB = 0d0
+!     pA(2:4) = (/Mom(2,LepP),   Mom(3,LepP),    mA /)*100d0
+!     pB(2:4) = (/Mom(2,LepM),Mom(3,LepM), mB /)*100d0
+!     pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar),Mom(3,nu)+Mom(3,nubar),0d0/) *100d0! this one has a sharpe edge at mW
+!     pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar)+Mom(2,X0)+Mom(2,X0bar),Mom(3,nu)+Mom(3,nubar)+Mom(3,X0)+Mom(3,X0bar),0d0/) *100d0
+!     call calcMT2( pA(2:4), pB(2:4), pTInvis(2:3),mT2 )  !  this is the call to the full MT2 library
+
+
+
+
+!     ! check point, should return mT2 = 412.6288381
+!     mA = 100d0
+!     mB = 150d0
+!     pA(2:4) = (/mA,410d0,20d0 /)
+!     pB(2:4) = (/mB,-210d0,-300d0 /)
+!     pTInvis(2:4) = (/100d0,-200d0,280d0/)
+
+    pA(2:4) = (/mA,Mom(2,LepP),Mom(3,LepP) /)*100d0
+    pB(2:4) = (/mB,Mom(2,LepM),Mom(3,LepM) /)*100d0
+!     pTInvis(2:4) = (/0d0,Mom(2,nu)+Mom(2,nubar),Mom(3,nu)+Mom(3,nubar)/) *100d0! this one has a sharpe edge at mW
+    pTInvis(2:4) = (/0d0,Mom(2,nu)+Mom(2,nubar)+Mom(2,X0)+Mom(2,X0bar),Mom(3,nu)+Mom(3,nubar)+Mom(3,X0)+Mom(3,X0bar)/) *100d0
+    call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
+    mT2=mT2/100d0
+
+
+
+
+
 ! check cuts
     if( pT_jet(1).lt.pT_bjet_cut .or. pT_jet(2).lt.pT_bjet_cut ) then
         applyPSCut = .true.
@@ -8570,6 +8651,26 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     if( abs(eta_jet(1)).gt.eta_bjet_cut .or. abs(eta_jet(2)).gt.eta_bjet_cut) then
         applyPSCut = .true.
         RETURN
+    endif
+    
+    if( NJet.eq.2 ) then!  require that the hardest jet has pT>50GeV
+        if( pT_jet(1).lt.pT_bjet_cut*2d0 )  then
+            applyPSCut = .true.
+            RETURN
+        endif
+    elseif( NJet.eq.3 ) then
+        pT_jet(3) = get_PT(MomJet(1:4,3))
+        if( pT_jet(3).gt.pT_jet(1) ) then
+            if( pT_jet(3).lt.pT_bjet_cut*2d0 )  then
+                applyPSCut = .true.
+                RETURN
+            endif
+        else
+            if( pT_jet(1).lt.pT_bjet_cut*2d0 )  then
+                applyPSCut = .true.
+                RETURN
+            endif
+        endif
     endif
 
     if( pT_lepM.lt.pT_lep_cut .OR. pT_lepP.lt.pT_lep_cut ) then
@@ -8586,45 +8687,11 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
         RETURN
     endif
 
+    if( MT2.lt.MTW_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
 
-
-!   !check: this input should return  mT2=412.62883811
-!     pA(2:4) = (/410d0,20d0,100d0/)              ! pxA, pyA, mA 
-!     pB(2:4) = (/-210d0,-300d0,150d0/)           ! pxB, pyB, mB
-!     pTInvis(2:4) = (/-200d0, 280d0, 100d0 /)     ! pxMiss, pyMiss, mass of one of the two inv. particles
-!     call callMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
-!     print *, mt2;pause
-
-!     pA(2:4) = (/Mom(2,Htbar),Mom(3,Htbar),m_Stop/)*100d0              ! pxA, pyA, mA 
-!     pB(2:4) = (/Mom(2,Ht),Mom(3,Ht),m_Stop/)      *100d0              ! pxB, pyB, mB
-! !     pTInvis(2:4) = (/MomMiss(2),MomMiss(3),m_X0/) *100d0              ! pxMiss, pyMiss, mass of one of the two inv. particles
-!     pTInvis(2:4) = (/Mom(2,X0)+Mom(2,X0bar),Mom(3,X0)+Mom(3,X0bar),m_X0/) *100d0
-!     call callMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
-!     mT2=mT2/100d0
-!     MTW=mT2
-!     print *, mt2;pause
-
-
-
-! ! this includes all missing energy
-    if( NLOParam.eq.2 ) call Error("MT2 is not yet IR save")
-    mA = dsqrt(dabs((Mom(1:4,LepP)+Mom(1:4,b)).dot.(Mom(1:4,LepP)+Mom(1:4,b))))
-    mB = dsqrt(dabs((Mom(1:4,LepM)+Mom(1:4,bbar)).dot.(Mom(1:4,LepM)+Mom(1:4,bbar))))
-    pA(2:4) = (/Mom(2,LepP)+Mom(2,b),   Mom(3,LepP)+Mom(3,b),    mA /)*100d0
-    pB(2:4) = (/Mom(2,LepM)+Mom(2,bbar),Mom(3,LepM)+Mom(3,bbar), mB /)*100d0
-    pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar)+Mom(2,X0)+Mom(2,X0bar),Mom(3,nu)+Mom(3,nubar)+Mom(3,X0)+Mom(3,X0bar),0d0/) *100d0
-!     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
-    mT2=mT2/100d0
-
-
-! ! this is ttbar hypothesis only, i.e. missing energy = only neutrino momenta
-! !     mA = dsqrt(dabs((Mom(1:4,LepP)+Mom(1:4,b)).dot.(Mom(1:4,LepP)+Mom(1:4,b))))
-! !     mB = dsqrt(dabs((Mom(1:4,LepM)+Mom(1:4,bbar)).dot.(Mom(1:4,LepM)+Mom(1:4,bbar))))
-! !     pA(2:4) = (/Mom(2,LepP)+Mom(2,b),   Mom(3,LepP)+Mom(3,b),    mA /)*100d0
-! !     pB(2:4) = (/Mom(2,LepM)+Mom(2,bbar),Mom(3,LepM)+Mom(3,bbar), mB /)*100d0
-! !     pTInvis(2:4) = (/Mom(2,nu)+Mom(2,nubar),Mom(3,nu)+Mom(3,nubar),0d0/) *100d0
-! !     call calcMT2( pA(2:3), pB(2:3), pTInvis(2:4),mT2 ) 
-! !     mT2=mT2/100d0
 
 
 
@@ -8664,25 +8731,32 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
     if( NJet.eq.5 ) eta_jet(5)= get_ETA(MomJet(1:4,5))
 
     pT_lepP  = get_PT(Mom(1:4,lep))
+
     eta_lepP = get_ETA(Mom(1:4,lep))
 
     MomMiss(1:4) = Mom(1:4,nu)+Mom(1:4,X0)+Mom(1:4,X0bar)
-    pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
+    pT_miss = get_pT( MomMiss(1:4) )
+!     pT_miss = get_ET( MomMiss(1:4) )! note that this is ET and not pT
 
     pT_Top = get_PT(Mom(1:4,t))
     eta_Top = get_ETA(Mom(1:4,t))
 
 
 !    MTW = Get_MT(Mom(1:4,lep),MomMiss(1:4))!    ==  dsqrt(  2d0*pT_lepP*get_PT( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lep),MomMiss(1:4))) )
-   MTW = dsqrt(  2d0*pT_lepP*get_ET( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lep),MomMiss(1:4))) )! let's define MTW with ET instead of pT in accordance with ATLAS
+   MTW = dsqrt(  2d0*pT_lepP*get_pT( MomMiss(1:4) )*(1d0-Get_CosPhi(Mom(1:4,lep),MomMiss(1:4))) )! let's define MTW with ET instead of pT in accordance with ATLAS
 
    MTeff = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4) + pT_lepP + pT_miss
    if( NJet.eq.5 ) MTeff = MTeff + pt_jet(5)
 
-   H_T = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4) + MTW ! definition in accoradance with ATLAS
-
 
 ! check cuts
+
+if( M_Stop.ne.600d0*GeV .and. M_Stop.ne.225d0*GeV ) then! note: for HTHT production: set MHTop=MStop=600
+
+    call Error("I dont want to be inside this if-condition")
+
+    H_T = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4) + MTW ! definition in accoradance with ATLAS
+
     if( pT_jet(1).lt.pT_bjet_cut .or. pT_jet(2).lt.pT_bjet_cut ) then
         applyPSCut = .true.
         RETURN
@@ -8720,6 +8794,107 @@ elseif( ObsSet.eq.33 .or. ObsSet.eq.35 .or.ObsSet.eq.43 .or. ObsSet.eq.45 ) then
       applyPSCut = .true.
        RETURN
    endif
+
+else
+
+    call pT_order(NumHadr,MomJet(1:4,1:NumHadr))
+    pT_jet(1) = get_PT( MomJet(1:4,1))
+    pT_jet(2) = get_PT( MomJet(1:4,2))
+    pT_jet(3) = get_PT( MomJet(1:4,3))
+    pT_jet(4) = get_PT( MomJet(1:4,4))
+    if( NJet.eq.5 ) pT_jet(5) = get_PT( MomJet(1:4,5))
+
+
+    H_T = pt_jet(1) + pt_jet(2) + pt_jet(3) + pt_jet(4)
+
+    if( pT_jet(1).lt.pT_bjet_cut ) then ! 25 GeV cut
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(2).lt.pT_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(3).lt.pT_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(4).lt.pT_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( pT_jet(1).lt.pT_jet_cut-40d0*GeV ) then ! 40 GeV cut
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(2).lt.pT_jet_cut-40d0*GeV ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(3).lt.pT_jet_cut-40d0*GeV ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( pT_jet(1).lt.pT_jet_cut-20d0*GeV ) then ! 60 GeV cut
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( pT_jet(2).lt.pT_jet_cut-20d0*GeV ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( pT_jet(1).lt.pT_jet_cut ) then ! 80 GeV cut
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( abs(eta_jet(1)).gt.eta_jet_cut .or. abs(eta_jet(2)).gt.eta_jet_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( abs(eta_jet(3)).gt.eta_jet_cut .or. abs(eta_jet(4)).gt.eta_jet_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    if( pT_lepP.lt.pT_lep_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+    if( abs(eta_lepP).gt.eta_lep_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_miss.lt.pT_miss_cut ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+  
+    if( MTW.lt.MTW_cut ) then
+      applyPSCut = .true.
+       RETURN
+    endif
+
+    if( (ObsSet.eq.33.or.ObsSet.eq.43 ) .and. M_Stop.eq.600d0*GeV .and.  pT_miss/dsqrt(H_T).lt.13d0*dsqrt(GeV) ) then! note: for HTHT production: set MHTop=MStop=600
+       applyPSCut = .true.
+        RETURN
+    endif
+    if( (ObsSet.eq.33.or.ObsSet.eq.43 ) .and. M_Stop.eq.225d0*GeV .and.  pT_miss/dsqrt(H_T).lt.5d0*dsqrt(GeV) ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+
+endif
 
 
 !  topness: step 1
@@ -9395,7 +9570,6 @@ elseif( ObsSet.eq.65 ) then ! Zprime, semi-hadronic top decay (for ATLAS analysi
 
 
 
-
 elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis: Roman Kogler)
 
 
@@ -9406,13 +9580,28 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
     call pT_order(NumHadr,MomJet(1:4,1:NumHadr))! pT-order jets
 !--------------------------------------------------------------------------
 
+
+
+    MomJetOrd(1:4,1:8) = 0d0
+    n = 0
+    do i = 1, NJet
+       pT_jet1  = get_PT(MomJet(1:4,i))
+       eta_jet1 = get_ETA(MomJet(1:4,i))
+       if (pT_jet1.gt.25d0*GeV .and. dabs(eta_jet1).lt.2.5d0) then
+          n = n+1
+          MomJetOrd(1:4,n) = MomJet(1:4,i)
+       endif
+    enddo
+    NJet = n
+
+
    if( NJet.lt.2 ) then
        applypscut = .true.
        RETURN
     endif
 
-    pT_jet1 = get_PT(MomJet(1:4,1))
-    pT_jet2 = get_PT(MomJet(1:4,2))
+    pT_jet1 = get_PT(MomJetOrd(1:4,1))
+    pT_jet2 = get_PT(MomJetOrd(1:4,2))
     if( pT_jet1.lt.pT_jet_cut ) then
        applypscut = .true.
        RETURN
@@ -9421,10 +9610,10 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
        applypscut = .true.
        RETURN
     endif
-   
-
-    eta_jet1 = get_eta(MomJet(1:4,1))
-    eta_jet2 = get_eta(MomJet(1:4,2))
+    
+    
+    eta_jet1 = get_eta(MomJetOrd(1:4,1))
+    eta_jet2 = get_eta(MomJetOrd(1:4,2))
     if (dabs(eta_jet1).gt.eta_jet_cut .or. dabs(eta_jet2).gt.eta_jet_cut) then
        applypscut = .true.
        RETURN
@@ -9436,7 +9625,7 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
        RETURN
     endif 
     eta_lep1 = get_ETA(MomLept(1:4,3))
-    if( abs(eta_lep1).lt.eta_lep_cut ) then
+    if( abs(eta_lep1).gt.eta_lep_cut ) then
        applypscut = .true.
        RETURN
     endif 
@@ -9453,14 +9642,13 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
        RETURN
     endif 
 
+
     do i=1,NJet
-      R_LepJet = get_R(MomJet(1:4,i),MomLept(1:4,3))
-      p_rel(2:4) = MomLept(2:4,3) - VectorProd(MomLept(2:4,3),MomJet(2:4,i))/VectorProd(MomJet(2:4,i),MomJet(2:4,i)) * MomJet(2:4,i)
-      pT_rel = dsqrt(abs( p_rel(2)**2+p_rel(3)**2+p_rel(4)**2 ))
+      R_LepJet = get_R(MomJetOrd(1:4,i),MomLept(1:4,3))
+      p_rel(2:4) = MomLept(2:4,3) - VectorProd(MomLept(2:4,3),MomJetOrd(2:4,i))/VectorProd(MomJetOrd(2:4,i),MomJetOrd(2:4,i)) * MomJetOrd(2:4,i)
+      pT_rel = dsqrt(abs( p_rel(2)**2+p_rel(3)**2 + p_rel(4)**2 ))
 
-
-!     below is the negation of: (R_LepJet.gt.Rsep_LepJet .OR. pT_rel.gt.25*GeV) .AND. (pT_jet.gt.25*GeV .AND. y_jet.lt.2.5d0)
-      if(  (R_LepJet.lt.Rsep_LepJet .AND. pT_rel.lt.25*GeV) .OR. get_PT(MomJet(1:4,i)).lt.25*GeV .OR. get_ETA(MomJet(1:4,i)).gt.2.5d0 ) then
+      if(  (R_LepJet.lt.Rsep_LepJet .AND. pT_rel.lt.25d0*GeV) ) then
          applypscut = .true.
          RETURN
       endif 
@@ -9473,6 +9661,8 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
 !   this is just for binning
     pT_ATop = get_PT(MomTops(1:4,1))
     pT_Top  = get_PT(MomTops(1:4,2))
+
+!     pT_Top  = get_pt( MomJetOrd(1:4,1) )
 
     y_ATop = get_ETA(MomTops(1:4,1))
     y_Top  = get_ETA(MomTops(1:4,2))

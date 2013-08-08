@@ -273,8 +273,12 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(Here)/MadGraph/uub_ttbgz.o\
 				  $(Here)/MadGraph/ddb_ttbgz.o\
 				  $(Here)/MadGraph/dg_ttbdz.o \
+				  $(Here)/MadGraph/gub_ttbubz.o \
+				  $(Here)/MadGraph/gdb_ttbdbz.o \
+				  $(Here)/MadGraph/ug_ttbuz.o \
 				  $(Here)/MadGraph/uub_ttbz.o \
-				  $(Here)/MadGraph/ddb_ttbz.o
+				  $(Here)/MadGraph/ddb_ttbz.o \
+				  $(Here)/MadGraph/ubg_ttbubz.o
 #				  $(Here)/MadGraph/gg_ttb.o \
 #				  $(Here)/MadGraph/gg_ttba.o \
 #				  $(Here)/MadGraph/gg_tbtga.o \
