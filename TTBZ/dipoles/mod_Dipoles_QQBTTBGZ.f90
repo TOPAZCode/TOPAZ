@@ -13,6 +13,7 @@
       public :: EvalDipoles_QQBTTBGZ
       integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private :: yRnDK(1:10), Wgt_ext(1:2)
+      integer,private :: npdf
 
       real(dp), parameter, private  :: Momzero(1:4)=0d0
       logical, parameter :: invert_alphaCut = .false.
@@ -27,7 +28,7 @@
 !--- I pass TWO external weights to the subroutine, one for `up' quarks
 !-------------------------------------------------, the other for 'dn' quarks
 
-      subroutine EvalDipoles_QQBTTBGZ(p,yRnDk1,Wgt,sum_dip)
+      subroutine EvalDipoles_QQBTTBGZ(p,yRnDk1,Wgt,npdf1,sum_dip)
       real(dp), intent(out) ::  sum_dip(2)
       real(dp), intent(in) :: p(4,6)
       real(dp), intent(in) :: yRnDK1(1:10), Wgt(1:2)
@@ -35,7 +36,7 @@
       integer, parameter :: in1 = 4
       integer, parameter :: in2 = 5
       real(dp) :: res(2)
-      integer ::  dip(ndip,3)
+      integer ::  dip(ndip,3),npdf1
       data dip(1,1)/6/, dip(1,2)/1/, dip(1,3)/3/
       data dip(2,1)/6/, dip(2,2)/1/, dip(2,3)/4/
       data dip(3,1)/6/, dip(3,2)/1/, dip(3,3)/5/
@@ -56,6 +57,7 @@
 
        yRnDK = yRnDK1
        Wgt_ext = Wgt
+       npdf = npdf1
 
 
         fl =    'gl'
@@ -332,35 +334,39 @@
               hel(1) = i5
            endif
 
-    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
-    if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
+      call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+      if( ZDecays.gt.0 ) call ZGamLCoupl(1,hel(2),couplZLL,couplGLL)  ! charged lept
 
 
-   if (pos.eq.1) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
-   endif
+      if (pos.eq.1) then
+      if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
+      endif
 
-   if (pos.eq.2) then    ! z
-      print *, 'error, pos = 2, z boson'
-      stop
-   endif
+      if (pos.eq.2) then    ! z
+          print *, 'error, pos = 2, z boson'
+          stop
+      endif
 
-   if (pos.eq.3) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(2)%pol(1:4)
-   endif
-
-
-   if (pos.eq.4) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(3)%pol(1:4)
-   endif
-
-   if (pos.eq.5) then
-   if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(4)%pol(1:4)
-   endif
+      if (pos.eq.3) then
+      if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(2)%pol(1:4)
+      endif
 
 
-      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
-      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      if (pos.eq.4) then
+      if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(3)%pol(1:4)
+      endif
+
+      if (pos.eq.5) then
+      if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(4)%pol(1:4)
+      endif
+
+      if( npdf.eq.1 ) then
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      else
+          call ZGamQcoupl(Up_,-ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,-ExtParticles(3)%Helicity,couplZDD,couplGDD)   
+      endif
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one
 
@@ -721,9 +727,13 @@
        if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%QUARKS(4)%pOL(1:4)
       endif
 
-
-      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
-      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      if( npdf.eq.1 ) then
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      else
+          call ZGamQcoupl(Up_,-ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,-ExtParticles(3)%Helicity,couplZDD,couplGDD)   
+      endif
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one
 
@@ -1096,8 +1106,13 @@
       if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%QUARKS(4)%pOL(1:4)
       endif
 
-      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
-      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      if( npdf.eq.1 ) then
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      else
+          call ZGamQcoupl(Up_,-ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,-ExtParticles(3)%Helicity,couplZDD,couplGDD)   
+      endif
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one
 
@@ -1478,9 +1493,13 @@
       if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%QUARKS(4)%pOL(1:4)
       endif
 
-
-      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
-      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      if( npdf.eq.1 ) then
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      else
+          call ZGamQcoupl(Up_,-ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,-ExtParticles(3)%Helicity,couplZDD,couplGDD)   
+      endif
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one
 
@@ -1704,8 +1723,8 @@
 
 
 
-
       end subroutine
+
 
 
 

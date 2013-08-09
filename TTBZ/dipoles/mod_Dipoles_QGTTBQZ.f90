@@ -1,4 +1,4 @@
-! this is the file to subtract dipoles for qq->tt+g+gamma amplitudes
+! this is the file to subtract dipoles for qq->tt+g+Z amplitudes
       module ModDipoles_QGTTBQZ
       use ModAmplitudes
       use ModProcess
@@ -13,6 +13,7 @@
       integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private :: yRnDK(1:10), Wgt_ext(2)
       real(dp), parameter, private  :: Momzero(1:4)=0d0
+      integer,private :: npdf
 
       public :: EvalDipoles_QGTTBQZ
 
@@ -21,7 +22,7 @@
       contains
 
 !  we have a list of dipoles that we need to go through
-!  We label things as 0-> bar t(p1)+ gamma(2) + t(3) + q(p4)+q(p5)+g(p6)
+!  We label things as 0-> bar t(p1)+ Z(2) + t(3) + q(p4)+q(p5)+g(p6)
 !  and we  assume that quark in the initial state has momentum p4 and
 ! the  gluon in the initial state has momentum  p6;
 ! final state (massless) quark has momentum p5
@@ -30,7 +31,7 @@
 !--- I pass TWO external weights to the subroutine, one for `up' quarks
 !-------------------------------------------------, the other for 'dn' quarks
 
-      subroutine EvalDipoles_QGTTBQZ(p,yRnDk1,Wgt,sum_dip)
+      subroutine EvalDipoles_QGTTBQZ(p,yRnDk1,Wgt,npdf1,sum_dip)
       real(dp), intent(out) ::  sum_dip(2)
       real(dp), intent(in) :: p(4,6)
       real(dp), intent(in) :: yRnDK1(1:10), Wgt(2)
@@ -38,7 +39,7 @@
       integer, parameter :: in1 = 4
       integer, parameter :: in2 = 6
       real(dp) :: res(2)
-      integer ::  dip(ndip,3)
+      integer ::  dip(ndip,3),npdf1
       data dip(1,1)/5/, dip(1,2)/4/, dip(1,3)/6/
       data dip(2,1)/5/, dip(2,2)/6/, dip(2,3)/4/
       real(dp) :: mass(6)
@@ -49,15 +50,16 @@
 
        yRnDK = yRnDK1
        Wgt_ext = Wgt
+       npdf = npdf1
 
 
-        fl =    'gl'
 
         fl(1) = 'qm'
         fl(2) = 'gm'  ! gm is the photon
         fl(3) = 'qm'
         fl(4) = 'qu'
         fl(5) = 'qu'
+        fl(6) = 'gl'
 
 !     mass assignment
       mass = zero
@@ -68,6 +70,9 @@
 
             do n=1,ndip
 
+! print *, "dipole",n
+
+
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor
          k=dip(n,3)  ! spectator
@@ -77,16 +82,16 @@
       if ( (j.eq.in1.and.k.eq.in2).or.(j.eq.in2.and.k.eq.in1)) then
          if (n.eq.1) then
 !------------------------------- here quark emits
-        call dipii_q(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+            call dipii_q(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
          elseif(n.eq.2) then
 !------------------------------- here gluon emits
-        call dipii_g(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
+            call dipii_g(n,i,j,k,mass(i),mass(j),mass(k),fl(i),fl(j),p,res)
          endif
       endif
 
         sum_dip = sum_dip + res
 
-print *, "dip",n,res
+! print *, "res",n,res
 
         enddo
 
@@ -277,7 +282,6 @@ print *, "dip",n,res
            hel(4) = i4
            hel(5) = i5
 
-
            if (pos.eq.1) then
              hel(1) = i1
           endif
@@ -301,7 +305,8 @@ print *, "dip",n,res
               hel(5) = i1
               hel(1) =i5
            endif
-  call SetPolarization_GG((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+     call SetPolarization_GG((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+
 
      if (pos.eq.1) then
        if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%QUARKS(1)%pOL(1:4)
@@ -321,13 +326,13 @@ print *, "dip",n,res
       endif
 
       if (pos.eq.4) then
-      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%GLUONS(2)%pOL(1:4)
-      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%GLUONS(2)%pOL(1:4)
+      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%GLUONS(1)%pOL(1:4)
+      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%GLUONS(1)%pOL(1:4)
       endif
 
       if (pos.eq.5) then
-      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%GLUONS(3)%pOL(1:4)
-      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%GLUONS(3)%pOL(1:4)
+      if (i1.eq.-1) POL1(i1,:)= TreeAmpsDip(1)%GLUONS(2)%pOL(1:4)
+      if (i1.eq.1)  POL1(i1,:)= TreeAmpsDip(1)%GLUONS(2)%pOL(1:4)
       endif
 
 
@@ -349,13 +354,12 @@ print *, "dip",n,res
 
        Am(i1,j1,c1,c2) = (0.0_dp,0.0_dp)
 
-      do i2=-1,1,2
+      do i2=-1,1,N2jump!  Z boson
       do i3=-1,1,2
       do i4=-1,1,2
       do i5=-1,1,2
 
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) +   Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -432,8 +436,8 @@ print *, "dip",n,res
            do i3=1,2
              do i4=1,2
 
-       cres(1) = cres(1) + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
-       cres(2) = cres(2) + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+              cres(1) = cres(1) + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
+              cres(2) = cres(2) + C(i3,i4)*Am(i1,i2,i3,i4)*HH(i1,i2)
 
             enddo
           enddo
@@ -515,7 +519,6 @@ print *, "dip",n,res
       endif
 
 
-
 !       momentum mapping
         pi =  p(:,i)
         pa = -p(:,a) ! the `-' sign accounts for the all outgoing convention
@@ -540,9 +543,8 @@ print *, "dip",n,res
           fl(1) = 'qm'
           fl(2) = 'gm'
           fl(3) = 'qm'
-          fl(4) = 'gl'
-          fl(5) = 'gl'
-
+          fl(4) = 'qu'
+          fl(5) = 'qu'
 
           q(:,1) = p(:,1)
           q(:,2) = p(:,2)
@@ -550,12 +552,12 @@ print *, "dip",n,res
           q(:,4) = p(:,4)
           q(:,5) = p(:,5)
 
-
-          q(:,a) = -pait(:)
-          q(:,5) = -pb(:)         !-- this is specific for this dipole
-          pos = a
-          in1 = a
+          q(:,5) = -pait(:)
+          q(:,b) = -pb(:)
+          pos = 5
+          in1 = 4
           in2 = 5
+
 
 !-- now Lorentz transform
 
@@ -601,8 +603,6 @@ print *, "dip",n,res
        ENDIF
 
 
-print *, "ou1",-q(1:4,4)
-print *, "ou1",-q(1:4,5)
 !-----------------     initial   initial       final  top      top
   call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
 
@@ -707,8 +707,13 @@ print *, "ou1",-q(1:4,5)
       endif
 
 
-      call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
-      call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      if( npdf.eq.1 ) then
+          call ZGamQcoupl(Up_,ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,ExtParticles(3)%Helicity,couplZDD,couplGDD)
+      else
+          call ZGamQcoupl(Up_,-ExtParticles(3)%Helicity,couplZUU,couplGUU)
+          call ZGamQcoupl(Dn_,-ExtParticles(3)%Helicity,couplZDD,couplGDD)   
+      endif
       couplZQQ_left_dyn=one
       couplZQQ_right_dyn=one
 
@@ -952,9 +957,11 @@ integer :: Hel(1:5)
     endif
 
     ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
+    ExtParticles(3)%Helicity = Hel(3)
     call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
 
     ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
+    ExtParticles(4)%Helicity = Hel(4)
     call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))
 
 

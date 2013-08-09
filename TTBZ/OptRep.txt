@@ -1,0 +1,726 @@
+
+<;-1:-1;IPO UNREFERENCED VAR REMOVING;;0>
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles._): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_qq_): VARS(2), PACKS (2) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_gg_): VARS(8), PACKS (8) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_qq_): VARS(4), PACKS (4) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_gg_): VARS(5), PACKS (5) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_qg_): VARS(5), PACKS (5) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_gg_): VARS(3), PACKS (3) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_qq_): VARS(3), PACKS (3) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_qg_): VARS(3), PACKS (3) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_gq_): VARS(3), PACKS (3) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_gg_): VARS(7), PACKS (7) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_qq_): VARS(7), PACKS (7) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_qg_): VARS(7), PACKS (7) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_gq_): VARS(7), PACKS (7) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_mqq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_mqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_mgq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ii_mgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_mqq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_if_mgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_mqq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_mgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_fi_mqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_1mqq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_mqq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_mqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_ff_mgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_initprocess_tbtggg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_initprocess_tbtgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_initprocess_tbtqbqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_initprocess_tbtqbq_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_generateeventttqqg2_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_generateevent52_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_generateeventttqqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_generateevent5_): VARS(2), PACKS (2) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_cc_ttqqg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_cc_ttggg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_cc_gg_ttgggg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_cc_qq_ttqqgg_): VARS(1), PACKS (1) 
+
+  UNREF VAR REMOVAL ROUTINE-SYMTAB (modintdipoles_mp_cc_qg_ttqqgg_): VARS(1), PACKS (1) 
+
+
+<;-1:-1;IPO VAR ADDRESSES;;0>
+  VAR ADDRESS: VARS (5) PACKS (5) 
+
+
+<;-1:-1;IPO UNREFERENCED VAR REMOVING;;0>
+  UNREF VAR REMOVAL: MODULE-SYMTAB: VARS(5), PACKS (5) 
+
+
+<;-1:-1;IPO VAR ADDRESSES;;0>
+  VAR ADDRESS: VARS (5) PACKS (5) 
+
+
+<;-1:-1;IPO ROUTINE ATTRIBUTES PROPAGATION;;0>
+  ROUTINE ATTRIBUTE PROPAGATION TOTALS: 
+
+      RDECL: NSE(0->0), AR(0->0)
+      ENTRY: SE(0->0), DSE(0->0), AR(0->0)
+
+
+
+<;-1:-1;IPO MODREF;;0>
+  CI-MOD: TOTAL(40): EMPTY(1) BOTTOM(22) OTHER(17) 
+
+  CI-REF: TOTAL(40): EMPTY(1) OTHER(39) 
+
+
+<;-1:-1;IPO;;0>
+WHOLE PROGRAM (SAFE) [EITHER METHOD]: FALSE
+
+WHOLE PROGRAM (SEEN) [TABLE METHOD]: FALSE
+
+WHOLE PROGRAM (READ) [OBJECT READER METHOD]: FALSE
+
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 20
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: 10000
+  -inline-max-per-compile: 125000
+
+
+<mod_IntDipoles.f90;47:217;IPO INLINING;modintdipoles_mp_ff_qq_;0>
+INLINING REPORT: (modintdipoles_mp_ff_qq_) [1/40=2.5%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_write_seq_lis_xmit(EXTERN)
+  -> for_write_seq_lis_xmit(EXTERN)
+  -> for_write_seq_lis_xmit(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_vl_(EXTERN)
+  -> modmisc_mp_vl_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> _alloca(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_vl_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;221:292;IPO INLINING;modintdipoles_mp_ff_gg_;0>
+INLINING REPORT: (modintdipoles_mp_ff_gg_) [2/40=5.0%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> _alloca(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;301:391;IPO INLINING;modintdipoles_mp_fi_qq_;0>
+INLINING REPORT: (modintdipoles_mp_fi_qq_) [3/40=7.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;397:471;IPO INLINING;modintdipoles_mp_fi_gg_;0>
+INLINING REPORT: (modintdipoles_mp_fi_gg_) [4/40=10.0%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;477:542;IPO INLINING;modintdipoles_mp_fi_qg_;0>
+INLINING REPORT: (modintdipoles_mp_fi_qg_) [5/40=12.5%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> log(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;547:623;IPO INLINING;modintdipoles_mp_if_gg_;0>
+INLINING REPORT: (modintdipoles_mp_if_gg_) [6/40=15.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;628:709;IPO INLINING;modintdipoles_mp_if_qq_;0>
+INLINING REPORT: (modintdipoles_mp_if_qq_) [7/40=17.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;715:764;IPO INLINING;modintdipoles_mp_if_qg_;0>
+INLINING REPORT: (modintdipoles_mp_if_qg_) [8/40=20.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;771:816;IPO INLINING;modintdipoles_mp_if_gq_;0>
+INLINING REPORT: (modintdipoles_mp_if_gq_) [9/40=22.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;823:861;IPO INLINING;modintdipoles_mp_ii_gg_;0>
+INLINING REPORT: (modintdipoles_mp_ii_gg_) [10/40=25.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;867:903;IPO INLINING;modintdipoles_mp_ii_qq_;0>
+INLINING REPORT: (modintdipoles_mp_ii_qq_) [11/40=27.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_cpstr(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;910:944;IPO INLINING;modintdipoles_mp_ii_qg_;0>
+INLINING REPORT: (modintdipoles_mp_ii_qg_) [12/40=30.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;950:988;IPO INLINING;modintdipoles_mp_ii_gq_;0>
+INLINING REPORT: (modintdipoles_mp_ii_gq_) [13/40=32.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> __resetsp_inlined(EXTERN)
+  -> _alloca(EXTERN)
+  -> modmisc_mp_scr_(EXTERN)
+  -> _alloca(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> __getsp_inlined(EXTERN)
+
+
+<mod_IntDipoles.f90;1036:1069;IPO INLINING;modintdipoles_mp_ii_mqq_;0>
+INLINING REPORT: (modintdipoles_mp_ii_mqq_) [14/40=35.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1074:1094;IPO INLINING;modintdipoles_mp_ii_mqg_;0>
+INLINING REPORT: (modintdipoles_mp_ii_mqg_) [15/40=37.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1099:1123;IPO INLINING;modintdipoles_mp_ii_mgq_;0>
+INLINING REPORT: (modintdipoles_mp_ii_mgq_) [16/40=40.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1128:1161;IPO INLINING;modintdipoles_mp_ii_mgg_;0>
+INLINING REPORT: (modintdipoles_mp_ii_mgg_) [17/40=42.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1169:1202;IPO INLINING;modintdipoles_mp_if_mqq_;0>
+INLINING REPORT: (modintdipoles_mp_if_mqq_) [18/40=45.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1207:1245;IPO INLINING;modintdipoles_mp_if_mgg_;0>
+INLINING REPORT: (modintdipoles_mp_if_mgg_) [19/40=47.5%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1263:1299;IPO INLINING;modintdipoles_mp_fi_mqq_;0>
+INLINING REPORT: (modintdipoles_mp_fi_mqq_) [20/40=50.0%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1312:1343;IPO INLINING;modintdipoles_mp_fi_mgg_;0>
+INLINING REPORT: (modintdipoles_mp_fi_mgg_) [21/40=52.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1350:1383;IPO INLINING;modintdipoles_mp_fi_mqg_;0>
+INLINING REPORT: (modintdipoles_mp_fi_mqg_) [22/40=55.0%]
+
+  -> log(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1392:1452;IPO INLINING;modintdipoles_mp_ff_1mqq_;0>
+INLINING REPORT: (modintdipoles_mp_ff_1mqq_) [23/40=57.5%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> for_write_seq_lis_xmit(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1459:1501;IPO INLINING;modintdipoles_mp_ff_mqq_;0>
+INLINING REPORT: (modintdipoles_mp_ff_mqq_) [24/40=60.0%]
+
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> modmisc_mp_dli2_(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> log(EXTERN)
+
+
+<mod_IntDipoles.f90;1508:1534;IPO INLINING;modintdipoles_mp_ff_mqg_;0>
+INLINING REPORT: (modintdipoles_mp_ff_mqg_) [25/40=62.5%]
+
+  -> log(EXTERN)
+  -> log(EXTERN)
+  -> for_write_seq_lis(EXTERN)
+  -> for_stop_core(EXTERN)
+
+
+<mod_IntDipoles.f90;1540:1565;IPO INLINING;modintdipoles_mp_ff_mgg_;0>
+INLINING REPORT: (modintdipoles_mp_ff_mgg_) [26/40=65.0%]
+
+
+
+<mod_IntDipoles.f90;1621:1654;IPO INLINING;modintdipoles_mp_initprocess_tbtggg_;0>
+INLINING REPORT: (modintdipoles_mp_initprocess_tbtggg_) [27/40=67.5%]
+
+
+
+<mod_IntDipoles.f90;1658:1685;IPO INLINING;modintdipoles_mp_initprocess_tbtgg_;0>
+INLINING REPORT: (modintdipoles_mp_initprocess_tbtgg_) [28/40=70.0%]
+
+
+
+<mod_IntDipoles.f90;1688:1720;IPO INLINING;modintdipoles_mp_initprocess_tbtqbqg_;0>
+INLINING REPORT: (modintdipoles_mp_initprocess_tbtqbqg_) [29/40=72.5%]
+
+
+
+<mod_IntDipoles.f90;1725:1752;IPO INLINING;modintdipoles_mp_initprocess_tbtqbq_;0>
+INLINING REPORT: (modintdipoles_mp_initprocess_tbtqbq_) [30/40=75.0%]
+
+
+
+<mod_IntDipoles.f90;1757:1786;IPO INLINING;modintdipoles_mp_generateeventttqqg2_;0>
+INLINING REPORT: (modintdipoles_mp_generateeventttqqg2_) [31/40=77.5%]
+
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+  -> modtopdecay_mp_topdecay_(EXTERN)
+  -> modtopdecay_mp_topdecay_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+
+
+<mod_IntDipoles.f90;1789:1818;IPO INLINING;modintdipoles_mp_generateevent52_;0>
+INLINING REPORT: (modintdipoles_mp_generateevent52_) [32/40=80.0%]
+
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modtopdecay_mp_topdecay_(EXTERN)
+  -> modtopdecay_mp_topdecay_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+
+
+<mod_IntDipoles.f90;1822:1847;IPO INLINING;modintdipoles_mp_generateeventttqqg_;0>
+INLINING REPORT: (modintdipoles_mp_generateeventttqqg_) [33/40=82.5%]
+
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+
+
+<mod_IntDipoles.f90;1850:1876;IPO INLINING;modintdipoles_mp_generateevent5_;0>
+INLINING REPORT: (modintdipoles_mp_generateevent5_) [34/40=85.0%]
+
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_pol_mless_(EXTERN)
+  -> modmisc_mp_ubarspi_(EXTERN)
+  -> modmisc_mp_vspi_(EXTERN)
+
+
+<mod_IntDipoles.f90;1879:1898;IPO INLINING;modintdipoles_mp_cc_ttqqg_;0>
+INLINING REPORT: (modintdipoles_mp_cc_ttqqg_) [35/40=87.5%]
+
+
+
+<mod_IntDipoles.f90;1901:1942;IPO INLINING;modintdipoles_mp_cc_ttggg_;0>
+INLINING REPORT: (modintdipoles_mp_cc_ttggg_) [36/40=90.0%]
+
+
+
+<mod_IntDipoles.f90;1945:3510;IPO INLINING;modintdipoles_mp_cc_gg_ttgggg_;0>
+INLINING REPORT: (modintdipoles_mp_cc_gg_ttgggg_) [37/40=92.5%]
+
+

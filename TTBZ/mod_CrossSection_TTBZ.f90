@@ -988,8 +988,8 @@ use ModMyRecurrence
 use ModParameters
 use ModZDecay
 use ModIntDipoles_QQBTTBGZ
-!use ModIntDipoles_QGTTBQP
-!use ModIntDipoles_QBGTTBQBP
+use ModIntDipoles_QGTTBQZ
+use ModIntDipoles_QBGTTBQBZ
 implicit none
 real(8) ::  EvalCS_1L_ttbqqbZ,yRnd(1:VegasMxDim),VgsWgt,xE
 complex(8) :: rdiv(1:2),LO_Res_Pol,LO_Res_Unpol,NLO_Res_Pol(-2:1),NLO_Res_UnPol(-2:1),NLO_Res_Unpol_Ferm(-2:1),rdiv5(1:2)
@@ -1842,8 +1842,10 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
 ! pause
 
    ELSEIF( PROCESS.EQ.73 ) THEN
-   stop " This correction not yet implemented for this process"
-!      call EvalIntDipoles_QGTTBQP((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:11),xE,HOp(1:2,1:3))
+
+
+      npdf=1
+      call EvalIntDipoles_QGTTBQZ((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:13),xE,npdf,HOp(1:2,1:3))
       HOp(1:2,1:3) = HOp(1:2,1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ttbqqbZ=HOp(1,1)    *  (pdf(Up_,1)*pdf(0,2)+pdf(Chm_,1)*pdf(0,2) ) &
                         +HOp(1,2)/xE * (pdf_z(Up_,1)*pdf(0,2)+pdf_z(Chm_,1)*pdf(0,2) ) &
@@ -1852,7 +1854,8 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
                         +HOp(2,2)/xE * (pdf_z(Dn_,1)*pdf(0,2)+pdf_z(Str_,1)*pdf(0,2)+pdf_z(Bot_,1)*pdf(0,2) ) &
                         +HOp(2,3)/xE * (pdf(Dn_,1)*pdf_z(0,2)+pdf(Str_,1)*pdf_z(0,2)+pdf(Bot_,1)*pdf_z(0,2) )
 
-!      call EvalIntDipoles_QGTTBQP((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,6:11),xE,HOp(1:2,1:3))
+      npdf=2
+      call EvalIntDipoles_QGTTBQZ((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:13),xE,npdf,HOp(1:2,1:3))
       HOp(1:2,1:3) = HOp(1:2,1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ttbqqbZ= EvalCS_1L_ttbqqbZ  &
                         +HOp(1,1)    * (pdf(Up_,2)*pdf(0,1)+pdf(Chm_,2)*pdf(0,1) ) &
@@ -1862,10 +1865,15 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
                         +HOp(2,2)/xE * (pdf_z(Dn_,2)*pdf(0,1)+pdf_z(Str_,2)*pdf(0,1)+pdf_z(Bot_,2)*pdf(0,1) ) &
                         +HOp(2,3)/xE * (pdf(Dn_,2)*pdf_z(0,1)+pdf(Str_,2)*pdf_z(0,1)+pdf(Bot_,2)*pdf_z(0,1) )
 
+! print *, "ID check", xe,EvalCS_1L_ttbqqbZ/(alpha_sOver2Pi*RunFactor)
+! pause
+
+
 
    ELSEIF( PROCESS.EQ.74 ) THEN
-   stop " This correction not yet implemented for this process"
-!      call EvalIntDipoles_QBGTTBQBP((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:11),xE,HOp(1:2,1:3))
+
+      npdf=1
+      call EvalIntDipoles_QBGTTBQBZ((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:13),xE,npdf,HOp(1:2,1:3))
       HOp(1:2,1:3) = HOp(1:2,1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ttbqqbZ= HOp(1,1)    * (pdf(AUp_,1)*pdf(0,2)+pdf(AChm_,1)*pdf(0,2) ) &
                         +HOp(1,2)/xE * (pdf_z(AUp_,1)*pdf(0,2)+pdf_z(AChm_,1)*pdf(0,2) ) &
@@ -1874,8 +1882,8 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
                         +HOp(2,2)/xE * (pdf_z(ADn_,1)*pdf(0,2)+pdf_z(AStr_,1)*pdf(0,2)+pdf_z(ABot_,1)*pdf(0,2) ) &
                         +HOp(2,3)/xE * (pdf(ADn_,1)*pdf_z(0,2)+pdf(AStr_,1)*pdf_z(0,2)+pdf(ABot_,1)*pdf_z(0,2) )
 
-
-!      call EvalIntDipoles_QBGTTBQBP((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,2),-MomExt(1:4,1)/),MomExt(1:4,6:11),xE,HOp(1:2,1:3))
+      npdf=2
+      call EvalIntDipoles_QBGTTBQBZ((/MomExt(1:4,4),MomExt(1:4,3),MomExt(1:4,5),-MomExt(1:4,1),-MomExt(1:4,2)/),MomExt(1:4,6:13),xE,npdf,HOp(1:2,1:3))
       HOp(1:2,1:3) = HOp(1:2,1:3)*RunFactor**3 * PreFac
       EvalCS_1L_ttbqqbZ= EvalCS_1L_ttbqqbZ &
                         +HOp(1,1)    * (pdf(AUp_,2)*pdf(0,1)+pdf(AChm_,2)*pdf(0,1) ) &
@@ -1885,11 +1893,12 @@ ELSEIF( CORRECTION.EQ.3 ) THEN
                         +HOp(2,2)/xE * (pdf_z(ADn_,2)*pdf(0,1)+pdf_z(AStr_,2)*pdf(0,1)+pdf_z(ABot_,2)*pdf(0,1) ) &
                         +HOp(2,3)/xE * (pdf(ADn_,2)*pdf_z(0,1)+pdf(AStr_,2)*pdf_z(0,1)+pdf(ABot_,2)*pdf_z(0,1) )
 
+
+! print *, "ID check", xe,EvalCS_1L_ttbqqbZ/(alpha_sOver2Pi*RunFactor)
+! pause
+
    ENDIF
 
-! print *, "real singularitites",EvalCS_1L_ttbqqbZ
-! print *, "real singularitites",EvalCS_1L_ttbqqbZ/(alpha_sOver2Pi*RunFactor*LO_Res_Unpol* PreFac)
-! pause
 
 ENDIF
 
@@ -2216,8 +2225,8 @@ ENDIF
    ENDIF
 
 
-!    DO NPDF=1,2
-   DO NPDF=1,1; print *, "restricting npdf"
+   DO NPDF=1,2
+!    DO NPDF=1,1; print *, "restricting npdf"
         if(npdf.eq.1) then
               PDFFac(1:2) = PDFFac_a(1:2)
         elseif(npdf.eq.2) then
@@ -2321,23 +2330,20 @@ endif!applyPSCut
 
     PreFacDip = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
     IF( PROCESS.EQ.76 .OR. PROCESS.EQ.86 ) THEN
-        call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),npdf,DipoleResult)
     ELSEIF( PROCESS.EQ.73 ) THEN
-print *, "in1",-MomExt(1:4,1)
-print *, "in1",-MomExt(1:4,2)
-        call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QGTTBQZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),MomExt(1:4,3),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),npdf,DipoleResult)
     ELSEIF( PROCESS.EQ.74 ) THEN
-        call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),DipoleResult)
+        call EvalDipoles_QBGTTBQBZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),MomExt(1:4,3),-MomExt(1:4,1),-MomExt(1:4,2)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),npdf,DipoleResult)
     ENDIF
     EvalCS_Dips_ttbqqbgZ = EvalCS_Dips_ttbqqbgZ + DipoleResult(1) + DipoleResult(2)
 
   ENDDO! loop over a<-->b pdfs
 
-     sij = 2d0*(MomExt(1:4,2).dot.MomExt(1:4,3))
-!      sij = MomExt(1,3)**2
-     print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)!,EvalCS_Dips_ttbqqbgZ/EvalCS_Real_ttbqqbgZ
-     pause
-
+!      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+! !      sij = MomExt(1,3)**2
+!      print *,  sij/EHat**2,EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,(1d0+EvalCS_Real_ttbqqbgZ/EvalCS_Dips_ttbqqbgZ)!,EvalCS_Dips_ttbqqbgZ/EvalCS_Real_ttbqqbgZ
+!      pause
 
 
 
