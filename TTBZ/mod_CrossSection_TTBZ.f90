@@ -810,8 +810,8 @@ ELSEIF( Correction.EQ.1 ) THEN
        print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
        print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
       PAUSE
-      print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
-      pause
+!       print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
+!       pause
 
       Col1Lf_ttbggZ = 0d0
       Col1Lf_ttbggZ(1,1) = 4d0 * Cf**2 * Nc - 2d0*Cf
@@ -2046,6 +2046,7 @@ ENDIF
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
    RunFactor = RunAlphaS(NLOParam,MuRen)
 
+
    if( applyPSCut ) then
        EvalCS_Real_ttbgggZ = 0d0
    else
@@ -2147,10 +2148,10 @@ logical :: applyPSCut,applySingCut
 real(8),parameter :: PhotonCouplCorr=2d0
 include "vegas_common.f"
 
-yrnd(1)=0.1d0
-yrnd(2)=0.03d0
-yrnd(3:10)=0.7d0
-print *, "fixing yrnd"
+! yrnd(1)=0.1d0
+! yrnd(2)=0.03d0
+! yrnd(3:10)=0.7d0
+! print *, "fixing yrnd"
 
 
    EvalCS_Real_ttbqqbgZ= 0d0

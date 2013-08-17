@@ -4028,6 +4028,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
          endif
       endif
 
+
       if( Quarks(1)%PartType.lt.0 ) then
          Eps1(:)= -vbqq(Dv,ubar2,u1)
       else

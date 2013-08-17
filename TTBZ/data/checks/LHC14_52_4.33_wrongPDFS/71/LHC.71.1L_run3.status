@@ -1,0 +1,58 @@
+# Program parameters:
+# Collider= 1 (  14.000 TeV)
+# ObsSet=52
+# Process=71
+# Master Process=17
+# Correction= 1
+# PDF Set= 1 MSTW2008 NLO (mstw2008nlo.00.dat)                                                                  
+# NLO Parameter= 2
+# Top Decays= 1
+# MuRen= 433.00 GeV
+# MuFac= 433.00 GeV
+# alpha_s(MuRen)=  0.096730880
+# 1/alpha_em=137.000000000
+# two loop running
+# m(top)= 172.000 GeV
+# Width expansion factor=  1.000000
+# Gamma_Top(LO) =  1.465331 GeV
+# Gamma_Top(NLO)=  1.352380 GeV
+# Gamma_W(LO) =  2.048077 GeV
+# Gamma_W(NLO)=  2.111138 GeV
+# Jet Algorithm= anti kT
+# Recombination scheme= 4-vector addition
+# no helicity sampling
+# cuts:
+# pT_jet_cut= ********
+# pT_hardestjet_cut= ********
+# eta_jet_cut= ********
+# eta_sepa_cut= ********
+# pT_bjet_cut=    0.000
+# eta_bjet_cut=  250.000
+# Rsep_jet=    0.000
+# pT_lep_cut=    0.000
+# eta_lep_cut=  250.000
+# pT_miss_cut=    0.000
+# MInv_jets_cut= ********
+# HT_cut= ********
+# pt_photon_cut= ********
+# eta_photon_cut= ********
+# Rsep_photonjet= ********
+# Rsep_photonbjet= ********
+# Rsep_photonlepton= ********
+#
+# VegasSeed=             19
+# VegasIt0 =              3
+# VegasNc0 =           5000
+# VegasIt1 =              5
+# VegasNc1 =          10000
+# Histo file:        ./LHC14_52_4.33/71/LHC.71.1L_run3.dat
+# Vegas status file: ./LHC14_52_4.33/71/LHC.71.1L_run3.status
+# Histo status file: ./LHC14_52_4.33/71/LHC.71.1L_run3.tmp_histo
+#   1      0.46179362E-01      0.74045912E-02      0.46179362E-01      0.74045912E-02
+#   2      0.63567389E-01      0.10591244E-01      0.54540039E-01      0.64187946E-02
+#   3      0.40159291E-01      0.60716858E-02      0.49238378E-01      0.46766867E-02
+    1      0.55573724E-01      0.14441316E-01      0.55573724E-01      0.14441316E-01
+    2      0.60372659E-01      0.26951861E-01      0.56788226E-01      0.13030887E-01
+    3      0.20477055E-01      0.55996353E-02      0.42162167E-01      0.84743683E-02
+    4      0.23874825E-01      0.53942781E-02      0.35375970E-01      0.60476022E-02
+    5      0.54993784E-01      0.17294658E-01      0.38529569E-01      0.58456590E-02

@@ -1826,7 +1826,7 @@ END SUBROUTINE
          function spi2_(v,sp)
          implicit none
          double complex, intent(in) :: sp(:),v(:)
-         double complex :: spi2_(size(sp))
+         double complex :: spi2_(size(sp)) ,tmp(size(sp))
          integer :: Dv,Ds
 
           Ds = size(sp)
@@ -1834,6 +1834,11 @@ END SUBROUTINE
           if (Ds == 8) Dv = 6
           if (Ds == 16) Dv = 8
           call spi2(Dv,Ds,v,sp,spi2_)
+
+!  tmp = VSpiL(v,sp)
+!  print *, "dif",tmp-spi2_
+!  if(Ds.eq.16 .and. any(abs(tmp-spi2_).gt.1d-8) ) pause
+
         return
         end function
 
@@ -1841,7 +1846,7 @@ END SUBROUTINE
         function spb2_(sp,v)
         implicit none
         double complex, intent(in) :: sp(:),v(:)
-        double complex :: spb2_(size(sp))
+        double complex :: spb2_(size(sp)) ,tmp(size(sp))
         integer :: Dv,Ds
 
           Ds = size(sp)
@@ -1849,6 +1854,15 @@ END SUBROUTINE
           if (Ds == 8) Dv = 6
           if (Ds == 16) Dv = 8
           call spb2(Dv,Ds,sp,v,spb2_)
+
+!  if(Ds.eq.16)then
+!  tmp = 0d0
+!  tmp = SpiVL(sp(1:Ds),v(1:Dv))
+! print *, "--------"
+!  print *, "dif",tmp-spb2_
+!  if(Ds.eq.16 .and. any(abs(tmp-spb2_).gt.1d-8) ) pause
+! endif
+
         return
         end function
 
@@ -1874,13 +1888,143 @@ END SUBROUTINE
 
       function SpiVL(sp,v)   ! SpiVL=sp.(v_mu*gamma^mu) =spb2(4,4,...)
       implicit none
-      double complex :: sp(1:4),v(1:4)
-      double complex :: SpiVL(1:4)
+      double complex :: sp(:),v(:)
+      double complex :: SpiVL(size(sp))
+      double complex :: sp1,sp2,sp3,sp4,sp5,sp6,sp7,sp8,sp9,sp10,sp11,sp12,sp13,sp14,sp15,sp16
+      double complex :: v1,v2,v3,v4,v5,v6,v7,v8
+      integer :: Ds
 
-        SpiVL(1) = sp(1)*v(1) + sp(4)*(v(2) + (0d0,1d0)*v(3)) + sp(3)*v(4)
-        SpiVL(2) = sp(2)*v(1) + sp(3)*(v(2) - (0d0,1d0)*v(3)) - sp(4)*v(4)
-        SpiVL(3) =-sp(3)*v(1) - sp(2)*(v(2) + (0d0,1d0)*v(3)) - sp(1)*v(4)
-        SpiVL(4) =-sp(4)*v(1) - sp(1)*(v(2) - (0d0,1d0)*v(3)) + sp(2)*v(4)
+        Ds = size(sp)
+        if( Ds.eq.4 ) then
+            SpiVL(1) = sp(1)*v(1) + sp(4)*(v(2) + (0d0,1d0)*v(3)) + sp(3)*v(4)
+            SpiVL(2) = sp(2)*v(1) + sp(3)*(v(2) - (0d0,1d0)*v(3)) - sp(4)*v(4)
+            SpiVL(3) =-sp(3)*v(1) - sp(2)*(v(2) + (0d0,1d0)*v(3)) - sp(1)*v(4)
+            SpiVL(4) =-sp(4)*v(1) - sp(1)*(v(2) - (0d0,1d0)*v(3)) + sp(2)*v(4)
+        elseif( Ds.eq.8 ) then
+            sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); 
+            v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); 
+            SpiVL(1) = sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 - (0d0,1d0)*sp7*v6
+            SpiVL(2) = sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 - (0d0,1d0)*sp8*v6
+            SpiVL(3) =-sp3*v1 - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 - (0d0,1d0)*sp5*v6
+            SpiVL(4) =-sp4*v1 - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 - (0d0,1d0)*sp6*v6
+            SpiVL(5) = sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp3*v6
+            SpiVL(6) = sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp4*v6
+            SpiVL(7) =-sp7*v1 - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp1*v6
+            SpiVL(8) =-sp8*v1 - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 - (0d0,1d0)*sp2*v6
+        elseif( Ds.eq.16 ) then
+            sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); sp9=sp(9); sp10=sp(10); sp11=sp(11); sp12=sp(12); sp13=sp(13); sp14=sp(14); sp15=sp(15); sp16=sp(16); 
+            v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); v7=v(7);  v8=v(8); 
+
+            SpiVL(1) =sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 - (0d0,1d0)*sp7*v6 +   (0d0,1d0)*sp15*v7 + sp15*v8
+            SpiVL(2) =sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 - (0d0,1d0)*sp8*v6 +  (0d0,1d0)*sp16*v7 + sp16*v8
+            SpiVL(3) =-(sp3*v1) - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 - (0d0,1d0)*sp5*v6 +  (0d0,1d0)*sp13*v7 + sp13*v8
+            SpiVL(4) =-(sp4*v1) - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 - (0d0,1d0)*sp6*v6 +  (0d0,1d0)*sp14*v7 + sp14*v8
+            SpiVL(5) =sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp3*v6 +  (0d0,1d0)*sp11*v7 + sp11*v8
+            SpiVL(6) =sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp4*v6 +   (0d0,1d0)*sp12*v7 + sp12*v8
+            SpiVL(7) =-(sp7*v1) - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp1*v6 +   (0d0,1d0)*sp9*v7 + sp9*v8
+            SpiVL(8) =-(sp8*v1) - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 - (0d0,1d0)*sp2*v6 +    (0d0,1d0)*sp10*v7 + sp10*v8
+            SpiVL(9) =sp9*v1 + sp12*(v2 + (0d0,1d0)*v3) + sp11*v4 + sp15*v5 - (0d0,1d0)*sp15*v6 -   (0d0,1d0)*sp7*v7 + sp7*v8
+            SpiVL(10) =sp10*v1 + sp11*(v2 - (0d0,1d0)*v3) - sp12*v4 + sp16*v5 - (0d0,1d0)*sp16*v6 -   (0d0,1d0)*sp8*v7 + sp8*v8
+            SpiVL(11) =-(sp11*v1) - sp10*(v2 + (0d0,1d0)*v3) - sp9*v4 + sp13*v5 -   (0d0,1d0)*sp13*v6 - (0d0,1d0)*sp5*v7 + sp5*v8
+            SpiVL(12) =-(sp12*v1) - sp9*v2 + (0d0,1d0)*sp9*v3 + sp10*v4 + sp14*v5 -   (0d0,1d0)*sp14*v6 - (0d0,1d0)*sp6*v7 + sp6*v8
+            SpiVL(13) =sp13*v1 + sp16*(v2 + (0d0,1d0)*v3) + sp15*v4 - sp11*v5 - (0d0,1d0)*sp11*v6 -  (0d0,1d0)*sp3*v7 + sp3*v8
+            SpiVL(14) =sp14*v1 + sp15*(v2 - (0d0,1d0)*v3) - sp16*v4 - sp12*v5 - (0d0,1d0)*sp12*v6 -   (0d0,1d0)*sp4*v7 + sp4*v8
+            SpiVL(15) =-(sp15*v1) - sp14*(v2 + (0d0,1d0)*v3) - sp13*v4 - sp9*v5 -   (0d0,1d0)*sp9*v6 - (0d0,1d0)*sp1*v7 + sp1*v8
+            SpiVL(16) =-(sp16*v1) - sp13*v2 + (0d0,1d0)*sp13*v3 + sp14*v4 - sp10*v5 -   (0d0,1d0)*sp10*v6 - (0d0,1d0)*sp2*v7 + sp2*v8
+
+
+
+
+!             SpiVL(1) = sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 + (0d0,1d0)*sp15*v6 - (0d0,1d0)*sp7*v7 + sp15*v8
+!             SpiVL(2) = sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 + (0d0,1d0)*sp16*v6 -(0d0,1d0)*sp8*v7 + sp16*v8
+!             SpiVL(3) =-(sp3*v1) - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 + (0d0,1d0)*sp13*v6 -   (0d0,1d0)*sp5*v7 + sp13*v8
+!             SpiVL(4) =-(sp4*v1) - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 + (0d0,1d0)*sp14*v6 - (0d0,1d0)*sp6*v7 + sp14*v8
+!             SpiVL(5) = sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp11*v6 -  (0d0,1d0)*sp3*v7 + sp11*v8
+!             SpiVL(6) = sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp12*v6 - (0d0,1d0)*sp4*v7 + sp12*v8
+!             SpiVL(7) =-(sp7*v1) - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp9*v6 - (0d0,1d0)*sp1*v7 + sp9*v8
+!             SpiVL(8) =-(sp8*v1) - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 -  (0d0,1d0)*sp10*v6 - (0d0,1d0)*sp2*v7 + sp10*v8
+!             SpiVL(9) = sp9*v1 + sp12*(v2 + (0d0,1d0)*v3) + sp11*v4 + sp15*v5 + (0d0,1d0)*sp7*v6 -   (0d0,1d0)*sp15*v7 + sp7*v8
+!             SpiVL(10)= sp10*v1 + sp11*(v2 - (0d0,1d0)*v3) - sp12*v4 + sp16*v5 + (0d0,1d0)*sp8*v6 -  (0d0,1d0)*sp16*v7 + sp8*v8
+!             SpiVL(11)= -(sp11*v1) - sp10*(v2 + (0d0,1d0)*v3) - sp9*v4 + sp13*v5 + (0d0,1d0)*sp5*v6 - (0d0,1d0)*sp13*v7 + sp5*v8
+!             SpiVL(12)= -(sp12*v1) - sp9*v2 + (0d0,1d0)*sp9*v3 + sp10*v4 + sp14*v5 +  (0d0,1d0)*sp6*v6 - (0d0,1d0)*sp14*v7 + sp6*v8
+!             SpiVL(13)= sp13*v1 + sp16*(v2 + (0d0,1d0)*v3) + sp15*v4 - sp11*v5 - (0d0,1d0)*sp3*v6 -  (0d0,1d0)*sp11*v7 + sp3*v8
+!             SpiVL(14)= sp14*v1 + sp15*(v2 - (0d0,1d0)*v3) - sp16*v4 - sp12*v5 - (0d0,1d0)*sp4*v6 -  (0d0,1d0)*sp12*v7 + sp4*v8
+!             SpiVL(15)= -(sp15*v1) - sp14*(v2 + (0d0,1d0)*v3) - sp13*v4 - sp9*v5 -  (0d0,1d0)*sp1*v6 - (0d0,1d0)*sp9*v7 + sp1*v8
+!             SpiVL(16)= -(sp16*v1) - sp13*v2 + (0d0,1d0)*sp13*v3 + sp14*v4 - sp10*v5 - (0d0,1d0)*sp2*v6 - (0d0,1d0)*sp10*v7 + sp2*v8
+        endif
+        
+      return
+      end function
+
+
+
+
+      function VSpiL(v,sp)   ! VSpiL=(v_mu*gamma^mu).sp =spi2(4,4,...)
+      implicit none
+      double complex :: sp(:),v(:)
+      double complex :: VSpiL(size(sp))
+      integer :: Ds
+      double complex :: sp1,sp2,sp3,sp4,sp5,sp6,sp7,sp8,sp9,sp10,sp11,sp12,sp13,sp14,sp15,sp16
+      double complex :: v1,v2,v3,v4,v5,v6,v7,v8
+
+
+        Ds = size(sp)
+        if( Ds.eq.4 ) then
+            VSpiL(1) = sp(1)*v(1) - sp(4)*(v(2) - (0d0,1d0)*v(3)) - sp(3)*v(4)
+            VSpiL(2) = sp(2)*v(1) - sp(3)*(v(2) + (0d0,1d0)*v(3)) + sp(4)*v(4)
+            VSpiL(3) =-sp(3)*v(1) + sp(2)*(v(2) - (0d0,1d0)*v(3)) + sp(1)*v(4)
+            VSpiL(4) =-sp(4)*v(1) + sp(1)*(v(2) + (0d0,1d0)*v(3)) - sp(2)*v(4)
+        elseif( Ds.eq.8 ) then
+            sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); 
+            v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); 
+            VSpiL(1) = sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 - (0d0,1d0)*sp7*v6
+            VSpiL(2) = sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp8*v6
+            VSpiL(3) =-sp3*v1 + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp5*v6
+            VSpiL(4) =-sp4*v1 + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp6*v6
+            VSpiL(5) = sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 - (0d0,1d0)*sp3*v6
+            VSpiL(6) = sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 - (0d0,1d0)*sp4*v6
+            VSpiL(7) =-sp7*v1 + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 - (0d0,1d0)*sp1*v6
+            VSpiL(8) =-sp8*v1 + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 - (0d0,1d0)*sp2*v6
+        elseif( Ds.eq.16 ) then
+            sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); sp9=sp(9); sp10=sp(10); sp11=sp(11); sp12=sp(12); sp13=sp(13); sp14=sp(14); sp15=sp(15); sp16=sp(16); 
+            v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); v7=v(7);  v8=v(8); 
+
+            VSpiL(1) =sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 -  (0d0,1d0)*sp7*v6 - (0d0,1d0)*sp15*v7 + sp15*v8
+            VSpiL(2) =sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp8*v6 -    (0d0,1d0)*sp16*v7 + sp16*v8
+            VSpiL(3) =-(sp3*v1) + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp5*v6 -    (0d0,1d0)*sp13*v7 + sp13*v8
+            VSpiL(4) =-(sp4*v1) + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp6*v6 -   (0d0,1d0)*sp14*v7 + sp14*v8
+            VSpiL(5) =sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 - (0d0,1d0)*sp3*v6 -    (0d0,1d0)*sp11*v7 + sp11*v8
+            VSpiL(6) =sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 - (0d0,1d0)*sp4*v6 -     (0d0,1d0)*sp12*v7 + sp12*v8
+            VSpiL(7) =-(sp7*v1) + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 - (0d0,1d0)*sp1*v6 -    (0d0,1d0)*sp9*v7 + sp9*v8
+            VSpiL(8) =-(sp8*v1) + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 - (0d0,1d0)*sp2*v6 -   (0d0,1d0)*sp10*v7 + sp10*v8
+            VSpiL(9) =sp9*v1 - sp12*v2 + (0d0,1d0)*sp12*v3 - sp11*v4 - sp15*v5 -    (0d0,1d0)*sp15*v6 + (0d0,1d0)*sp7*v7 + sp7*v8
+            VSpiL(10) =sp10*v1 - sp11*(v2 + (0d0,1d0)*v3) + sp12*v4 - sp16*v5 - (0d0,1d0)*sp16*v6 +   (0d0,1d0)*sp8*v7 + sp8*v8
+            VSpiL(11) =-(sp11*v1) + sp10*(v2 - (0d0,1d0)*v3) + sp9*v4 - sp13*v5 -  (0d0,1d0)*sp13*v6 + (0d0,1d0)*sp5*v7 + sp5*v8
+            VSpiL(12) =-(sp12*v1) + sp9*(v2 + (0d0,1d0)*v3) - sp10*v4 - sp14*v5 -    (0d0,1d0)*sp14*v6 + (0d0,1d0)*sp6*v7 + sp6*v8
+            VSpiL(13) =sp13*v1 - sp16*v2 + (0d0,1d0)*sp16*v3 - sp15*v4 + sp11*v5 -     (0d0,1d0)*sp11*v6 + (0d0,1d0)*sp3*v7 + sp3*v8
+            VSpiL(14) =sp14*v1 - sp15*(v2 + (0d0,1d0)*v3) + sp16*v4 + sp12*v5 - (0d0,1d0)*sp12*v6 +   (0d0,1d0)*sp4*v7 + sp4*v8
+            VSpiL(15) =-(sp15*v1) + sp14*(v2 - (0d0,1d0)*v3) + sp13*v4 + sp9*v5 -   (0d0,1d0)*sp9*v6 + (0d0,1d0)*sp1*v7 + sp1*v8
+            VSpiL(16) =-(sp16*v1) + sp13*(v2 + (0d0,1d0)*v3) - sp14*v4 + sp10*v5 -    (0d0,1d0)*sp10*v6 + (0d0,1d0)*sp2*v7 + sp2*v8
+
+
+!             VSpiL(1) = sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 - (0d0,1d0)*sp15*v6 - (0d0,1d0)*sp7*v7 + sp15*v8
+!             VSpiL(2) = sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp16*v6 -  (0d0,1d0)*sp8*v7 + sp16*v8
+!             VSpiL(3) =-(sp3*v1) + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp13*v6 -  (0d0,1d0)*sp5*v7 + sp13*v8
+!             VSpiL(4) =-(sp4*v1) + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp14*v6 -    (0d0,1d0)*sp6*v7 + sp14*v8
+!             VSpiL(5) = sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 + (0d0,1d0)*sp11*v6 -   (0d0,1d0)*sp3*v7 + sp11*v8
+!             VSpiL(6) = sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 + (0d0,1d0)*sp12*v6 -  (0d0,1d0)*sp4*v7 + sp12*v8
+!             VSpiL(7) =-(sp7*v1) + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 + (0d0,1d0)*sp9*v6 -    (0d0,1d0)*sp1*v7 + sp9*v8
+!             VSpiL(8) =-(sp8*v1) + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 + (0d0,1d0)*sp10*v6 -   (0d0,1d0)*sp2*v7 + sp10*v8
+!             VSpiL(9) = sp9*v1 - sp12*v2 + (0d0,1d0)*sp12*v3 - sp11*v4 - sp15*v5 -  (0d0,1d0)*sp7*v6 - (0d0,1d0)*sp15*v7 + sp7*v8
+!             VSpiL(10) = sp10*v1 - sp11*(v2 + (0d0,1d0)*v3) + sp12*v4 - sp16*v5 - (0d0,1d0)*sp8*v6 -   (0d0,1d0)*sp16*v7 + sp8*v8
+!             VSpiL(11) =-(sp11*v1) + sp10*(v2 - (0d0,1d0)*v3) + sp9*v4 - sp13*v5 -   (0d0,1d0)*sp5*v6 - (0d0,1d0)*sp13*v7 + sp5*v8
+!             VSpiL(12) =-(sp12*v1) + sp9*(v2 + (0d0,1d0)*v3) - sp10*v4 - sp14*v5 -  (0d0,1d0)*sp6*v6 - (0d0,1d0)*sp14*v7 + sp6*v8
+!             VSpiL(13) = sp13*v1 - sp16*v2 + (0d0,1d0)*sp16*v3 - sp15*v4 + sp11*v5 +  (0d0,1d0)*sp3*v6 - (0d0,1d0)*sp11*v7 + sp3*v8
+!             VSpiL(14) = sp14*v1 - sp15*(v2 + (0d0,1d0)*v3) + sp16*v4 + sp12*v5 + (0d0,1d0)*sp4*v6 -  (0d0,1d0)*sp12*v7 + sp4*v8
+!             VSpiL(15) =-(sp15*v1) + sp14*(v2 - (0d0,1d0)*v3) + sp13*v4 + sp9*v5 +  (0d0,1d0)*sp1*v6 - (0d0,1d0)*sp9*v7 + sp1*v8
+!             VSpiL(16) =-(sp16*v1) + sp13*(v2 + (0d0,1d0)*v3) - sp14*v4 + sp10*v5 +  (0d0,1d0)*sp2*v6 - (0d0,1d0)*sp10*v7 + sp2*v8
+        endif
+
       return
       end function
 
@@ -2435,20 +2579,60 @@ END SUBROUTINE
 
 
 
-      function vbqV(sp,e1,coupl_left,coupl_right)!   careful, Chir works only in D=4 dimensions
+      function vbqV(sp,e1,coupl_left,coupl_right)
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
       complex(8), intent(in) :: coupl_left,coupl_right
       complex(8) :: vbqV(size(sp))
+!  complex(8) :: check_new(size(sp)),check_old(size(sp))
 
             vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) ) 
+
+!             vbqV = -(0d0,1d0)*( coupl_left*Chir_check(.false.,spb2_(sp,e1)) + coupl_right*Chir_check(.true.,spb2_(sp,e1)) ) 
+
+!  print *, "D=",size(sp)
+!  compare old vs. new  projectors
+!  check_new = -(0d0,1d0)*( Chir_check(.false.,spb2_(sp,e1)) ) 
+!  check_old = -(0d0,1d0)*( Chir(.false.,spb2_(sp,e1))  ) 
+!  print *, "old",check_old
+!  print *, "new",check_new
+!  print *, "dif",check_new - check_old
+
+!  check projector properties
+!  check_new = Chir_check(.false.,spb2_(sp,e1)) + Chir_check(.true.,spb2_(sp,e1)) - spb2_(sp,e1)
+!  check_old = Chir(.false.,spb2_(sp,e1)) + Chir(.true.,spb2_(sp,e1)) - spb2_(sp,e1)
+!  print *, "old",check_old
+!  print *, "new",check_new
+
+!  check projector properties
+!  check_new =  Chir_check(.false.,Chir_check(.false.,spb2_(sp,e1)))- Chir_check(.false.,spb2_(sp,e1))
+!  check_old = Chir(.false.,Chir(.false.,spb2_(sp,e1))) - Chir(.false.,spb2_(sp,e1))
+!  print *, "old",check_old
+!  print *, "new",check_new
+!  check_new =  Chir_check(.true.,Chir_check(.true.,spb2_(sp,e1)))- Chir_check(.true.,spb2_(sp,e1))
+!  check_old = Chir(.true.,Chir(.true.,spb2_(sp,e1))) - Chir(.true.,spb2_(sp,e1))
+!  print *, "old",check_old
+!  print *, "new",check_new
+
+
+!  check projector properties
+!  check_new =  Chir_check(.false.,Chir_check(.true.,spb2_(sp,e1)))
+!  check_old = Chir(.false.,Chir(.true.,spb2_(sp,e1)))
+!  print *, "old",check_old
+!  print *, "new",check_new
+!  check_new =  Chir_check(.true.,Chir_check(.false.,spb2_(sp,e1)))
+!  check_old = Chir(.true.,Chir(.false.,spb2_(sp,e1)))
+!  print *, "old",check_old
+!  print *, "new",check_new
+
+!  if( size(sp).eq.16 ) pause
 
       end function vbqV
 
 
 
-      function vVq(e1,sp,coupl_left,coupl_right)!   careful, Chir works only in D=4 dimensions
+      function vVq(e1,sp,coupl_left,coupl_right)
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
@@ -2457,7 +2641,14 @@ END SUBROUTINE
 
             vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )
 
+!             vVq = -(0d0,1d0)*( coupl_left*Chir_check(.true., spi2_(e1,sp)) + coupl_right*Chir_check(.false., spi2_(e1,sp)) )
+
       end function vVq
+
+
+
+
+
 
 
 
@@ -3307,6 +3498,159 @@ END SUBROUTINE
                endif
 
              end function Chir
+
+
+
+
+               function Chir_check(sign,sp) result(res)
+               implicit none
+               logical :: sign
+               double complex :: sp(:)
+               double complex :: res(size(sp))               
+               integer        :: D
+
+                    D = size(sp)
+                    if( D.eq.4) then
+                        if(sign) then !omega_+
+                            res(1) = 0.5d0*(sp(1)+sp(3))
+                            res(2) = 0.5d0*(sp(2)+sp(4))
+                            res(3) = res(1)
+                            res(4) = res(2)
+! sp1 + sp3,
+! sp2 + sp4,
+! sp1 + sp3,
+! sp2 + sp4
+                        else !omega_-
+                            res(1) = 0.5d0*(sp(1)-sp(3))
+                            res(2) = 0.5d0*(sp(2)-sp(4))
+                            res(3) =-res(1)
+                            res(4) =-res(2)
+! sp1 - sp3,
+! sp2 - sp4,
+! -sp1 + sp3,
+! -sp2 + sp4
+                        endif
+                    elseif( D.eq.8) then
+                        if(sign) then !omega_+
+                            res(1) = 0.5d0*(sp(1)+sp(3))
+                            res(2) = 0.5d0*(sp(2)+sp(4))
+                            res(3) = res(1)
+                            res(4) = res(2)
+                            res(5) = 0.5d0*(sp(5)-sp(7))
+                            res(6) = 0.5d0*(sp(6)-sp(8))
+                            res(7) = -res(5)
+                            res(8) = -res(6)
+! sp1 + sp3,
+! sp2 + sp4,
+! sp1 + sp3,
+! sp2 + sp4,
+! sp5 - sp7,
+! sp6 - sp8,
+! -sp5 + sp7,
+! -sp6 + sp8
+
+                        else !omega_-
+                            res(1) = 0.5d0*(sp(1)-sp(3))
+                            res(2) = 0.5d0*(sp(2)-sp(4))
+                            res(3) = -res(1)
+                            res(4) = -res(2)
+                            res(5) = 0.5d0*(sp(5)+sp(7))
+                            res(6) = 0.5d0*(sp(6)+sp(8))
+                            res(7) = res(5)
+                            res(8) = res(6)
+! sp1 - sp3,
+! sp2 - sp4,
+! -sp1 + sp3,
+! -sp2 + sp4,
+! sp5 + sp7,
+! sp6 + sp8,
+! sp5 + sp7,
+! sp6 + sp8
+                        endif
+
+
+
+                    elseif( D.eq.16) then
+                        if(sign) then !omega_+
+                            res(1) = 0.5d0*(sp(1)-sp(3))
+                            res(2) = 0.5d0*(sp(2)-sp(4))
+                            res(3) = -res(1)
+                            res(4) = -res(2)
+                            res(5) = 0.5d0*(sp(5)-sp(7))
+                            res(6) = 0.5d0*(sp(6)-sp(8))
+                            res(7) = -res(5)
+                            res(8) = -res(6)
+                            res(9) = 0.5d0*(sp(9)-sp(11))
+                            res(10)= 0.5d0*(sp(10)-sp(12))
+                            res(11)= -res(9)
+                            res(12)= -res(10)
+                            res(13)= 0.5d0*(sp(13)-sp(15))
+                            res(14)= 0.5d0*(sp(14)-sp(16))
+                            res(15)= -res(13)
+                            res(16)= -res(14)
+! sp1 - sp3,
+! sp2 - sp4,
+! -sp1 + sp3,
+! -sp2 + sp4,
+! 
+! sp5 - sp7,
+! sp6 - sp8,
+! -sp5 + sp7,
+! -sp6 + sp8,
+! 
+! -sp11 + sp9,
+! sp10 - sp12,
+! sp11 - sp9,
+! -sp10 + sp12,
+! 
+! sp13 - sp15,
+! sp14 - sp16,
+! -sp13 + sp15,
+! -sp14 + sp16
+                        else !omega_-
+                            res(1) = 0.5d0*(sp(1)+sp(3))
+                            res(2) = 0.5d0*(sp(2)+sp(4))
+                            res(3) = res(1)
+                            res(4) = res(2)
+                            res(5) = 0.5d0*(sp(5)+sp(7))
+                            res(6) = 0.5d0*(sp(6)+sp(8))
+                            res(7) = res(5)
+                            res(8) = res(6)
+                            res(9) = 0.5d0*(sp(9)+sp(11))
+                            res(10)= 0.5d0*(sp(10)+sp(12))
+                            res(11)= res(9)
+                            res(12)= res(10)
+                            res(13)= 0.5d0*(sp(13)+sp(15))
+                            res(14)= 0.5d0*(sp(14)+sp(16))
+                            res(15)= res(13)
+                            res(16)= res(14)
+                        endif
+! sp1 + sp3,
+! sp2 + sp4,
+! sp1 + sp3,
+! sp2 + sp4,
+! 
+! sp5 + sp7,
+! sp6 + sp8,
+! sp5 + sp7,
+! sp6 + sp8,
+! 
+! sp11 + sp9,
+! sp10 + sp12,
+! sp11 + sp9,
+! sp10 + sp12,
+! 
+! sp13 + sp15,
+! sp14 + sp16,
+! sp13 + sp15,
+! sp14 + sp16
+
+                    endif
+
+
+               end function Chir_check
+
+
 
 !--------------------Weyl routines-----------------------
 

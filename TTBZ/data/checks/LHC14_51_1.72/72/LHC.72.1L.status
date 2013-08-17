@@ -1,0 +1,50 @@
+# Program parameters:
+# Collider= 1 (  14.000 TeV)
+# ObsSet=51
+# Process=72
+# Master Process=18
+# Correction= 1
+# PDF Set= 2 CTEQ6.6M NLO (ctq66.00.pds)                                                                        
+# NLO Parameter= 2
+# Top Decays= 0
+# MuRen= 172.00 GeV
+# MuFac= 172.00 GeV
+# alpha_s(MuRen)=  0.107711402
+# 1/alpha_em=137.000000000
+# two loop running
+# m(top)= 172.000 GeV
+# Width expansion factor=  1.000000
+# Gamma_Top(LO) =  1.465331 GeV
+# Gamma_Top(NLO)=  1.339558 GeV
+# Gamma_W(LO) =  2.048077 GeV
+# Gamma_W(NLO)=  2.118296 GeV
+# Jet Algorithm= anti kT
+# Recombination scheme= 4-vector addition
+# no helicity sampling
+# cuts:
+# pT_jet_cut= ********
+# pT_hardestjet_cut= ********
+# eta_jet_cut= ********
+# eta_sepa_cut= ********
+# pT_bjet_cut= ********
+# eta_bjet_cut= ********
+# Rsep_jet= ********
+# pT_lep_cut= ********
+# eta_lep_cut= ********
+# pT_miss_cut= ********
+# MInv_jets_cut= ********
+# HT_cut= ********
+# pt_photon_cut= ********
+# eta_photon_cut= ********
+# Rsep_photonjet= ********
+# Rsep_photonbjet= ********
+# Rsep_photonlepton= ********
+#
+# VegasSeed=             19
+# VegasIt0 =              3
+# VegasNc0 =         100000
+# VegasIt1 =              5
+# VegasNc1 =         100000
+# Histo file:        ./LHC14_51_1.72/72/LHC.72.1L.dat
+# Vegas status file: ./LHC14_51_1.72/72/LHC.72.1L.status
+# Histo status file: ./LHC14_51_1.72/72/LHC.72.1L.tmp_histo

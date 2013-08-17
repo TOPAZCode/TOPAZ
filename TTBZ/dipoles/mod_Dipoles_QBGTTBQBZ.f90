@@ -71,7 +71,7 @@
 
             do n=1,ndip
 
-print *, "dipole",n
+! print *, "dipole",n
 
          i=dip(n,1)  ! emitted
          j=dip(n,2)  ! emittor
@@ -91,7 +91,7 @@ print *, "dipole",n
 
         sum_dip = sum_dip + res
 
-print *, "res",n,res
+! print *, "res",n,res
 
         enddo
 
