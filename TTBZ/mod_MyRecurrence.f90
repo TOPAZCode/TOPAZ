@@ -3668,8 +3668,11 @@ end function fV
           couplVQQ_left  = couplZTT_left_dyn
           couplVQQ_right = couplZTT_right_dyn
       else
-          couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
-          couplVQQ_right = one ! 
+! this seems to be a serious bug, since this is not the same as in fV -- but seems to have no effect on LO or virt calc...
+!          couplVQQ_left  = one ! massless quark-Z couplings are set in mod_CrossSection
+!          couplVQQ_right = one !
+         couplVQQ_left=couplZQQ_left_dyn
+         couplVQQ_right=couplZQQ_right_dyn 
       endif
 
 
@@ -4151,8 +4154,7 @@ integer :: rIn,rOut,i,counter
     if(Quarks(3)%PartType.eq.-Quarks(4)%PartType .and. Quark1PartType.ne.-Quarks(2)%PartType ) print *,"wrong flavor in cur_f_4f (1)"
     if(Quarks(2)%PartType.eq.-Quarks(3)%PartType .and. Quark1PartType.ne.-Quarks(4)%PartType ) print *,"wrong flavor in cur_f_4f (2)"
 !DEC$ ENDIF
-
-   Res(:)=(0d0,0d0)
+    Res(:)=(0d0,0d0)
    if ( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType ) then
       do n2a=0,NumGlu(2)
          do n4a=0,NumGlu(4)
