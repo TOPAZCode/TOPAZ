@@ -1178,6 +1178,8 @@ ENDIF
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
+   Ren_Res_Pol=0d0
+   Ren_Res_UnPol=0d0
    
 
 !------------ LO --------------
