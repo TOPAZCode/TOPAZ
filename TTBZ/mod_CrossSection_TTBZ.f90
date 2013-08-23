@@ -1010,6 +1010,8 @@ real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),P
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,ParityFlip=1,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
 integer :: ZQcoupl
 integer,parameter :: up=1,dn=2
+complex(8) :: couplZQQ_left_dyn_old,couplZQQ_right_dyn_old,couplZTT_left_dyn_old,couplZTT_right_dyn_old,RenormAmp(1:2)
+real(8) :: Ren_Res_Pol,Ren_Res_UnPol,R_V,R_A
 include 'misc/global_import'
 include "vegas_common.f"
 
@@ -1280,6 +1282,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          call swapMom(MomExt(1:4,1),MomExt(1:4,2))
          ISFac = MomCrossing(MomExt)
       endif
+         ISFac = MomCrossing(MomExt)
 !       PDFFac(1:2)=(/1d0,1d0/); print *, "setting pdfs to one"
       call SetPropagators()
 
@@ -1747,6 +1750,39 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
+
+! first attempt at gamma-5 renorm in FDH scheme: Gamma_V = GA = 1+alpha_s/4pi*Cf
+        print *, 'GAMMA-5 RENORM ONLY DONE WITH ZDK=0 FOR THE MOMENT (TILL IT WORKS! --  RR 20 AUG'
+
+! FDH --  see 0903380, table 2
+!          R_V=4d0/3d0/two
+!          R_A=4d0/3d0/two
+! HV
+          R_V=0d0
+          R_A=-4d0/3d0*two
+
+        couplZQQ_left_dyn=(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_left*R_V
+        couplZQQ_right_dyn=-(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_right*R_V
+        couplZTT_left_dyn_old  = couplZTT_left_dyn
+        couplZTT_right_dyn_old = couplZTT_right_dyn
+        couplZTT_left_dyn=(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_left_dyn_old*R_V
+        couplZTT_right_dyn=-(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_right_dyn_old*R_V
+
+
+      do iPrimAmp=1,NumBornAmps
+         BornAmps(iPrimAmp)%Result=(0d0,0d0)
+         call EvalTree(BornAmps(iPrimAmp))
+      enddo
+      RenormAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result
+
+      Ren_Res_Pol = two * ColLO_ttbqqb(1,1) * dreal( LOPartAmp(up)*dconjg(RenormAmp(up))) 
+      Ren_Res_UnPol=Ren_Res_UnPol + Ren_Res_Pol 
+      couplZTT_left_dyn  = couplZTT_left_dyn_old
+      couplZTT_right_dyn = couplZTT_right_dyn_old
+!
+!! end gamma--5 renorm bit
+
+
     enddo!helicity loop
 !    stop
 !    pause
@@ -1781,6 +1817,11 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
+
+
+!!!! gamma5 renorm
+   NLO_Res_UnPol(0) = NLO_Res_UnPol(0) + Ren_Res_UnPol
+!!!!
 
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol                         * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi
