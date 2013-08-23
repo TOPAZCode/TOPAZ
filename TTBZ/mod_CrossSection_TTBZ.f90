@@ -1751,8 +1751,9 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
 
-! first attempt at gamma-5 renorm in FDH scheme: Gamma_V = GA = 1+alpha_s/4pi*Cf
-        print *, 'GAMMA-5 RENORM ONLY DONE WITH ZDK=0 FOR THE MOMENT (TILL IT WORKS! --  RR 20 AUG'
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!     GAMMA-5 RENORMALIZATION -- SEE RR NOTES, 23 AUG 2013                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! FDH --  see 0903380, table 2
 !          R_V=4d0/3d0/two
@@ -1760,27 +1761,41 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 ! HV
           R_V=0d0
           R_A=-4d0/3d0*two
+          
+          couplZTT_left_dyn_old  = couplZTT_left_dyn
+          couplZTT_right_dyn_old = couplZTT_right_dyn
+          couplZTT_left_dyn=(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_left_dyn_old*R_V
+          couplZTT_right_dyn=-(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_right_dyn_old*R_V
 
-        couplZQQ_left_dyn=(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_left*R_V
-        couplZQQ_right_dyn=-(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_right*R_V
-        couplZTT_left_dyn_old  = couplZTT_left_dyn
-        couplZTT_right_dyn_old = couplZTT_right_dyn
-        couplZTT_left_dyn=(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_left_dyn_old*R_V
-        couplZTT_right_dyn=-(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_right_dyn_old*R_V
+          do qf=1,2
+             if ( qf .eq. up) then                 ! up quark
+                couplZQQ_left_dyn=(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_left*R_V
+                couplZQQ_right_dyn=-(couplZUU_left-couplZUU_right)/two*R_A+couplZUU_right*R_V
+             elseif (qf .eq. dn) then              ! down quark
+                couplZQQ_left_dyn=(couplZDD_left-couplZDD_right)/two*R_A+couplZDD_left*R_V
+                couplZQQ_right_dyn=-(couplZDD_left-couplZDD_right)/two*R_A+couplZDD_right*R_V
+             endif
+                
+          do iPrimAmp=1,NumBornAmps
+             BornAmps(iPrimAmp)%Result=(0d0,0d0)
+             call EvalTree(BornAmps(iPrimAmp))
+          enddo
+      if (Zdecays .eq. 0) then
+         RenormAmp(qf)=BornAmps(1)%Result+BornAmps(2)%Result                          ! couplZUU/couplZDD included in the dyn couplings above
+      elseif( Zdecays.lt.10 .and. Zdecays .gt. 0 ) then
+         RenormAmp(qf)=BornAmps(1)%Result+BornAmps(2)%Result*propZ*couplZLL 
+      elseif( Zdecays.gt.10 ) then
+         RenormAmp(qf)=BornAmps(1)%Result+BornAmps(2)%Result*propZ*couplZLL           ! no renorm needed for off-shell photon contribution
+      endif
+   enddo
 
-
-      do iPrimAmp=1,NumBornAmps
-         BornAmps(iPrimAmp)%Result=(0d0,0d0)
-         call EvalTree(BornAmps(iPrimAmp))
-      enddo
-      RenormAmp(up)=BornAmps(1)%Result+BornAmps(2)%Result
-
-      Ren_Res_Pol = two * ColLO_ttbqqb(1,1) * dreal( LOPartAmp(up)*dconjg(RenormAmp(up))) 
+      Ren_Res_Pol = two * ColLO_ttbqqb(1,1) * dreal( LOPartAmp(up)*dconjg(RenormAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(RenormAmp(dn))*PDFFac(dn) )
       Ren_Res_UnPol=Ren_Res_UnPol + Ren_Res_Pol 
       couplZTT_left_dyn  = couplZTT_left_dyn_old
       couplZTT_right_dyn = couplZTT_right_dyn_old
-!
-!! end gamma--5 renorm bit
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        end gamma--5 renorm                                                            !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
     enddo!helicity loop
