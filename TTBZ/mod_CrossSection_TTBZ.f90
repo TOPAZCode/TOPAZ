@@ -40,6 +40,8 @@ real(8) :: QPtol,DPtol
 integer :: NBin(1:NumMaxHisto),NHisto,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
 integer :: ZQcoupl,jj,lastSister
 integer :: QPredo(1:8,1:5)
+complex(8) :: couplZQQ_left_dyn_old,couplZQQ_right_dyn_old,couplZTT_left_dyn_old,couplZTT_right_dyn_old,LOPartAmp(1:NumBornAmps),RenormAmp(1:NumBornAmps)
+real(8) :: Ren_Res_Pol,Ren_Res_UnPol,R_V,R_A
 include 'misc/global_import'
 include 'vegas_common.f'
 
@@ -198,7 +200,9 @@ ENDIF
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
    NLO_Res_Unpol_Ferm(-2:1) = (0d0,0d0)
-
+   Ren_Res_Pol=0d0
+   Ren_Res_UnPol=0d0
+   
 !------------ LO --------------
 IF( Correction.EQ.0 ) THEN
 !   do iHel=nHel(1),nHel(2)
@@ -232,7 +236,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 !       useQP=0
 !       pole_skipped=0
       QPredo=-1
-      print *, 'Helicity', iHel
+!      print *, 'Helicity', iHel
 !      print *, 'Born...'
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
 !      print *, Helicities(iHel,1:5)
@@ -260,7 +264,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 ! ----------------- bosonic loops --------------------
        
-       print *, 'doing bosonic loops'
+!       print *, 'doing bosonic loops'
 !      print *, 'virt...'
       ListPrimAmps=(/1,2,3,5,7,10,13,16,19,20,21,24,27,28/)
       do iPrimAmp=1,12
@@ -396,7 +400,7 @@ ELSEIF( Correction.EQ.1 ) THEN
 
 !------------ fermionic loops --------------
 
-       print *, 'doing fermionic loops'
+!       print *, 'doing fermionic loops'
 
 
       if (ZQcoupl .eq. 1)  then
@@ -805,11 +809,11 @@ ELSEIF( Correction.EQ.1 ) THEN
    enddo
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
 
-       print *, 'bosonic loops:'
-       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-       print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-      PAUSE
+!       print *, 'bosonic loops:'
+!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+!       print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+!      PAUSE
 !       print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
 !       pause
 
@@ -826,16 +830,58 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
       enddo
       enddo
-       print *, 'fermionic loops:'
-       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-       print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-       pause
+!       print *, 'fermionic loops:'
+!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
+!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
+!       print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
+!       pause
+
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
 
 !      print *, useQP, pole_skipped
 !      pause
-      print *, iHel
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!     GAMMA-5 RENORMALIZATION -- SEE RR NOTES, 23 AUG 2013                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! FDH --  see 0903380, table 2
+!          R_V=4d0/3d0/two
+!          R_A=4d0/3d0/two
+! HV
+          R_V=0d0
+          R_A=-4d0/3d0*two
+          
+          couplZTT_left_dyn_old  = couplZTT_left_dyn
+          couplZTT_right_dyn_old = couplZTT_right_dyn
+          couplZTT_left_dyn=(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_left_dyn_old*R_V
+          couplZTT_right_dyn=-(couplZTT_left_dyn_old-couplZTT_right_dyn_old)/two*R_A+couplZTT_right_dyn_old*R_V
+
+
+          do iPrimAmp=1,NumBornAmps
+             LOPartAmp(iPrimAmp)=BornAmps(iPrimAmp)%Result
+             BornAmps(iPrimAmp)%Result=(0d0,0d0)
+             call EvalTree(BornAmps(iPrimAmp))
+             RenormAmp(iPrimAmp)=BornAmps(iPrimAmp)%Result
+          enddo
+
+          do jPrimAmp=1,2
+             do iPrimAmp=1,2
+                Ren_Res_Pol = Ren_Res_Pol + two * ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( LOPartAmp(iPrimAmp)*dconjg(RenormAmp(jPrimAmp)) )
+             enddo
+          enddo
+          
+
+       Ren_Res_UnPol=Ren_Res_UnPol + Ren_Res_Pol 
+       couplZTT_left_dyn  = couplZTT_left_dyn_old
+       couplZTT_right_dyn = couplZTT_right_dyn_old
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        end gamma--5 renorm                                                            !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+!      print *, iHel
     enddo! helicity loop
 !    print *, 'boson',NLO_Res_UnPol(0:1)
 !    print *, 'ferm',NLO_Res_UnPol_Ferm(0:1)
@@ -871,6 +917,11 @@ ELSEIF( Correction.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-1) = NLO_Res_UnPol_Ferm(-1) - (-2d0/3d0*Nf_light)*LO_Res_Unpol
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
+
+!!!! gamma5 renorm
+   NLO_Res_UnPol(0) = NLO_Res_UnPol(0) + Ren_Res_UnPol
+!!!!
+
 !   print *, 'boson',NLO_Res_UnPol(0:1)
 !   print *, 'ferm',NLO_Res_UnPol_Ferm(0:1)
 !   print *,'coupl'
@@ -1007,7 +1058,7 @@ real(8) :: MG_MOM(0:3,1:NumExtParticles)
 real(8) :: MadGraph_tree
 real(8),parameter :: Nc=3d0
 real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),PDFFac(1:2),pdf(-6:6,1:2)
-integer :: NHisto,NBin(1:NumMaxHisto),npdf,ParityFlip=1,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
+integer :: NHisto,NBin(1:NumMaxHisto),npdf,ParityFlip=1,PhotonCouplCorr=2d0,nHel(1:2),NRndHel,qf
 integer :: ZQcoupl
 integer,parameter :: up=1,dn=2
 complex(8) :: couplZQQ_left_dyn_old,couplZQQ_right_dyn_old,couplZTT_left_dyn_old,couplZTT_right_dyn_old,RenormAmp(1:2)
