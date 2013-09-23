@@ -3362,7 +3362,7 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
 ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
           if(abs(TopDecays).ne.1)  call Error("TopDecays needs to be 1")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
-          NumHistograms = 3
+          NumHistograms = 20
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3370,53 +3370,459 @@ ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di
 
           Histo(1)%Info   = "pT(lep+)"
           Histo(1)%NBins  = 50
-          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%BinSize= 10d0*GeV
           Histo(1)%LowVal =  0d0*GeV
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "pT(Z(l+,l-))"
+          Histo(2)%Info   = "pT(lep-))"
           Histo(2)%NBins  = 50
-          Histo(2)%BinSize= 50d0*GeV
+          Histo(2)%BinSize= 10d0*GeV
           Histo(2)%LowVal =  0d0*GeV
           Histo(2)%SetScale= 100d0
 
-          Histo(3)%Info   = "phi(l+,l-)"
-          Histo(3)%NBins  = 15    *4d0
-          Histo(3)%BinSize= 0.25d0/4d0
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%Info   = "pT(Z)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal =  0d0*GeV
+          Histo(3)%SetScale= 100d0
 
+          Histo(4)%Info   = "pT(top))"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 10d0*GeV
+          Histo(4)%LowVal =  0d0*GeV
+          Histo(4)%SetScale= 100d0
 
+          Histo(5)%Info   = "pT(atop))"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 10d0*GeV
+          Histo(5)%LowVal =  0d0*GeV
+          Histo(5)%SetScale= 100d0
 
+          Histo(6)%Info   = "pT(j1))"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 10d0*GeV
+          Histo(6)%LowVal =  0d0*GeV
+          Histo(6)%SetScale= 100d0
 
+          Histo(7)%Info   = "pT(j2))"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal =  0d0*GeV
+          Histo(7)%SetScale= 100d0
+
+          Histo(8)%Info   = "pT(mu+))"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal =  0d0*GeV
+          Histo(8)%SetScale= 100d0
+
+          Histo(9)%Info   = "pT(e-))"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal =  0d0*GeV
+          Histo(9)%SetScale= 100d0
+
+          Histo(10)%Info   = "pT(miss))"
+          Histo(10)%NBins  = 50
+          Histo(10)%BinSize= 10d0*GeV
+          Histo(10)%LowVal =  0d0*GeV
+          Histo(10)%SetScale= 100d0
+
+          Histo(11)%Info   = "eta(lep+)"
+          Histo(11)%NBins  = 50
+          Histo(11)%BinSize= 0.5d0
+          Histo(11)%LowVal =-5.0d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "eta(lep-)"
+          Histo(12)%NBins  = 50
+          Histo(12)%BinSize= 0.5d0
+          Histo(12)%LowVal =-5.0d0
+          Histo(12)%SetScale= 1d0
+
+          Histo(13)%Info   = "eta(Z)"
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 0.5d0
+          Histo(13)%LowVal =-5.0d0
+          Histo(13)%SetScale= 1d0
+
+          Histo(14)%Info   = "eta(top)"
+          Histo(14)%NBins  = 50
+          Histo(14)%BinSize= 0.5d0
+          Histo(14)%LowVal =-5.0d0
+          Histo(14)%SetScale= 1d0
+
+          Histo(15)%Info   = "eta(atop)"
+          Histo(15)%NBins  = 50
+          Histo(15)%BinSize= 0.5d0
+          Histo(15)%LowVal =-5.0d0
+          Histo(15)%SetScale= 1d0
+
+          Histo(16)%Info   = "eta(j1)"
+          Histo(16)%NBins  = 50
+          Histo(16)%BinSize= 0.5d0
+          Histo(16)%LowVal =-5.0d0
+          Histo(16)%SetScale= 1d0
+
+          Histo(17)%Info   = "eta(j2)"
+          Histo(17)%NBins  = 50
+          Histo(17)%BinSize= 0.5d0
+          Histo(17)%LowVal =-5.0d0
+          Histo(17)%SetScale= 1d0
+
+          Histo(18)%Info   = "eta(mu+)"
+          Histo(18)%NBins  = 50
+          Histo(18)%BinSize= 0.5d0
+          Histo(18)%LowVal =-5.0d0
+          Histo(18)%SetScale= 1d0
+
+          Histo(19)%Info   = "eta(e-)"
+          Histo(19)%NBins  = 50
+          Histo(19)%BinSize= 0.5d0
+          Histo(19)%LowVal =-5.0d0
+          Histo(19)%SetScale= 1d0
+
+          Histo(20)%Info   = "phi(l+,l-)"
+          Histo(20)%NBins  = 15    *4d0
+          Histo(20)%BinSize= 0.25d0/4d0
+          Histo(20)%LowVal = 0d0
+          Histo(20)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
-          if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 1")
+          if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
-          NumHistograms = 3
+!          NumHistograms = 3
+          NumHistograms = 48
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
+          print *, 'allocating histos'
 
           Histo(1)%Info   = "pT(lep+)"
           Histo(1)%NBins  = 50
-          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%BinSize= 20d0*GeV
           Histo(1)%LowVal =  0d0*GeV
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "pT(Z(l+,l-))"
+          Histo(2)%Info   = "pT(mu-)"
           Histo(2)%NBins  = 50
-          Histo(2)%BinSize= 50d0*GeV
+          Histo(2)%BinSize= 20d0*GeV
           Histo(2)%LowVal =  0d0*GeV
           Histo(2)%SetScale= 100d0
 
-          Histo(3)%Info   = "phi(l+,l-)"
-          Histo(3)%NBins  = 15    *4d0
-          Histo(3)%BinSize= 0.25d0/4d0
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%Info   = "pT(mu+)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 20d0*GeV
+          Histo(3)%LowVal =  0d0*GeV
+          Histo(3)%SetScale= 100d0
+
+          Histo(4)%Info   = "pT(b1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 20d0*GeV
+          Histo(4)%LowVal =  0d0*GeV
+          Histo(4)%SetScale= 100d0
+
+          Histo(5)%Info   = "pT(b2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 20d0*GeV
+          Histo(5)%LowVal =  0d0*GeV
+          Histo(5)%SetScale= 100d0
+
+          Histo(6)%Info   = "pT(j1)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 20d0*GeV
+          Histo(6)%LowVal =  0d0*GeV
+          Histo(6)%SetScale= 100d0
+
+          Histo(7)%Info   = "pT(j2)"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 20d0*GeV
+          Histo(7)%LowVal =  0d0*GeV
+          Histo(7)%SetScale= 100d0
+
+          Histo(8)%Info   = "pT(miss)"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 20d0*GeV
+          Histo(8)%LowVal =  0d0*GeV
+          Histo(8)%SetScale= 100d0
+
+          Histo(9)%Info   = "y(lep+)"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 0.5d0
+          Histo(9)%LowVal =-5.0d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "y(mu-)"
+          Histo(10)%NBins  = 50
+          Histo(10)%BinSize= 0.5d0
+          Histo(10)%LowVal =-5.0d0
+          Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "y(mu+)"
+          Histo(11)%NBins  = 50
+          Histo(11)%BinSize= 0.5d0
+          Histo(11)%LowVal =-5.0d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "y(b1)"
+          Histo(12)%NBins  = 50
+          Histo(12)%BinSize= 0.5d0
+          Histo(12)%LowVal =-5.0d0
+          Histo(12)%SetScale= 1d0
+
+          Histo(13)%Info   = "y(b2)"
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 0.5d0
+          Histo(13)%LowVal =-5.0d0
+          Histo(13)%SetScale= 1d0
+
+          Histo(14)%Info   = "y(j1)"
+          Histo(14)%NBins  = 50
+          Histo(14)%BinSize= 0.5d0
+          Histo(14)%LowVal =-5.0d0
+          Histo(14)%SetScale= 1d0
+
+          Histo(15)%Info   = "y(j2)"
+          Histo(15)%NBins  = 50
+          Histo(15)%BinSize= 0.5d0
+          Histo(15)%LowVal =-5.0d0
+          Histo(15)%SetScale= 1d0
+
+          Histo(16)%Info   = "pT(Z)"
+          Histo(16)%NBins  = 50
+          Histo(16)%BinSize= 20d0*GeV
+          Histo(16)%LowVal =  0d0*GeV
+          Histo(16)%SetScale= 100d0
+
+          Histo(17)%Info   = "y(Z)"
+          Histo(17)%NBins  = 50
+          Histo(17)%BinSize= 0.5d0
+          Histo(17)%LowVal =-5.0d0
+          Histo(17)%SetScale= 1d0
+
+          Histo(18)%Info   = "pT(top)"
+          Histo(18)%NBins  = 50
+          Histo(18)%BinSize= 20d0*GeV
+          Histo(18)%LowVal =  0d0*GeV
+          Histo(18)%SetScale= 100d0
+
+          Histo(19)%Info   = "y(top)"
+          Histo(19)%NBins  = 50
+          Histo(19)%BinSize= 0.5d0
+          Histo(19)%LowVal =-5.0d0
+          Histo(19)%SetScale= 1d0
+
+          Histo(20)%Info   = "pT(antitop)"
+          Histo(20)%NBins  = 50
+          Histo(20)%BinSize= 20d0*GeV
+          Histo(20)%LowVal =  0d0*GeV
+          Histo(20)%SetScale= 100d0
+
+          Histo(21)%Info   = "y(antitop)"
+          Histo(21)%NBins  = 50
+          Histo(21)%BinSize= 0.5d0
+          Histo(21)%LowVal =-5.0d0
+          Histo(21)%SetScale= 1d0
+
+          Histo(22)%Info   = "mT_inv(lb,miss)"
+          Histo(22)%NBins  = 50
+          Histo(22)%BinSize= 20d0*GeV
+          Histo(22)%LowVal =  0d0*GeV
+          Histo(22)%SetScale= 100d0
+
+          Histo(23)%Info   = "phi(Z,t)"
+          Histo(23)%NBins  = 15    *4d0
+          Histo(23)%BinSize= 0.25d0/4d0
+          Histo(23)%LowVal = 0d0
+          Histo(23)%SetScale= 1d0
+
+          Histo(24)%Info   = "phi(Z,antit)"
+          Histo(24)%NBins  = 15    *4d0
+          Histo(24)%BinSize= 0.25d0/4d0
+          Histo(24)%LowVal = 0d0
+          Histo(24)%SetScale= 1d0
+
+          Histo(25)%Info   = "phi(t,antit)"
+          Histo(25)%NBins  = 15    *4d0
+          Histo(25)%BinSize= 0.25d0/4d0
+          Histo(25)%LowVal = 0d0
+          Histo(25)%SetScale= 1d0
+
+          Histo(26)%Info   = "phi(mu-,mu+)"
+          Histo(26)%NBins  = 15    *4d0
+          Histo(26)%BinSize= 0.25d0/4d0
+          Histo(26)%LowVal = 0d0
+          Histo(26)%SetScale= 1d0
+
+          Histo(27)%Info   = "phi(mu-,l+)"
+          Histo(27)%NBins  = 15    *4d0
+          Histo(27)%BinSize= 0.25d0/4d0
+          Histo(27)%LowVal = 0d0
+          Histo(27)%SetScale= 1d0
+
+          Histo(28)%Info   = "phi(mu-,b1)"
+          Histo(28)%NBins  = 15    *4d0
+          Histo(28)%BinSize= 0.25d0/4d0
+          Histo(28)%LowVal = 0d0
+          Histo(28)%SetScale= 1d0
+
+          Histo(29)%Info   = "phi(mu-,b2)"
+          Histo(29)%NBins  = 15    *4d0
+          Histo(29)%BinSize= 0.25d0/4d0
+          Histo(29)%LowVal = 0d0
+          Histo(29)%SetScale= 1d0
+
+          Histo(30)%Info   = "phi(mu-,j1)"
+          Histo(30)%NBins  = 15    *4d0
+          Histo(30)%BinSize= 0.25d0/4d0
+          Histo(30)%LowVal = 0d0
+          Histo(30)%SetScale= 1d0
+
+          Histo(31)%Info   = "phi(mu-,j2)"
+          Histo(31)%NBins  = 15    *4d0
+          Histo(31)%BinSize= 0.25d0/4d0
+          Histo(31)%LowVal = 0d0
+          Histo(31)%SetScale= 1d0          
+          
+          Histo(32)%Info   = "phi(mu+,l+)"
+          Histo(32)%NBins  = 15    *4d0
+          Histo(32)%BinSize= 0.25d0/4d0
+          Histo(32)%LowVal = 0d0
+          Histo(32)%SetScale= 1d0
+
+          Histo(33)%Info   = "phi(mu+,b1)"
+          Histo(33)%NBins  = 15    *4d0
+          Histo(33)%BinSize= 0.25d0/4d0
+          Histo(33)%LowVal = 0d0
+          Histo(33)%SetScale= 1d0
+
+          Histo(34)%Info   = "phi(mu+,b2)"
+          Histo(34)%NBins  = 15    *4d0
+          Histo(34)%BinSize= 0.25d0/4d0
+          Histo(34)%LowVal = 0d0
+          Histo(34)%SetScale= 1d0
+
+          Histo(35)%Info   = "phi(mu+,j1)"
+          Histo(35)%NBins  = 15    *4d0
+          Histo(35)%BinSize= 0.25d0/4d0
+          Histo(35)%LowVal = 0d0
+          Histo(35)%SetScale= 1d0
+
+          Histo(36)%Info   = "phi(mu+,j2)"
+          Histo(36)%NBins  = 15    *4d0
+          Histo(36)%BinSize= 0.25d0/4d0
+          Histo(36)%LowVal = 0d0
+          Histo(36)%SetScale= 1d0
+
+          Histo(37)%Info   = "DeltaR(Z,t)"
+          Histo(37)%NBins  = 15    *4d0
+          Histo(37)%BinSize= 0.25d0/4d0
+          Histo(37)%LowVal = 0d0
+          Histo(37)%SetScale= 1d0
+
+          Histo(38)%Info   = "DeltaR(Z,antit)"
+          Histo(38)%NBins  = 15    *4d0
+          Histo(38)%BinSize= 0.25d0/4d0
+          Histo(38)%LowVal = 0d0
+          Histo(38)%SetScale= 1d0
+
+          Histo(39)%Info   = "DeltaR(t,antit)"
+          Histo(39)%NBins  = 15    *4d0
+          Histo(39)%BinSize= 0.25d0/4d0
+          Histo(39)%LowVal = 0d0
+          Histo(39)%SetScale= 1d0
+
+          Histo(40)%Info   = "DeltaR(mu-,mu+)"
+          Histo(40)%NBins  = 15    *4d0
+          Histo(40)%BinSize= 0.25d0/4d0
+          Histo(40)%LowVal = 0d0
+          Histo(40)%SetScale= 1d0
+
+          Histo(41)%Info   = "DeltaR(mu-,l+)"
+          Histo(41)%NBins  = 15    *4d0
+          Histo(41)%BinSize= 0.25d0/4d0
+          Histo(41)%LowVal = 0d0
+          Histo(41)%SetScale= 1d0
+
+          Histo(42)%Info   = "DeltaR(mu-,b1)"
+          Histo(42)%NBins  = 15    *4d0
+          Histo(42)%BinSize= 0.25d0/4d0
+          Histo(42)%LowVal = 0d0
+          Histo(42)%SetScale= 1d0
+
+          Histo(43)%Info   = "DeltaR(mu-,b2)"
+          Histo(43)%NBins  = 15    *4d0
+          Histo(43)%BinSize= 0.25d0/4d0
+          Histo(43)%LowVal = 0d0
+          Histo(43)%SetScale= 1d0
+
+          Histo(44)%Info   = "DeltaR(mu-,j1)"
+          Histo(44)%NBins  = 15    *4d0
+          Histo(44)%BinSize= 0.25d0/4d0
+          Histo(44)%LowVal = 0d0
+          Histo(44)%SetScale= 1d0
+
+          Histo(45)%Info   = "DeltaR(mu-,j2)"
+          Histo(45)%NBins  = 15    *4d0
+          Histo(45)%BinSize= 0.25d0/4d0
+          Histo(45)%LowVal = 0d0
+          Histo(45)%SetScale= 1d0          
+          
+          Histo(46)%Info   = "DeltaR(mu+,l+)"
+          Histo(46)%NBins  = 15    *4d0
+          Histo(46)%BinSize= 0.25d0/4d0
+          Histo(46)%LowVal = 0d0
+          Histo(46)%SetScale= 1d0
+
+          Histo(47)%Info   = "DeltaR(mu+,b1)"
+          Histo(47)%NBins  = 15    *4d0
+          Histo(47)%BinSize= 0.25d0/4d0
+          Histo(47)%LowVal = 0d0
+          Histo(47)%SetScale= 1d0
+
+          Histo(48)%Info   = "DeltaR(mu+,b2)"
+          Histo(48)%NBins  = 15    *4d0
+          Histo(48)%BinSize= 0.25d0/4d0
+          Histo(48)%LowVal = 0d0
+          Histo(48)%SetScale= 1d0
+!
+!          Histo(49)%Info   = "DeltaR(mu+,j1)"
+!          Histo(49)%NBins  = 15    *4d0
+!          Histo(49)%BinSize= 0.25d0/4d0
+!          Histo(49)%LowVal = 0d0
+!          Histo(49)%SetScale= 1d0
+!
+!          Histo(50)%Info   = "DeltaR(mu+,j2)"
+!          Histo(50)%NBins  = 15    *4d0
+!          Histo(50)%BinSize= 0.25d0/4d0
+!          Histo(50)%LowVal = 0d0
+!          Histo(50)%SetScale= 1d0
+!          
+!          
+!          print *, 'done allocating histos'
+
+
+          
+
+!          Histo(1)%Info   = "pT(lep+)"
+!          Histo(1)%NBins  = 50
+!          Histo(1)%BinSize= 20d0*GeV
+!          Histo(1)%LowVal =  0d0*GeV
+!          Histo(1)%SetScale= 100d0
+!
+!          Histo(2)%Info   = "pT(Z(l+,l-))"
+!          Histo(2)%NBins  = 50
+!          Histo(2)%BinSize= 20d0*GeV
+!          Histo(2)%LowVal =  0d0*GeV
+!          Histo(2)%SetScale= 100d0
+!
+!          Histo(3)%Info   = "phi(l+,l-)"
+!          Histo(3)%NBins  = 15    *4d0
+!          Histo(3)%BinSize= 0.25d0/4d0
+!          Histo(3)%LowVal = 0d0
+!          Histo(3)%SetScale= 1d0
 
 
 
@@ -6904,7 +7310,12 @@ real(8) :: eta_ATop,eta_Top,eta_lep(1:4)
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,mT_bln(1:2),pT_Z
 real(8) :: R_lj(1:5),R_PlepM,pT_lept,ET_lept,mT,dPhiLL
 integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z
-
+! RR
+real(8) :: eta_Z,Recon_M1,Recon_M2,mT_inv 
+real(8) :: DphiZt,DphiZtbar,Dphittbar,Dphimumu,Dphimuml,Dphimumb1,Dphimumb2
+real(8) :: Dphimumj1,Dphimumj2,Dphimupl,Dphimupb1,Dphimupb2,Dphimupj1,Dphimupj2
+real(8) :: DRZt,DRZtbar,DRttbar,DRmumu,DRmuml,DRmumb1,DRmumb2
+real(8) :: DRmumj1,DRmumj2,DRmupl,DRmupb1,DRmupb2,DRmupj1,DRmupj2
 
 
 applyPSCut = .false.
@@ -7093,10 +7504,21 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
     eta_jet(1) = get_ETA(Mom(1:4,b))
     eta_jet(2) = get_ETA(Mom(1:4,bbar))
 
+    eta_Z = get_ETA(Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z))
+    pT_top = get_PT(Mom(1:4,t))
+    pT_atop = get_PT(Mom(1:4,tbar))
+    eta_top = get_PT(Mom(1:4,t))
+    eta_atop = get_PT(Mom(1:4,tbar))
+
+
     pT_Lep(1)  = get_PT(Mom(1:4,ferm_Z))
     pT_Lep(2)  = get_PT(Mom(1:4,Aferm_Z))
+    pT_Lep(3)  = get_PT(Mom(1:4,LepP))
+    pT_Lep(4)  = get_PT(Mom(1:4,LepM))
     eta_Lep(1)  = get_ETA(Mom(1:4,ferm_Z))
     eta_Lep(2)  = get_ETA(Mom(1:4,Aferm_Z))
+    eta_Lep(3) = get_ETA(Mom(1:4,LepP))
+    eta_Lep(4) = get_ETA(Mom(1:4,LepM))
 
     pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
 
@@ -7136,8 +7558,25 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
 
 ! binning
     NBin(1) = WhichBin(1,pT_Lep(1))
-    NBin(2) = WhichBin(2,pT_Z)
-    NBin(3) = WhichBin(3,dphill)
+    NBin(2) = WhichBin(2,pT_Lep(2))
+    NBin(3) = WhichBin(3,pT_Z)
+    NBin(4) = WhichBin(4,pT_top)
+    NBin(5) = WhichBin(5,pT_atop)
+    NBin(6) = WhichBin(6,pT_jet(1))
+    NBin(7) = WhichBin(7,pT_jet(2))
+    NBin(8) = WhichBin(8,pT_Lep(3))
+    NBin(9) = WhichBin(9,pT_Lep(4))
+    NBin(10) = WhichBin(10,pT_miss)
+    NBin(11) = WhichBin(11,eta_Lep(1))
+    NBin(12) = WhichBin(12,eta_Lep(2))
+    NBin(13) = WhichBin(13,eta_Z)
+    NBin(14) = WhichBin(14,eta_top)
+    NBin(15) = WhichBin(15,eta_atop)
+    NBin(16) = WhichBin(16,eta_jet(1))
+    NBin(17) = WhichBin(17,eta_jet(2))
+    NBin(18) = WhichBin(18,eta_Lep(3))
+    NBin(19) = WhichBin(19,eta_Lep(4))
+    NBin(20) = WhichBin(20,dphill)
 
 
 
@@ -7181,8 +7620,80 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     DphiLL = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,Aferm_Z))  )
     if( DphiLL.gt.Pi ) DphiLL=2d0*Pi-DphiLL
 
+! these are only needed for RR plots
+    eta_Z = get_ETA(Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z))
+    pT_top = get_PT(Mom(1:4,t))
+    pT_atop = get_PT(Mom(1:4,tbar))
+    eta_top = get_PT(Mom(1:4,t))
+    eta_atop = get_PT(Mom(1:4,tbar))
+    Recon_M1 = Get_MInv(Mom(1:4,lepP)+Mom(1:4,nu)+MomJet(1:4,1))
+    Recon_M2 = Get_MInv(Mom(1:4,lepP)+Mom(1:4,nu)+MomJet(1:4,2))
+    if ( abs(m_Top-Recon_M1) .le. abs(m_Top-Recon_M2)) then
+       mT_inv = Get_MT(Mom(1:4,lepP)+MomJet(1:4,1),Mom(1:4,nu))
+    else
+       mT_inv = Get_MT(Mom(1:4,lepP)+MomJet(1:4,2),Mom(1:4,nu))
+    endif
 
 
+! delta phi
+    DphiZt = dabs( Get_PHI(Mom(1:4,Zbos)) - Get_PHI(Mom(1:4,t))  )
+    if( DphiZt.gt.Pi ) DphiZt=2d0*Pi-DphiZt
+
+    DphiZtbar = dabs( Get_PHI(Mom(1:4,Zbos)) - Get_PHI(Mom(1:4,tbar))  )
+    if( DphiZtbar.gt.Pi ) DphiZtbar=2d0*Pi-DphiZtbar
+
+    Dphittbar = dabs( Get_PHI(Mom(1:4,t)) - Get_PHI(Mom(1:4,tbar))  )
+    if( Dphittbar.gt.Pi ) Dphittbar=2d0*Pi-Dphittbar
+
+    Dphimumu = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,aferm_Z))  )
+    if( Dphimumu.gt.Pi ) Dphimumu=2d0*Pi-Dphimumu
+
+    Dphimuml = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,lepP))  )
+    if( Dphimuml.gt.Pi ) Dphimuml = 2d0*Pi-Dphimuml
+
+    Dphimumb1 = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(MomJet(1:4,1))  )
+    if( Dphimumb1.gt.Pi ) Dphimumb1 = 2d0*Pi-Dphimumb1
+
+    Dphimumb2 = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(MomJet(1:4,2))  )
+    if( Dphimumb2.gt.Pi ) Dphimumb2 = 2d0*Pi-Dphimumb2
+
+    Dphimumj1 = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(MomJet(1:4,3))  )
+    if( Dphimumj1.gt.Pi ) Dphimumj1 = 2d0*Pi-Dphimumj1
+
+    Dphimumj2 = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(MomJet(1:4,4))  )
+    if( Dphimumj2.gt.Pi ) Dphimumj2 = 2d0*Pi-Dphimumj2
+
+    Dphimupl = dabs( Get_PHI(Mom(1:4,aferm_Z)) - Get_PHI(Mom(1:4,lepP))  )
+    if( Dphimupl.gt.Pi ) Dphimupl = 2d0*Pi-Dphimupl
+
+    Dphimupb1 = dabs( Get_PHI(Mom(1:4,aferm_Z)) - Get_PHI(MomJet(1:4,1))  )
+    if( Dphimupb1.gt.Pi ) Dphimupb1 = 2d0*Pi-Dphimupb1
+
+    Dphimupb2 = dabs( Get_PHI(Mom(1:4,aferm_Z)) - Get_PHI(MomJet(1:4,2))  )
+    if( Dphimupb2.gt.Pi ) Dphimupb2 = 2d0*Pi-Dphimupb2
+
+    Dphimupj1 = dabs( Get_PHI(Mom(1:4,aferm_Z)) - Get_PHI(MomJet(1:4,3))  )
+    if( Dphimupj1.gt.Pi ) Dphimupj1 = 2d0*Pi-Dphimupj1
+
+    Dphimupj2 = dabs( Get_PHI(Mom(1:4,aferm_Z)) - Get_PHI(MomJet(1:4,4))  )
+    if( Dphimupj2.gt.Pi ) Dphimupj2 = 2d0*Pi-Dphimupj2
+
+    ! delta R
+    DRZt    = Get_R(Mom(1:4,Zbos),Mom(1:4,t))
+    DRZtbar = Get_R(Mom(1:4,Zbos),Mom(1:4,tbar))
+    DRttbar = Get_R(Mom(1:4,t),Mom(1:4,tbar))  
+    DRmumu  = Get_R(Mom(1:4,ferm_Z),Mom(1:4,aferm_Z))
+    DRmuml  = Get_R(Mom(1:4,ferm_Z),Mom(1:4,lepP))
+    DRmumb1 = Get_R(Mom(1:4,ferm_Z), MomJet(1:4,1))  
+    DRmumb2 = Get_R(Mom(1:4,ferm_Z), MomJet(1:4,2))  
+    DRmumj1 = Get_R(Mom(1:4,ferm_Z), MomJet(1:4,3))  
+    DRmumj2 = Get_R(Mom(1:4,ferm_Z), MomJet(1:4,4))  
+    DRmupl  = Get_R(Mom(1:4,aferm_Z), Mom(1:4,lepP)) 
+    DRmupb1 = Get_R(Mom(1:4,aferm_Z), MomJet(1:4,1)) 
+    DRmupb2 = Get_R(Mom(1:4,aferm_Z), MomJet(1:4,2)) 
+    DRmupj1 = Get_R(Mom(1:4,aferm_Z), MomJet(1:4,3)) 
+    DRmupj2 = Get_R(Mom(1:4,aferm_Z), MomJet(1:4,4)) 
+    
     
 
 ! check cuts
@@ -7233,11 +7744,59 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     enddo
 
 ! binning
+!    NBin(1) = WhichBin(1,pT_Lep(1))
+!    NBin(2) = WhichBin(2,pT_Z)
+!    NBin(3) = WhichBin(3,dphill)
+
     NBin(1) = WhichBin(1,pT_Lep(1))
-    NBin(2) = WhichBin(2,pT_Z)
-    NBin(3) = WhichBin(3,dphill)
-
-
+    NBin(2) = WhichBin(2,pT_Lep(2))
+    NBin(3) = WhichBin(3,pT_Lep(3))
+    NBin(4) = WhichBin(4,pT_jet(1))
+    NBin(5) = WhichBin(5,pT_jet(2))
+    NBin(6) = WhichBin(6,pT_jet(3))
+    NBin(7) = WhichBin(7,pT_jet(4))
+    NBin(8) = WhichBin(8,pT_miss)
+    NBin(9) = WhichBin(9,eta_Lep(1))
+    NBin(10) = WhichBin(10,eta_Lep(2))
+    NBin(11) = WhichBin(11,eta_Lep(3))
+    NBin(12) = WhichBin(12,eta_jet(1))
+    NBin(13) = WhichBin(13,eta_jet(2))
+    NBin(14) = WhichBin(14,eta_jet(3))
+    NBin(15) = WhichBin(15,eta_jet(4))
+    NBin(16) = WhichBin(16,pT_Z)
+    NBin(17) = WhichBin(17,eta_Z)
+    NBin(18) = WhichBin(18,pT_top)
+    NBin(19) = WhichBin(19,eta_top)
+    NBin(20) = WhichBin(20,pT_atop)
+    NBin(21) = WhichBin(21,eta_atop)
+    NBin(22) = WhichBin(22,mT_inv)
+!
+    NBin(23) = WhichBin(23,DPhiZt)
+    NBin(24) = WhichBin(24,DPhiZtbar)
+    NBin(25) = WhichBin(25,DPhittbar)
+    NBin(26) = WhichBin(26,DPhimumu)
+    NBin(27) = WhichBin(27,DPhimuml)
+    NBin(28) = WhichBin(28,DPhimumb1)
+    NBin(29) = WhichBin(29,DPhimumb2)
+    NBin(30) = WhichBin(30,DPhimumj1)
+    NBin(31) = WhichBin(31,DPhimumj2)
+    NBin(32) = WhichBin(32,DPhimupl)
+    NBin(33) = WhichBin(33,DPhimupb1)
+    NBin(34) = WhichBin(34,DPhimupb2)
+    NBin(35) = WhichBin(35,DPhimupj1)
+    NBin(36) = WhichBin(36,DPhimupj2)
+    NBin(37) = WhichBin(37,DRZt)
+    NBin(38) = WhichBin(38,DRZtbar)
+    NBin(39) = WhichBin(39,DRttbar)
+    NBin(40) = WhichBin(40,DRmumu)
+    NBin(41) = WhichBin(41,DRmuml)
+    NBin(42) = WhichBin(42,DRmumb1)
+    NBin(43) = WhichBin(43,DRmumb2)
+    NBin(44) = WhichBin(44,DRmumj1)
+    NBin(45) = WhichBin(45,DRmumj2)
+    NBin(46) = WhichBin(46,DRmupl)
+    NBin(47) = WhichBin(47,DRmupb1)
+    NBin(48) = WhichBin(48,DRmupb2)
 
 
 !-------------------------------------------------------
@@ -10258,7 +10817,7 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
 ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
 !             call mrst2004(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-            call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+!            call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
 !             call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
@@ -10275,7 +10834,7 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         endif
         if( x2.lt.1d0 ) then
 !             call mrst2004(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-            call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+!            call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
 !             call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
