@@ -20,7 +20,7 @@ integer(8), public, save :: SkipCounter=0
 
 integer,public, save :: pole_skipped=0
 integer,public, save :: useQP=0
-
+real(8), public      :: opp_err
 
 real(8),public,save :: maxWgt=0d0
 integer, allocatable :: Crossing(:)
