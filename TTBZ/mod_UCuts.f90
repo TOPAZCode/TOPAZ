@@ -638,8 +638,9 @@ double precision :: KMom(1,1:4),VMom(1,1:4)
 double complex :: NMom(1:3,1:4),SqrtPreF
 double precision :: V2(1:4),x1,x2,phi
 double complex :: x3,x4,r1,r2,r3,r4
-double complex :: LoopMom(1:5),alpha_1,alpha_2,alpha_3,alpha_5
+double complex :: LoopMom(1:5),alpha_1,alpha_2,alpha_3,alpha_5,alpha_4,alpha_e
 double complex :: Res(1:10),s1(1:10),s2(1:10),s3(1:10),se2
+double complex :: ResCheck,s1CH,s2CH,s3CH,seCH,ResCH,xtr
 double complex :: LinSysEq(1:10,1:11)
 integer :: k
 
@@ -699,7 +700,10 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
             LinSysEq(1:9,10) = Res(1:9)
             DoubCuts%Coeff(CutNum,0:8) = go_Gauss(9,LinSysEq(1:9,1:10))
 
+
          else     !  vanishing  SqrtF
+
+
           alpha_1 = drand(1)
           do k=1,9
                 alpha_1 = drand(0)
@@ -740,7 +744,6 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
          endif
 
-
          alpha_5 = 1d0
          alpha_3 = cdsqrt( SqrtPreF**2-alpha_5**2 )
          s3(10)  = alpha_3
@@ -753,6 +756,71 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
                                             - DoubCuts%Coeff(CutNum,3)*s3(10)  &
 !                                             + DoubCuts%Coeff(CutNum,4)*s3(10)**2
                                             + DoubCuts%Coeff(CutNum,5)*s3(10)**2*2d0
+
+
+
+!!!!!!!!!  RR  ADDED 24 SEPT 2013 !!!!!!!!!!!!
+! Checks that the OPP equations are solved correctly,
+! by reconstructing an arbitrary loop momentum l and using it to compute residue from currents,
+! and compare that to residue from OPP coefficients.
+! The global variable opp_err gives the relative difference between these two values. 
+! Checked for ttbZ production. 
+         
+         if (cdabs(SqrtPreF).gt. 1d-1) then     !  NON-vanishing SqrtF
+            alpha_1 = 17d0/19d0
+            alpha_2 = -5d0/7d0
+            alpha_3 = 23d0/29d0
+            alpha_4 = -31d0/39d0
+            xtr = SqrtPreF/sqrt(alpha_1**2+alpha_2**2+alpha_3**2+alpha_4**2)
+            LoopMom(1:4) = V2(1:4) + xtr*(alpha_1*NMom(1,1:4) + alpha_2*NMom(2,1:4) + alpha_3*NMom(3,1:4))
+            LoopMom(5)   = xtr*alpha_4*(0d0,1d0)
+            
+            s1CH = (LoopMom(1:4).dot.NMom(1,1:4))
+            s2CH = (LoopMom(1:4).dot.NMom(2,1:4))
+            s3CH = (LoopMom(1:4).dot.NMom(3,1:4))
+            seCH = (xtr*alpha_4)**2
+
+            call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,ResCH)
+            ResCheck = (DoubCuts%Coeff(CutNum,0)+DoubCuts%Coeff(CutNum,1)*s1CH+&
+                 + DoubCuts%Coeff(CutNum,2)*s2CH+DoubCuts%Coeff(CutNum,3)*s3CH  &
+                 + DoubCuts%Coeff(CutNum,4)*(s1CH**2-s2CH**2)+&
+                 + DoubCuts%Coeff(CutNum,5)*(s1CH**2+s2CH**2-2d0*s3CH**2) &
+                 + DoubCuts%Coeff(CutNum,6)*s1CH*s2CH &
+                 + DoubCuts%Coeff(CutNum,7)*s1CH*s3CH &
+                 + DoubCuts%Coeff(CutNum,8)*s2CH*s3CH &
+                 + seCH*DoubCuts%Coeff(CutNum,9) )
+
+         else
+
+            alpha_1 = 11d0/19d0
+            alpha_2 = -1d0/7d0
+            alpha_3 = 3d0/29d0
+            xtr = cdsqrt(SqrtPreF**2 - alpha_1**2-alpha_2**2-alpha_3**2)
+            LoopMom(1:4) = V2(1:4) + (alpha_1*NMom(1,1:4) + alpha_2*NMom(2,1:4) + alpha_3*NMom(3,1:4))
+            LoopMom(5)   = xtr*(0d0,1d0)
+            s1CH = (LoopMom(1:4).dot.NMom(1,1:4))
+            s2CH = (LoopMom(1:4).dot.NMom(2,1:4))
+            s3CH = (LoopMom(1:4).dot.NMom(3,1:4))
+            seCH = (xtr)**2
+            
+            call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,ResCH)           
+            ResCheck = (DoubCuts%Coeff(CutNum,0)+DoubCuts%Coeff(CutNum,1)*s1CH+&
+                 + DoubCuts%Coeff(CutNum,2)*s2CH+DoubCuts%Coeff(CutNum,3)*s3CH  &
+                 + DoubCuts%Coeff(CutNum,4)*(s1CH**2-s2CH**2)+&
+                 + DoubCuts%Coeff(CutNum,5)*(s1CH**2+s2CH**2-2d0*s3CH**2) &
+                 + DoubCuts%Coeff(CutNum,6)*s1CH*s2CH &
+                 + DoubCuts%Coeff(CutNum,7)*s1CH*s3CH + &
+                 + DoubCuts%Coeff(CutNum,8)*s2CH*s3CH + &
+                 + seCH*DoubCuts%Coeff(CutNum,9) )
+         endif
+         
+         if ( cdabs(ResCheck).gt.1d-4) then
+            opp_err =abs( (ResCH-ResCheck)/ResCheck)
+         else
+            opp_err = abs( (ResCH-ResCheck) )
+         endif   
+!!!!!! CHECK ENDS HERE !!!!!!!!!!!!!!
+
 
 !     set vars. for kirill's routines
          tagdcut(CutNum,1)=666    ! needed for integrals
@@ -780,6 +848,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
 
       else    !  light-like-vector
+         
 
          call NVBasis1_Light(KMom(1,1:4),VMom(1,1:4),NMom(1:3,1:4))
 
@@ -924,6 +993,47 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 
          DoubCuts%Coeff(CutNum,9) = 1d0/xe**2*(Res(1) - DoubCuts%Coeff(CutNum,0) - DoubCuts%Coeff(CutNum,1)*r1*x1 - DoubCuts%Coeff(CutNum,2)*x3-DoubCuts%Coeff(CutNum,3)*x4 -DoubCuts%Coeff(CutNum,4)*r1**2*x1**2 -DoubCuts%Coeff(CutNum,5)*r1*x1*x3 - DoubCuts%Coeff(CutNum,6)*r1*x1*x4-DoubCuts%Coeff(CutNum,7)*(x3**2 - x4**2) - DoubCuts%Coeff(CutNum,8)*x3*x4 )
 
+
+
+!!!!!!!!!  RR  ADDED 24 SEPT 2013 !!!!!!!!!!!!
+! Checks that the OPP equations are solved correctly,
+! by reconstructing an arbitrary loop momentum l and using it to compute residue from currents,
+! and compare that to residue from OPP coefficients.
+! The global variable opp_err gives the relative difference between these two values. 
+
+! N.B. NOT TESTED YET -- CAVEAT EMPTOR!
+
+         alpha_1 = 17d0/19d0
+         alpha_2 = ( IntPart(DoubCuts%CutProp(CutNum,2))%Mass2 - IntPart(DoubCuts%CutProp(CutNum,1))%Mass2 )/(2d0*r1)
+         alpha_3 = -1d0/7d0
+         alpha_e = 3d0/29d0
+         alpha_4 = cdsqrt(SqrtPreF**2 - alpha_e**2 - alpha_3**2)
+         LoopMom(1:4) = alpha_1*VMom(1,1:4) + alpha_2*NMom(1,1:4) + alpha_3*NMom(2,1:4) + alpha_4*NMom(3,1:4)
+         LoopMom(5)   = alpha_e * (0d0,1d0)
+         s1CH = LoopMom(1:4) .dot. NMom(1,1:4)
+         s2CH = LoopMom(1:4) .dot. NMom(2,1:4)
+         s3CH = LoopMom(1:4) .dot. NMom(3,1:4)
+         seCH = alpha_e**2
+
+         call resid2(LoopMom(1:5),dcmplx(KMom(1,1:4)),DoubCuts%CutProp(CutNum,1:2),TreeProcs,ResCH)
+         ResCheck = DoubCuts%Coeff(CutNum,0) + DoubCuts%Coeff(CutNum,1)*s1CH + DoubCuts%Coeff(CutNum,2)*s2CH + &
+              & DoubCuts%Coeff(CutNum,3)*s3CH +  DoubCuts%Coeff(CutNum,4)*s1CH**2 + DoubCuts%Coeff(CutNum,5)*s1CH*s2CH &
+              & + DoubCuts%Coeff(CutNum,6)*s1CH*s3CH + DoubCuts%Coeff(CutNum,7)*(s2CH**2 - s3CH**2) &
+              & + DoubCuts%Coeff(CutNum,8)*s2CH*s3CH + DoubCuts%Coeff(CutNum,9)*seCH
+!         print *, 'resCH',resCH
+!         print *, 'ResCheck',ResCheck
+
+          if ( cdabs(ResCheck).gt.1d-4) then
+             opp_err = (ResCH-ResCheck)/ResCheck
+          else
+             opp_err = (ResCH-ResCheck)
+          endif
+!          print *, 'err', opp_err
+!          pause
+
+          ! end stability check in D dim
+
+         
 
          tagdcut(CutNum,1)=999    ! needed for integrals
          DoubCuts%tagcuts(CutNum)=999
