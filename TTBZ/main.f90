@@ -34,7 +34,8 @@ real(8) :: VG_Result,VG_Error
    call cpu_time(time_end)
 !    call WriteHisto(6,it,VG_Result,VG_Error,time_end-time_start)   ! stdout (unit=6)
    call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
-   call PlotVegas()
+   print *, 'VEGAS CONVERGENCE PLOTTING DISABLED!'
+!   call PlotVegas()
    call CloseFiles()
    print *, "Done (",(time_end-time_start)/60d0,") minutes"
 
@@ -154,10 +155,10 @@ logical :: dirresult
     elseif( arg(1:9).eq."NLOParam=" ) then
         read(arg(10:11),*) NLOParam
     elseif( arg(1:6).eq."MuRen=" ) then
-        read(arg(7:10),*) MuRen
+        read(arg(7:11),*) MuRen
 !         if( MuRen.ne.m_Top ) write(MuStr,"(F4.2)") MuRen
     elseif( arg(1:6).eq."MuFac=" ) then
-        read(arg(7:10),*) MuFac
+        read(arg(7:11),*) MuFac
     elseif( arg(1:7).eq."MuFrag=" ) then
         read(arg(8:11),*) MuFrag
     elseif( arg(1:6).eq."TopDK=" ) then
@@ -392,7 +393,7 @@ logical :: dirresult
     endif
 
    if( trim(GridFile).eq."grid" ) then
-      GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//".1L."//trim(GridFile)
+      GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//trim(FileTag)//".1L."//trim(GridFile)
    endif
 
 return
@@ -424,8 +425,8 @@ integer TheUnit
    write(TheUnit,"(A,I2,A)") "# PDF Set=",PDFSet,PDFSetString
    write(TheUnit,"(A,I2)") "# NLO Parameter=",NLOParam
    write(TheUnit,"(A,I2)") "# Top Decays=",TopDecays
-   write(TheUnit,"(A,F7.2,A)") "# MuRen=",MuRen*100," GeV"
-   write(TheUnit,"(A,F7.2,A)") "# MuFac=",MuFac*100," GeV"
+   write(TheUnit,"(A,F9.3,A)") "# MuRen=",MuRen*100," GeV"
+   write(TheUnit,"(A,F9.3,A)") "# MuFac=",MuFac*100," GeV"
    if( Q_top.ne.Q_up ) write(TheUnit,"(A,F13.9)") "# Q_top=",Q_top
    if( Correction.eq.2 .or. Correction.eq.3 .or. Correction.eq.4 .or. Correction.eq.5 ) then
         write(TheUnit,"(A,PE9.2,PE9.2,PE9.2,PE9.2,PE9.2,A)") "# Alpha Parameters (ii if fi ff DK)=(",alpha_ii,alpha_if,alpha_fi,alpha_ff,alpha_DK,")"
@@ -451,6 +452,11 @@ integer TheUnit
     else
        write(TheUnit,*) "# no alpha_s running"
     endif
+    
+    write(TheUnit,'(A,F10.5,A)') "# m(Z)=",m_Z*100d0, " GeV"
+    write(TheUnit,'(A,F10.5,A)') "# Gamma(Z)=",Ga_ZExp*100d0, " GeV"
+    write(TheUnit,'(A,F10.5,A)') "# m(W)=",m_W*100d0, " GeV"
+    write(TheUnit,'(A,F10.5,A)') "# Gamma(W)=",Ga_W(0)*100d0, " GeV"
     if( ObsSet.ge.60 .and. ObsSet.le.69 ) then
         write(TheUnit,'(A,F10.5,A)') "# m(Zpr)=",m_Zpr*100d0, " GeV"
         write(TheUnit,'(A,F10.5,A)') "# Gamma(Zpr)=",Ga_Zpr*100d0, " GeV"
@@ -460,6 +466,7 @@ integer TheUnit
         write(TheUnit,'(A,F10.5)') "# gR_Zpr(dn_)=",gR_Zpr(dn_)
     endif
     if ( ObsSet .ge. 50 .and. ObsSet .le. 59) then
+       write(TheUnit,"(A,I2)") "# Z Decays=",ZDecays
        write(TheUnit,'(A,F10.5)') '# SM tZ vector=',couplZTT_left+couplZTT_right
        write(TheUnit,'(A,F10.5)') '# SM tZ axial=',-couplZTT_left+couplZTT_right
        write(TheUnit,'(A,F10.5)') '# DeltaF1V=',DeltaF1V
