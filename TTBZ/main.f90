@@ -467,8 +467,8 @@ integer TheUnit
     endif
     if ( ObsSet .ge. 50 .and. ObsSet .le. 59) then
        write(TheUnit,"(A,I2)") "# Z Decays=",ZDecays
-       write(TheUnit,'(A,F10.5)') '# SM tZ vector=',couplZTT_left+couplZTT_right
-       write(TheUnit,'(A,F10.5)') '# SM tZ axial=',-couplZTT_left+couplZTT_right
+       write(TheUnit,'(A,F10.5)') '# SM tZ vector=',couplZTT_V_SM
+       write(TheUnit,'(A,F10.5)') '# SM tZ axial=',couplZTT_A_SM
        write(TheUnit,'(A,F10.5)') '# DeltaF1V=',DeltaF1V
        write(TheUnit,'(A,F10.5)') '# DeltaF1A=',DeltaF1A
     endif
