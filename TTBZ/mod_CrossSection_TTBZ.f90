@@ -1035,8 +1035,8 @@ include "vegas_common.f"
   ZQcoupl=3           !vector and axial-vector
   npdfmin=1
   npdfmax=1
-  DPtol=1d-4
-  QPtol=1d-4
+  DPtol=1d-3
+  QPtol=1d-3
 
   if (first) then
      print *, '=============================================================================='
