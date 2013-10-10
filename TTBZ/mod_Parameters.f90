@@ -47,7 +47,7 @@ real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
 !orig real(8), public            :: m_Z     = 91.19d0*GeV  
 !KTP
- real(8), public            :: m_Z     = 91.1876d0*GeV
+ real(8), public :: m_Z     = 91.1876d0*GeV
 
 !orig real(8), public, parameter :: m_W     = 80.419d0*GeV
 !KTP
@@ -59,7 +59,7 @@ real(8), public, parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8), public, parameter :: g_weak = dsqrt(g2_weak)
 !orig real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
 !orig real(8), public, parameter :: sw2 = sw**2
-real(8), public, parameter :: sw2 = 1d0-m_W**2/m_Z**2
+real(8), public, parameter :: sw2 = 2.22626515643872d-1
 real(8), public, parameter :: sw = dsqrt(sw2)
 real(8), public, parameter :: alpha4Pi = g2_weak*sw2
 real(8), public, parameter :: alpha = alpha4Pi/4d0/DblPi
