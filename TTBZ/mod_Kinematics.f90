@@ -3441,21 +3441,21 @@ ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di
           Histo(12)%SetScale= 1d0
 
           Histo(13)%Info   = "eta(Z)"
-          Histo(13)%NBins  = 50
-          Histo(13)%BinSize= 0.5d0
-          Histo(13)%LowVal =-5.0d0
+          Histo(13)%NBins  = 30
+          Histo(13)%BinSize= 0.2d0
+          Histo(13)%LowVal =-3.0d0
           Histo(13)%SetScale= 1d0
 
           Histo(14)%Info   = "eta(top)"
-          Histo(14)%NBins  = 50
-          Histo(14)%BinSize= 0.5d0
-          Histo(14)%LowVal =-5.0d0
+          Histo(14)%NBins  = 30
+          Histo(14)%BinSize= 0.2d0
+          Histo(14)%LowVal =-3.0d0
           Histo(14)%SetScale= 1d0
 
           Histo(15)%Info   = "eta(atop)"
-          Histo(15)%NBins  = 50
-          Histo(15)%BinSize= 0.5d0
-          Histo(15)%LowVal =-5.0d0
+          Histo(15)%NBins  = 30
+          Histo(15)%BinSize= 0.2d0
+          Histo(15)%LowVal =-3.0d0
           Histo(15)%SetScale= 1d0
 
           Histo(16)%Info   = "eta(j1)"
@@ -3487,6 +3487,24 @@ ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di
           Histo(20)%BinSize= 0.25d0/4d0
           Histo(20)%LowVal = 0d0
           Histo(20)%SetScale= 1d0
+
+          Histo(21)%Info   = "pseudo(Z)"
+          Histo(21)%NBins  = 30
+          Histo(21)%BinSize= 0.2d0
+          Histo(21)%LowVal =-3.0d0
+          Histo(21)%SetScale= 1d0
+
+          Histo(22)%Info   = "pseudo(top)"
+          Histo(22)%NBins  = 30
+          Histo(22)%BinSize= 0.2d0
+          Histo(22)%LowVal =-3.0d0
+          Histo(22)%SetScale= 1d0
+
+          Histo(23)%Info   = "pseudo(atop)"
+          Histo(23)%NBins  = 30
+          Histo(23)%BinSize= 0.2d0
+          Histo(23)%LowVal =-3.0d0
+          Histo(23)%SetScale= 1d0
 
 
 ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
@@ -7342,7 +7360,7 @@ logical :: applyPSCut
 integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree,leptj(1:3),i,j
 real(8) :: nZLept,s12,s13,s14,s23,s24,s34
 real(8) :: pT_lep(4),ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
-real(8) :: eta_ATop,eta_Top,eta_lep(1:4)
+real(8) :: eta_ATop,eta_Top,eta_lep(1:4),pseudo_Z, pseudo_top, pseudo_tbar
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,mT_bln(1:2),pT_Z
 real(8) :: R_lj(1:5),R_PlepM,pT_lept,ET_lept,mT,dPhiLL
 integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z,jlabel
@@ -7543,9 +7561,12 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
     eta_Z = get_ETA(Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z))
     pT_top = get_PT(Mom(1:4,t))
     pT_atop = get_PT(Mom(1:4,tbar))
-    eta_top = get_PT(Mom(1:4,t))
-    eta_atop = get_PT(Mom(1:4,tbar))
+    eta_top = get_ETA(Mom(1:4,t))
+    eta_atop = get_ETA(Mom(1:4,tbar))
 
+    pseudo_Z=get_pseudoETA(Mom(1:4,Zbos))
+    pseudo_top=get_pseudoETA(Mom(1:4,t))
+    pseudo_tbar=get_pseudoETA(Mom(1:4,tbar))
 
     pT_Lep(1)  = get_PT(Mom(1:4,ferm_Z))
     pT_Lep(2)  = get_PT(Mom(1:4,Aferm_Z))
@@ -7613,6 +7634,9 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
     NBin(18) = WhichBin(18,eta_Lep(3))
     NBin(19) = WhichBin(19,eta_Lep(4))
     NBin(20) = WhichBin(20,dphill)
+    NBin(21) = WhichBin(21,pseudo_Z)
+    NBin(22) = WhichBin(22,pseudo_top)
+    NBin(23) = WhichBin(23,pseudo_tbar)
 
 
 
