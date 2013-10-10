@@ -3362,7 +3362,7 @@ ELSEIF( ObsSet.EQ.51 ) THEN! set of observables for ttb+Z (stable tops)
 ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
           if(abs(TopDecays).ne.1)  call Error("TopDecays needs to be 1")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
-          NumHistograms = 20
+          NumHistograms = 23
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
