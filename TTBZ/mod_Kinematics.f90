@@ -3511,7 +3511,7 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
 !          NumHistograms = 3
-          NumHistograms = 48
+          NumHistograms = 54
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -7757,7 +7757,7 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     jlabel=0
     do i=1,4
        do j=1,4
-          if (i.ne.j) then
+          if (i.lt.j) then
              jlabel=jlabel+1
              DRjetjet(jlabel)=Get_R(MomJet(1:4,i),MomJet(1:4,j))
           endif
