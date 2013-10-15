@@ -2,7 +2,7 @@
 use ModTopDecay
 implicit none
 
-integer,private,parameter :: NumMaxHisto=45
+integer,private,parameter :: NumMaxHisto=55
 
 
 contains
@@ -1034,7 +1034,7 @@ include "vegas_common.f"
 ! ZQcoupl=2           ! up and down
   ZQcoupl=3           !vector and axial-vector
   npdfmin=1
-  npdfmax=1
+  npdfmax=2
   DPtol=1d-3
   QPtol=1d-3
 
@@ -1693,9 +1693,10 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * alpha_sOver2Pi*RunFactor
 
 
+
+   EvalCS_1L_ttbqqbZ = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 ! RR add LO
-!   EvalCS_1L_ttbqqbZ = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
-   EvalCS_1L_ttbqqbZ = ( LO_Res_UnPol + NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
+!   EvalCS_1L_ttbqqbZ = ( LO_Res_UnPol + NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
 
 
 
