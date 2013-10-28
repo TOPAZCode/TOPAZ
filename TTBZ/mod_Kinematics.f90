@@ -3511,7 +3511,7 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
 !          NumHistograms = 3
-          NumHistograms = 54
+          NumHistograms = 45
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3788,59 +3788,59 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(45)%LowVal = 0d0
           Histo(45)%SetScale= 1d0          
           
-          Histo(46)%Info   = "DeltaR(mu+,l+)"
-          Histo(46)%NBins  = 15    *4d0
-          Histo(46)%BinSize= 0.25d0/4d0
-          Histo(46)%LowVal = 0d0
-          Histo(46)%SetScale= 1d0
-
-          Histo(47)%Info   = "DeltaR(mu+,b1)"
-          Histo(47)%NBins  = 15    *4d0
-          Histo(47)%BinSize= 0.25d0/4d0
-          Histo(47)%LowVal = 0d0
-          Histo(47)%SetScale= 1d0
-
-          Histo(48)%Info   = "DeltaR(mu+,b2)"
-          Histo(48)%NBins  = 15    *4d0
-          Histo(48)%BinSize= 0.25d0/4d0
-          Histo(48)%LowVal = 0d0
-          Histo(48)%SetScale= 1d0
-
-          Histo(49)%Info   = "DeltaR(j1,j2)"
-          Histo(49)%NBins  = 15    *4d0
-          Histo(49)%BinSize= 0.25d0/4d0
-          Histo(49)%LowVal = 0d0
-          Histo(49)%SetScale= 1d0
-
-          Histo(50)%Info   = "DeltaR(j1,j3)"
-          Histo(50)%NBins  = 15    *4d0
-          Histo(50)%BinSize= 0.25d0/4d0
-          Histo(50)%LowVal = 0d0
-          Histo(50)%SetScale= 1d0
-
-          Histo(51)%Info   = "DeltaR(j1,j4)"
-          Histo(51)%NBins  = 15    *4d0
-          Histo(51)%BinSize= 0.25d0/4d0
-          Histo(51)%LowVal = 0d0
-          Histo(51)%SetScale= 1d0
-
-          Histo(52)%Info   = "DeltaR(j2,j3)"
-          Histo(52)%NBins  = 15    *4d0
-          Histo(52)%BinSize= 0.25d0/4d0
-          Histo(52)%LowVal = 0d0
-          Histo(52)%SetScale= 1d0
-
-          Histo(53)%Info   = "DeltaR(j2,j4)"
-          Histo(53)%NBins  = 15    *4d0
-          Histo(53)%BinSize= 0.25d0/4d0
-          Histo(53)%LowVal = 0d0
-          Histo(53)%SetScale= 1d0
-
-          Histo(54)%Info   = "DeltaR(j3,j4)"
-          Histo(54)%NBins  = 15    *4d0
-          Histo(54)%BinSize= 0.25d0/4d0
-          Histo(54)%LowVal = 0d0
-          Histo(54)%SetScale= 1d0
+!           Histo(46)%Info   = "DeltaR(mu+,l+)"
+!           Histo(46)%NBins  = 15    *4d0
+!           Histo(46)%BinSize= 0.25d0/4d0
+!           Histo(46)%LowVal = 0d0
+!           Histo(46)%SetScale= 1d0
+! 
+!           Histo(47)%Info   = "DeltaR(mu+,b1)"
+!           Histo(47)%NBins  = 15    *4d0
+!           Histo(47)%BinSize= 0.25d0/4d0
+!           Histo(47)%LowVal = 0d0
+!           Histo(47)%SetScale= 1d0
+! 
+!           Histo(48)%Info   = "DeltaR(mu+,b2)"
+!           Histo(48)%NBins  = 15    *4d0
+!           Histo(48)%BinSize= 0.25d0/4d0
+!           Histo(48)%LowVal = 0d0
+!           Histo(48)%SetScale= 1d0
+! 
+!           Histo(49)%Info   = "DeltaR(j1,j2)"
+!           Histo(49)%NBins  = 15    *4d0
+!           Histo(49)%BinSize= 0.25d0/4d0
+!           Histo(49)%LowVal = 0d0
+!           Histo(49)%SetScale= 1d0
+! 
+!           Histo(50)%Info   = "DeltaR(j1,j3)"
+!           Histo(50)%NBins  = 15    *4d0
+!           Histo(50)%BinSize= 0.25d0/4d0
+!           Histo(50)%LowVal = 0d0
+!           Histo(50)%SetScale= 1d0
+! 
+!           Histo(51)%Info   = "DeltaR(j1,j4)"
+!           Histo(51)%NBins  = 15    *4d0
+!           Histo(51)%BinSize= 0.25d0/4d0
+!           Histo(51)%LowVal = 0d0
+!           Histo(51)%SetScale= 1d0
+! 
+!           Histo(52)%Info   = "DeltaR(j2,j3)"
+!           Histo(52)%NBins  = 15    *4d0
+!           Histo(52)%BinSize= 0.25d0/4d0
+!           Histo(52)%LowVal = 0d0
+!           Histo(52)%SetScale= 1d0
+! 
+!           Histo(53)%Info   = "DeltaR(j2,j4)"
+!           Histo(53)%NBins  = 15    *4d0
+!           Histo(53)%BinSize= 0.25d0/4d0
+!           Histo(53)%LowVal = 0d0
+!           Histo(53)%SetScale= 1d0
+! 
+!           Histo(54)%Info   = "DeltaR(j3,j4)"
+!           Histo(54)%NBins  = 15    *4d0
+!           Histo(54)%BinSize= 0.25d0/4d0
+!           Histo(54)%LowVal = 0d0
+!           Histo(54)%SetScale= 1d0
 !
 !          Histo(49)%Info   = "DeltaR(mu+,j1)"
 !          Histo(49)%NBins  = 15    *4d0
@@ -5262,7 +5262,7 @@ real(8),parameter :: NPr=4, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
   call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
-!    Pcol1= 2 -1
+!    Pcol1= 1 -1
 !    Pcol2= 3 -1
 !    SingDepth = 1d-16
 !    Steps = 20
@@ -7369,7 +7369,7 @@ real(8) :: eta_Z,Recon_M1,Recon_M2,mT_inv
 real(8) :: DphiZt,DphiZtbar,Dphittbar,Dphimumu,Dphimuml,Dphimumb1,Dphimumb2
 real(8) :: Dphimumj1,Dphimumj2,Dphimupl,Dphimupb1,Dphimupb2,Dphimupj1,Dphimupj2
 real(8) :: DRZt,DRZtbar,DRttbar,DRmumu,DRmuml,DRmumb1,DRmumb2
-real(8) :: DRmumj1,DRmumj2,DRmupl,DRmupb1,DRmupb2,DRmupj1,DRmupj2,DRjetjet(1:6)
+real(8) :: DRmumj1,DRmumj2,DRmupl,DRmupb1,DRmupb2,DRmupj1,DRmupj2,DRjetjet(1:12)
 
 
 applyPSCut = .false.
@@ -7757,7 +7757,7 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     jlabel=0
     do i=1,4
        do j=1,4
-          if (i.lt.j) then
+          if (i.ne.j) then
              jlabel=jlabel+1
              DRjetjet(jlabel)=Get_R(MomJet(1:4,i),MomJet(1:4,j))
           endif
@@ -7864,15 +7864,15 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     NBin(43) = WhichBin(43,DRmumb2)
     NBin(44) = WhichBin(44,DRmumj1)
     NBin(45) = WhichBin(45,DRmumj2)
-    NBin(46) = WhichBin(46,DRmupl)
-    NBin(47) = WhichBin(47,DRmupb1)
-    NBin(48) = WhichBin(48,DRmupb2)
-    NBin(49) = WhichBin(49,DRjetjet(1))
-    NBin(50) = WhichBin(50,DRjetjet(2))
-    NBin(51) = WhichBin(51,DRjetjet(3))
-    NBin(52) = WhichBin(52,DRjetjet(4))
-    NBin(53) = WhichBin(53,DRjetjet(5))
-    NBin(54) = WhichBin(54,DRjetjet(6))
+!     NBin(46) = WhichBin(46,DRmupl)
+!     NBin(47) = WhichBin(47,DRmupb1)
+!     NBin(48) = WhichBin(48,DRmupb2)
+!     NBin(49) = WhichBin(49,DRjetjet(1))
+!     NBin(50) = WhichBin(50,DRjetjet(2))
+!     NBin(51) = WhichBin(51,DRjetjet(3))
+!     NBin(52) = WhichBin(52,DRjetjet(4))
+!     NBin(53) = WhichBin(53,DRjetjet(5))
+!     NBin(54) = WhichBin(54,DRjetjet(6))
 
 
 !-------------------------------------------------------
@@ -10624,7 +10624,6 @@ ELSEIF( NumExtParticles.EQ.6 .AND. CORRECTION.EQ.2 ) THEN
         return
     endif
 
-
 ELSEIF( CORRECTION.EQ.5 ) THEN
     s14 = MomExt(1:4,1).dot.MomExt(1:4,4)
     E4 = dabs(MomExt(1,4))
@@ -10857,13 +10856,13 @@ real(8) :: pdf(-6:6,1:2)
 !   MRSW PDFS
 IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
-            call mrstlo(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+!             call mrstlo(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
 ! RR added
-            sbar(1)=str(1)
-            cbar(1)=chm(1)
-            bbar(1)=bot(1)
+!             sbar(1)=str(1)
+!             cbar(1)=chm(1)
+!             bbar(1)=bot(1)
 !             call mrs96(x1,PDFScale,2,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-!             call GetAllPDFs("mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
+            call GetAllPDFs("mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
             dnv(1) = 0d0
@@ -10878,14 +10877,14 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
             glu(1) = 0d0
         endif
         if( x2.lt.1d0 ) then
-            call mrstlo(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+!             call mrstlo(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
 ! RR added
-            sbar(2)=str(2)
-            cbar(2)=chm(2)
-            bbar(2)=bot(2)
+!             sbar(2)=str(2)
+!             cbar(2)=chm(2)
+!             bbar(2)=bot(2)
 
 !             call mrs96(x2,PDFScale,2,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-!             call GetAllPDFs("mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
+            call GetAllPDFs("mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
             dnv(2) = 0d0
@@ -10902,8 +10901,8 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
 ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
 !             call mrst2004(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-            call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-!             call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
+!             call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+            call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
             dnv(1) = 0d0
@@ -10919,8 +10918,8 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         endif
         if( x2.lt.1d0 ) then
 !             call mrst2004(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-            call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-!             call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
+!             call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+            call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
             dnv(2) = 0d0

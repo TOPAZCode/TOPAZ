@@ -287,6 +287,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
 ! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
 ! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(2)%Mom(1:4)
@@ -632,6 +635,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
 !--- after momentum mapping -- sum over colors and polarizations
 
@@ -967,6 +973,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
 ! print *, "if dipole"
 ! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
@@ -1021,6 +1030,7 @@
            endif
 
    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
@@ -1303,6 +1313,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
 
 ! print *, "ii dipole"
@@ -1358,6 +1371,7 @@
            endif
 
   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+
 
 ! print *, "pol check1",TreeAmpsDip(1)%quarks(1)%Pol(1:4)
 ! print *, "pol check2",TreeAmpsDip(1)%quarks(2)%Pol(1:4)

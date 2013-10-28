@@ -153,7 +153,7 @@ contains
       print *, 'The expression for the P-val is no longer correct'
       stop
    endif
-
+   
  ! now that I have chi-sq, I can get p-value
    P=0d0
    do k=0,NumEventBins/2-1
@@ -165,7 +165,7 @@ contains
    P=pval(chisq/2d0,NumEventBins/2)
    print *,'p2=', P
    pause
-
+   
  end SUBROUTINE MinChisq
 
 ! SUBROUTINE GetLogL(Events_SM, Events_BSM, Events_Pred,NumEventBins,DeltaN,L,P,sigs)

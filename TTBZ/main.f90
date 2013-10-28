@@ -280,6 +280,10 @@ logical :: dirresult
               print *, "if the Z boson decays then the tops also have to decay (and vice versa)"
               stop
           endif
+          if( TTBZ_SpeedUp .and. (Correction.eq.2) ) then
+              print *, "SpeedUp=.true. is not working for real corrections"
+              stop
+          endif
     endif
     if( Process.ge.81 .and. Process.le.89 ) then
           ZDecays=-2

@@ -295,6 +295,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -661,6 +664,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
+        endif
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -1020,6 +1026,9 @@
         N2Jump = 1
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
+        endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
         endif
 
 
@@ -1410,6 +1419,9 @@
         N2Jump = 1
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
+        endif
+        if( TTBZ_SpeedUp ) then
+          Nmax(2) = -1
         endif
 
 ! print *, "TB",dreal( TreeAmpsDip(1)%QUARKS(1)%Mom(1:4) )

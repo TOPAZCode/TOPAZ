@@ -17,6 +17,8 @@ integer, public :: DKRE_switch
 integer(8), public, save :: EvalCounter=0
 integer(8), public, save :: PSCutCounter=0
 integer(8), public, save :: SkipCounter=0
+logical,public ,parameter :: TTBZ_SpeedUp=.true.
+
 
 integer,public, save :: pole_skipped=0
 integer,public, save :: useQP=0
@@ -124,10 +126,10 @@ real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
 
 real(8), public, parameter :: couplZTT_left_SM  = -sw/cw*Q_up + 1d0/sw/cw * T3_up!  treat the top separate from up quark
 real(8), public, parameter :: couplZTT_right_SM = -sw/cw*Q_up
-! real(8), public, parameter :: couplZTT_left  = Q_up!  This is for the check against ttb+photon.
-! real(8), public, parameter :: couplZTT_right = Q_up
-! real(8), public, parameter :: couplZTT_left  = 1d0!  This is for the check against ttb+photon.
-! real(8), public, parameter :: couplZTT_right = 1d0
+! real(8), public, parameter :: couplZTT_left_SM  = Q_up!  This is for the check against ttb+photon.
+! real(8), public, parameter :: couplZTT_right_SM = Q_up
+! real(8), public, parameter :: couplZTT_left_SM  = 1d0!  This is for the check against ttb+photon.
+! real(8), public, parameter :: couplZTT_right_SM = 1d0
 real(8), public, parameter ::  couplZTT_V_SM =  couplZTT_left_SM+couplZTT_right_SM
 real(8), public, parameter ::  couplZTT_A_SM = -couplZTT_left_SM+couplZTT_right_SM
 
@@ -911,7 +913,6 @@ real(8) :: beta1=17d0*3d0-4d0/3d0*NF-5d0*NF
 
 
 !print *, "USING DUW Alpha_S"
-
 ! ! ! !   DUW version
 !     if( Loop.eq.1 ) then
 !       RunAlphaS = 4d0*dblpi/beta0/dlog((Q*100d0)**2/165d-3**2)

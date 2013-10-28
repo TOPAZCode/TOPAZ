@@ -818,7 +818,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
             opp_err =abs( (ResCH-ResCheck)/ResCheck)
          else
             opp_err = abs( (ResCH-ResCheck) )
-         endif   
+         endif
 !!!!!! CHECK ENDS HERE !!!!!!!!!!!!!!
 
 
@@ -1000,8 +1000,7 @@ double complex :: lhseq1,lhseq47a,lhseq36a,lhseq3,lhseq47b,lhseq36b,lhseq1new,xe
 ! by reconstructing an arbitrary loop momentum l and using it to compute residue from currents,
 ! and compare that to residue from OPP coefficients.
 ! The global variable opp_err gives the relative difference between these two values. 
-
-! N.B. NOT TESTED YET -- CAVEAT EMPTOR!
+! N.B. NOT TESTED YET -- CAVEAT EMPTOR! 
 
          alpha_1 = 17d0/19d0
          alpha_2 = ( IntPart(DoubCuts%CutProp(CutNum,2))%Mass2 - IntPart(DoubCuts%CutProp(CutNum,1))%Mass2 )/(2d0*r1)

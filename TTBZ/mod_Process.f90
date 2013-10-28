@@ -4175,16 +4175,16 @@ ELSEIF( MASTERPROCESS.EQ.19 ) THEN
       enddo
       enddo
       enddo
-    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.0 ) THEN
+    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.1 ) THEN
     NumHelicities = 16
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
-      do h3=-1,1,2
+      do h3=-1,1,2! Z boson hel. Markus: rearranged for TTBZ_Speed=.true.
       do h4=-1,1,2
       do h5=-1,1,2
-      do h6=-1,1,2! Z boson hel
+      do h6=-1,1,2
           if( ih.ge.17 ) cycle
-          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          Helicities(ih,1:6) = (/0,0,h6,h4,h5,h3/)
           ih=ih+1
       enddo
       enddo
@@ -4253,16 +4253,16 @@ ELSEIF( MASTERPROCESS.EQ.20 ) THEN
       enddo
       enddo
       enddo
-    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.0 ) THEN
+    ELSEIF( TOPDECAYS.GE.1 .AND. ZDECAYS.GE.1 ) THEN
     NumHelicities = 16
     allocate(Helicities(1:NumHelicities,1:NumExtParticles))
       ih=1
-      do h3=-1,1,2
+      do h3=-1,1,2! Z boson hel. Markus: rearranged for TTBZ_Speed=.true.
       do h4=-1,1,2
       do h5=-1,1,2
-      do h6=-1,1,2! Z boson hel
+      do h6=-1,1,2
           if( ih.ge.17 ) cycle
-          Helicities(ih,1:6) = (/0,0,h3,h4,h5,h6/)
+          Helicities(ih,1:6) = (/0,0,h6,h4,h5,h3/)
           ih=ih+1
       enddo
       enddo
