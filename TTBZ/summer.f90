@@ -1,8 +1,9 @@
 PROGRAM summer
 use ifport
 implicit none
-integer :: NumArgs,NArg,op,iHisto,nrebin
-character :: filename_in*(80),filename_out*(50),operation*(10),factor_str*(20),iHisto_str*(5),nrebin_str*(5)
+integer :: NumArgs,NArg,op,iHisto,nrebin,NumEvents,NumPseudoExp,Lumi
+character :: filename_in*(80),filename_in2*(80),filename_out*(50),operation*(10),factor_str*(20)
+character :: iHisto_str*(5),nrebin_str*(5),NumEvents_str*(6),Lumi_str*(6),NumPseudoExp_str*(9)
 real(8):: factor =1d10
 
 ! get number of arguments
@@ -24,14 +25,17 @@ real(8):: factor =1d10
       op=6
   elseif( trim(operation).eq.'readlhe' ) then
       op=7
+  elseif( trim(operation).eq.'likelihood' ) then
+      op=8
   else
-      write(*,*) "operation not available (add,avg,sumbins,mul,quo,rebin,readlhe)",trim(operation)
+      write(*,*) "operation not available (add,avg,sumbins,mul,quo,rebin,readlhe,likelihood)",trim(operation)
       stop
   endif
 
 ! check for invalid arguments
   if( (op.lt.3 .and. NumArgs.le.3) .or. (op.eq.3 .and. NumArgs.ne.3) .or. (op.eq.4 .and. NumArgs.ne.4) .or. (op.eq.5 .and. NumArgs.le.3)  & 
-                                   .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3)  .or. NumArgs.gt.49) then
+                                   .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3) .or. (op.eq.8 .and. NumArgs.ne.7)  &
+                                   .or. NumArgs.gt.49 ) then
     print *, "invalid number of arguments",op,NumArgs
     stop
   endif
@@ -108,6 +112,30 @@ real(8):: factor =1d10
       call GetArg(3,filename_out)
       open(unit=13,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
       call readlhe()
+
+  elseif( op.eq.8 ) then! SYNTAX: summer likelihood infile1 infile2 Histo Events PseudoEvents outfile
+      call GetArg(2,filename_in)
+      open(unit=12,file=trim(filename_in),form='formatted',access='sequential')  ! open input file1
+      call GetArg(3,filename_in2)
+      open(unit=13,file=trim(filename_in2),form='formatted',access='sequential')  ! open input file2
+      call GetArg(4,iHisto_str)
+      read(iHisto_str,"(I2)") iHisto   
+
+!       call GetArg(5,NumEvents_str)
+!       read(NumEvents_str,"(I6)") NumEvents
+      call GetArg(5,Lumi_str)
+      read(Lumi_str,"(I6)") Lumi
+
+      call GetArg(6,NumPseudoExp_str)
+      read(NumPseudoExp_str,"(I9)") NumPseudoExp
+      call GetArg(7,filename_out)
+      open(unit=14,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
+      write(*,*) ""
+!       write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with ",NumEvents," events using ",NumPseudoExp," pseudo-experiments"
+      write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments"
+      write(*,*) ""
+!       call likelihood(iHisto,NumEvents,NumPseudoExp)
+      call likelihood(iHisto,Lumi,NumPseudoExp)
   endif
 
 
@@ -379,7 +407,233 @@ character :: dummy*(1)
 
   enddo
 
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE likelihood(iHisto,LumiORNumEvents,NumPseudoExp)
+implicit none
+integer :: iHisto,LumiORNumEvents,NumPseudoExp
+integer,parameter :: MaxBins=1000, MaxEvents=200000
+integer,parameter :: NumLLbins=1000! the LLratio should only vary between - and + this number
+character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
+character :: dummy*(1)
+integer :: iBin,iPseudoExp,NumBins1=0,NumBins2=0,ranBin,BinAccept(1:MaxEvents),NumAccepted,NEvent
+integer :: NumEvents,NumExpectedEvents(1:2),iHypothesis
+integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999
+real(8) :: Lumi,BinVal(1:2,1:MaxBins)=-1d-99,Value(1:2,1:MaxBins)=-1d-99,Error(1:2,1:MaxBins)=-1d-99
+real(8) :: ymax,zran(1:2),ValAccepted(1:MaxEvents),LLRatio,WhichBin,BinSize
+real(8) :: sigmatot(1:2),check(1:2)
+integer :: SelectedEvent,LLbin
+type :: Histogram
+    integer :: NBins
+    real(8) :: BinSize
+    real(8) :: LowVal
+    integer :: Hits(1:500)
+end type
+type(Histogram) :: LLHisto(1:2)
+logical, parameter :: normalize=.true.
+
+
+
+! NumEvents=LumiORNumEvents
+Lumi = dble(LumiORNumEvents)
+
+
+!--------------------------------------------------
+!          0. init
+!--------------------------------------------------
+LLHisto(1)%NBins   = 1000
+LLHisto(1)%BinSize = 1.0d0
+LLHisto(1)%LowVal  = -500d0
+LLHisto(1)%Hits(:) = 0
+
+LLHisto(2)%NBins   = LLHisto(1)%NBins
+LLHisto(2)%BinSize = LLHisto(1)%BinSize
+LLHisto(2)%LowVal  = LLHisto(1)%LowVal
+LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
+
+
+
+!--------------------------------------------------
+!          1. reading input files
+!--------------------------------------------------
+  do while(.not.eof(12))!   reading input file 1
+      read(unit=12,fmt="(A)") dummy
+      if(dummy(1:1).eq."#") cycle
+      backspace(unit=12) ! go to the beginning of the line
+
+      read(unit=12,fmt=fmt1) NHisto(1),dummy,BinVal(1,NumBins1+1),dummy,Value(1,NumBins1+1),dummy,Error(1,NumBins1+1),dummy,Hits(1,NumBins1+1),dummy
+      if( NHisto(1).ne.iHisto ) cycle
+      NumBins1=NumBins1 + 1
+  enddo
+
+  do while(.not.eof(13))!   reading input file 2
+      read(unit=13,fmt="(A)") dummy
+      if(dummy(1:1).eq."#") cycle
+      backspace(unit=13) ! go to the beginning of the line
+
+      read(unit=13,fmt=fmt1) NHisto(2),dummy,BinVal(2,NumBins2+1),dummy,Value(2,NumBins2+1),dummy,Error(2,NumBins2+1),dummy,Hits(2,NumBins2+1),dummy
+      if( NHisto(2).ne.iHisto ) cycle
+      NumBins2=NumBins2 + 1
+  enddo
+
+  if( NumBins1.ne.NumBins2 ) then
+     print *, "Error: Number of bins in input file 1 and 2 are different: ",NumBins1,NumBins2
+     stop
+  endif
+
+  sigmatot(1:2) = 0d0
+  BinSize = BinVal(1,2)-BinVal(1,1)
+  do iBin=1,NumBins1! calculate total cross section
+       sigmatot(1) = sigmatot(1) + Value(1,iBin) * BinSize
+       sigmatot(2) = sigmatot(2) + Value(2,iBin) * BinSize
+  enddo
+  NumExpectedEvents(1) = int(Lumi * sigmatot(1) *8 ) ! factor of 8 from lepton species
+  NumExpectedEvents(2) = int(Lumi * sigmatot(2) *8 ) 
+
+
+! normalize distributions
+  if( normalize ) then
+   print *, "Normalizing input files" 
+   do iBin=1,NumBins1! normalize histogram
+       Value(1,iBin) = Value(1,iBin)*BinSize/sigmatot(1)
+       Value(2,iBin) = Value(2,iBin)*BinSize/sigmatot(2)
+   enddo
+  endif
+
+! print the input histograms 
+  write(*,"(2X,A,16X,A,11X,A,16X,A)") "NBin|","Input file 1","|","Input file 2"
+  do iBin=1,NumBins1
+    write(*,fmt="(2X,1I3,A,2X,1PE10.3,2X,1PE23.16,A,2X,1PE10.3,2X,1PE23.16)") iBin," | ",BinVal(1,iBin),Value(1,iBin)," | ",BinVal(2,iBin),Value(2,iBin)
+    if( dabs(BinVal(1,iBin)-BinVal(2,iBin)).gt.1d-6 ) then
+        print *, "Error: Different bin sizes in input files 1 and 2"
+        stop
+    endif
+  enddo
+  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
+  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
+  check(1:2) = 0d0
+  do iBin=1,NumBins1! check
+      check(1) = check(1) + Value(1,iBin)
+      check(2) = check(2) + Value(2,iBin)
+  enddo
+  write(*,"(A,1PE16.8)") "Sum of bins in input file 1: ",check(1)
+  write(*,"(A,1PE16.8)") "Sum of bins in input file 2: ",check(2)
+  write(*,*) ""
+
+
+
+
+
+
+
+
+
+!----------------------------------------------------------------------------------------
+!          2. generate pseudo experiments for null hypothesis and alternative hypothesis
+!----------------------------------------------------------------------------------------
+do iHypothesis=1,2
+
+!   NumEvents = NumExpectedEvents(1)              ! choose number of events fixed for each hypothesis
+  NumEvents = NumExpectedEvents(iHypothesis)    ! choose number of events differently for each hypothesis
+
+  write(*,"(A,I6,A)") "Generating ",NumEvents," events"
+  if( NumEvents.gt.MaxEvents ) then
+    print *, "Error: NumEvents is too large. Increase MaxEvents in SUBROUTINE likelihood."
+    stop
+  endif
+
+
+  do iPseudoExp=1,NumPseudoExp
+      if( mod(iPseudoExp,1000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NumPseudoExp
+
+!************************************************************
+!  2.1 generate event sample according to hypothesis
+!************************************************************
+      ! find max. of y-axis
+      ymax=-1d13;
+      do iBin=1,NumBins1
+         if(  Value(iHypothesis,iBin).gt.ymax ) ymax = Value(iHypothesis,iBin)
+      enddo
+
+      NumAccepted=0
+      call random_seed()     
+      do while( NumAccepted .lt. NumEvents )!  loop until required number of events is reached
+           call random_number(zran(1:2))         
+           ranBin = 1 + int( zran(1)*NumBins1 ) ! randomly select a bin (=event)
+           if( ymax*zran(2) .lt.  Value(iHypothesis,ranBin) ) then! accept/reject this event
+               NumAccepted=NumAccepted+1
+               BinAccept(NumAccepted) = ranBin
+               ValAccepted(NumAccepted) = Value(iHypothesis,ranBin)
+           endif
+      enddo
+
+
+!************************************************************
+!  2.2 calculate log likelihood ratio 
+!************************************************************
+      LLRatio = 0d0
+      do NEvent=1,NumEvents
+         SelectedEvent = BinAccept(NEvent)
+         if( ValAccepted(NEvent).ne.Value(iHypothesis,SelectedEvent) ) then! can be removed/simplified later 
+             print *, "error in ll"
+             stop
+         endif
+         LLRatio = LLRatio + 2d0*dlog( (Value(1,SelectedEvent))/(Value(2,SelectedEvent)) )
+      enddo
+
+
+!************************************************************
+!  2.3 bin the likelihood value 
+!************************************************************
+      WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
+      if( WhichBin.lt.0 ) WhichBin = 1
+      if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
+      LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
+
+  enddo! iPseudoExp
+
+
+!************************************************************
+!  3. write out the LL distribution
+!************************************************************
+      print *, ""
+      print *, "Writing log-likelihood distribution to outful file"
+      print *, ""
+      do LLbin=1,LLHisto(iHypothesis)%NBins
+           write(14,"(2X,I1,2X,I4,2X,1PE16.8,I10)") 1,LLbin, LLHisto(iHypothesis)%LowVal+LLbin*LLHisto(iHypothesis)%BinSize, LLHisto(iHypothesis)%Hits(LLbin)
+      enddo
+
+enddo! iHypothesis
+
+
+
 
 END SUBROUTINE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

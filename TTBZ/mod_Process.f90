@@ -142,7 +142,7 @@ IF( abs(TOPDECAYS).GE.1 ) THEN
   NDim = NDim + 4+4
 ENDIF
 
-IF( ZDECAYS.GE.1 ) THEN
+IF( ZDECAYS.GE.1 .or. ZDECAYS.EQ.-1 ) THEN
   NDim = NDim + 2
 ENDIF
 

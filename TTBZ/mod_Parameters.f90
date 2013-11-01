@@ -17,7 +17,7 @@ integer, public :: DKRE_switch
 integer(8), public, save :: EvalCounter=0
 integer(8), public, save :: PSCutCounter=0
 integer(8), public, save :: SkipCounter=0
-logical,public ,parameter :: TTBZ_SpeedUp=.true.
+logical,public ,parameter :: TTBZ_SpeedUp=.false.  !  good idea but doesn't work. always set to .false.
 
 
 integer,public, save :: pole_skipped=0

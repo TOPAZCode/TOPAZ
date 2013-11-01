@@ -91,6 +91,7 @@ IF( ZDECAYS.NE.0 .AND. ZDECAYS.NE.-2 ) THEN!  -2: Z=photon
    PSWgt = PSWgt * PSWgt4
 ENDIF
 
+
 IF( ZDECAYS.EQ.-1 ) THEN!   spin un-correlated decays
      ExtParticle(5)%Helicity=+1
      call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
@@ -187,7 +188,7 @@ ELSEIF( Correction.EQ.1 ) THEN
       call HelCrossing(Helicities(iHel,1:NumExtParticles))
       call SetPolarizations()
       if( ZDecays.gt.0 ) then
-!           if( ExtParticle(5)%Helicity.eq.0 ) cycle!  !   MARKUS: removed this. not required anymore
+!           if( ExtParticle(5)%Helicity.eq.0 ) cycle!     MARKUS: removed this. not required anymore
           call ZDecay(ExtParticle(5),DK_LO,MomExt(1:4,12:13))
       endif
 
@@ -749,15 +750,6 @@ ELSEIF( Correction.EQ.1 ) THEN
       enddo
    enddo
       NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
-
-!       print *, 'bosonic loops:'
-!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-!       print *, 'color-summed boson FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-!      PAUSE
-!       print *, 'color-summed SP', NLO_Res_Pol(-1)/LO_Res_Pol
-!       pause
-
       Col1Lf_ttbggZ = 0d0
       Col1Lf_ttbggZ(1,1) = 4d0 * Cf**2 * Nc - 2d0*Cf
       Col1Lf_ttbggZ(1,2) = -4d0*Cf
@@ -771,28 +763,12 @@ ELSEIF( Correction.EQ.1 ) THEN
 ! NLO_Res_Pol(-2:1) = NLO_Res_Pol(-2:1) + ColLO_ttbgg(iPrimAmp,jPrimAmp) * dreal( BornAmps(iPrimAmp)%Result*dconjg(FermionLoopPartAmp(jPrimAmp,-2:1)) )
       enddo
       enddo
-!       print *, 'fermionic loops:'
-!       print *, 'color-summed DP',NLO_Res_Pol(-2)/LO_Res_Pol
-!       print *, 'color-summed SP',NLO_Res_Pol(-1)/LO_Res_Pol
-!       print *, 'color-summed ferm loop FIN',(NLO_Res_Pol(0)+NLO_Res_Pol(1))/2d0/Q_top**2
-!       pause
-
       NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
     enddo! helicity loop
-    
 ENDIF
-!print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
-!print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
-!print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
-!print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
-!print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
-!print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
-!print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
-!print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
-!print *, 'No. times QP used : ', useQP
-!print *, 'No. times QP fails: ', pole_skipped
-!stop
-!
+
+
+
 IF( Correction.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
@@ -1100,7 +1076,6 @@ IF( CORRECTION.EQ.0 ) THEN
    do npdf=npdfmin,npdfmax
       if (npdf .eq. 1) then
          PDFFac(1:2)=PDFFac_a(1:2) 
-         if( npdfmax.eq.1 ) PDFFac(1:2) = PDFFac(1:2) + PDFFac_b(1:2)
       elseif (npdf .eq. 2) then
          PDFFac(1:2)=PDFFac_b(1:2)
          call swapMom(MomExt(1:4,1),MomExt(1:4,2))
@@ -1122,8 +1097,7 @@ IF( CORRECTION.EQ.0 ) THEN
          endif
 
 
-       if (npdf .eq. 2) then
-! change helicities of the massless quarks for the couplings to Z          
+       if (npdf .eq. 2) then! change helicities of the massless quarks for the couplings to Z          
           Helicities(iHel,3)=-Helicities(iHel,3)
           Helicities(iHel,4)=-Helicities(iHel,4)
        endif

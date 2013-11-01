@@ -33,8 +33,10 @@ ccomp = gcc -O0
 Exec = ./TOPAZ
 
 
-makeDep = $(ConfigFile) \
-          makefile
+makeDep = 
+
+#$(ConfigFile) \
+#          makefile
 
 
 # fastjet stuff
@@ -46,9 +48,8 @@ FJLIBS += $(shell $(FASTJET_CONFIG) --libs --plugins )
 
 
 PDFObj = $(PDFDir)/mstwpdf.o \
-         $(PDFDir)/mrst2001lo.o \
-         $(PDFDir)/mrst2001.o \
          $(PDFDir)/cteq2mrst.o \
+	 $(PDFDir)/mrst2001lo.o \
          $(PDFDir)/Cteq66Pdf.o \
          $(PDFDir)/CT10Pdf.o
 RockyObj = $(PSDir)/genps.o \
@@ -401,8 +402,8 @@ all: $(allObjects)
 	@echo " linking"
 	@echo " executable file is " $(Exec)
 	@echo " "
-# 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) 
-	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) $(MadGraphObj)
+# 	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(CubaLib) $(PDFObj) $(MadGraphObj)	
+	$(fcomp) -o $(Exec) $(allObjects) $(RockyObj) $(YetiObj) $(IntegralObj) $(VegasObj) $(PDFObj) 
 # $(ObjectDir)/fastjetfortran.o $(FJLIBS) -lstdc++    add this to above line when fastjet routines are used
 
 
