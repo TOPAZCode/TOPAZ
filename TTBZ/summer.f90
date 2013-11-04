@@ -3,7 +3,8 @@ use ifport
 implicit none
 integer :: NumArgs,NArg,op,iHisto,nrebin,NumEvents,NumPseudoExp,Lumi
 character :: filename_in*(80),filename_in2*(80),filename_out*(50),operation*(10),factor_str*(20)
-character :: iHisto_str*(5),nrebin_str*(5),NumEvents_str*(6),Lumi_str*(6),NumPseudoExp_str*(9)
+character :: iHisto_str*(5),nrebin_str*(5),NumEvents_str*(6),Lumi_str*(6),NumPseudoExp_str*(9),DeltaN_str*(5)
+real(8) :: DeltaN
 real(8):: factor =1d10
 
 ! get number of arguments
@@ -34,7 +35,7 @@ real(8):: factor =1d10
 
 ! check for invalid arguments
   if( (op.lt.3 .and. NumArgs.le.3) .or. (op.eq.3 .and. NumArgs.ne.3) .or. (op.eq.4 .and. NumArgs.ne.4) .or. (op.eq.5 .and. NumArgs.le.3)  & 
-                                   .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3) .or. (op.eq.8 .and. NumArgs.ne.7)  &
+                                   .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3) .or. (op.eq.8 .and. NumArgs.ne.8)  &
                                    .or. NumArgs.gt.49 ) then
     print *, "invalid number of arguments",op,NumArgs
     stop
@@ -113,7 +114,7 @@ real(8):: factor =1d10
       open(unit=13,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
       call readlhe()
 
-  elseif( op.eq.8 ) then! SYNTAX: summer likelihood infile1 infile2 Histo Events PseudoEvents outfile
+  elseif( op.eq.8 ) then! SYNTAX: summer likelihood infile1 infile2 Histo Events PseudoEvents DeltaN outfile
       call GetArg(2,filename_in)
       open(unit=12,file=trim(filename_in),form='formatted',access='sequential')  ! open input file1
       call GetArg(3,filename_in2)
@@ -127,15 +128,20 @@ real(8):: factor =1d10
       read(Lumi_str,"(I6)") Lumi
 
       call GetArg(6,NumPseudoExp_str)
+      call GetArg(7,DeltaN_str)
+      read(DeltaN_str,"(F9.6)") DeltaN
+!      DeltaN=1.3d0
       read(NumPseudoExp_str,"(I9)") NumPseudoExp
-      call GetArg(7,filename_out)
+      call GetArg(8,filename_out)
       open(unit=14,file=trim(filename_out),form='formatted',access='sequential')  ! open output file
       write(*,*) ""
 !       write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with ",NumEvents," events using ",NumPseudoExp," pseudo-experiments"
-      write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments"
+!      write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments"
+      write(*,"(A,I2,A,I6,A,I9,A,F9.6)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
+      
       write(*,*) ""
 !       call likelihood(iHisto,NumEvents,NumPseudoExp)
-      call likelihood(iHisto,Lumi,NumPseudoExp)
+      call likelihood(iHisto,Lumi,NumPseudoExp,DeltaN)
   endif
 
 
@@ -413,25 +419,28 @@ END SUBROUTINE
 
 
 
-SUBROUTINE likelihood(iHisto,LumiORNumEvents,NumPseudoExp)
+SUBROUTINE likelihood(iHisto,LumiORNumEvents,NumPseudoExp,DeltaN)
 implicit none
 integer :: iHisto,LumiORNumEvents,NumPseudoExp
+real(8) :: DeltaN
 integer,parameter :: MaxBins=1000, MaxEvents=200000
 integer,parameter :: NumLLbins=1000! the LLratio should only vary between - and + this number
 character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
 character :: dummy*(1)
-integer :: iBin,iPseudoExp,NumBins1=0,NumBins2=0,ranBin,BinAccept(1:MaxEvents),NumAccepted,NEvent
+integer :: iBin,iPseudoExp,NumBins1=0,NumBins2=0,ranBin,BinAccept(1:MaxEvents),NumAccepted,NEvent,TryEvents
 integer :: NumEvents,NumExpectedEvents(1:2),iHypothesis
-integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999
+integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999,WhichBin
 real(8) :: Lumi,BinVal(1:2,1:MaxBins)=-1d-99,Value(1:2,1:MaxBins)=-1d-99,Error(1:2,1:MaxBins)=-1d-99
-real(8) :: ymax,zran(1:2),ValAccepted(1:MaxEvents),LLRatio,WhichBin,BinSize
-real(8) :: sigmatot(1:2),check(1:2)
-integer :: SelectedEvent,LLbin
+real(8) :: ymax,zran(1:2),nran(1:2),ValAccepted(1:MaxEvents),LLRatio,BinSize,MaxPoisson(1:2),Poisson
+real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
+integer :: SelectedEvent,LLbin,PlotObsEvts(1:2,1:10000),i,s,offset,SUA
+real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),sran
+logical ::  GotNumEvents,PoissonEvents,PoissonBins,useshape
 type :: Histogram
     integer :: NBins
     real(8) :: BinSize
     real(8) :: LowVal
-    integer :: Hits(1:500)
+    integer :: Hits(1:1000)
 end type
 type(Histogram) :: LLHisto(1:2)
 logical, parameter :: normalize=.true.
@@ -446,14 +455,26 @@ Lumi = dble(LumiORNumEvents)
 !          0. init
 !--------------------------------------------------
 LLHisto(1)%NBins   = 1000
-LLHisto(1)%BinSize = 1.0d0
-LLHisto(1)%LowVal  = -500d0
+LLHisto(1)%BinSize = 0.5d0
+LLHisto(1)%LowVal  = -200d0
 LLHisto(1)%Hits(:) = 0
 
 LLHisto(2)%NBins   = LLHisto(1)%NBins
 LLHisto(2)%BinSize = LLHisto(1)%BinSize
 LLHisto(2)%LowVal  = LLHisto(1)%LowVal
 LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
+PlotObsEvts=0
+
+PoissonEvents=.true.
+!  Scale Uncertainty Approach: 
+! 1=rescale PREDICTED cross-secs and distr (conservative)
+! 2=change OBSERVED events in each pseudoexp
+SUA=2                   
+
+if (SUA .ne. 1 .and. SUA .ne. 2 .and. DeltaN .ne. 1d0) then
+   print *, "WARNING : SCALE UNCERTAINTY NOT USED!"
+   stop
+endif
 
 
 
@@ -491,19 +512,60 @@ LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
        sigmatot(1) = sigmatot(1) + Value(1,iBin) * BinSize
        sigmatot(2) = sigmatot(2) + Value(2,iBin) * BinSize
   enddo
+
+  NumExpectedEvents(1) = int(Lumi * sigmatot(1) *8 ) ! factor of 8 from lepton species
+  NumExpectedEvents(2) = int(Lumi * sigmatot(2) *8 ) 
+  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
+  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
+  check(1:2) = 0d0
+
+  rescale=1d0
+  if (SUA .eq. 1) then
+     ! Added -- scale uncertainty -- this should also change 
+     if (sigmatot(1) .gt. sigmatot(2)) then
+        if (sigmatot(1)/DeltaN .gt. sigmatot(2)*DeltaN) then
+           sigmatot(1)=sigmatot(1)/DeltaN
+           sigmatot(2)=sigmatot(2)*DeltaN
+           rescale(1)=1d0/DeltaN
+           rescale(2)=DeltaN
+        else
+           rescale(1)=1d0
+           rescale(2)=sigmatot(1)/sigmatot(2)
+           sigmatot(2)=sigmatot(1)
+        endif
+     else
+        if (sigmatot(1)*DeltaN .lt. sigmatot(2)/DeltaN) then
+           sigmatot(1)=sigmatot(1)*DeltaN
+           sigmatot(2)=sigmatot(2)/DeltaN
+           rescale(1)=DeltaN
+           rescale(2)=1d0/DeltaN
+        else
+           rescale(1)=1d0
+           rescale(2)=sigmatot(1)/sigmatot(2)
+           sigmatot(2)=sigmatot(1)
+        endif
+     endif
+  endif
+
   NumExpectedEvents(1) = int(Lumi * sigmatot(1) *8 ) ! factor of 8 from lepton species
   NumExpectedEvents(2) = int(Lumi * sigmatot(2) *8 ) 
 
 
+  write(*,"(A,I6,A)") "Scale uncertainty for null hypothesis-> ", NumExpectedEvents(1) , " events"
+  write(*,"(A,I6,A)") "Scale uncertainty for alt hypothesis-> ", NumExpectedEvents(2) , " events"
+  
+  MaxPoisson(1) = Poisson(NumExpectedEvents(1),NumExpectedEvents(1))
+  MaxPoisson(2) = Poisson(NumExpectedEvents(2),NumExpectedEvents(2))
+
+  print *, 'Max of Poisson:', MaxPoisson(1:2)
 ! normalize distributions
   if( normalize ) then
    print *, "Normalizing input files" 
    do iBin=1,NumBins1! normalize histogram
-       Value(1,iBin) = Value(1,iBin)*BinSize/sigmatot(1)
-       Value(2,iBin) = Value(2,iBin)*BinSize/sigmatot(2)
+       Value(1,iBin) = Value(1,iBin)*BinSize/sigmatot(1)*rescale(1)
+       Value(2,iBin) = Value(2,iBin)*BinSize/sigmatot(2)*rescale(2)
    enddo
   endif
-
 ! print the input histograms 
   write(*,"(2X,A,16X,A,11X,A,16X,A)") "NBin|","Input file 1","|","Input file 2"
   do iBin=1,NumBins1
@@ -513,8 +575,6 @@ LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
         stop
     endif
   enddo
-  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
-  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
   check(1:2) = 0d0
   do iBin=1,NumBins1! check
       check(1) = check(1) + Value(1,iBin)
@@ -531,24 +591,67 @@ LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
 
 
 
-
 !----------------------------------------------------------------------------------------
 !          2. generate pseudo experiments for null hypothesis and alternative hypothesis
 !----------------------------------------------------------------------------------------
+  call random_seed()     
 do iHypothesis=1,2
 
-!   NumEvents = NumExpectedEvents(1)              ! choose number of events fixed for each hypothesis
-  NumEvents = NumExpectedEvents(iHypothesis)    ! choose number of events differently for each hypothesis
+   if (.not. PoissonEvents) then       ! dont incl cross-section info, so same number of events for every pseudoexperiment
+      !   NumEvents = NumExpectedEvents(1)              ! choose number of events fixed for each hypothesis
+      NumEvents = NumExpectedEvents(iHypothesis)    ! choose number of events differently for each hypothesis
 
-  write(*,"(A,I6,A)") "Generating ",NumEvents," events"
-  if( NumEvents.gt.MaxEvents ) then
-    print *, "Error: NumEvents is too large. Increase MaxEvents in SUBROUTINE likelihood."
-    stop
-  endif
+      write(*,"(A,I6,A)") "Generating ",NumEvents," events"
+      if( NumEvents.gt.MaxEvents ) then
+         print *, "Error: NumEvents is too large. Increase MaxEvents in SUBROUTINE likelihood."
+         stop
+      endif
+   else
+      write(*,*)  "Generating Poisson distributed events for each pseudoexperiment"
+   endif
+
+   do iPseudoExp=1,NumPseudoExp
+
+      if( mod(iPseudoExp,10000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NumPseudoExp
+
+      
+      if (PoissonEvents) then
+               
+!*************************************************************
+!  2.0 generate number of events for null hypothesis
+!*************************************************************
+         GotNumEvents=.false.
+               
+         do while (.not. GotNumEvents) 
+            call random_number(nran(1:2))
+            nran(1)=nran(1)*MaxPoisson(iHypothesis)
+            TryEvents=int(2d0*NumExpectedEvents(iHypothesis)*nran(2)) 
+            if ( Poisson(NumExpectedEvents(iHypothesis),TryEvents) .gt. nran(1) ) then
+               NumEvents = TryEvents
+               GotNumEvents=.true.
+!               PlotObsEvts(iHypothesis,TryEvents)=PlotObsEvts(iHypothesis,TryEvents)+1     ! this is to check the Poisson dist.
+            endif
+         enddo
+         if( NumEvents.gt.MaxEvents ) then
+            print *, "Error: NumEvents is too large. Increase MaxEvents in SUBROUTINE likelihood."
+            stop
+         endif
+      endif
+
+      if (SUA .eq. 2) then  
+         !************************************************************
+         !  2.0a change number of observed events for scale uncertainty
+         !************************************************************    
+         
+         call random_number(sran)
+         sran=sran*(DeltaN**2-1d0)/DeltaN + 1d0/DeltaN
+         write(201,*) sran
+         ! this should be uniformly distr in [1/DeltaN,DeltaN] -- check
+         NumEvents=NumEvents*sran
+         PlotObsEvts(iHypothesis,NumEvents)=PlotObsEvts(iHypothesis,NumEvents)+1     ! this is to check the Poisson dist.
+      endif
 
 
-  do iPseudoExp=1,NumPseudoExp
-      if( mod(iPseudoExp,1000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NumPseudoExp
 
 !************************************************************
 !  2.1 generate event sample according to hypothesis
@@ -560,7 +663,7 @@ do iHypothesis=1,2
       enddo
 
       NumAccepted=0
-      call random_seed()     
+!      call random_seed()     
       do while( NumAccepted .lt. NumEvents )!  loop until required number of events is reached
            call random_number(zran(1:2))         
            ranBin = 1 + int( zran(1)*NumBins1 ) ! randomly select a bin (=event)
@@ -575,7 +678,12 @@ do iHypothesis=1,2
 !************************************************************
 !  2.2 calculate log likelihood ratio 
 !************************************************************
-      LLRatio = 0d0
+!      LLRatio = 0d0
+       if (PoissonEvents) then
+         LLRatio=NumEvents*dlog(1d0*NumExpectedEvents(1)/NumExpectedEvents(2))
+      else
+         LLRatio = 0d0
+      endif
       do NEvent=1,NumEvents
          SelectedEvent = BinAccept(NEvent)
          if( ValAccepted(NEvent).ne.Value(iHypothesis,SelectedEvent) ) then! can be removed/simplified later 
@@ -584,35 +692,109 @@ do iHypothesis=1,2
          endif
          LLRatio = LLRatio + 2d0*dlog( (Value(1,SelectedEvent))/(Value(2,SelectedEvent)) )
       enddo
+      if (iHypothesis .eq. 1 .and. iPseudoExp .eq. 1) then
+         offset=-100d0*(int(LLRatio)/100)
+
+      endif
+      LLRatio=LLRatio+offset
+      if (iPseudoExp .eq. 1) then
+         print *, 'LLRatio=',LLRatio
+      endif
+
 
 
 !************************************************************
 !  2.3 bin the likelihood value 
 !************************************************************
       WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
+      WhichBin=int(WhichBin)
       if( WhichBin.lt.0 ) WhichBin = 1
       if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
       LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
-
   enddo! iPseudoExp
-
+  do i=1,2000
+     s=101+iHypothesis
+     write(s,*) i,PlotObsEvts(iHypothesis,i)
+  enddo
 
 !************************************************************
-!  3. write out the LL distribution
+! 2.4 Find the integral under the LL distribution
+!************************************************************
+
+      do LLbin=1,LLHisto(iHypothesis)%NBins
+         IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)+&
+              LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+         alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NumPseudoExp*LLHisto(iHypothesis)%BinSize)
+      enddo
+   enddo! iHypothesis
+
+!************************************************************
+!  3. write out the LL distribution, and find integral under each distribution
 !************************************************************
       print *, ""
       print *, "Writing log-likelihood distribution to outful file"
       print *, ""
-      do LLbin=1,LLHisto(iHypothesis)%NBins
-           write(14,"(2X,I1,2X,I4,2X,1PE16.8,I10)") 1,LLbin, LLHisto(iHypothesis)%LowVal+LLbin*LLHisto(iHypothesis)%BinSize, LLHisto(iHypothesis)%Hits(LLbin)
+      do LLbin=1,LLHisto(1)%NBins
+!         print *, LLBin
+           write(14,"(2X,I4,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,1PE16.8)") LLbin, LLHisto(1)%LowVal+LLbin*LLHisto(1)%BinSize, LLHisto(1)%Hits(LLbin),LLHisto(2)%LowVal+LLbin*LLHisto(2)%BinSize, LLHisto(2)%Hits(LLbin),alpha(1,LLBin),alpha(2,LLBin)
       enddo
 
-enddo! iHypothesis
+
+!************************************************************
+!  4. Now find the point at which alpha=1-beta
+!************************************************************
+
+! for the time being, I'm going to assume that both distributions have the same range and binning - can change this later
+   do LLbin=1,LLHisto(1)%NBins
+      checkalpha(LLBin)=alpha(1,LLBin)+alpha(2,LLBin)-1d0
+      print *, LLBIn,alpha(1,LLBin),alpha(2,LLBin),checkalpha(LLBin)
+      if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
+         alphamin=alpha(1,LLBin-1)
+         alphamax=alpha(1,LLBin)
+         betamin =alpha(2,LLBin-1)
+         betamax =alpha(2,LLBin)
+      endif
+   enddo
+
+   print *, 'alpha value in range:', alphamin,alphamax
+   print *, 'betaa value in range:', betamin,betamax 
+
+
+
 
 
 
 
 END SUBROUTINE
+
+FUNCTION Poisson(nu,n)
+! Poisson distribution = exp(-nu)*nu^n/n!
+  implicit none
+  integer :: nu,n
+  real(8) :: Poisson,logfac
+    
+  Poisson=-nu+n*log(1d0*nu)-logfac(n)
+  Poisson=exp(Poisson)
+  
+end FUNCTION POISSON
+
+
+FUNCTION logfac(N)
+  ! log(N!)=log[ (N)(N-1)(N-2)...(2)(1)]=log(N)+log(N-1)+...+log(2)
+  implicit none
+  integer :: N,i
+  real(8) :: logfac
+  
+  logfac=0d0
+  do i=2,N
+     logfac=logfac+dlog(1d0*i)
+  enddo
+  
+end FUNCTION logfac
+
+
+
+
 
 
 
