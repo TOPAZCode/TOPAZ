@@ -119,6 +119,7 @@ real(8):: factor =1d10
       open(unit=12,file=trim(filename_in),form='formatted',access='sequential')  ! open input file1
       call GetArg(3,filename_in2)
       open(unit=13,file=trim(filename_in2),form='formatted',access='sequential')  ! open input file2
+      print *, 'Using input files:', filename_in, filename_in2
       call GetArg(4,iHisto_str)
       read(iHisto_str,"(I2)") iHisto   
 
@@ -138,7 +139,8 @@ real(8):: factor =1d10
 !       write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with ",NumEvents," events using ",NumPseudoExp," pseudo-experiments"
 !      write(*,"(A,I2,A,I6,A,I9,A)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments"
       write(*,"(A,I2,A,I6,A,I9,A,F9.6)") "reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
-      
+      write(14,"(A,I2,A,I6,A,I9,A,F9.6)") "# reading histogram ",iHisto," for likelihood analysis with Lumi=",Lumi,"fb^-1 using ",NumPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
+      write(*,*) "Writing output to file : ", filename_out
       write(*,*) ""
 !       call likelihood(iHisto,NumEvents,NumPseudoExp)
       call likelihood(iHisto,Lumi,NumPseudoExp,DeltaN)
@@ -435,6 +437,7 @@ real(8) :: ymax,zran(1:2),nran(1:2),ValAccepted(1:MaxEvents),LLRatio,BinSize,Max
 real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
 integer :: SelectedEvent,LLbin,PlotObsEvts(1:2,1:10000),i,s,offset,SUA
 real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),sran
+real(8) :: LLRatio_array(1:2,1:NumPseudoExp),LLRatio_min,LLRatio_max
 logical ::  GotNumEvents,PoissonEvents,PoissonBins,useshape
 type :: Histogram
     integer :: NBins
@@ -469,7 +472,7 @@ PoissonEvents=.true.
 !  Scale Uncertainty Approach: 
 ! 1=rescale PREDICTED cross-secs and distr (conservative)
 ! 2=change OBSERVED events in each pseudoexp
-SUA=2                   
+SUA=1                   
 
 if (SUA .ne. 1 .and. SUA .ne. 2 .and. DeltaN .ne. 1d0) then
    print *, "WARNING : SCALE UNCERTAINTY NOT USED!"
@@ -698,25 +701,71 @@ do iHypothesis=1,2
       endif
       LLRatio=LLRatio+offset
       if (iPseudoExp .eq. 1) then
-         print *, 'LLRatio=',LLRatio
+         print *, 'LLRatio=',LLRatio,offset
       endif
 
 
-
-!************************************************************
-!  2.3 bin the likelihood value 
-!************************************************************
-      WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
-      WhichBin=int(WhichBin)
-      if( WhichBin.lt.0 ) WhichBin = 1
-      if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
-      LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
+      LLRatio_array(iHypothesis,iPseudoExp)=LLRatio
   enddo! iPseudoExp
   do i=1,2000
      s=101+iHypothesis
      write(s,*) i,PlotObsEvts(iHypothesis,i)
   enddo
 
+enddo! iHypothesis
+
+LLRatio_max=-1d-6
+LLRatio_min=1d6
+
+do iHypothesis=1,2
+   do iPseudoExp=1,NumPseudoExp
+      if (LLRatio_array(iHypothesis,iPseudoExp) .gt. LLRatio_max) then
+         LLRatio_max=LLRatio_array(iHypothesis,iPseudoExp) 
+      endif
+      if (LLRatio_array(iHypothesis,iPseudoExp) .lt. LLRatio_min) then
+         LLRatio_min=LLRatio_array(iHypothesis,iPseudoExp) 
+      endif
+   enddo
+enddo
+print *, LLRatio_min,LLRatio_max
+!LLRatio_max=100d0*(int(LLRatio_max/100)+1)
+!LLRatio_min=100d0*(int(LLRatio_max/100)-1)
+LLRatio_max=ceiling(LLRatio_max)
+LLRatio_min=floor(LLRatio_min)
+
+if (LLRatio_max .lt. LLRatio_min) then
+   print *, 'ERROR: MAX OF LL RATIO IS SMALLER THAN MIN!'
+   print *, LLRatio_max,LLRatio_min
+   stop
+endif
+
+
+LLHisto(1)%NBins   = 1000
+LLHisto(1)%BinSize = (LLRatio_max-LLRatio_min)/LLHisto(1)%NBins
+LLHisto(1)%LowVal  = LLRatio_min
+LLHisto(1)%Hits(:) = 0
+print *, LLHisto(1)%BinSize
+print *, LLRatio_min, LLRatio_max
+pause
+LLHisto(2)%NBins   = LLHisto(1)%NBins
+LLHisto(2)%BinSize = LLHisto(1)%BinSize
+LLHisto(2)%LowVal  = LLHisto(1)%LowVal
+LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
+
+!************************************************************
+!  2.3 bin the likelihood value 
+!************************************************************
+do iHypothesis=1,2
+   do iPseudoExp=1,NumPseudoExp
+      LLRatio=LLRatio_array(iHypothesis,iPseudoExp)
+      WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
+      WhichBin=int(WhichBin)
+      if( WhichBin.lt.0 ) WhichBin = 1
+      if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
+      LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
+   enddo
+
+         
 !************************************************************
 ! 2.4 Find the integral under the LL distribution
 !************************************************************
@@ -726,8 +775,7 @@ do iHypothesis=1,2
               LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
          alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NumPseudoExp*LLHisto(iHypothesis)%BinSize)
       enddo
-   enddo! iHypothesis
-
+enddo
 !************************************************************
 !  3. write out the LL distribution, and find integral under each distribution
 !************************************************************
@@ -753,13 +801,22 @@ do iHypothesis=1,2
          alphamax=alpha(1,LLBin)
          betamin =alpha(2,LLBin-1)
          betamax =alpha(2,LLBin)
+         
+         if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
+            ! this is comparing two identical hypotheses!
+            alphamin=1d0
+            alphamax=1d0
+            betamin=0d0
+            betamax=0d0
+         endif
       endif
    enddo
 
    print *, 'alpha value in range:', alphamin,alphamax
    print *, 'betaa value in range:', betamin,betamax 
 
-
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
 
 
 
