@@ -8,7 +8,14 @@ use ifport
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error
-
+!DEC$ IF(_UseMPIVegas .EQ.1)
+include 'mpif.h'
+integer :: ierror
+   call MPI_INIT(ierror)
+   call MPI_COMM_RANK(MPI_COMM_WORLD,MPI_Rank,ierror)
+!DEC$ ELSE
+   MPI_Rank=0
+!DEC$ ENDIF
 
 
    call GetCommandlineArgs()
@@ -24,24 +31,31 @@ real(8) :: VG_Result,VG_Error
    call InitVegas()
    call InfoPrimAmps("PrimAmpInfo.txt")
    call OpenFiles()
-   call WriteParameters(6)   ! stdout
-   call WriteParameters(15)  ! vegas status file
+   if( MPI_Rank.eq.0 ) then   
+      call WriteParameters(6)   ! stdout
+      call WriteParameters(15)  ! vegas status file
+   endif
    if( TopDecays.eq.5 .or. TopDecays.eq.6 ) call fitFF(MuFrag)
 
    print *, "Running"
    call cpu_time(time_start)
+!DEC$ IF(_UseMPIVegas .EQ.0)
    call StartVegas(VG_Result,VG_Error)
+!DEC$ ELSE
+   call StartPVegas(VG_Result,VG_Error)
+!DEC$ ENDIF
    call cpu_time(time_end)
-!    call WriteHisto(6,it,VG_Result,VG_Error,time_end-time_start)   ! stdout (unit=6)
    call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
-   print *, 'VEGAS CONVERGENCE PLOTTING DISABLED!'
 !   call PlotVegas()
    call CloseFiles()
    print *, "Done (",(time_end-time_start)/60d0,") minutes"
 
 
-print *, "COUNTER pole_skipped",pole_skipped
-print *, "COUNTER useQP",useQP
+
+!DEC$ IF(_UseMPIVegas .EQ.1)
+   call MPI_FINALIZE(ierror)
+!DEC$ ENDIF
+
 
 END PROGRAM
 
@@ -57,7 +71,7 @@ use ModKinematics
 use ifport
 implicit none
 character :: arg*(100)
-character :: env*(31),ColliderStr*(10),ColliderDirStr*(10),ProcessStr*(2),CorrectionStr*(10),FileTag*(50),SeedStr*(6),MuStr*(7),ObsStr*(6)
+character :: env*(31),ColliderStr*(10),ColliderDirStr*(10),ProcessStr*(2),CorrectionStr*(10),FileTag*(50),DataDir*(80),SeedStr*(6),MuStr*(7),ObsStr*(6)
 integer :: NumArgs,NArg,IDipAlpha(1:5),iDKAlpha(1:3),DipAlpha2
 logical :: dirresult
 
@@ -73,7 +87,7 @@ logical :: dirresult
    ZDecays=-100
    HelSampling=.false.
    FirstLOThenVI=.false.
-   m_Top=172d0*GeV
+   m_Top=173d0*GeV
    m_STop=350d0*GeV
    m_HTop=500d0*GeV
    m_Zpr=1500d0*GeV
@@ -94,6 +108,7 @@ logical :: dirresult
    Unweighted = .false.
    HistoFile=""
    FileTag=""
+   DataDir="./"
    MuStr=""
    ObsStr=""
    GridFile="grid"
@@ -186,13 +201,16 @@ logical :: dirresult
     elseif( arg(1:8).eq."FileTag=" ) then
         read(arg(9:59),*)  FileTag
         if( FileTag.eq."." ) FileTag=""
-     elseif( arg(1:10) .eq. "AbsDelF1A=" ) then
+    elseif( arg(1:8).eq."DataDir=" ) then
+        DataDir(:)=trim(arg(9:100))
+        ! note copying via read(arg(:),*)  DataDir does not work because the strings are terminated when "\" is encountered
+    elseif( arg(1:10) .eq. "AbsDelF1A=" ) then
         read(arg(11:16),*) AbsDelF1A
-     elseif( arg(1:10) .eq. "AbsDelF1V=" ) then
+    elseif( arg(1:10) .eq. "AbsDelF1V=" ) then
         read(arg(11:16),*) AbsDelF1V
-     elseif( arg(1:10) .eq. "RelDelF1A=" ) then
+    elseif( arg(1:10) .eq. "RelDelF1A=" ) then
         read(arg(11:16),*) RelDelF1A
-     elseif( arg(1:10) .eq. "RelDelF1V=" ) then
+    elseif( arg(1:10) .eq. "RelDelF1V=" ) then
         read(arg(11:16),*) RelDelF1V
     elseif( arg(1:9).eq."DipAlpha=" ) then
         read(arg(10:10),*) iDipAlpha(1)
@@ -221,7 +239,7 @@ logical :: dirresult
 
    if( DipAlpha2.eq.0d0 ) then
        print *, "DipAlpha2 cannot ne zero"
-       !stop
+       stop
    endif
    if (alpha_ii.ne.1d0) alpha_ii = DipAlpha2 * alpha_ii
    if (alpha_if.ne.1d0) alpha_if = DipAlpha2 * alpha_if
@@ -287,7 +305,7 @@ logical :: dirresult
     endif
     if( Process.ge.81 .and. Process.le.89 ) then
           ZDecays=-2
-          M_Z = 0d0
+          print *, "Please set M_Z=0 in ModParameters, recompile and remove this line."; stop
           if( TopDecays.ne.0 ) then
               print *, "tops are not yet allowed to decay for process",Process
               stop
@@ -380,9 +398,9 @@ logical :: dirresult
     endif
 
 
-    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr)))! need adjustl to cut off leading spaces for Mu<10.00 (=1TeV)
-    dirresult = makedirqq("./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr))
-    if(dirresult) print *, "created directory "//"./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)
+    dirresult = makedirqq(trim(DataDir)//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr)))! need adjustl to cut off leading spaces for Mu<10.00 (=1TeV)
+    dirresult = makedirqq(trim(DataDir)//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr))
+    if(dirresult) print *, "created directory "//trim(DataDir)//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)
 
 
     if( ObsSet.eq.8 ) then!   spin correlations with R
@@ -393,11 +411,11 @@ logical :: dirresult
 
 
     if(HistoFile.eq."") then
-        HistoFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
+        HistoFile = trim(DataDir)//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//"."//trim(CorrectionStr)//trim(SeedStr)//trim(FileTag)
     endif
 
    if( trim(GridFile).eq."grid" ) then
-      GridFile = "./"//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//trim(FileTag)//".1L."//trim(GridFile)
+      GridFile = trim(DataDir)//trim(ColliderDirStr)//"_"//trim(ObsStr)//"_"//trim(adjustl(MuStr))//"/"//trim(ProcessStr)//"/"//trim(ColliderStr)//"."//trim(ProcessStr)//trim(FileTag)//".1L."//trim(GridFile)
    endif
 
 return
@@ -561,8 +579,7 @@ END SUBROUTINE
 
 
 
-
-!DEC$ IF(_UseCuba .EQ.0)
+!DEC$ IF(_UseMPIVegas .EQ.0)
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModMisc
 use ModCrossSection_TTB
@@ -1408,7 +1425,7 @@ IF( CORRECTION   .EQ.0 ) THEN
    call vegas1(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
   endif
 
-ELSEIF( CORRECTION   .EQ.1 ) THEN
+ELSEIF( CORRECTION .EQ.1 ) THEN
   if( FirstLOThenVI ) then
       CORRECTION=0
       call vegas(EvalCS_1L_ttbqqbZ,VG_Result,VG_Error,VG_Chi2)
@@ -1681,16 +1698,13 @@ END SUBROUTINE
 
 
 
-
-
-
-
-!DEC$ IF(_UseCuba .EQ.1)
-SUBROUTINE StartVegas(VG_Result,VG_Error)
+!DEC$ IF(_UseMPIVegas .EQ.1)
+SUBROUTINE StartPVegas(VG_Result,VG_Error)
 use ModMisc
 use ModCrossSection_TTB
 use ModCrossSection_TTBJ
 use ModCrossSection_TTBP
+use ModCrossSection_TTBZ
 use ModCrossSection_TTBETmiss
 use ModCrossSection_ZprimeTTB
 use ModKinematics
@@ -1698,67 +1712,118 @@ use ModParameters
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
-integer :: verbose,mineval,maxeval,nstart,nincrease,neval,fail,ncomp,nbatch,userdata,seed,gridno
-real(8) :: epsrel,epsabs
-character :: CubaStateFile*(20)
+logical :: warmup
+include 'mpif.h'
+integer i,init;
+double precision yrange(1:2*MXDIM)
+
+
+do i=1,ndim
+  yrange(i)=0d0
+  yrange(i+ndim)=1d0
+enddo
+nprn=3
+
+
+if( GridIO.eq.-1 ) then
+  readin=.false.
+  writeout=.true.
+  outgridfile=GridFile(1:72)
+elseif( GridIO.eq.+1 ) then
+  readin=.true.
+  writeout=.false.
+  ingridfile=GridFile(1:72)
+elseif( GridIO.eq.+2 ) then
+  FirstLOThenVI = .true.
+else
+  readin=.false.
+  writeout=.false.
+endif
 
 
 
-  ncomp = 1
-  mineval   = 1000
-  maxeval   = VegasNc1
-  nstart    = 1000
-  nincrease = 1000
-  epsrel = 1d-10
-  epsabs = 1d-10
-  verbose = 2
-  userdata = 0
-  seed = 0
-  nbatch = 10000
-  gridno = 1
-  cubastatefile = ""
-! in bash shell: export CUBACORES=8
+VegasMxDim=mxdim
+
+if( VegasIt0.eq.0 .OR. VegasNc0.eq.0 ) then
+   warmup = .false.
+   itmx = VegasIt1
+   ncall= VegasNc1
+else
+   itmx = VegasIt0
+   ncall= VegasNc0
+   warmup = .true.
+endif
 
 
-  VegasMxDim=mxdim
-  call InitHisto()
 
 
 IF( MASTERPROCESS.EQ.1 ) THEN
+IF( CORRECTION.LE.1 .AND. PROCESS.EQ.1 .AND. TOPDECAYS.NE.101) THEN
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbgg_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbgg_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+
+
+
+IF( MASTERPROCESS.EQ.17 ) THEN
 IF( CORRECTION   .EQ.0 ) THEN
-
-  call vegas(ndim,ncomp,EvalCS_1L_ttbgg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
-
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
 ENDIF
 ENDIF
 
 
 
-IF( MASTERPROCESS.EQ.5 ) THEN
-IF( CORRECTION   .EQ.2 ) THEN
 
-  call vegas(ndim,ncomp,EvalCS_Real_ttbgggg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
-
+IF( MASTERPROCESS.EQ.19 ) THEN
+IF( CORRECTION.EQ.2 ) THEN
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_Real_ttbgggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_Real_ttbgggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
 ENDIF
 ENDIF
 
 
 
-IF( MASTERPROCESS.EQ.6 ) THEN
-IF( CORRECTION   .EQ.2 ) THEN
 
-  call vegas(ndim,ncomp,EvalCS_Real_ttbqqbgg_CUBA,userdata,epsrel,epsabs,verbose,seed,mineval,maxeval,nstart,nincrease,nbatch,gridno,cubastatefile,neval,fail,VG_Result,VG_Error,VG_Chi2)
-
-ENDIF
-ENDIF
-
-
-it=4
-
-
-RETURN
+return
 END SUBROUTINE
 !DEC$ ENDIF
+
+
+
+
+
 
 
 
@@ -1781,6 +1846,9 @@ include "vegas_common.f"
   nprn = 1
   readin=.false.
   writeout=.false.
+!DEC$ IF(_UseMPIVegas .EQ.1)
+  it = 1   ! this has to be fixed for PVegas because the division by curit is done already in the c code
+!DEC$ ENDIF
 
   if( VegasIt0.eq.-1 ) VegasIt0 = VegasIt0_default
   if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default

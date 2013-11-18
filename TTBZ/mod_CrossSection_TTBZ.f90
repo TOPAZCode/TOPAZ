@@ -8,6 +8,20 @@ contains
 
 
 
+
+FUNCTION EvalCS_1L_ttbggZ_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_1L_ttbggZ_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_1L_ttbggZ(yRnd,VgsWgt)
+EvalCS_1L_ttbggZ_MPI=0
+RETURN
+END FUNCTION
+
+
+
+
 FUNCTION EvalCS_1L_ttbggZ(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -51,7 +65,7 @@ include 'vegas_common.f'
 ! ZQcoupl=2           ! up and down
 ZQcoupl=3           !vector and axial-vector
 DPtol=1d-4
-QPtol=1d-4
+QPtol=1d-3
 
 
 EvalCS_1L_ttbggZ = 0d0
@@ -933,7 +947,7 @@ include "vegas_common.f"
   npdfmin=1
   npdfmax=2
   DPtol=1d-4
-  QPtol=1d-4
+  QPtol=1d-3
 
   if (first) then
      print *, '=============================================================================='
@@ -1754,6 +1768,16 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_Real_ttbgggZ_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_Real_ttbgggZ_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_Real_ttbgggZ(yRnd,VgsWgt)
+EvalCS_Real_ttbgggZ_MPI=0
+RETURN
+END FUNCTION
+
 
 
 
@@ -2545,6 +2569,7 @@ do npdf=1,2
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
    enddo
+   EvalCounter = EvalCounter + 1
 
 
 14 continue
@@ -2842,6 +2867,7 @@ do npdf=1,2
    do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
    enddo
+   EvalCounter = EvalCounter + 1
 
 
 15 continue

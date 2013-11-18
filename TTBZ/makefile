@@ -15,6 +15,7 @@ QCDLoop = $(Here)/QCDLoop-1.9
 
 # compiler options
 F95compiler = ifort
+#F95compiler = mpif90 -lpthread  -lm
 Opt = Yes
 
 
@@ -55,7 +56,8 @@ PDFObj = $(PDFDir)/mstwpdf.o \
 RockyObj = $(PSDir)/genps.o \
            $(PSDir)/boost.o
 YetiObj  = $(PSDir)/yeti.o
-VegasObj = $(VegasDir)/vegas.o
+VegasObj = $(VegasDir)/vegas.o 
+           #$(VegasDir)/pvegas_mpi.o
 
 CubaLib = $(CubaDir)/libcuba.a
 

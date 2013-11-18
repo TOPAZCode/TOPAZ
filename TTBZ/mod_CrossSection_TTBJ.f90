@@ -1699,26 +1699,6 @@ END FUNCTION
 
 
 
-INTEGER FUNCTION EvalCS_Real_ttbgggg_CUBA(ndims,var,ncomp,integral,userdata,weight,iter)
-use ModParameters
-implicit none
-integer :: ndims,ncomp,iter,userdata
-real(8) :: var(ndims),integral(ncomp),weight
-real(8) :: yRnd(1:VegasMxDim)
-
-  if( weight.eq.0d0 ) then!   wtf ??
-    integral(1) = 0d0
-    return
-  endif
-
-  yRnd(1:NDims) = var(1:NDims)
-  integral(1) = EvalCS_Real_ttbgggg(yRnd(1:VegasMxDim),weight)
-  EvalCS_Real_ttbgggg_CUBA = 0
-
-RETURN
-END FUNCTION
-
-
 
 
 FUNCTION EvalCS_Real_ttbgggg(yRnd,VgsWgt)
@@ -1916,27 +1896,6 @@ END FUNCTION
 
 
 
-
-
-
-INTEGER FUNCTION EvalCS_Real_ttbqqbgg_CUBA(ndims,var,ncomp,integral,userdata,weight,iter)
-use ModParameters
-implicit none
-integer :: ndims,ncomp,iter,userdata
-real(8) :: var(ndims),integral(ncomp),weight
-real(8) :: yRnd(1:VegasMxDim)
-
-  if( weight.eq.0d0 ) then!   wtf ??
-    integral(1) = 0d0
-    return
-  endif
-
-  yRnd(1:NDims) = var(1:NDims)
-  integral(1) = EvalCS_Real_ttbqqbgg(yRnd(1:VegasMxDim),weight)
-  EvalCS_Real_ttbqqbgg_CUBA = 0
-
-RETURN
-END FUNCTION
 
 
 

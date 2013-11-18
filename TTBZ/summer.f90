@@ -6,6 +6,8 @@ character :: filename_in*(80),filename_in2*(80),filename_out*(50),operation*(10)
 character :: iHisto_str*(5),nrebin_str*(5),NumEvents_str*(6),Lumi_str*(6),NumPseudoExp_str*(9),DeltaN_str*(5)
 real(8) :: DeltaN
 real(8):: factor =1d10
+logical :: silent=.false.
+
 
 ! get number of arguments
   NumArgs = NArgs()-1
@@ -14,6 +16,9 @@ real(8):: factor =1d10
   call GetArg(1,operation)
   if( trim(operation).eq.'add' ) then
       op=1
+  elseif( trim(operation).eq.'addsilent' ) then
+      op=1
+      silent=.true.
   elseif( trim(operation).eq.'avg' ) then
       op=2
   elseif( trim(operation).eq.'sumbins' ) then
@@ -50,7 +55,7 @@ real(8):: factor =1d10
         call GetArg(NArg,filename_in)
         open(unit=10+NArg,file=trim(filename_in),form='formatted',access='sequential')
       enddo
-      call add_avg(NumArgs,op)
+      call add_avg(NumArgs,op,silent)
       print *, "output written to "//trim(filename_out)
 
   elseif( op.eq.2 ) then
@@ -61,7 +66,7 @@ real(8):: factor =1d10
         call GetArg(NArg,filename_in)
         open(unit=10+NArg,file=trim(filename_in),form='formatted',access='sequential')
       enddo
-      call add_avg(NumArgs,op)
+      call add_avg(NumArgs,op,silent)
       print *, "output written to "//trim(filename_out)
 
   elseif( op.eq.3 ) then
@@ -160,7 +165,7 @@ END PROGRAM
 
 
 
-SUBROUTINE add_avg(NumArgs,op)
+SUBROUTINE add_avg(NumArgs,op,silent)
 implicit none
 integer :: NArg,row,NumArgs,op
 character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
@@ -170,7 +175,7 @@ real(8) :: BinVal(1:MaxFiles)=-1d-99,Value(1:MaxFiles)=-1d-99,Error(1:MaxFiles)=
 real(8) :: SumValue,SumError,n
 integer :: SumHits
 character :: dummy*(1)
-
+logical :: silent
 
   do while(.not.eof(12))  ! loop over all rows
     SumValue = 0d0
@@ -206,7 +211,7 @@ character :: dummy*(1)
     SumError = dsqrt(SumError)
 
     if(abs(SumHits).gt.999999999) SumHits=999999999
-    write(* ,fmt1) NHisto(1),"|",BinVal(1),"|",SumValue,"|",SumError,"|",SumHits,"|"
+    if( .not.silent ) write(* ,fmt1) NHisto(1),"|",BinVal(1),"|",SumValue,"|",SumError,"|",SumHits,"|"
     write(10,fmt1) NHisto(1),"|",BinVal(1),"|",SumValue,"|",SumError,"|",SumHits,"|"
   enddo
 

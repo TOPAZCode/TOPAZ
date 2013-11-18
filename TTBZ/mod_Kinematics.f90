@@ -36,7 +36,86 @@ real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut, Mttbar_cut
 
 real(8),public ::MInv_LB
 
+
+
+
+!DEC$ IF(_UseMPIVegas.EQ.1)
+integer,public,parameter :: NUMHISTO=30       ! this has to match the constants in pvegas_mpi.c
+integer,public,parameter :: MXHISTOBINS=50
+type, BIND(C) :: ReducedHistogram
+    real(8) :: Value(1:MXHISTOBINS)
+    real(8) :: Value2(1:MXHISTOBINS)
+    integer :: Hits(1:MXHISTOBINS)
+end type
+type(ReducedHistogram)  :: RedHisto(1:NUMHISTO)
+public :: RedHisto,getRedHisto,transferHisto,clearRedHisto
+!DEC$ ENDIF
+
+
+
 contains
+
+
+
+
+
+!DEC$ IF(_UseMPIVegas.EQ.1)
+INTEGER FUNCTION getRedHisto(TheHisto,NHisto)
+implicit none
+type(ReducedHistogram) :: TheHisto
+integer NHisto,NBin
+
+
+  do NBin=1,MXHISTOBINS
+    TheHisto%Value(NBin)  = RedHisto(NHisto)%Value(NBin)
+    TheHisto%Value2(NBin) = RedHisto(NHisto)%Value2(NBin)
+    TheHisto%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)
+  enddo
+
+getRedHisto=0
+RETURN
+END FUNCTION
+
+
+
+
+INTEGER FUNCTION transferHisto(TheHisto,NHisto)
+use ModParameters
+implicit none
+type(ReducedHistogram) :: TheHisto
+integer NHisto,NBin
+
+  if( NHisto.gt.NumHistograms ) return! this is required because in C we loop until max.number of histograms (NUMHISTO)
+  do NBin=1,Histo(NHisto)%NBins
+    Histo(NHisto)%Value(NBin)  = TheHisto%Value(NBin)
+    Histo(NHisto)%Value2(NBin) = TheHisto%Value2(NBin)
+    Histo(NHisto)%Hits(NBin)   = TheHisto%Hits(NBin)
+  enddo
+
+transferHisto=0
+RETURN
+END FUNCTION
+
+
+
+
+SUBROUTINE clearRedHisto()
+implicit none
+integer NHisto,NBin
+
+  do NHisto=1,NUMHISTO
+  do NBin=1,MXHISTOBINS
+    RedHisto(NHisto)%Value(NBin)  = 0d0
+    RedHisto(NHisto)%Value2(NBin) = 0d0
+    RedHisto(NHisto)%Hits(NBin)   = 0
+  enddo
+  enddo
+
+RETURN
+END SUBROUTINE
+!DEC$ ENDIF
+
+
 
 
 
@@ -3511,7 +3590,7 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
 !          NumHistograms = 3
-          NumHistograms = 20
+          NumHistograms = 21
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3615,28 +3694,34 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(16)%SetScale= 1d0
 
           Histo(17)%Info   = "phi(mu-,mu+)"
-          Histo(17)%NBins  = 15    *4d0
+          Histo(17)%NBins  = 50
           Histo(17)%BinSize= 0.25d0/4d0
           Histo(17)%LowVal = 0d0
           Histo(17)%SetScale= 1d0
 
           Histo(18)%Info   = "CosAlpha*(Z,mu-)"
-          Histo(18)%NBins  = 15    *4d0
+          Histo(18)%NBins  = 50
           Histo(18)%BinSize= 0.25d0/4d0
           Histo(18)%LowVal = -1d0
           Histo(18)%SetScale= 1d0
 
           Histo(19)%Info   = "phi(Z,antit)"
-          Histo(19)%NBins  = 15    *4d0
+          Histo(19)%NBins  = 50
           Histo(19)%BinSize= 0.25d0/4d0
           Histo(19)%LowVal = 0d0
           Histo(19)%SetScale= 1d0
 
           Histo(20)%Info   = "phi(t,antit)"
-          Histo(20)%NBins  = 15    *4d0
+          Histo(20)%NBins  = 50
           Histo(20)%BinSize= 0.25d0/4d0
           Histo(20)%LowVal = 0d0
           Histo(20)%SetScale= 1d0
+
+          Histo(21)%Info   = "N(jets)"
+          Histo(21)%NBins  = 5
+          Histo(21)%BinSize= 1d0
+          Histo(21)%LowVal = 1d0
+          Histo(21)%SetScale= 1d0
 
 
 
@@ -3976,6 +4061,10 @@ ELSE
 ENDIF
 
 
+!DEC$ IF(_UseMPIVegas.EQ.1)
+    if( NumHistograms.gt.NUMHISTO ) call Error("Number of histograms exceeds limit for MPI implemenation. Increase NUMHISTO in .f90 and .c",NumHistograms)
+!DEC$ ENDIF
+
 
 do NHisto=1,NumHistograms
       if( .not.allocated(Histo(NHisto)%Value) ) then
@@ -3993,6 +4082,9 @@ do NHisto=1,NumHistograms
       Histo(NHisto)%Value(0:Histo(NHisto)%NBins+1) = 0d0
       Histo(NHisto)%Value2(0:Histo(NHisto)%NBins+1)= 0d0
       Histo(NHisto)%Hits(0:Histo(NHisto)%NBins+1)  = 0
+!DEC$ IF(_UseMPIVegas.EQ.1)
+    if( Histo(NHisto)%NBins.gt.MXHISTOBINS ) call Error("Number of histo bins exceeds limit for MPI implemenation. Increase MXHISTOBINS in .f90 and .c",NHisto)
+!DEC$ ENDIF
 enddo
 
 
@@ -7482,6 +7574,11 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
         RETURN
     endif
 
+    NObsJet=0
+    do i=1,NJet
+        if( get_PT(MomJet(1:4,i)).gt.pT_jet_cut .and. abs(get_ETA(MomJet(1:4,i))).lt.eta_jet_cut ) NObsJet=NObsJet+1
+    enddo
+
     if( pT_lep(1).lt.pT_lep_cut .OR. pT_lep(2).lt.pT_lep_cut .OR. pT_lep(3).lt.pT_lep_cut ) then
         applyPSCut = .true.
         RETURN
@@ -7530,6 +7627,7 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     NBin(18) = WhichBin(18,CosTheta1)
     NBin(19) = WhichBin(19,DphiZt)
     NBin(20) = WhichBin(20,Dphittbar)
+    NBin(21) = WhichBin(21,dble(NObsJet))
 
 
 !-------------------------------------------------------
@@ -10332,9 +10430,17 @@ real(8) :: Value
 
     if( IsNaN(Value) ) return
 
+!DEC$ IF(_UseMPIVegas.EQ.0)
      Histo(NHisto)%Value(NBin) = Histo(NHisto)%Value(NBin)  + Value
      Histo(NHisto)%Value2(NBin)= Histo(NHisto)%Value2(NBin) + Value**2
      Histo(NHisto)%Hits(NBin)  = Histo(NHisto)%Hits(NBin)+1
+!DEC$ ELSE
+     if( nbin.le.0 ) return
+     if( nbin.gt.MXHISTOBINS ) return
+     RedHisto(NHisto)%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)+1
+     RedHisto(NHisto)%Value(NBin)  = RedHisto(NHisto)%Value(NBin)+Value
+     RedHisto(NHisto)%Value2(NBin) = RedHisto(NHisto)%Value2(NBin)+Value**2
+!DEC$ ENDIF
 
 RETURN
 END SUBROUTINE

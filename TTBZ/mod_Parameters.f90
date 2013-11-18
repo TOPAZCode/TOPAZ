@@ -19,6 +19,12 @@ integer(8), public, save :: PSCutCounter=0
 integer(8), public, save :: SkipCounter=0
 logical,public ,parameter :: TTBZ_SpeedUp=.false.  !  good idea but doesn't work. always set to .false.
 
+! PVegas (MPI) part
+integer, public :: MPI_Rank
+integer, parameter :: NUMFUNCTIONS=1
+integer, parameter :: WORKERS=7
+integer, parameter :: PDIM=0
+
 
 integer,public, save :: pole_skipped=0
 integer,public, save :: useQP=0
@@ -40,20 +46,15 @@ real(8), public, parameter :: GeV=0.01d0
 
 !orig real(8), public, parameter :: alpha = 1d0/(137d0)
 !orig real(8), public, parameter :: alpha4Pi = alpha*4d0*DblPi
-real(8), public, parameter :: GF = (1.16639d-5)/GeV**2
+real(8), public, parameter :: GF = (1.166379d-5)/GeV**2
 real(8), public            :: m_Top, m_SMTop
 real(8), public            :: m_Bot
 real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-!orig real(8), public            :: m_Z     = 91.19d0*GeV  
-!KTP
- real(8), public :: m_Z     = 91.1876d0*GeV
-
-!orig real(8), public, parameter :: m_W     = 80.419d0*GeV
-!KTP
-real(8), public, parameter :: m_W     = 80.399d0*GeV
+real(8), public, parameter :: m_Z     = 91.1876d0*GeV  ! 
+real(8), public, parameter :: m_W     = 80.385d0*GeV
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
 real(8), public            :: m_HTop
@@ -61,7 +62,7 @@ real(8), public, parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8), public, parameter :: g_weak = dsqrt(g2_weak)
 !orig real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
 !orig real(8), public, parameter :: sw2 = sw**2
-real(8), public, parameter :: sw2 = 2.22626515643872d-1
+real(8), public, parameter :: sw2 = 1d0 - m_W**2/m_Z**2
 real(8), public, parameter :: sw = dsqrt(sw2)
 real(8), public, parameter :: alpha4Pi = g2_weak*sw2
 real(8), public, parameter :: alpha = alpha4Pi/4d0/DblPi
@@ -130,8 +131,8 @@ real(8), public, parameter :: couplZTT_right_SM = -sw/cw*Q_up
 ! real(8), public, parameter :: couplZTT_right_SM = Q_up
 ! real(8), public, parameter :: couplZTT_left_SM  = 1d0!  This is for the check against ttb+photon.
 ! real(8), public, parameter :: couplZTT_right_SM = 1d0
-real(8), public, parameter ::  couplZTT_V_SM =  couplZTT_left_SM+couplZTT_right_SM
-real(8), public, parameter ::  couplZTT_A_SM = -couplZTT_left_SM+couplZTT_right_SM
+real(8), public, parameter ::  couplZTT_V_SM =  (+couplZTT_left_SM+couplZTT_right_SM)/2d0   ! MARKUS: introduced 1/2 here
+real(8), public, parameter ::  couplZTT_A_SM =  (+couplZTT_left_SM-couplZTT_right_SM)/2d0   ! MARKUS: introduced 1/2 here and changed sign
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
@@ -405,42 +406,6 @@ ELSEIF( COLLIDER.EQ.12 ) THEN
 ELSEIF( COLLIDER.EQ.13 ) THEN
    Collider_Energy  = 13000d0*GeV
    COLLIDER = 1
-
-!    Collider_Energy  = 14000d0*GeV
-!    if( ObsSet.eq.1 ) then
-!         Collider_Energy  = 14000d0*GeV
-!    endif
-!    if( ObsSet.eq.3 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.5 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.6 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.8 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.11 ) then
-!         Collider_Energy  = 14000d0*GeV
-!    endif
-!    if( ObsSet.eq.13 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.15 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.25 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.60 ) then
-!         Collider_Energy  = 7000d0*GeV
-!    endif
-!    if( ObsSet.eq.61 ) then
-!         Collider_Energy  = 14000d0*GeV
-!    endif
-
 ELSEIF( COLLIDER.EQ.2 ) THEN
   Collider_Energy  = 1960d0*GeV
 ENDIF
@@ -455,19 +420,16 @@ IF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.1 .OR. NLOPARAM.EQ.0) ) THEN
 ELSEIF( PDFSet.EQ.2 .AND. (NLOPARAM.EQ.2) ) THEN
   Lambda_QCD = 0.226235d0*GeV
   alpha_s = 0.118d0
+
 ELSEIF(  PDFSet.EQ.1 .AND. (NLOPARAM.EQ.1 .OR. NLOPARAM.EQ.0)) THEN
   Lambda_QCD = 0.167d0/100d0
   alpha_s = 0.13939d0
-
-alpha_s = 0.13; print *, "change alpha_s for MSTR pdfs (comparison with Kirill)"
+! alpha_s = 0.13; print *, "change alpha_s for MSTR pdfs (comparison with Kirill)"
 
 ELSEIF( PDFSet.EQ.1 .AND. (NLOPARAM.EQ.2) ) THEN
    Lambda_QCD = 0.226235d0/100d0
    alpha_s=0.12018D0
-
-alpha_s = 0.119; print *, "change alpha_s for MRST pdfs (comparison with Kirill)"
-
-
+! alpha_s = 0.119; print *, "change alpha_s for MRST pdfs (comparison with Kirill)"
 ELSE
   print *, "alpha_s not set"
 ENDIF
@@ -518,8 +480,8 @@ ENDIF
 
    couplZTT_V = couplZTT_V_SM * (1d0 + DeltaF1V)
    couplZTT_A = couplZTT_A_SM * (1d0 + DeltaF1A)
-   couplZTT_left  = (couplZTT_V - couplZTT_A)/2d0
-   couplZTT_right = (couplZTT_V + couplZTT_A)/2d0
+   couplZTT_left  = (couplZTT_V + couplZTT_A)/1d0     ! MARKUS:  removed 1/2
+   couplZTT_right = (couplZTT_V - couplZTT_A)/1d0     ! MARKUS:  removed 1/2 and introduced a minus
 
 !   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
    couplZTT_left_dyn  = couplZTT_left
@@ -538,9 +500,8 @@ ENDIF
                              )
     BrZtoEE = alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/ZWidth
 !     print *, "Z->ee branching using calculated LO total width",BrZtoEE
-    print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
-    print *, "sw2",sw**2
-!     pause
+!     print *, "Z->ee branching using experimental  total width",alpha/12d0*M_Z *( (couplZEE_left+couplZEE_right)**2 + (couplZEE_left-couplZEE_right)**2 )/Ga_ZExp
+!     print *, "sw2",sw**2
 
 
 !  chiral couplings for stop-Chi^0-top
