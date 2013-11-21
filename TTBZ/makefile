@@ -13,21 +13,27 @@ PSDir = $(Here)/PhaseSpace
 QCDLoop = $(Here)/QCDLoop-1.9
 
 
-# compiler options
-F95compiler = ifort
-#F95compiler = mpif90 -lpthread  -lm
+# MPI compiler options.  Also adjust -D_UseMPIVegas=0,1 in ttbjets.cfg
+# run with: mpiexec -n 4 ./TOPAZ ...
+useMPI = No
+ifeq ($(useMPI),Yes)
+    F95compiler = mpif90 -f90=ifort -lpthread  -lm 
+    ccomp = mpicc -lpthread  -lm 
+else
+    F95compiler = ifort
+    ccomp = gcc -O0
+# never use gcc with other than O0, optimization seems to be buggy
+endif
+
+
 Opt = Yes
-
-
 ifeq ($(Opt),Yes)
-   IfortOpts   = -O1 -fpp -vec-report0 -opt-report -opt-report-file$(OptReport) -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
+   IfortOpts   = -O2 -fpp -vec-report0 -opt-report -opt-report-file$(OptReport) -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
 else
    IfortOpts   = -O0 -fpp -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv -I$(Here)/colors -I$(VegasDir) -module $(ModuleDir)
 endif
 fcomp = $(F95compiler) $(IfortOpts) @$(ConfigFile)
 
-# never use gcc with other than O0, optimization seems to be buggy
-ccomp = gcc -O0
 
 
 # executable file
@@ -35,7 +41,6 @@ Exec = ./TOPAZ
 
 
 makeDep = 
-
 #$(ConfigFile) \
 #          makefile
 
@@ -56,8 +61,13 @@ PDFObj = $(PDFDir)/mstwpdf.o \
 RockyObj = $(PSDir)/genps.o \
            $(PSDir)/boost.o
 YetiObj  = $(PSDir)/yeti.o
-VegasObj = $(VegasDir)/vegas.o 
-           #$(VegasDir)/pvegas_mpi.o
+
+ifeq ($(useMPI),Yes)
+   VegasObj = $(VegasDir)/pvegas_mpi.o
+else
+   VegasObj = $(VegasDir)/vegas.o 
+endif
+
 
 CubaLib = $(CubaDir)/libcuba.a
 

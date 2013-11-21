@@ -444,7 +444,7 @@ integer TheUnit
    write(TheUnit,"(A,I2)") "# Process=",Process
    write(TheUnit,"(A,I2)") "# Master Process=",MasterProcess
    write(TheUnit,"(A,I2)") "# Correction=",Correction
-   write(TheUnit,"(A,I2,A)") "# PDF Set=",PDFSet,PDFSetString
+   write(TheUnit,"(A,I2,A)") "# PDF Set=",PDFSet,trim(PDFSetString)
    write(TheUnit,"(A,I2)") "# NLO Parameter=",NLOParam
    write(TheUnit,"(A,I2)") "# Top Decays=",TopDecays
    write(TheUnit,"(A,F9.3,A)") "# MuRen=",MuRen*100," GeV"
@@ -1797,6 +1797,25 @@ ENDIF
 
 
 
+IF( MASTERPROCESS.EQ.18 ) THEN
+IF( CORRECTION   .EQ.0 ) THEN
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbqqbZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbqqbZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
+
 IF( MASTERPROCESS.EQ.19 ) THEN
 IF( CORRECTION.EQ.2 ) THEN
   init=0
@@ -1812,6 +1831,27 @@ IF( CORRECTION.EQ.2 ) THEN
   endif
 ENDIF
 ENDIF
+
+
+
+IF( MASTERPROCESS.EQ.20 ) THEN
+IF( CORRECTION.EQ.2 ) THEN
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_Real_ttbqqbgZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_Real_ttbqqbgZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
+ENDIF
+ENDIF
+
+
+
 
 
 
@@ -1870,9 +1910,9 @@ implicit none
 IF( PDFSET.EQ.1 ) THEN! MRST/MSTW
 ! no initialization necessary
   IF( NLOPARAM.EQ.2) THEN
-      PDFSetString = " MSTW2008 NLO (mstw2008nlo.00.dat)"
+      PDFSetString(:) = " MSTW2008 NLO (mstw2008nlo.00.dat)"
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
-      PDFSetString = " MSTW2008 LO (mstw2008lo.00.dat)"
+      PDFSetString(:) = " MSTW2008 LO (mstw2008lo.00.dat)"
   ENDIF
 
 
@@ -1882,12 +1922,13 @@ ELSEIF( PDFSET  .EQ.2 ) THEN! CTEQ
 !       call SetCtq6(1) !  CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl
 !       call SetCtq6(200) !  updated CTEQ6.1M Standard MSbar scheme   0.118     326   226    cteq6m.tbl
      call SetCtq6(400) !  CTEQ6.6M;                        0.118     326   226    ctq66.00.pds
-     PDFSetString = " CTEQ6.6M NLO (ctq66.00.pds)"
+     PDFSetString(:) = " CTEQ6.6M NLO (ctq66.00.pds)"
 !      call SetCT10(100)!   Central CT10           0.118      ct10.00.pds
 !      PDFSetString = "CTEQ10 NLO (ct10.00.pds)"
 !      print *, "check that in cteq2mrst.f ct10 is really called!"; stop
   ELSEIF( NLOPARAM.EQ.0 .OR. NLOPARAM.EQ.1 ) THEN
      call SetCtq6(4)  ! CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
+     PDFSetString(:) = " CTEQ6L1 LO"
 !       call SetCtq6(3)  ! CTEQ6L  Leading Order            0.118**   326   226    cteq6l.tbl
   ENDIF
 ENDIF

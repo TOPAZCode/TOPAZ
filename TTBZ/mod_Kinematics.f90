@@ -3595,7 +3595,6 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
-          print *, 'allocating histos'
 
           Histo(1)%Info   = "pT(lep+)"
           Histo(1)%NBins  = 50
@@ -7490,8 +7489,6 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
 
 
 elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
-
-!     Rsep_jetlep = 0.4d0
 
 ! request at least four jets where two are b-jets
     NObsJet_Tree = 4

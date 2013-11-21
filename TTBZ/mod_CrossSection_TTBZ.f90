@@ -895,6 +895,17 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_1L_ttbqqbZ_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_1L_ttbqqbZ_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_1L_ttbqqbZ(yRnd,VgsWgt)
+EvalCS_1L_ttbqqbZ_MPI=0
+RETURN
+END FUNCTION
+
+
 
 
 FUNCTION EvalCS_1L_ttbqqbZ(yRnd,VgsWgt)
@@ -1602,11 +1613,10 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
 ELSEIF( CORRECTION.EQ.3 ) THEN
 
-! print *, "ME tree",LO_Res_Unpol
-
 ! NLO_Res_UnPol      = NLO_Res_UnPol      * PreFac
 ! NLO_Res_UnPol_Ferm = NLO_Res_UnPol_Ferm * PreFac
 ! LO_Res_Unpol       = LO_Res_Unpol       * PreFac
+! call swapMom(MomExt(1:4,1),MomExt(1:4,2))
 
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
@@ -1941,6 +1951,16 @@ END FUNCTION
 
 
 
+
+FUNCTION EvalCS_Real_ttbqqbgZ_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_Real_ttbqqbgZ_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_Real_ttbqqbgZ(yRnd,VgsWgt)
+EvalCS_Real_ttbqqbgZ_MPI=0
+RETURN
+END FUNCTION
 
 
 
