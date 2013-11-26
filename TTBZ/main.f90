@@ -45,11 +45,12 @@ integer :: ierror
    call StartPVegas(VG_Result,VG_Error)
 !DEC$ ENDIF
    call cpu_time(time_end)
-   call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
-!   call PlotVegas()
+   if( MPI_Rank.eq.0 ) then   
+      call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
+!       call PlotVegas()
+      print *, "Done (",(time_end-time_start)/60d0,") minutes"
+   endif
    call CloseFiles()
-   print *, "Done (",(time_end-time_start)/60d0,") minutes"
-
 
 
 !DEC$ IF(_UseMPIVegas .EQ.1)
@@ -1482,6 +1483,7 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.19 ) THEN
+
 IF( CORRECTION.EQ.2 ) THEN
   call vegas(EvalCS_Real_ttbgggZ,VG_Result,VG_Error,VG_Chi2)
   if( warmup ) then
@@ -2010,7 +2012,7 @@ character :: filename*(100)
           else
               Value  = Histo(NHisto)%Value(NBin)/BinSize/curit
               Integral = Integral + Histo(NHisto)%Value(NBin)/curit
-              Error  = 1d0/(BinSize)/curit * dsqrt( Histo(NHisto)%Value2(NBin) - 1d0/curit/ncall*Histo(NHisto)%Value(NBin)**2 )
+              Error  = 1d0/(BinSize)/curit * dsqrt(dabs( Histo(NHisto)%Value2(NBin) - 1d0/curit/ncall*Histo(NHisto)%Value(NBin)**2) )
           endif
           if(Hits.ge.999999999) Hits=999999999
           write(TheUnit,"(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)") NHisto,"|",BinVal,"|",Value,"|",Error,"|",Hits,"|"

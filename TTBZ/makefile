@@ -15,7 +15,7 @@ QCDLoop = $(Here)/QCDLoop-1.9
 
 # MPI compiler options.  Also adjust -D_UseMPIVegas=0,1 in ttbjets.cfg
 # run with: mpiexec -n 4 ./TOPAZ ...
-useMPI = No
+useMPI = Yes
 ifeq ($(useMPI),Yes)
     F95compiler = mpif90 -f90=ifort -lpthread  -lm 
     ccomp = mpicc -lpthread  -lm 

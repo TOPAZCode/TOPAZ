@@ -12,7 +12,13 @@ type :: Histogram
     real(8),allocatable :: Value2(:)
     integer,allocatable :: Hits(:)
     character :: Info*(50)
+    logical :: BinSmearing=.false.
+    real(8) :: SmearSigma=0.1d0
 end type
+
+
+
+
 
 !type :: Histogram2D
 !    integer :: NBins(1:2)
@@ -41,7 +47,7 @@ real(8),public ::MInv_LB
 
 !DEC$ IF(_UseMPIVegas.EQ.1)
 integer,public,parameter :: NUMHISTO=30       ! this has to match the constants in pvegas_mpi.c
-integer,public,parameter :: MXHISTOBINS=50
+integer,public,parameter :: MXHISTOBINS=55
 type, BIND(C) :: ReducedHistogram
     real(8) :: Value(1:MXHISTOBINS)
     real(8) :: Value2(1:MXHISTOBINS)
@@ -85,7 +91,7 @@ implicit none
 type(ReducedHistogram) :: TheHisto
 integer NHisto,NBin
 
-  if( NHisto.gt.NumHistograms ) return! this is required because in C we loop until max.number of histograms (NUMHISTO)
+  if( NHisto.gt.NumHistograms ) return! this is required because in pvegas we loop until max.number of histograms (NUMHISTO)
   do NBin=1,Histo(NHisto)%NBins
     Histo(NHisto)%Value(NBin)  = TheHisto%Value(NBin)
     Histo(NHisto)%Value2(NBin) = TheHisto%Value2(NBin)
@@ -3697,6 +3703,8 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(17)%BinSize= 0.25d0/4d0
           Histo(17)%LowVal = 0d0
           Histo(17)%SetScale= 1d0
+!           Histo(17)%BinSmearing=.true.
+          Histo(17)%SmearSigma=0.5d0
 
           Histo(18)%Info   = "CosAlpha*(Z,mu-)"
           Histo(18)%NBins  = 50
@@ -7198,7 +7206,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_TTBARZ(NPlus1PS,Mom,MomOrder,applyPSCut,NBin)
+SUBROUTINE Kinematics_TTBARZ(NPlus1PS,Mom,MomOrder,applyPSCut,NBin,PObs)
 use ModMisc
 use ModParameters
 implicit none
@@ -7209,6 +7217,7 @@ real(8) :: MomHadr(1:4,0:8),MomZ(1:4),MomFermZframe(1:4)
 real(8) :: MomBoost(1:4),MomMiss(1:4),MomObs(1:4)
 logical :: applyPSCut
 integer :: NBin(:),PartList(1:7),JetList(1:7),NJet,NObsJet,k,NObsJet_Tree,leptj(1:3),i,j
+real(8),optional :: PObs(:)
 real(8) :: nZLept,s12,s13,s14,s23,s24,s34
 real(8) :: pT_lep(4),ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
 real(8) :: eta_ATop,eta_Top,eta_lep(1:4),pseudo_Z, pseudo_top, pseudo_tbar
@@ -7530,7 +7539,7 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
 
 
     DphiLL = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,Aferm_Z))  )
-    if( DphiLL.gt.Pi ) DphiLL=2d0*Pi-DphiLL
+    if( DphiLL.gt.Pi ) DphiLL=dabs(2d0*Pi-DphiLL)
 
 
 
@@ -7626,6 +7635,29 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     NBin(20) = WhichBin(20,Dphittbar)
     NBin(21) = WhichBin(21,dble(NObsJet))
 
+    if( present(PObs) ) then
+      PObs(1) = pT_Lep(1)
+      PObs(2) = pT_Lep(2)
+      PObs(3) = pT_Lep(3)
+      PObs(4) = pT_jet(1)
+      PObs(5) = pT_jet(2)
+      PObs(6) = pT_jet(3)
+      PObs(7) = pT_jet(4)
+      PObs(8) = pT_miss
+      PObs(9) = eta_Lep(1)
+      PObs(10) = eta_Lep(2)
+      PObs(11) = eta_Lep(3)
+      PObs(12) = pT_Z
+      PObs(13) = eta_Z
+      PObs(14) = pT_top
+      PObs(15) = eta_top
+      PObs(16) = eta_atop
+      PObs(17) = DphiLL
+      PObs(18) = CosTheta1
+      PObs(19) = DphiZt
+      PObs(20) = Dphittbar
+      PObs(21) = dble(NObsJet)
+    endif
 
 !-------------------------------------------------------
 else
@@ -10419,28 +10451,88 @@ END FUNCTION
 
 
 
-SUBROUTINE IntoHisto(NHisto,NBin,Value)
+! SUBROUTINE IntoHisto(NHisto,NBin,Value)!    older version without compatibility for bin smearing
+! use ModMisc
+! implicit none
+! integer :: NHisto,NBin
+! real(8) :: Value
+! 
+!      if( IsNaN(Value) ) return
+! 
+! !DEC$ IF(_UseMPIVegas.EQ.0)
+!      Histo(NHisto)%Value(NBin) = Histo(NHisto)%Value(NBin)  + Value
+!      Histo(NHisto)%Value2(NBin)= Histo(NHisto)%Value2(NBin) + Value**2
+!      Histo(NHisto)%Hits(NBin)  = Histo(NHisto)%Hits(NBin)+1
+! !DEC$ ELSE
+!      if( nbin.le.0 ) return
+!      if( nbin.gt.MXHISTOBINS ) return
+!      RedHisto(NHisto)%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)+1
+!      RedHisto(NHisto)%Value(NBin)  = RedHisto(NHisto)%Value(NBin)+Value
+!      RedHisto(NHisto)%Value2(NBin) = RedHisto(NHisto)%Value2(NBin)+Value**2
+! !DEC$ ENDIF
+! 
+! RETURN
+! END SUBROUTINE
+
+
+
+
+SUBROUTINE IntoHisto(NHisto,NBin,Value,BinValue)
 use ModMisc
 implicit none
-integer :: NHisto,NBin
+integer :: NHisto,NBin,NeighbBin,i
 real(8) :: Value
+real(8),optional :: BinValue
+real(8) :: LowerBinValue,UpperBinValue,NeighbBinValue,ErrorFunct
+
 
     if( IsNaN(Value) ) return
-
+    if( present(BinValue) ) NBin = WhichBin(NHisto,BinValue)
+    if( (.not. Histo(NHisto)%BinSmearing) .or. NBin.eq.0 .or. NBin.eq.Histo(NHisto)%NBins+1 ) then
 !DEC$ IF(_UseMPIVegas.EQ.0)
-     Histo(NHisto)%Value(NBin) = Histo(NHisto)%Value(NBin)  + Value
-     Histo(NHisto)%Value2(NBin)= Histo(NHisto)%Value2(NBin) + Value**2
-     Histo(NHisto)%Hits(NBin)  = Histo(NHisto)%Hits(NBin)+1
+        Histo(NHisto)%Value(NBin)  = Histo(NHisto)%Value(NBin)  + Value
+        Histo(NHisto)%Value2(NBin) = Histo(NHisto)%Value2(NBin) + Value**2
+        Histo(NHisto)%Hits(NBin)   = Histo(NHisto)%Hits(NBin)+1
 !DEC$ ELSE
-     if( nbin.le.0 ) return
-     if( nbin.gt.MXHISTOBINS ) return
-     RedHisto(NHisto)%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)+1
-     RedHisto(NHisto)%Value(NBin)  = RedHisto(NHisto)%Value(NBin)+Value
-     RedHisto(NHisto)%Value2(NBin) = RedHisto(NHisto)%Value2(NBin)+Value**2
+        if( nbin.le.0 ) return
+        if( nbin.gt.MXHISTOBINS ) return
+        RedHisto(NHisto)%Value(NBin)  = RedHisto(NHisto)%Value(NBin)  + Value
+        RedHisto(NHisto)%Value2(NBin) = RedHisto(NHisto)%Value2(NBin) + Value**2
+        RedHisto(NHisto)%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)+1
 !DEC$ ENDIF
+    else
+        LowerBinValue=(NBin-1)*Histo(NHisto)%BinSize + Histo(NHisto)%LowVal
+        UpperBinValue=LowerBinValue + Histo(NHisto)%BinSize
+        if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
+           NeighbBinValue=UpperBinValue
+           NeighbBin=NBin+1
+        else
+           NeighbBinValue=LowerBinValue
+           NeighbBin=NBin-1
+        endif
+           ! ErrorFunct ranges between 0...+1
+           ! erf(0)=0, erf(1/sqrt2)=0.68, erf(2/sqrt2)=0.95, erf(3/sqrt2)=0.99
+           ! --> the smaller SmearSigma the less leakage into the other bin
+           ! --> SmearSigma=0.5 means that sigma of the gauss distribution is 0.5 of half the bin size
+           ErrorFunct=erf( dabs(NeighbBinValue-BinValue)/(Histo(NHisto)%SmearSigma*0.5d0*Histo(NHisto)%BinSize)/dsqrt(2d0) )
+!DEC$ IF(_UseMPIVegas.EQ.0)
+           Histo(NHisto)%Value(NBin)      = Histo(NHisto)%Value(NBin)       + 0.5d0*(1d0+ErrorFunct)*Value
+           Histo(NHisto)%Value(NeighbBin) = Histo(NHisto)%Value(NeighbBin)  + 0.5d0*(1d0-ErrorFunct)*Value
+           Histo(NHisto)%Value2(NBin)     = Histo(NHisto)%Value2(NBin)      +(0.5d0*(1d0+ErrorFunct)*Value)**2
+           Histo(NHisto)%Value2(NeighbBin)= Histo(NHisto)%Value2(NeighbBin) +(0.5d0*(1d0-ErrorFunct)*Value)**2
+           Histo(NHisto)%Hits(NBin)       = Histo(NHisto)%Hits(NBin)+1
+!DEC$ ELSE
+           RedHisto(NHisto)%Value(NBin)      = RedHisto(NHisto)%Value(NBin)       + 0.5d0*(1d0+ErrorFunct)*Value
+           RedHisto(NHisto)%Value(NeighbBin) = RedHisto(NHisto)%Value(NeighbBin)  + 0.5d0*(1d0-ErrorFunct)*Value
+           RedHisto(NHisto)%Value2(NBin)     = RedHisto(NHisto)%Value2(NBin)      +(0.5d0*(1d0+ErrorFunct)*Value)**2
+           RedHisto(NHisto)%Value2(NeighbBin)= RedHisto(NHisto)%Value2(NeighbBin) +(0.5d0*(1d0-ErrorFunct)*Value)**2
+           RedHisto(NHisto)%Hits(NBin)       = RedHisto(NHisto)%Hits(NBin)+1
+!DEC$ ENDIF
+    endif
 
 RETURN
 END SUBROUTINE
+
 
 
 

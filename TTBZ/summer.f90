@@ -381,11 +381,11 @@ character :: dummy*(1)
          newvalue = newvalue/real(nrebin+1)
 
          write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",newvalue,"|",newerror,"|",newhits,"|"
-         do ibin = 1, nrebin
-            write(13 ,fmt1) NHisto(1),"|",BinVal(1+ibin),"|",newvalue,"|",newerror,"|",newhits,"|"
-         enddo
-
          write(*  ,fmt1) NHisto(1),"|",BinVal(1),"|",newvalue,"|",newerror,"|",newhits,"|"
+
+!          do ibin = 1, nrebin
+!             write(13 ,fmt1) NHisto(1),"|",BinVal(1+ibin),"|",newvalue,"|",newerror,"|",newhits,"|"
+!          enddo
 
       else
          write(13 ,fmt1) NHisto(1),"|",BinVal(1),"|",Value(1),"|",Error(1),"|",Hits(1),"|"

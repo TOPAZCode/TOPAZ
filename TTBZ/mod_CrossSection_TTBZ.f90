@@ -91,7 +91,6 @@ EvalCS_1L_ttbggZ = 0d0
    ISFac = MomCrossing(MomExt)
    NRndHel=8
 
-
 IF( TOPDECAYS.NE.0 ) THEN
    call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
    call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
@@ -1806,12 +1805,12 @@ complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto),nHel(1:2)
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,RunFactor,PreFac,sij
 real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac,MZ_Inv
-real(8) :: MomExt(1:4,1:14),pdf(-6:6,1:2)
+real(8) :: MomExt(1:4,1:14),pdf(-6:6,1:2),PObs(1:NumMaxHisto)
 real(8) :: MG_MOM(0:3,1:6)
 real(8) :: MadGraph_tree
 logical :: applyPSCut,applySingCut
 include "vegas_common.f"
-
+!real(8) :: rho31,rho32
 
 
 ! yRnd( 1)=  0.3385585941088194d0
@@ -1862,6 +1861,11 @@ IF( ZDECAYS.NE.0 ) THEN
    PSWgt = PSWgt * PSWgt4
 ENDIF
 
+
+!rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )
+!rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )
+!PSWgt = PSWgt * rho32/(rho31+rho32)
+
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
        EvalCS_Real_ttbgggZ = 0d0
@@ -1869,7 +1873,7 @@ ENDIF
        return
    endif
 
-   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin,PObs)
    call setPDFs(eta1,eta2,MuFac,pdf)
    PDFFac = pdf(0,1) * pdf(0,2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PDFFac
@@ -1903,8 +1907,9 @@ ENDIF
         EvalCS_Real_ttbgggZ = LO_Res_Unpol * PreFac
 
         do NHisto=1,NumHistograms
-               call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ttbgggZ)
+               call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ttbgggZ,BinValue=PObs(NHisto))
         enddo
+
         EvalCounter = EvalCounter + 1
 endif!applyPSCut
 
