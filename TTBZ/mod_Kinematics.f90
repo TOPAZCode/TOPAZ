@@ -10755,7 +10755,7 @@ real(8) :: pdf(-6:6,1:2)
 IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
 !             call mrstlo(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-! RR added
+! RR added -- these are needed if using MRST LO as above
 !             sbar(1)=str(1)
 !             cbar(1)=chm(1)
 !             bbar(1)=bot(1)
@@ -10776,7 +10776,7 @@ IF( PDFSET.EQ.1 .AND. NLOPARAM.LE.1) THEN
         endif
         if( x2.lt.1d0 ) then
 !             call mrstlo(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-! RR added
+! RR added -- these are needed if using MRST LO as above
 !             sbar(2)=str(2)
 !             cbar(2)=chm(2)
 !             bbar(2)=bot(2)
@@ -10800,6 +10800,10 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         if( x1.lt.1d0 ) then ! this is needed for integrated dipole routines, where eta/z appears
 !             call mrst2004(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
 !             call mrst2001(x1,PDFScale,1,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+! RR added -- needed if using MRST2001 as above
+!            sbar(1)=str(1)
+!            cbar(1)=chm(1)
+!            bbar(1)=bot(1)
             call GetAllPDFs("mstw2008nlo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot)
         else
             upv(1) = 0d0
@@ -10817,6 +10821,10 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
         if( x2.lt.1d0 ) then
 !             call mrst2004(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
 !             call mrst2001(x2,PDFScale,1,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+! RR added -- needed if using MRST2001 as above
+!            sbar(2)=str(2)
+!            cbar(2)=chm(2)
+!            bbar(2)=bot(2)
             call GetAllPDFs("mstw2008nlo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot)
         else
             upv(2) = 0d0
