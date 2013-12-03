@@ -129,26 +129,58 @@ static int ncall=0;
 // generate phase space (using sequential splitting)
 // missing normalization (Byckling norm * linear mapping)= (2*Pi)^-(3n-4) * (4*Pi)^(n-1)
 void genps_(int *NOut, double *Energy, double *XRan, double *Mass, double Mom[][4], double *PSWgt ){
-double MInv[10];
+double MInv[10],q2,q2min,q2max;
 double EIntMom[10];
 double xJac,mu=0.0;
 const int Nminus1=(*NOut)-1;
 const int Nminus2=(*NOut)-2;
 int Levl,NMom;
 double SingScale,eta;
+const double nu=2.0;
+const int q2MappingSelector=0;
 
 // set invariant masses: MInv
 // set Jacobian factors: xJac
-   MInv[0] = (*Energy);
-   MInv[Nminus1] = Mass[Nminus1];
-   (*PSWgt)=0.5/MInv[0];
 
-   for(NMom=1; NMom<=Nminus1; NMom++ ) mu+=Mass[NMom];
-   for(Levl=1; Levl<=Nminus2; Levl++ ) {
-      xJac = MInv[Levl-1]-Mass[Levl-1] - mu;
-      MInv[Levl] = xJac*XRan[Levl-1] + mu;
-      mu-=Mass[Levl];
-      (*PSWgt)*= xJac;
+   if( q2MappingSelector==0 ) {    /* linear mapping M(x) */
+      MInv[0] = (*Energy);
+      MInv[Nminus1] = Mass[Nminus1];
+      (*PSWgt)=0.5/MInv[0];
+      for(NMom=1; NMom<=Nminus1; NMom++ ) mu+=Mass[NMom];
+      for(Levl=1; Levl<=Nminus2; Levl++ ) {
+          xJac = MInv[Levl-1]-Mass[Levl-1] - mu;
+          MInv[Levl] = xJac*XRan[Levl-1] + mu;
+          mu-=Mass[Levl];
+          (*PSWgt)*= xJac;
+      };
+   } else if( q2MappingSelector==1 ) {    /* linear mapping q2(x) */
+      MInv[0] = (*Energy);
+      MInv[Nminus1] = Mass[Nminus1];
+      (*PSWgt)=0.5/MInv[0];
+      for(NMom=1; NMom<=Nminus1; NMom++ ) mu+=Mass[NMom];
+      for(Levl=1; Levl<=Nminus2; Levl++ ) {
+          q2min = sq(mu);
+          q2max = sq(MInv[Levl-1]-Mass[Levl-1]);   
+          xJac = q2max - q2min;
+          q2 = xJac*XRan[Levl-1] + q2min;
+          MInv[Levl] = sqrt(abs(q2));
+          mu-=Mass[Levl];
+          (*PSWgt)*= xJac/2.0/MInv[Levl];
+      };
+   } else if( q2MappingSelector==2 ) {    /* s-channel propagator mapping q2(x) */
+      MInv[0] = (*Energy);
+      MInv[Nminus1] = Mass[Nminus1];
+      (*PSWgt)=0.5/MInv[0];
+      for(NMom=1; NMom<=Nminus1; NMom++ ) mu+=Mass[NMom];
+      for(Levl=1; Levl<=Nminus2; Levl++ ) {
+          q2min = sq(mu);
+          q2max = sq(MInv[Levl-1]-Mass[Levl-1]);
+          q2 = pow( XRan[Levl-1]*pow(q2max,1.0-nu) + (1.0-XRan[Levl-1])*pow(q2min,1.0-nu)  ,1.0/(1.0-nu) );
+          MInv[Levl] = sqrt(abs(q2));
+          xJac = pow(q2,nu) * ( pow(q2max,1.0-nu) - pow(q2min,1.0-nu) ) / (1.0-nu);
+          mu-=Mass[Levl];
+          (*PSWgt)*= xJac/2.0/MInv[Levl];
+      };
    }
 
 

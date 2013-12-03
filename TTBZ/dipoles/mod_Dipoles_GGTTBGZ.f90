@@ -140,6 +140,7 @@
        real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
        integer :: Njet, Nmax(5), Nhisto,N2jump
        logical, save :: first_time = .true.
+       complex(8) :: The2ndResult(1:2), PolExt1(1:4)
 
 
        res = zero
@@ -151,14 +152,18 @@
        if( first_time ) then
              call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
-             TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
-             TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
+             if( TTBZ_SpeedUp ) then
+                TreeAmpsDip(1)%PartRef(1:5) = (/3,4,1,5,2/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/3,1,5,2,4/)
+             else
+                TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)            
+             endif      
              do iTree=1,2
                 call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
              first_time=.false.
       endif
-
 
 !       momentum mapping
         pi=p(:,i)
@@ -287,9 +292,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 ! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
 ! print *, "mom check2",TreeAmpsDip(1)%quarks(2)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(2)%Mom(1:4)
@@ -342,7 +347,8 @@
               hel(1) = i5
            endif
 
-    call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+   if( TTBZ_SpeedUp .and. hel(4).eq.-1 ) cycle
+   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5),PolExt1(1:4))
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
@@ -360,6 +366,7 @@
 
    if (pos.eq.4) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
+   if( TTBZ_SpeedUp ) POL1(-i1,:)= PolExt1(1:4)
    endif
 
    if (pos.eq.5) then
@@ -368,9 +375,17 @@
 
 
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      if( TTBZ_SpeedUp ) then
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5),PolExt1(1:4),The2ndResult(i6))
+           if( pos.eq.4 ) then 
+               Bm(-i1,i6,i2,i3,i4,i5) = The2ndResult(i6)
+           else
+               Bm(i1,i6,i2,i3,-i4,i5) = The2ndResult(i6)
+           endif
+      else
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      endif
       enddo
-
 
       enddo
       enddo
@@ -511,6 +526,7 @@
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto, n2jump
        real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
+       complex(8) :: The2ndResult(1:2), PolExt1(1:4)
 
        res = zero
        cres = (0d0,0d0)
@@ -521,8 +537,13 @@
        if( first_time ) then
              call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
-             TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
-             TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
+             if( TTBZ_SpeedUp ) then
+                TreeAmpsDip(1)%PartRef(1:5) = (/3,4,1,5,2/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/3,1,5,2,4/)
+             else
+                TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)            
+             endif      
              do iTree=1,2
                 call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
@@ -635,9 +656,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 !--- after momentum mapping -- sum over colors and polarizations
 
@@ -677,7 +698,8 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+   if( TTBZ_SpeedUp .and. hel(4).eq.-1 ) cycle
+   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5),PolExt1(1:4))
 
    if (pos.eq.1) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%quarks(1)%pol(1:4)
@@ -695,6 +717,7 @@
 
    if (pos.eq.4) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
+   if( TTBZ_SpeedUp ) POL1(-i1,:)= PolExt1(1:4)
    endif
 
    if (pos.eq.5) then
@@ -703,7 +726,16 @@
 
 
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      if( TTBZ_SpeedUp ) then
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5),PolExt1(1:4),The2ndResult(i6))
+           if( pos.eq.4 ) then 
+               Bm(-i1,i6,i2,i3,i4,i5) = The2ndResult(i6)
+           else
+               Bm(i1,i6,i2,i3,-i4,i5) = The2ndResult(i6)
+           endif
+      else
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      endif
       enddo
 
       enddo
@@ -724,8 +756,7 @@
       do i4=-1,1,2
       do i5=-1,1,2
 
-         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + &
-  Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
+         Am(i1,j1,c1,c2) = Am(i1,j1,c1,c2) + Bm(i1,c1,i2,i3,i4,i5)*conjg(Bm(j1,c2,i2,i3,i4,i5))
 
       enddo
       enddo
@@ -843,6 +874,7 @@
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
        real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
+       complex(8) :: The2ndResult(1:2), PolExt1(1:4)
 
 
        res = zero
@@ -853,8 +885,13 @@
        if( first_time ) then
              call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
-             TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
-             TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
+             if( TTBZ_SpeedUp ) then
+                TreeAmpsDip(1)%PartRef(1:5) = (/3,4,1,5,2/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/3,1,5,2,4/)
+             else
+                TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)            
+             endif      
              do iTree=1,2
                 call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
@@ -973,9 +1010,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 ! print *, "if dipole"
 ! print *, "mom check1",TreeAmpsDip(1)%quarks(1)%Mom(1:4).dot.TreeAmpsDip(1)%quarks(1)%Mom(1:4)
@@ -1029,7 +1066,8 @@
               hel(1) = i5
            endif
 
-   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+   if( TTBZ_SpeedUp .and. hel(4).eq.-1 ) cycle
+   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5),PolExt1(1:4))
 
 
    if (pos.eq.1) then
@@ -1048,6 +1086,7 @@
 
    if (pos.eq.4) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
+   if( TTBZ_SpeedUp ) POL1(-i1,:)= PolExt1(1:4)
    endif
 
    if (pos.eq.5) then
@@ -1060,7 +1099,16 @@
 ! print *, "pol check5",TreeAmpsDip(1)%boson%Pol(1:4)
 
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      if( TTBZ_SpeedUp ) then
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5),PolExt1(1:4),The2ndResult(i6))
+           if( pos.eq.4 ) then 
+               Bm(-i1,i6,i2,i3,i4,i5) = The2ndResult(i6)
+           else
+               Bm(i1,i6,i2,i3,-i4,i5) = The2ndResult(i6)
+           endif
+      else
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      endif
       enddo
 
       enddo
@@ -1188,6 +1236,7 @@
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
        real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
+       complex(8) :: The2ndResult(1:2), PolExt1(1:4)
 
 
        res = zero
@@ -1197,8 +1246,13 @@
        if( first_time ) then
              call InitTrees(2,2,2,TreeAmpsDip,NumBoson=1)
              call InitProcess_TbTGGZ(ExtParticles(1:5))
-             TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
-             TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)
+             if( TTBZ_SpeedUp ) then
+                TreeAmpsDip(1)%PartRef(1:5) = (/3,4,1,5,2/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/3,1,5,2,4/)
+             else
+                TreeAmpsDip(1)%PartRef(1:5) = (/1,5,2,3,4/)
+                TreeAmpsDip(2)%PartRef(1:5) = (/1,5,2,4,3/)            
+             endif      
              do iTree=1,2
                 call LinkTreeParticles(TreeAmpsDip(iTree),ExtParticles(1:5))
              enddo
@@ -1313,9 +1367,9 @@
         if (ZDecays.ge.1) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 
 ! print *, "ii dipole"
@@ -1370,7 +1424,8 @@
               hel(1) =i5
            endif
 
-  call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5))
+   if( TTBZ_SpeedUp .and. hel(4).eq.-1 ) cycle
+   call SetPolarization((/q(1:4,1),q(1:4,3),q(1:4,4),q(1:4,5),q(1:4,2)/),momDK(1:4,1:8),(/hel(1),hel(3),hel(4),hel(5),hel(2)/),ExtParticles(1:5),PolExt1(1:4))
 
 
 ! print *, "pol check1",TreeAmpsDip(1)%quarks(1)%Pol(1:4)
@@ -1394,6 +1449,7 @@
 
    if (pos.eq.4) then
    if (i1.eq.-1.or.i1.eq.1) POL1(i1,:)= TreeAmpsDip(1)%gluons(1)%pol(1:4)
+   if( TTBZ_SpeedUp ) POL1(-i1,:)= PolExt1(1:4)
    endif
 
    if (pos.eq.5) then
@@ -1402,7 +1458,16 @@
 
 
       do i6 = 1,2
-      call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      if( TTBZ_SpeedUp ) then
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5),PolExt1(1:4),The2ndResult(i6))
+           if( pos.eq.4 ) then 
+               Bm(-i1,i6,i2,i3,i4,i5) = The2ndResult(i6)
+           else
+               Bm(i1,i6,i2,i3,-i4,i5) = The2ndResult(i6)
+           endif
+      else
+           call EvalTree2(TreeAmpsDip(i6),Bm(i1,i6,i2,i3,i4,i5))
+      endif
       enddo
 
       enddo
@@ -1485,6 +1550,7 @@
          enddo
 
          endif !  for passed cuts
+
 
         end subroutine dipii
 
@@ -1608,7 +1674,7 @@ END SUBROUTINE InitProcess_TbTGGZ
 
 
 
-SUBROUTINE SetPolarization(Mom,MomDK,Hel,ExtParticles)
+SUBROUTINE SetPolarization(Mom,MomDK,Hel,ExtParticles,SecondPol)
 use ModMisc
 use ModProcess
 use ModTopDecay
@@ -1617,6 +1683,7 @@ implicit none
 type(Particle) :: ExtParticles(1:5)
 real(8) :: Mom(1:4,1:5),MomDK(1:4,1:8)
 integer :: Hel(1:5)
+complex(8),optional :: SecondPol(1:4)
 
      ExtParticles(1)%Mom(1:4) = dcmplx(Mom(1:4,1))   ! HERE WAS A BUG: this was inside the (TopDecays.ge.1) condition
      ExtParticles(2)%Mom(1:4) = dcmplx(Mom(1:4,2))
@@ -1639,6 +1706,7 @@ integer :: Hel(1:5)
 
     ExtParticles(3)%Mom(1:4) = dcmplx(Mom(1:4,3))
     call pol_mless(ExtParticles(3)%Mom(1:4),Hel(3),ExtParticles(3)%Pol(1:4))
+    if( present(SecondPol) ) call pol_mless(ExtParticles(3)%Mom(1:4),-Hel(3),SecondPol(1:4))
 
     ExtParticles(4)%Mom(1:4) = dcmplx(Mom(1:4,4))
     call pol_mless(ExtParticles(4)%Mom(1:4),Hel(4),ExtParticles(4)%Pol(1:4))

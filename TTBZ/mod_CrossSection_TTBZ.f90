@@ -48,7 +48,7 @@ real(8) :: MG_MOM(0:3,1:5),tmpmom(1:4)
 real(8) :: MadGraph_tree
 real(8),parameter :: Nc=3d0, Cf=4d0/3d0
 real(8) :: eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac,AccPoles
-real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,HOp(1:3),MZ_Inv
+real(8) :: pdf(-6:6,1:2),pdf_z(-6:6,1:2),xE,HOp(1:3),MZ_Inv,PObs(1:NumMaxHisto)
 real(8) :: QPtol,DPtol
 integer :: NBin(1:NumMaxHisto),NHisto,PhotonCouplCorr=2d0,nHel(1:2),NRndHel
 integer :: ZQcoupl,jj,lastSister
@@ -147,7 +147,7 @@ IF( ZDECAYS.EQ.-1 ) THEN!   spin un-correlated decays
 ENDIF
 
 
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
    if( applyPSCut ) then
       EvalCS_1L_ttbggZ = 0d0
       return
@@ -160,10 +160,10 @@ ENDIF
    RunFactor = RunAlphaS(NLOParam,MuRen)
    nHel(1:2) = getHelicity(yrnd(NRndHel))
  !  PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
-    if( TTBZ_SpeedUp ) then
-        nHel(2)=NumHelicities/2
-        PreFac=PreFac*2d0
-    endif
+!     if( TTBZ_SpeedUp ) then
+!         nHel(2)=NumHelicities/2
+!         PreFac=PreFac*2d0
+!     endif
 
 
    LO_Res_Unpol             = (0d0,0d0)
@@ -781,7 +781,6 @@ ELSEIF( Correction.EQ.1 ) THEN
 ENDIF
 
 
-
 IF( Correction.EQ.0 ) THEN
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * WidthExpansion
@@ -880,12 +879,14 @@ ENDIF
 
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbggZ)
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbggZ,BinValue=PObs(NHisto))
    enddo
    EvalCounter = EvalCounter + 1 
 
 
    EvalCS_1L_ttbggZ = EvalCS_1L_ttbggZ/VgsWgt
+
+
 
 RETURN
 END FUNCTION
@@ -931,7 +932,7 @@ complex(8) :: s12Z,s34Z,fermloop_fin(1:2)
 complex(8) :: propZ,ZPolVec(1:4),BarSpi(1:4),Spi(1:4),light_quark_coupl(1:2)
 logical :: applyPSCut
 logical, save :: first=.true.
-real(8) :: DPtol, QPtol
+real(8) :: DPtol, QPtol,PObs(1:NumMaxHisto)
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 real(8) :: MG_MOM(0:3,1:NumExtParticles)
 real(8) :: MadGraph_tree
@@ -1053,7 +1054,7 @@ include "vegas_common.f"
       PSWgt = PSWgt * Msq_T_BWENU
    ENDIF
 
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
    if( applyPSCut ) then
       EvalCS_1L_ttbqqbZ = 0d0
       return
@@ -1083,10 +1084,10 @@ include "vegas_common.f"
    RunFactor = RunAlphaS(NLOParam,MuRen)
    nHel(1:2) = getHelicity(yrnd(NRndHel))
 !   PreFac = PreFac * dble(NumHelicities/(nHel(2)-nHel(1)+1))
-   if( TTBZ_SpeedUp ) then
-        nHel(2)=NumHelicities/2
-        PreFac=PreFac*2d0
-   endif
+!    if( TTBZ_SpeedUp ) then
+!         nHel(2)=NumHelicities/2
+!         PreFac=PreFac*2d0
+!    endif
 
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
@@ -1764,7 +1765,7 @@ ENDIF
 
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbqqbZ)
+      call intoHisto(NHisto,NBin(NHisto),EvalCS_1L_ttbqqbZ,BinValue=PObs(NHisto))
    enddo
 
 
@@ -1801,7 +1802,7 @@ use ModDipoles_GGTTBGZ
 use ModZDecay
 implicit none
 real(8) ::  EvalCS_Real_ttbgggZ,yRnd(1:VegasMxDim),VgsWgt,DipoleResult
-complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4)
+complex(8) :: LO_Res_Pol,LO_Res_Unpol,PartAmp(1:4),PolExt1(1:4),The2ndResult(1:6)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto),nHel(1:2)
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,RunFactor,PreFac,sij
 real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac,MZ_Inv
@@ -1810,8 +1811,8 @@ real(8) :: MG_MOM(0:3,1:6)
 real(8) :: MadGraph_tree
 logical :: applyPSCut,applySingCut
 include "vegas_common.f"
-!real(8) :: rho31,rho32
-
+real(8) :: rho31,rho32,rho35,rho36
+integer, parameter :: SelectChannel=99
 
 ! yRnd( 1)=  0.3385585941088194d0
 ! yRnd( 2)=  0.2799513116385563d0
@@ -1841,7 +1842,48 @@ include "vegas_common.f"
       call Error("need to implement phase space for off-shell Z's")
    endif
 
-   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
+
+if( SelectChannel.eq.31 ) then
+   call EvalPhaseSpace_2to4M(EHat,(/0d0,MZ_Inv,m_Top,m_Top/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
+   rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )/MomExt(1,3)/MomExt(1,1)
+   rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )/MomExt(1,3)/MomExt(1,2)
+   rho35 = 1d0 - ( MomExt(2,3)*MomExt(2,5)+MomExt(3,3)*MomExt(3,5)+MomExt(4,3)*MomExt(4,5) )/MomExt(1,3)/dsqrt(dabs(MomExt(1,5)**2-m_top**2))
+   rho36 = 1d0 - ( MomExt(2,3)*MomExt(2,6)+MomExt(3,3)*MomExt(3,6)+MomExt(4,3)*MomExt(4,6) )/MomExt(1,3)/dsqrt(dabs(MomExt(1,6)**2-m_top**2))
+! print *, 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
+! print *, "rhos",1d0 -rho31,1d0 -rho32,1d0 -rho35,1d0 -rho36
+! pause
+!    PSWgt = PSWgt * (rho32*rho35*rho36)/(rho31*rho32*rho35 + rho31*rho32*rho36 + rho31*rho35*rho36 + rho32*rho35*rho36)
+   PSWgt = PSWgt * (rho32)/(rho31 + rho32)
+elseif( SelectChannel.eq.32 ) then
+   call EvalPhaseSpace_2to4M(EHat,(/0d0,MZ_Inv,m_Top,m_Top/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
+   rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )/MomExt(1,3)/MomExt(1,1)
+   rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )/MomExt(1,3)/MomExt(1,2)
+   rho35 = 1d0 - ( MomExt(2,3)*MomExt(2,5)+MomExt(3,3)*MomExt(3,5)+MomExt(4,3)*MomExt(4,5) )/MomExt(1,3)/MomExt(1,5)
+   rho36 = 1d0 - ( MomExt(2,3)*MomExt(2,6)+MomExt(3,3)*MomExt(3,6)+MomExt(4,3)*MomExt(4,6) )/MomExt(1,3)/MomExt(1,6)
+!    PSWgt = PSWgt * (rho31*rho35*rho36)/(rho31*rho32*rho35 + rho31*rho32*rho36 + rho31*rho35*rho36 + rho32*rho35*rho36)
+   PSWgt = PSWgt * (rho31)/(rho31 + rho32)
+elseif( SelectChannel.eq.35 ) then
+   call EvalPhaseSpace_2to4M(EHat,(/MZ_Inv,m_Top,m_Top,0d0/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon Z t tb gluon
+   call swapMom(MomExt(1:4,6),MomExt(1:4,3)) !  -->  (/0d0,m_Top,m_Top,MZ_Inv/)
+   call swapMom(MomExt(1:4,4),MomExt(1:4,6)) !  -->  (/0d0,MZ_Inv,m_Top,m_Top/)
+   rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )/MomExt(1,3)/MomExt(1,1)
+   rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )/MomExt(1,3)/MomExt(1,2)
+   rho35 = 1d0 - ( MomExt(2,3)*MomExt(2,5)+MomExt(3,3)*MomExt(3,5)+MomExt(4,3)*MomExt(4,5) )/MomExt(1,3)/MomExt(1,5)
+   rho36 = 1d0 - ( MomExt(2,3)*MomExt(2,6)+MomExt(3,3)*MomExt(3,6)+MomExt(4,3)*MomExt(4,6) )/MomExt(1,3)/MomExt(1,6)
+   PSWgt = PSWgt * (rho31*rho32*rho36)/(rho31*rho32*rho35 + rho31*rho32*rho36 + rho31*rho35*rho36 + rho32*rho35*rho36)
+elseif( SelectChannel.eq.36 ) then
+   call EvalPhaseSpace_2to4M(EHat,(/MZ_Inv,m_Top,m_Top,0d0/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon Z tb t gluon
+   call swapMom(MomExt(1:4,6),MomExt(1:4,3)) !  -->  (/0d0,m_Top,m_Top,MZ_Inv/)
+   call swapMom(MomExt(1:4,5),MomExt(1:4,6)) !  -->  (/0d0,m_Top,MZ_Inv,m_Top/)
+   call swapMom(MomExt(1:4,4),MomExt(1:4,5)) !  -->  (/0d0,MZ_Inv,m_Top,m_Top/)
+   rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )/MomExt(1,3)/MomExt(1,1)
+   rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )/MomExt(1,3)/MomExt(1,2)
+   rho35 = 1d0 - ( MomExt(2,3)*MomExt(2,5)+MomExt(3,3)*MomExt(3,5)+MomExt(4,3)*MomExt(4,5) )/MomExt(1,3)/MomExt(1,5)
+   rho36 = 1d0 - ( MomExt(2,3)*MomExt(2,6)+MomExt(3,3)*MomExt(3,6)+MomExt(4,3)*MomExt(4,6) )/MomExt(1,3)/MomExt(1,6)
+   PSWgt = PSWgt * (rho31*rho32*rho35)/(rho31*rho32*rho35 + rho31*rho32*rho36 + rho31*rho35*rho36 + rho32*rho35*rho36)
+else
+   call EvalPhaseSpace_2to4M(EHat,(/0d0,MZ_Inv,m_Top,m_Top/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! gluon gluon gluon Z tb t
+endif
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
    ISFac = MomCrossing(MomExt)
 
@@ -1861,11 +1903,6 @@ IF( ZDECAYS.NE.0 ) THEN
    PSWgt = PSWgt * PSWgt4
 ENDIF
 
-
-!rho31 = 1d0 - ( MomExt(2,3)*MomExt(2,1)+MomExt(3,3)*MomExt(3,1)+MomExt(4,3)*MomExt(4,1) )
-!rho32 = 1d0 - ( MomExt(2,3)*MomExt(2,2)+MomExt(3,3)*MomExt(3,2)+MomExt(4,3)*MomExt(4,2) )
-!PSWgt = PSWgt * rho32/(rho31+rho32)
-
    call CheckSing(MomExt,applySingCut)
    if( applySingCut ) then
        EvalCS_Real_ttbgggZ = 0d0
@@ -1883,29 +1920,28 @@ ENDIF
        EvalCS_Real_ttbgggZ = 0d0
    else
         LO_Res_Unpol = (0d0,0d0)
-        if( TTBZ_SpeedUp ) nHel(2)=NumHelicities/2
         do iHel=nHel(1),nHel(2)
+          if( TTBZ_SpeedUp .and. Helicities(iHel,3).eq.-1 ) cycle
           call HelCrossing(Helicities(iHel,1:NumExtParticles))
-          call SetPolarizations()
+          call SetPolarizations(3,PolExt1(1:4))
           if( ZDecays.ne.0 ) then
               if( ExtParticle(6)%Helicity.eq.0 ) cycle!   this can be more elegantly done in mod_process
               call ZDecay(ExtParticle(6),DK_LO,MomExt(1:4,13:14))
           endif
           do iPrimAmp=1,NumBornAmps
-              call EvalTree(BornAmps(iPrimAmp))
+                 call EvalTree(BornAmps(iPrimAmp),PolExt1(1:4),The2ndResult(iPrimAmp))
           enddo
           LO_Res_Pol = (0d0,0d0)
           do jPrimAmp=1,6
           do iPrimAmp=1,6
               LO_Res_Pol = LO_Res_Pol + ColLO_ttbggg(iPrimAmp,jPrimAmp) * BornAmps(iPrimAmp)%Result * dconjg(BornAmps(jPrimAmp)%Result)
+              if( TTBZ_SpeedUp ) LO_Res_Pol = LO_Res_Pol + ColLO_ttbggg(iPrimAmp,jPrimAmp) * The2ndResult(iPrimAmp) * dconjg(The2ndResult(jPrimAmp))
           enddo
           enddo
           LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
         enddo!helicity loop
-        if( TTBZ_SpeedUp ) LO_Res_Unpol = LO_Res_Unpol * 2d0
         LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi
         EvalCS_Real_ttbgggZ = LO_Res_Unpol * PreFac
-
         do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),EvalCS_Real_ttbgggZ,BinValue=PObs(NHisto))
         enddo
@@ -1914,9 +1950,8 @@ ENDIF
 endif!applyPSCut
 
     PreFac = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
-    if( TTBZ_SpeedUp ) PreFac=PreFac  * 2d0
     call EvalDipoles_GGTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),PreFac,DipoleResult)
-! 
+
 !      sij = 2d0*(MomExt(1:4,1).dot.MomExt(1:4,3))
 ! !      sij = MomExt(1,3)**2
 !      print *,  sij/EHat**2,EvalCS_Real_ttbgggZ,DipoleResult,(1d0+EvalCS_Real_ttbgggZ/DipoleResult)
@@ -1984,7 +2019,7 @@ real(8) ::  EvalCS_Real_ttbqqbgZ,EvalCS_Dips_ttbqqbgZ,yRnd(1:VegasMxDim),VgsWgt,
 complex(8) :: LO_Res_Pol,LO_Res_Unpol,PropZ,LOPartAmp(1:4,1:2)
 integer :: iHel,jPrimAmp,iPrimAmp,NHisto,NBin(1:NumMaxHisto),NPDF,nHel(1:2)
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,PSWgt4,ISFac,RunFactor,PreFac,PreFacDip
-real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac(1:2),PDFFac_a(1:2),PDFFac_b(1:2)
+real(8) :: eta1,eta2,sHatJacobi,FluxFac,PDFFac(1:2),PDFFac_a(1:2),PDFFac_b(1:2),PObs(1:NumMaxHisto)
 real(8) :: MomExt(1:4,1:14),sij,pdf(-6:6,1:2),MZ_Inv,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
 real(8) :: MG_MOM(0:3,1:6),MadGraph_tree
 logical :: applyPSCut,applySingCut
@@ -2014,7 +2049,7 @@ include "vegas_common.f"
       ! need to think about threshold cut: EHat.le.2d0*m_Top+M_Z   when z is off-shell! 
    endif
 
-   call EvalPhaseSpace_2to4M(EHat,MZ_Inv,yRnd(3:10),MomExt(1:4,1:6),PSWgt)! q qb gluon Z tb t / q g q Z tb t
+   call EvalPhaseSpace_2to4M(EHat,(/0d0,MZ_Inv,m_Top,m_Top/),yRnd(3:10),MomExt(1:4,1:6),PSWgt)! q qb gluon Z tb t / q g q Z tb t
    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
    PSWgt2 = 1d0
@@ -2038,7 +2073,7 @@ ENDIF
        return
    endif
 
-   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/5,6,4,1,2,3,7,8,9,10,11,12,13,14/),applyPSCut,NBin,PObs)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
 
@@ -2092,7 +2127,7 @@ if( applyPSCut ) then
         EvalCS_Real_ttbqqbgZ = 0d0
 else
         LO_Res_Unpol = (0d0,0d0)
-        if( TTBZ_SpeedUp ) nHel(2)=NumHelicities/2
+!         if( TTBZ_SpeedUp ) nHel(2)=NumHelicities/2
         do iHel=nHel(1),nHel(2)
           call HelCrossing(Helicities(iHel,1:NumExtParticles))
           call SetPolarizations()
@@ -2157,7 +2192,7 @@ else
           enddo
           LO_Res_Unpol = LO_Res_Unpol + LO_Res_Pol
         enddo!helicity loop
-        if( TTBZ_SpeedUp ) LO_Res_Unpol = LO_Res_Unpol*2d0
+!         if( TTBZ_SpeedUp ) LO_Res_Unpol = LO_Res_Unpol*2d0
 
 ! ./TOPAZ Collider=1 TopDK=0 ZDK=-2 Process=86 Correction=2 NLOParam=0 ObsSet=51  VegasNc0=1000 VegasNc1=1000
 ! ./TOPAZ Collider=1 TopDK=0 Process=30 Correction=2 NLOParam=0 ObsSet=21  VegasNc0=1000 VegasNc1=1000
@@ -2166,16 +2201,15 @@ else
 
         LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**3 *alpha4Pi
         EvalCS_Real_ttbqqbgZ = EvalCS_Real_ttbqqbgZ + dble(LO_Res_Unpol*PreFac)
-
         do NHisto=1,NumHistograms
-               call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol*PreFac))
+               call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol*PreFac),BinValue=PObs(NHisto))
         enddo
         EvalCounter = EvalCounter + 1
 endif!applyPSCut
 
 
     PreFacDip = PreFac * ISFac * (alpha_s4Pi*RunFactor)**3 * alpha4Pi /PSWgt2/PSWgt3/PSWgt4
-    if( TTBZ_SpeedUp ) PreFacDip = PreFacDip  * 2d0
+!     if( TTBZ_SpeedUp ) PreFacDip = PreFacDip  * 2d0
     IF( PROCESS.EQ.76 .OR. PROCESS.EQ.86 ) THEN
         call EvalDipoles_QQBTTBGZ((/MomExt(1:4,5),MomExt(1:4,4),MomExt(1:4,6),-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,3)/),yRnd(11:20),(/PreFacDip*PDFFac(1),PreFacDip*PDFFac(2)/),npdf,DipoleResult)
     ELSEIF( PROCESS.EQ.73 ) THEN
@@ -2229,6 +2263,18 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_NLODK_ttbZ_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_NLODK_ttbZ_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_NLODK_ttbZ(yRnd,VgsWgt)
+EvalCS_NLODK_ttbZ_MPI=0
+RETURN
+END FUNCTION
+
+
+
 
 
 
@@ -2252,7 +2298,7 @@ real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),P
 real(8) :: pdf(-6:6,1:2)
 real(8) :: couplZUU,couplZDD,couplZLL,couplGUU,couplGDD,couplGLL,couplZTT,couplGTT
 integer :: NBin(1:NumMaxHisto),NHisto,npdf
-real(8) :: pbDpg,ptDpg,ptDpb,z,omz,Dipole,rsq,y
+real(8) :: pbDpg,ptDpg,ptDpb,z,omz,Dipole,rsq,y,PObs(1:NumMaxHisto)
 real(8), parameter :: CF=4d0/3d0,PhotonCouplCorr=2d0
 real(8) :: MomBoost(1:4),MomLep1(1:4),MomLep2(1:4)
 integer,parameter :: up=1,dn=2,glu=1
@@ -2310,7 +2356,7 @@ IF( CORRECTION.EQ.4 ) THEN
    call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),.false.,MomExt(1:4,9:11),PSWgt3)
    call EvalPhasespace_ZDecay(MZ_Inv,MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 
-   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExt(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
    if( applyPSCut ) then
       EvalCS_NLODK_ttbZ = 0d0
       return
@@ -2404,7 +2450,7 @@ do npdf=1,2
    EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + dble(NLO_Res_Unpol)
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol),BinValue=PObs(NHisto))
    enddo
 
 enddo! npdf loop
@@ -2506,7 +2552,7 @@ do npdf=1,2
    EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + dble(NLO_Res_Unpol)
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(NLO_Res_Unpol),BinValue=PObs(NHisto))
    enddo
 
 enddo! npdf loop
@@ -2544,7 +2590,7 @@ do npdf=1,2
         if( Process.eq.71 ) cycle
     endif
     ISFac = MomCrossing(MomExt)
-    call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,9,6,7,8,10,11,12,13,14/),applyPSCut,NBin)
+    call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,9,6,7,8,10,11,12,13,14/),applyPSCut,NBin,PObs)
     if( applyPSCut ) then
       goto 14
     endif
@@ -2592,7 +2638,7 @@ do npdf=1,2
    EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + dble(LO_Res_Unpol)
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol),BinValue=PObs(NHisto))
    enddo
    EvalCounter = EvalCounter + 1
 
@@ -2612,7 +2658,7 @@ do npdf=1,2
 
    MomExtTd(1:4,1:5)  = MomExt(1:4,1:5)
    MomExtTd(1:4,9:13) = MomExt(1:4,10:14)
-   call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
    if( applyPSCut ) cycle ! = goto next npdf
 
    Dip_Res_Unpol= (0d0,0d0)
@@ -2655,7 +2701,7 @@ do npdf=1,2
    EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + Dip_Res_Unpol
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol),BinValue=PObs(NHisto))
    enddo
 
 !             print *, npdf,(MomExt(1:4,6).dot.MomExt(1:4,9))/m_top**2
@@ -2693,7 +2739,7 @@ do npdf=1,2
               if( Process.eq.71 ) cycle
           endif
           ISFac = MomCrossing(MomExt)
-          call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,9,6,7,8,10,11,12,13,14/),applyPSCut,NBin)
+          call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,9,6,7,8,10,11,12,13,14/),applyPSCut,NBin,PObs)
           if( applyPSCut ) then
             goto 16
           endif
@@ -2741,7 +2787,7 @@ do npdf=1,2
         LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * PreFac
         EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + dble(LO_Res_Unpol)
         do NHisto=1,NumHistograms
-            call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
+            call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol),BinValue=PObs(NHisto))
         enddo
 
 
@@ -2754,7 +2800,7 @@ do npdf=1,2
               Dipole = - alpha_s4Pi*RunFactor * CF * dip_res_w
               MomExtTd(1:4,1:5)  = MomExt(1:4,1:5)
               MomExtTd(1:4,9:13) = MomExt(1:4,10:14)
-              call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+              call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
               if( applyPSCut ) cycle! = goto next dipole
 
               Dip_Res_Unpol= (0d0,0d0)
@@ -2796,7 +2842,7 @@ do npdf=1,2
               Dip_Res_Unpol = Dip_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * Dipole * PreFac
               EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + Dip_Res_Unpol
               do NHisto=1,NumHistograms
-                  call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol))
+                  call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol),BinValue=PObs(NHisto))
               enddo
 
 !                         print *, npdf,(MomExt(1:4,7).dot.MomExt(1:4,9))/m_W**2,(MomExt(1:4,8).dot.MomExt(1:4,9))/m_W**2
@@ -2842,7 +2888,7 @@ do npdf=1,2
         if( Process.eq.71 ) cycle
     endif
     ISFac = MomCrossing(MomExt)
-    call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,12,6,7,8,9,10,11,13,14/),applyPSCut,NBin)
+    call Kinematics_TTBARZ(1,MomExt(1:4,1:14),(/4,5,3,1,2,12,6,7,8,9,10,11,13,14/),applyPSCut,NBin,PObs)
     if( applyPSCut ) then
       goto 15
     endif
@@ -2885,12 +2931,13 @@ do npdf=1,2
    enddo!helicity loop
 
 
+
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi * PreFac
    EvalCS_NLODK_ttbZ = EvalCS_NLODK_ttbZ + dble(LO_Res_Unpol)
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(LO_Res_Unpol),BinValue=PObs(NHisto))
    enddo
    EvalCounter = EvalCounter + 1
 
@@ -2911,7 +2958,7 @@ do npdf=1,2
 
    MomExtTd(1:4,1:8) = MomExt(1:4,1:8)
    MomExtTd(1:4,12:13) = MomExt(1:4,13:14)
-   call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin)
+   call Kinematics_TTBARZ(0,MomExtTd(1:4,1:14),(/4,5,3,1,2,0,6,7,8,9,10,11,12,13/),applyPSCut,NBin,PObs)
    if( applyPSCut ) then
       goto 17
    endif
@@ -2960,7 +3007,7 @@ do npdf=1,2
 !             pause
 
    do NHisto=1,NumHistograms
-      call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol))
+      call intoHisto(NHisto,NBin(NHisto),dble(Dip_Res_Unpol),BinValue=PObs(NHisto))
    enddo
 
 enddo! npdf loop

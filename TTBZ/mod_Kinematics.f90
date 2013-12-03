@@ -3595,8 +3595,7 @@ ELSEIF( ObsSet.EQ.52 .or. ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di
 ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
           if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
           if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
-!          NumHistograms = 3
-          NumHistograms = 21
+          NumHistograms = 25
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3699,12 +3698,10 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(16)%SetScale= 1d0
 
           Histo(17)%Info   = "phi(mu-,mu+)"
-          Histo(17)%NBins  = 50
-          Histo(17)%BinSize= 0.25d0/4d0
+          Histo(17)%NBins  = 26
+          Histo(17)%BinSize= 0.25d0/2d0
           Histo(17)%LowVal = 0d0
           Histo(17)%SetScale= 1d0
-!           Histo(17)%BinSmearing=.true.
-          Histo(17)%SmearSigma=0.5d0
 
           Histo(18)%Info   = "CosAlpha*(Z,mu-)"
           Histo(18)%NBins  = 50
@@ -3713,14 +3710,14 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(18)%SetScale= 1d0
 
           Histo(19)%Info   = "phi(Z,antit)"
-          Histo(19)%NBins  = 50
-          Histo(19)%BinSize= 0.25d0/4d0
+          Histo(19)%NBins  = 26
+          Histo(19)%BinSize= 0.25d0/2d0
           Histo(19)%LowVal = 0d0
           Histo(19)%SetScale= 1d0
 
           Histo(20)%Info   = "phi(t,antit)"
-          Histo(20)%NBins  = 50
-          Histo(20)%BinSize= 0.25d0/4d0
+          Histo(20)%NBins  = 26
+          Histo(20)%BinSize= 0.25d0/2d0
           Histo(20)%LowVal = 0d0
           Histo(20)%SetScale= 1d0
 
@@ -3729,6 +3726,39 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(21)%BinSize= 1d0
           Histo(21)%LowVal = 1d0
           Histo(21)%SetScale= 1d0
+
+          ! distributions 17..20 but with bin smearing and double the bin size
+          Histo(22)%Info   = "phi(mu-,mu+) smeared"
+          Histo(22)%NBins  = 26
+          Histo(22)%BinSize= 0.25d0/2d0
+          Histo(22)%LowVal = 0d0
+          Histo(22)%SetScale= 1d0
+          Histo(22)%BinSmearing=.true.
+          Histo(22)%SmearSigma=1d0
+
+          Histo(23)%Info   = "CosAlpha*(Z,mu-) smeared"
+          Histo(23)%NBins  = 50
+          Histo(23)%BinSize= 0.25d0/2d0
+          Histo(23)%LowVal = -1d0
+          Histo(23)%SetScale= 1d0
+          Histo(22)%BinSmearing=.true.
+          Histo(22)%SmearSigma=1d0
+
+          Histo(24)%Info   = "phi(Z,antit) smeared"
+          Histo(24)%NBins  = 26
+          Histo(24)%BinSize= 0.25d0/2d0
+          Histo(24)%LowVal = 0d0
+          Histo(24)%SetScale= 1d0
+          Histo(24)%BinSmearing=.true.
+          Histo(24)%SmearSigma=1d0
+
+          Histo(25)%Info   = "phi(t,antit) smeared"
+          Histo(25)%NBins  = 26
+          Histo(25)%BinSize= 0.25d0/2d0
+          Histo(25)%LowVal = 0d0
+          Histo(25)%SetScale= 1d0
+          Histo(25)%BinSmearing=.true.
+          Histo(25)%SmearSigma=1d0
 
 
 
@@ -5100,13 +5130,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_2to4M(EHat,Mass,xRndPS,Mom,PSWgt)
+SUBROUTINE EvalPhasespace_2to4M(EHat,Masses,xRndPS,Mom,PSWgt)
 use ModProcess
 use ModMisc
 use ModParameters
 implicit none
 real(8) :: EHat
-real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: PSWgt,PSWgt2,PSWgt3,Masses(1:4)
 real(8) :: xRndPS(1:5)
 real(8) :: Mom(1:4,1:5),TmpMom(1:4)
 ! real(8) :: MomDK(1:4,1:6)
@@ -5118,15 +5148,15 @@ real(8),parameter :: NPr=4, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 
 !  generate PS: massless + massless --> massless + massive(M) + massive(anti-top) + massive(top)
-  call genps(4,Ehat,xRndPS(1:8),(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),PSWgt)
+  call genps(4,Ehat,xRndPS(1:8),Masses(1:4),Mom(1:4,3:6),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
 !    Pcol1= 1 -1
 !    Pcol2= 3 -1
 !    SingDepth = 1d-16
-!    Steps = 20
+!    Steps = 10
 !    PSWgt = 1d0
-!    call gensing(4,EHat,(/0d0,Mass,m_Top,m_Top/),Mom(1:4,3:6),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing"
+!    call gensing(4,EHat,Masses(1:4),Mom(1:4,3:6),Pcol1,Pcol2,SingDepth,Steps); print *, "gensing"
 
 
 !  particles on the beam axis:
@@ -7634,6 +7664,11 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     NBin(19) = WhichBin(19,DphiZt)
     NBin(20) = WhichBin(20,Dphittbar)
     NBin(21) = WhichBin(21,dble(NObsJet))
+    NBin(22) = WhichBin(22,DphiLL)
+    NBin(23) = WhichBin(23,CosTheta1)
+    NBin(24) = WhichBin(24,DphiZt)
+    NBin(25) = WhichBin(25,Dphittbar)
+
 
     if( present(PObs) ) then
       PObs(1) = pT_Lep(1)
@@ -7657,6 +7692,10 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
       PObs(19) = DphiZt
       PObs(20) = Dphittbar
       PObs(21) = dble(NObsJet)
+      PObs(22) = DphiLL
+      PObs(23) = CosTheta1
+      PObs(24) = DphiZt
+      PObs(25) = Dphittbar
     endif
 
 !-------------------------------------------------------
@@ -10501,6 +10540,7 @@ real(8) :: LowerBinValue,UpperBinValue,NeighbBinValue,ErrorFunct
         RedHisto(NHisto)%Hits(NBin)   = RedHisto(NHisto)%Hits(NBin)+1
 !DEC$ ENDIF
     else
+        if( .not. present(BinValue) ) call Error("Argument BinValue is missing in call to IntoHisto.")
         LowerBinValue=(NBin-1)*Histo(NHisto)%BinSize + Histo(NHisto)%LowVal
         UpperBinValue=LowerBinValue + Histo(NHisto)%BinSize
         if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
@@ -10538,27 +10578,33 @@ END SUBROUTINE
 
 
 
-SUBROUTINE setPolarizations()
+SUBROUTINE setPolarizations(iSel,SecondPol)
 use ModProcess
 use ModMisc
 use ModParameters
 implicit none
 integer :: NPart
+complex(8),optional :: SecondPol(1:4)
+integer,optional :: iSel
 
    do NPart=1,NumExtParticles
-
       if( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.lt.0 .and. abs(ExtParticle(NPart)%Helicity).eq.1 ) then
          call vSpi(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+
       elseif( IsAQuark(ExtParticle(NPart)%PartType) .and. ExtParticle(NPart)%PartType.gt.0 .and. abs(ExtParticle(NPart)%Helicity).eq.1 ) then
          call ubarSpi(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+
       elseif( ExtParticle(NPart)%PartType.eq.Glu_ ) then
          call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+         if( present(SecondPol) .and. present(iSel) ) call pol_mless(ExtParticle(iSel)%Mom(1:4),-ExtParticle(iSel)%Helicity,SecondPol(1:4))
+
       elseif ( ExtParticle(NPart)%PartType.eq.Z0_ .and. .not. ZDecays.gt.0 ) then 
          call pol_massSR(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Mass,ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))! on-shell Z-boson polarization
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)
+
       elseif( ExtParticle(NPart)%PartType.eq.Pho_  ) then
          call pol_mless(ExtParticle(NPart)%Mom(1:4),ExtParticle(NPart)%Helicity,ExtParticle(NPart)%Pol(1:4))
          ExtParticle(NPart)%Pol(5:16) = (0d0,0d0)

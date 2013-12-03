@@ -7,7 +7,7 @@ use ModJPsiFrag
 use ifport
 implicit none
 include "vegas_common.f"
-real(8) :: VG_Result,VG_Error
+real(8) :: VG_Result,VG_Error,chi2
 !DEC$ IF(_UseMPIVegas .EQ.1)
 include 'mpif.h'
 integer :: ierror
@@ -33,20 +33,19 @@ integer :: ierror
    call OpenFiles()
    if( MPI_Rank.eq.0 ) then   
       call WriteParameters(6)   ! stdout
-      call WriteParameters(15)  ! vegas status file
    endif
    if( TopDecays.eq.5 .or. TopDecays.eq.6 ) call fitFF(MuFrag)
 
-   print *, "Running"
-   call cpu_time(time_start)
+   if( MPI_Rank.eq.0 ) print *, "Running"
+   if( MPI_Rank.eq.0 ) call cpu_time(time_start)
 !DEC$ IF(_UseMPIVegas .EQ.0)
-   call StartVegas(VG_Result,VG_Error)
+   call StartVegas(VG_Result,VG_Error,Chi2)
 !DEC$ ELSE
-   call StartPVegas(VG_Result,VG_Error)
+   call StartPVegas(VG_Result,VG_Error,Chi2)
 !DEC$ ENDIF
-   call cpu_time(time_end)
-   if( MPI_Rank.eq.0 ) then   
-      call WriteHisto(14,it,VG_Result,VG_Error,time_end-time_start)  ! Histogram file (unit=14)
+   if( MPI_Rank.eq.0 ) then
+      call cpu_time(time_end)
+!       call WriteHisto(14,1,0d0,0d0,VG_Result,VG_Error,Chi2,time_end-time_start)  ! Histogram file (unit=14)
 !       call PlotVegas()
       print *, "Done (",(time_end-time_start)/60d0,") minutes"
    endif
@@ -297,10 +296,6 @@ logical :: dirresult
           endif
           if( (ZDecays.gt.0 .and. TopDecays.eq.0) .OR. (ZDecays.eq.0 .and. TopDecays.ne.0) ) then
               print *, "if the Z boson decays then the tops also have to decay (and vice versa)"
-              stop
-          endif
-          if( TTBZ_SpeedUp ) then
-              print *, "SpeedUp=.true. is not working for ttb+Z production"
               stop
           endif
     endif
@@ -581,7 +576,7 @@ END SUBROUTINE
 
 
 !DEC$ IF(_UseMPIVegas .EQ.0)
-SUBROUTINE StartVegas(VG_Result,VG_Error)
+SUBROUTINE StartVegas(VG_Result,VG_Error,VG_Chi2)
 use ModMisc
 use ModCrossSection_TTB
 use ModCrossSection_TTBJ
@@ -1701,7 +1696,7 @@ END SUBROUTINE
 
 
 !DEC$ IF(_UseMPIVegas .EQ.1)
-SUBROUTINE StartPVegas(VG_Result,VG_Error)
+SUBROUTINE StartPVegas(VG_Result,VG_Error,VG_Chi2)
 use ModMisc
 use ModCrossSection_TTB
 use ModCrossSection_TTBJ
@@ -1781,7 +1776,7 @@ ENDIF
 
 
 IF( MASTERPROCESS.EQ.17 ) THEN
-IF( CORRECTION   .EQ.0 ) THEN
+IF( CORRECTION.EQ.0 ) THEN
   init=0
   call ClearRedHisto()
   call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
@@ -1793,6 +1788,22 @@ IF( CORRECTION   .EQ.0 ) THEN
     call ClearRedHisto()
     call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_1L_ttbggZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
   endif
+
+
+ELSEIF( CORRECTION.EQ.4 ) THEN
+  init=0
+  call ClearRedHisto()
+  call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_NLODK_ttbZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  if( warmup ) then
+    init=1
+    itmx = VegasIt1
+    ncall= VegasNc1
+    call InitHisto()
+    call ClearRedHisto()
+    call vegas_mpi(yrange(1:2*ndim),ndim,EvalCS_NLODK_ttbZ_MPI,init,ncall,itmx,nprn,NUMFUNCTIONS,PDIM,WORKERS,VG_Result,VG_Error,VG_Chi2)
+  endif
+
+
 ENDIF
 ENDIF
 
@@ -1950,8 +1961,8 @@ character :: filename*(100)
 !    filename = trim(HistoFile)//'.dat'
 !    open(unit=14,file=trim(filename),form='formatted',access= 'sequential',status='replace')            ! Histogram file
 
-   filename = trim(HistoFile)//'.status'
-   open(unit=15,file=trim(filename),form='formatted',access= 'sequential',status='replace')         ! Vegas status file
+!    filename = trim(HistoFile)//'.status'
+!    open(unit=15,file=trim(filename),form='formatted',access= 'sequential',status='replace')         ! Vegas status file
 
 !    filename = trim(HistoFile)//'.tmp_histo'
 !    open(unit=16,file=trim(filename),form='formatted',access= 'sequential',status='replace')         ! Histo status file
@@ -1965,7 +1976,7 @@ SUBROUTINE CloseFiles()
 implicit none
 
 !    close(14)
-   close(15)
+!    close(15)
 !    close(16)
 
 return
@@ -1974,7 +1985,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE WriteHisto(TheUnit,curit,VG_Result,VG_Error,RunTime)
+SUBROUTINE WriteHisto(TheUnit,curit,VG_CurrResult,VG_CurrError,VG_Result,VG_Error,Chi2,RunTime)
 use ModKinematics
 use ModParameters
 implicit none
@@ -1982,11 +1993,31 @@ include "vegas_common.f"
 integer :: NBin,Hits,NHisto,SumHits,TheUnit,curit
 real(8) :: BinSize,LowVal,BinVal,Value,Error,Integral
 real(8),parameter :: ToGeV=1d2, ToPb=1d-3
-real(8) :: VG_Result,VG_Error,RunTime
-character :: filename*(100)
+real(8) :: VG_Result,VG_Error,RunTime,VG_CurrResult,VG_CurrError,Chi2
+character :: filename*(100),arg*(300)
+logical, save :: FirstTime=.true.
 
-  filename = trim(HistoFile)//'.dat'
-  if(TheUnit.ne.6) open(unit=TheUnit,file=trim(filename),form='formatted',access= 'sequential',status='replace')   ! Histogram file
+  if(TheUnit.ne.6) then 
+    filename = trim(HistoFile)//'.dat'
+    open(unit=TheUnit,  file=trim(filename),form='formatted',access= 'sequential',status='replace')   ! Histogram file
+
+!   writing status file
+    filename = trim(HistoFile)//'.status'
+    if( FirstTime ) then
+        open(unit=TheUnit+1,file=trim(filename),form='formatted',access= 'sequential',status='replace')   ! status file
+        call Get_Command(arg)
+        write(TheUnit+1,'(A1,1X,A)') "#","-------------------------------------------------------------------------------------------------"
+        write(TheUnit+1,'(A1,1X,A)') "#",trim(arg)
+        write(TheUnit+1,'(A1,1X,A)') "#","-------------------------------------------------------------------------------------------------"
+        write(TheUnit+1,'(A1,1X,A)') "#","  It.    Result              Error               Accum. result       Accum. error         Chi^2  "
+        write(TheUnit+1,'(A1,1X,A)') "#","-------------------------------------------------------------------------------------------------"
+        FirstTime=.false. 
+      else
+        open(unit=TheUnit+1,file=trim(filename),form='formatted',access= 'sequential',status='old',position='append')   ! status file
+        if( curit.eq.1 ) write(TheUnit+1,'(A1,1X,A)') "#","-------------------------------------------------------------------------------------------------"
+    endif
+    if( curit.gt.0 ) write(TheUnit+1,'(A1,1X,I3,4E20.8,F12.2)') "#",curit,VG_CurrResult,VG_CurrError,VG_Result,VG_Error,Chi2
+  endif
 
   call WriteParameters(TheUnit)
   write(TheUnit,"(A,2X,1F9.2,A)") "# run time =",RunTime/60d0,"min"
@@ -2022,7 +2053,13 @@ character :: filename*(100)
       write(TheUnit,"(A,2X,1I23)") "# total number of hits:",SumHits
   enddo
 
-  if(TheUnit.ne.6) close(TheUnit)
+
+
+
+  if(TheUnit.ne.6) then
+    close(TheUnit)
+    close(TheUnit+1)
+  endif
 
 return
 END SUBROUTINE

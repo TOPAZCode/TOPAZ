@@ -22,11 +22,11 @@ integer :: NumParticles,iTree
   do iTree=1,NumTrees
       TreeAmpsDip(iTree)%NumPart=NumParticles
       TreeAmpsDip(iTree)%NumQua=NumQuarks
-      allocate( TreeAmpsDip(iTree)%NumGlu(0:NumQuarks)     )
+      allocate( TreeAmpsDip(iTree)%NumGlu(0:NumQuarks+1)     ) ! adding +1 in case one gluon is off-shell
       allocate( TreeAmpsDip(iTree)%PartRef(1:NumParticles) )
       allocate( TreeAmpsDip(iTree)%PartType(1:NumParticles))
       allocate( TreeAmpsDip(iTree)%Quarks(1:NumQuarks)     )
-      allocate( TreeAmpsDip(iTree)%Gluons(1:NumGluons)     )
+      allocate( TreeAmpsDip(iTree)%Gluons(1:NumGluons)   )
 !     TreeAmpsDip(iTree)%Boson doesn't need to be allocated
       TreeAmpsDip(iTree)%NumGlu(0) = NumGluons
 
@@ -516,12 +516,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalTree(TheBornAmp)
+SUBROUTINE EvalTree(TheBornAmp,SecondPol,SecondResult)
 use ModProcess
 use ModMisc
 use ModParameters
 implicit none
 type(BornAmplitude) :: TheBornAmp
+complex(8),optional :: SecondPol(1:4),SecondResult
 complex(8) :: Res(1:4)
 
    call new_calc_ampl(4,4,0,0,TheBornAmp%TreeProc,Res(1:4))
@@ -536,18 +537,33 @@ complex(8) :: Res(1:4)
       call Error("EvalTree")
    endif
 
+   if( present(SecondPol) .and. present(SecondResult) ) then
+        if( IsAQuark(TheBornAmp%TreeProc%PartType(1)) ) then
+            SecondResult = psp1_(Res(1:4),SecondPol(1:4))
+        elseif( IsAScalar(TheBornAmp%TreeProc%PartType(1)) ) then
+            SecondResult = Res(1) * SecondPol(1)
+        elseif( TheBornAmp%TreeProc%PartType(1).eq.Glu_ ) then
+            SecondResult = (Res(1:4)).dot.(SecondPol(1:4))
+        else
+            call Error("EvalTree")
+        endif
+   endif
+
+
 return
 END SUBROUTINE EvalTree
 
 
 
-SUBROUTINE EvalTree2(TheTreeProcess,Res)
+SUBROUTINE EvalTree2(TheTreeProcess,Res,SecondPol,SecondResult)
 use ModProcess
 use ModMisc
 use ModParameters
 implicit none
 type(TreeProcess) :: TheTreeProcess
 complex(8) :: Pol(1:4),Res
+complex(8),optional :: SecondPol(1:4),SecondResult
+
 
    call new_calc_ampl(4,4,0,0,TheTreeProcess,Pol(1:4))
 
@@ -560,13 +576,27 @@ complex(8) :: Pol(1:4),Res
 ! pause
 
    if( IsAQuark(TheTreeProcess%PartType(1)) ) then
-      Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))  ! assumes that first particle is an Quark!!!!
+      Res = psp1_(Pol(1:4),TheTreeProcess%Quarks(1)%Pol(1:4))
+   elseif( TheTreeProcess%PartType(1).eq.Glu_ ) then
+      Res = Pol(1:4).dot.(TheTreeProcess%Gluons(1)%Pol(1:4))
    else
       call Error("EvalTree2")
    endif
 
+
+   if( present(SecondPol) .and. present(SecondResult) ) then
+        if( TheTreeProcess%PartType(1).eq.Glu_ ) then
+            SecondResult = (Pol(1:4)).dot.(SecondPol(1:4))
+        else
+            call Error("EvalTree2")
+        endif
+   endif
+
+
 return
 END SUBROUTINE EvalTree2
+
+
 
 
 

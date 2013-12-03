@@ -6279,6 +6279,31 @@ ELSEIF( MasterProcess.EQ.19 ) THEN
 
       PrimAmps(6)%ExtLine = (/1,6,2,5,4,3/)
       BornAmps(6)%ExtLine = (/1,6,2,5,4,3/)
+
+
+      if( TTBZ_SpeedUp ) then
+            PrimAmps(1)%ExtLine = (/3,4,5,1,6,2/)
+            BornAmps(1)%ExtLine = (/3,4,5,1,6,2/)
+
+            PrimAmps(2)%ExtLine = (/3,5,4,1,6,2/)
+            BornAmps(2)%ExtLine = (/3,5,4,1,6,2/)
+
+            PrimAmps(3)%ExtLine = (/3,5,1,6,2,4/)
+            BornAmps(3)%ExtLine = (/3,5,1,6,2,4/)
+
+            PrimAmps(4)%ExtLine = (/3,1,6,2,4,5/)
+            BornAmps(4)%ExtLine = (/3,1,6,2,4,5/)
+
+            PrimAmps(5)%ExtLine = (/3,4,1,6,2,5/)
+            BornAmps(5)%ExtLine = (/3,4,1,6,2,5/)
+
+            PrimAmps(6)%ExtLine = (/3,1,6,2,5,4/)
+            BornAmps(6)%ExtLine = (/3,1,6,2,5,4/)
+      endif
+
+
+
+
    ENDIF
 
 
@@ -6579,7 +6604,7 @@ ENDIF
                     TheTree%NumGlu(1) = QuarkPos(1) - 2
                     TheTree%NumGlu(2) = QuarkPos(2) - QuarkPos(1) - 1
                     TheTree%NumGlu(3) = TheTree%NumGlu(0)+TheTree%NumQua+TheTree%NumSca - QuarkPos(2)
-                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3).ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
+                    if( TheTree%NumGlu(0)-TheTree%NumGlu(1)-TheTree%NumGlu(2)-TheTree%NumGlu(3)-1.ne.0 ) call Error("Wrong number of gluons in TheTree%NumGlu")
               endif
               if( TheTree%NumQua+TheTree%NumSca .eq. 4 ) then
                     TheTree%NumGlu(1) = QuarkPos(1) - 2

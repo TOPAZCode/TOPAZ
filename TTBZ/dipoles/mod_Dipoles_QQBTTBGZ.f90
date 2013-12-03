@@ -147,7 +147,7 @@
        real(dp) ::  pjetout(4,5), weight,couplZLL,couplGLL,couplZUU,couplGUU,couplZDD,couplGDD
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms)
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
        integer :: Njet, Nmax(5), Nhisto,N2jump
        logical, save :: first_time = .true.
 
@@ -272,7 +272,7 @@
 !----------------- ini   ini     final   top   top, real
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms),PObs)
 
 
 
@@ -295,9 +295,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -426,7 +426,6 @@
       enddo
       enddo
 
-
       enddo
       enddo
       enddo
@@ -495,7 +494,7 @@
 !------- fill in histograms --- this  is not going to
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2),BinValue=PObs(NHisto))
          enddo
 
 
@@ -538,7 +537,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
 
        res = zero
        cres = (0d0,0d0)
@@ -642,7 +641,7 @@
 !----------------- ini   ini     final   top   top, real
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms),PObs)
 
 
 
@@ -664,9 +663,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
        do i1=-1,Nmax(1),2
          do i2 = -1,Nmax(2),N2Jump! Z boson
@@ -855,7 +854,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2),BinValue=PObs(NHisto))
          enddo
 
 
@@ -898,7 +897,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
 
        res = zero
        cres = (0d0,0d0)
@@ -1004,7 +1003,7 @@
 !----------------- ini   ini     final   top   top, real
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms),PObs)
 
 
 
@@ -1027,9 +1026,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 
 ! print *, "Dip",n
@@ -1245,7 +1244,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2),BinValue=PObs(NHisto))
          enddo
 
          endif ! -- ! passed cuts
@@ -1290,7 +1289,7 @@
        logical, save :: first_time = .true.
        logical :: Not_Passed_Cuts
        integer :: NBin(1:NumHistograms), Nmax(5), Nhisto,N2jump
-       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv
+       real(dp) :: MomDK(1:4,1:8),PSWgt1,PSWgt2,PSWgt3,MZ_Inv,PObs(1:NumHistograms)
 
 
        res = zero
@@ -1398,7 +1397,7 @@
 !----------------- ini   ini     final   top   top, real
 
 
-  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms)   )
+  call Kinematics_TTBARZ(0,(/-q(1:4,4),-q(1:4,5),q(1:4,2),q(1:4,1),q(1:4,3), Momzero,MomDK(1:4,1:8)/), (/4,5,3,1,2,0,7,8,9,10,11,12,13,14/), Not_Passed_Cuts,NBin(1:NumHistograms),PObs)
 
 
      if(Not_Passed_Cuts.eq..false.) then
@@ -1420,9 +1419,9 @@
         if (ZDecays.ge.1 .or. ZDecays.eq.-2) then ! Z decays
             N2jump=2
         endif
-        if( TTBZ_SpeedUp ) then
-          Nmax(2) = -1
-        endif
+!         if( TTBZ_SpeedUp ) then
+!           Nmax(2) = -1
+!         endif
 
 ! print *, "TB",dreal( TreeAmpsDip(1)%QUARKS(1)%Mom(1:4) )
 ! print *, "T ",dreal( TreeAmpsDip(1)%QUARKS(2)%Mom(1:4) )
@@ -1634,7 +1633,7 @@
 !------- fill in histograms
 
          do NHisto=1,NumHistograms
-          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2))
+          call intoHisto(NHisto,NBin(NHisto),res(1)+res(2),BinValue=PObs(NHisto))
          enddo
 
          endif !  for passed cuts

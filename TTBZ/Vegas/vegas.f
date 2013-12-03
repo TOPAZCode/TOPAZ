@@ -76,7 +76,7 @@ c
          include 'vegas_common.f'
 !          include 'gridinfo.f'
          include 'maxwt.f'
-         integer nvegasrun! added by Markus
+!          integer nvegasrun! added by Markus
          parameter(mprod=50*mxdim)
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
@@ -93,7 +93,7 @@ c
          ndo=1
          do 1 j=1,ndim
  1       xi(1,j)=one
-         nvegasrun=131313
+!          nvegasrun=131313
 c
          entry vegas1(fxn,avgi,sd,chi2a)
 c        initialises  cumulative  variables but not grid
@@ -250,17 +250,17 @@ c
 c      it: current iteration, ti: integral, tsi: std.dev.
 c      avgi: accum. intgreal, sd: accum. std.dev., wtmax: max weight, chi2a: chi^2
 c        write(6,201)it,ti,tsi,avgi,sd,chi2a
-        write(6,201)it,ti,avgi,tsi,sd,wtmax,chi2a
+        write(6,201) it,ti,avgi,tsi,sd,wtmax,chi2a
 !         write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
-        if(nvegasrun.eq.131313) then
-            write(15,'(A1,1X,I3,4E20.8,I)') "#",it,ti,tsi,avgi,sd
-        else
-            write(15,'(2X,I3,4E20.8,I)') it,ti,tsi,avgi,sd
-        endif
+!         if(nvegasrun.eq.131313) then
+!             write(15,'(A1,1X,I3,4E20.8,I)') "#",it,ti,tsi,avgi,sd
+!         else
+!             write(15,'(2X,I3,4E20.8,I)') it,ti,tsi,avgi,sd
+!         endif
         call flush(6)
-        call flush(15)
+!         call flush(15)
 !DEC$ IF(_WriteTmpHisto .EQ.1)
-        call WriteHisto(14,it,avgi,sd,0d0)
+        call WriteHisto(14,it,ti,tsi,avgi,sd,chi2a,0d0)
 !DEC$ ENDIF
         if(nprn.ge.0)go to 21
         do 20 j=1,ndim
