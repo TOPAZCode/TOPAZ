@@ -15,8 +15,9 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   integer :: ExpectedEvents(1:2,1:MaxBins),TryEvts,ObsEvents(1:2,1:MaxBins),PlotObsEvts(1:2,1:10000)
   real(8) :: nran(1:2),offset,sran,DeltaN
   real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
-  real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2)
+  real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),alpha_ave,beta_ave,sigs
   real(8) :: LLRatio_array(1:2,1:MaxExp),LLRatio_min,LLRatio_max,WhichBin
+  
   integer :: j,i,s,SUA
   type :: Histogram
      integer :: NBins
@@ -38,7 +39,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 
   NumArgs=NArgs()-1
   PreFactor=8d0
-  SUA=1
+  SUA=2
 
 
   if (SUA .ne. 1 .and. SUA .ne. 2 .and. DeltaN .ne. 1d0) then
@@ -75,11 +76,15 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      print *, MaxExp, NPseudoExp
      stop
   endif
-
+  sigmatot(1:2) = 0d0
+  NumBins0=0
+  NumBins1=0
 !--------------------------------------------------
 !          1. reading input files
 !--------------------------------------------------
 
+  open(unit=112,file=trim(H0_infile),form='formatted',access='sequential')  ! open input file1
+  open(unit=113,file=trim(H1_infile),form='formatted',access='sequential')  ! open input file
   open(unit=12,file=trim(H0_infile),form='formatted',access='sequential')  ! open input file1
   open(unit=13,file=trim(H1_infile),form='formatted',access='sequential')  ! open input file
   open(unit=14,file=trim(filename_out1),form='formatted',access='sequential')  ! open output file
@@ -90,13 +95,60 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   write(14,*) 'Using input files:', trim(H0_infile),trim(H1_infile)
   write(14,*) "Writing output to files : ", trim(filename_out1), " and ", trim(filename_out2)
 
+
+!-------------------------------------------------------------------------
+! 1a. Because our Delta phi_ll histogram excludes a small bin at the end,
+! first use histo #1 to get the total cross-section
+!-------------------------------------------------------------------------
+
+  do while(.not.eof(112))!   reading input file 1
+     read(unit=112,fmt="(A)") dummy
+     if(dummy(1:1).eq."#") cycle
+     backspace(unit=112) ! go to the beginning of the line
+     
+     read(unit=112,fmt=fmt1) NHisto(1),dummy,BinVal(1,NumBins0+1),dummy,Value(1,NumBins0+1),dummy,Error(1,NumBins0+1),dummy,Hits(1,NumBins0+1),dummy
+
+    if( NHisto(1).ne.1 ) cycle
+     NumBins0=NumBins0 + 1
+  enddo
+  
+  do while(.not.eof(113))!   reading input file 2
+     read(unit=113,fmt="(A)") dummy
+     if(dummy(1:1).eq."#") cycle
+     backspace(unit=113) ! go to the beginning of the line
+     
+     read(unit=113,fmt=fmt1) NHisto(2),dummy,BinVal(2,NumBins1+1),dummy,Value(2,NumBins1+1),dummy,Error(2,NumBins1+1),dummy,Hits(2,NumBins1+1),dummy
+    if( NHisto(2).ne.1 ) cycle
+     NumBins1=NumBins1 + 1
+  enddo
+
+  BinSize(1) = BinVal(1,2)-BinVal(1,1)
+  BinSize(2) = BinVal(2,2)-BinVal(2,1)
+  do iBin=1,NumBins1! calculate total cross section
+       sigmatot(1) = sigmatot(1) + Value(1,iBin) * BinSize(1)
+       sigmatot(2) = sigmatot(2) + Value(2,iBin) * BinSize(2)
+  enddo
+
+! now reset everything to zero
+  NumBins0=0
+  NumBins1=0
+  BinSize=0d0
+  NHisto=0
+  BinVal=0d0
+  Value=0d0
+  Error=0d0
+  Hits=0
+
+!------------------------------------------------------------------------- 
+! 1b. Now read in the actual ditribution of interest
+!-------------------------------------------------------------------------
+
   do while(.not.eof(12))!   reading input file 1
      read(unit=12,fmt="(A)") dummy
      if(dummy(1:1).eq."#") cycle
      backspace(unit=12) ! go to the beginning of the line
-     
      read(unit=12,fmt=fmt1) NHisto(1),dummy,BinVal(1,NumBins0+1),dummy,Value(1,NumBins0+1),dummy,Error(1,NumBins0+1),dummy,Hits(1,NumBins0+1),dummy
-     if( NHisto(1).ne.Histo ) cycle
+    if( NHisto(1).ne.Histo ) cycle
      NumBins0=NumBins0 + 1
   enddo
   
@@ -108,8 +160,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      read(unit=13,fmt=fmt1) NHisto(2),dummy,BinVal(2,NumBins1+1),dummy,Value(2,NumBins1+1),dummy,Error(2,NumBins1+1),dummy,Hits(2,NumBins1+1),dummy
      if( NHisto(2).ne.Histo ) cycle
      NumBins1=NumBins1 + 1
-     
   enddo
+
 
   if( NumBins0 .ne. NumBins1 ) then
      print *, "Error: Number of bins in input file 1 and 2 are different: ",NumBins0,NumBins1
@@ -117,20 +169,15 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   else
      NumBins=NumBins0
   endif
-
-  sigmatot(1:2) = 0d0
+  
   BinSize(1) = BinVal(1,2)-BinVal(1,1)
   BinSize(2) = BinVal(2,2)-BinVal(2,1)
-  do iBin=1,NumBins1! calculate total cross section
-       sigmatot(1) = sigmatot(1) + Value(1,iBin) * BinSize(1)
-       sigmatot(2) = sigmatot(2) + Value(2,iBin) * BinSize(2)
-  enddo
+
 
   NumExpectedEvents(1) = int(Data * sigmatot(1) * PreFactor) ! factor of 8 from lepton species
   NumExpectedEvents(2) = int(Data * sigmatot(2) * PreFactor) 
   write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
   write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
-
 
 !  check(1:2) = 0d0
 !  do iBin=1,NumBins! check
@@ -380,14 +427,30 @@ do LLbin=1,LLHisto(1)%NBins
    endif
 enddo
 
+
+alpha_ave=(alphamin+alphamax)/2d0
+beta_ave=(betamin+betamax)/2d0
+sigs=dsqrt(2d0)*inverf(1d0-alpha_ave)
+
 print *, 'alpha value in range:', alphamin,alphamax
-print *, 'betaa value in range:', betamin,betamax 
+print *, 'beta value in range:', betamin,betamax 
+print *, 'alpha average :', alpha_ave
+print *, 'beta average :', beta_ave
+print *, 'sigma value :', sigs
 
 write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
 write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
+write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha average:", alpha_ave 
+write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta average:", beta_ave   
+write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# sigma value: ", sigs
 
-write(15,"(1PE16.8)") (alphamin+alphamax)/2d0
-write(15,"(1PE16.8)") (betamin+betamax)/2d0
+
+write(15,"(1PE16.8)") alpha_ave
+write(15,"(1PE16.8)") beta_ave
+write(15,"(1PE16.8)") sigs
+
+
+
 
 
 
@@ -418,7 +481,68 @@ contains
     enddo
 
   end FUNCTION logfac
-       
-           
+
+
+  function INVERF(Y)
+    real(8) :: Y,inverf,zork,inverf_old,inverf_new,derinverf_old,err
+    integer :: Nmax,k
+    real(8), parameter :: tol=1d-10
+    real(8), parameter :: DblPi = 3.1415926535897932384626433832795028842d0
+! done with Newton-Raphson method, using Maclaurin series as initial guess
+
+! initial guess
+    Nmax=10
+    INVERF=0d0
+    do k=0,Nmax
+       zork=inverf_coeff(k)
+       INVERF=INVERF + INVERF_COEFF(k)/(2*k+1)*( dsqrt(Dblpi)/2d0*Y )**(2*k+1)
+    enddo
+!    print *, 'first guess',inverf
+
+! NR method
+    inverf_old=inverf
+    err=1d8
+    k=0
+    do while (err > tol .and. k .lt. 50)
+       k=k+1
+       inverf_old=inverf
+       derinverf_old=2d0/dsqrt(DblPi)*exp(-inverf_old**2)
+       inverf_new=inverf_old + (Y-erf(inverf_old))/derinverf_old
+       err = abs(inverf_new-inverf_old)/inverf_old
+       inverf=inverf_new
+    enddo
+    
+    if (k .eq. 50) then
+!       print *, 'INVERF REACHED MAXIMUM 50 NEWTON-RAPHSON ITERATIONS!'
+    else
+!       print *, 'NEWTON-RAPHSON CONVERGES WITH TOLERANCE ', tol, ' IN ', k, 'ITERATIONS'
+    endif
+
+!    print *, 'nr',inverf
+    return
+    
+
+  end function INVERF       
+
+
+
+  recursive function INVERF_COEFF(k)
+    integer :: k,m
+    real(8) :: inverf_coeff,c,inverf_koeff(0:44)
+    
+    c = 0d0;
+    if (k .eq. 0) then
+       inverf_coeff=1d0
+       return
+    endif
+    do m=0,k-1
+       c = c + INVERF_COEFF(m) *  INVERF_COEFF(k-1-m) / ( (m+1)*(2*m+1) )
+    enddo
+    INVERF_COEFF=c
+    return
+
+  end function INVERF_COEFF           
+
+
 end program BinnedLogL
   
