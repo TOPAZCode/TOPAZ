@@ -4,8 +4,9 @@ implicit none
 integer :: NumArgs,NArg,op,iHisto,nrebin,NumEvents,NumPseudoExp,Lumi
 character :: filename_in*(80),filename_in2*(80),filename_out*(50),operation*(10),factor_str*(20)
 character :: iHisto_str*(5),nrebin_str*(5),NumEvents_str*(6),Lumi_str*(6),NumPseudoExp_str*(9),DeltaN_str*(5)
+character :: dVcoupl_str*(10),dAcoupl_str*(10)
 real(8) :: DeltaN
-real(8):: factor =1d10
+real(8):: factor =1d10,dVcoupl(1:6)=1d10,dAcoupl(1:6)=1d10,VcouplSM,AcouplSM
 logical :: silent=.false.
 
 
@@ -33,6 +34,8 @@ logical :: silent=.false.
       op=7
   elseif( trim(operation).eq.'likelihood' ) then
       op=8
+  elseif( trim(operation).eq.'ttbzcoupl' ) then
+      op=9
   else
       write(*,*) "operation not available (add,avg,sumbins,mul,quo,rebin,readlhe,likelihood)",trim(operation)
       stop
@@ -41,7 +44,7 @@ logical :: silent=.false.
 ! check for invalid arguments
   if( (op.lt.3 .and. NumArgs.le.3) .or. (op.eq.3 .and. NumArgs.ne.3) .or. (op.eq.4 .and. NumArgs.ne.4) .or. (op.eq.5 .and. NumArgs.le.3)  & 
                                    .or. (op.eq.6 .and. NumArgs.ne.5) .or. (op.eq.7 .and. NumArgs.ne.3) .or. (op.eq.8 .and. NumArgs.ne.8)  &
-                                   .or. NumArgs.gt.49 ) then
+                                   .or. (op.eq.9 .and. NumArgs.ne.21).or. NumArgs.gt.49 ) then
     print *, "invalid number of arguments",op,NumArgs
     stop
   endif
@@ -149,18 +152,34 @@ logical :: silent=.false.
       write(*,*) ""
 !       call likelihood(iHisto,NumEvents,NumPseudoExp)
       call likelihood(iHisto,Lumi,NumPseudoExp,DeltaN)
+
+  elseif( op.eq.9 ) then! SYNTAX: NHi dV1 dA1 file1 ... dV6 dA6 file6 outfilenametag
+      VcouplSM = 0.24364d0
+      AcouplSM = 0.60069d0
+      write(*,"(2X,A,F8.5,A,F8.5)") "Fixed SM t-tb-Z couplings V=",VcouplSM," A=",AcouplSM
+      call GetArg(2,iHisto_str)
+      read(iHisto_str,"(I2)") iHisto   
+      do NArg=3,NumArgs-1,3
+            call GetArg(NArg,dVcoupl_str)
+            read(dVcoupl_str,"(F5.2)") dVcoupl(NArg/3)
+            call GetArg(NArg+1,dAcoupl_str)
+            read(dAcoupl_str,"(F5.2)") dAcoupl(NArg/3)
+            call GetArg(NArg+2,filename_in)
+            open(unit=10+(NArg/3),file=trim(filename_in),form='formatted',access='sequential')! units=11,...,16
+            write(*,"(2X,A,I1,X,A,A,F6.3,A,F6.3)") "Reading file ",(NArg/3),trim(filename_in), " with dV=",dVcoupl(NArg/3)," dA=",dAcoupl(NArg/3)
+      enddo
+      call GetArg(NumArgs,filename_out)
+      open(unit=10,file=trim(filename_out),form='formatted',access='sequential',status='replace') ! open output file (last one in arguments list)
+      call ttbzcoupl(iHisto,VcouplSM,AcouplSM,dVcoupl,dAcoupl,filename_out)
+      close(11);close(12);close(13);close(14);close(15);close(16)
   endif
 
 
 ! close all files
-  do NArg=2,NumArgs
-      close(unit=10+NArg)
-  enddo
   close(10)
 
-END PROGRAM
 
-
+CONTAINS 
 
 
 
@@ -438,7 +457,7 @@ integer :: iBin,iPseudoExp,NumBins1=0,NumBins2=0,ranBin,BinAccept(1:MaxEvents),N
 integer :: NumEvents,NumExpectedEvents(1:2),iHypothesis
 integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999,WhichBin
 real(8) :: Lumi,BinVal(1:2,1:MaxBins)=-1d-99,Value(1:2,1:MaxBins)=-1d-99,Error(1:2,1:MaxBins)=-1d-99
-real(8) :: ymax,zran(1:2),nran(1:2),ValAccepted(1:MaxEvents),LLRatio,BinSize,MaxPoisson(1:2),Poisson
+real(8) :: ymax,zran(1:2),nran(1:2),ValAccepted(1:MaxEvents),LLRatio,BinSize,MaxPoisson(1:2)
 real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
 integer :: SelectedEvent,LLbin,PlotObsEvts(1:2,1:10000),i,s,offset,SUA
 real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),sran
@@ -824,16 +843,155 @@ enddo
    write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
 
 
+END SUBROUTINE
 
+
+
+
+
+
+SUBROUTINE ttbzcoupl(iHisto,VcouplSM,AcouplSM,dVcoupl,dAcoupl,filename_out)
+IMPLICIT NONE
+integer :: iHisto
+real(8) :: VcouplSM,AcouplSM,dVcoupl(1:6),dAcoupl(1:6),Vcoupl,Acoupl
+character :: filename_out*(50),NewFileName*(100)
+character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
+character :: dummy*(1)
+integer,parameter :: MaxBins=100
+integer :: NHisto=-999999,Hits=-999999,TheUnit,ibin,NumBins,Vgrid,Agrid,Ai,Vi
+real(8) :: BinVal(1:6,0:MaxBins)=-1d-99,Value(1:6,0:MaxBins)=-1d-99,Error=-1d-99
+real(8) :: res,CoefFits(1:6),couplMatrix_new(1:6),dV_new,dA_new,NewValue,dVrange,dArange,dVstep,dAstep
+complex(8) :: couplMatrix(1:6,1:7)
+
+  ! reading all input files
+  do TheUnit=11,16! looping over all 6 input files
+      ibin=0
+      do while(.not.eof(TheUnit))! looping over all lines in the input file
+          read(unit=TheUnit,fmt="(A)") dummy; if(dummy(1:1).eq."#") cycle; backspace(unit=TheUnit) ! skip # lines
+          read(unit=TheUnit,fmt="(I2)") NHisto
+          if(NHisto.eq.iHisto) then
+              backspace(unit=TheUnit)
+              ibin=ibin+1
+              read(unit=TheUnit,fmt=fmt1) NHisto,dummy,BinVal(TheUnit-10,ibin),dummy,Value(TheUnit-10,ibin),dummy,Error,dummy,Hits,dummy
+          endif
+      enddo 
+  enddo
+  NumBins=ibin
+
+
+
+dummy=" "
+! write(*,"(2X,A,") ""
+do ibin=1,NumBins! looping over all histogram bins
+
+! Solving the system of 6 linear equations for coefficients of A^2, V^2, 1, A*V, A, V
+  do TheUnit=1,6
+     if( BinVal(TheUnit,ibin).ne.BinVal( mod(TheUnit,6)+1,ibin)  ) print *, "ERROR: Different bin values!" 
+     Vcoupl = VcouplSM * ( 1d0 + dVcoupl(TheUnit) )
+     Acoupl = AcouplSM * ( 1d0 + dAcoupl(TheUnit) )
+     res = Value(TheUnit,ibin)
+     couplMatrix(TheUnit,1:7) = (/ dcmplx(Acoupl**2), dcmplx(Vcoupl**2), dcmplx(1d0), dcmplx(Acoupl*Vcoupl), dcmplx(Acoupl), dcmplx(Vcoupl), dcmplx(res) /)
+!      write(*,"(2X,A,6F8.5,F10.6)") "Matrix ",dble(couplMatrix(TheUnit,1:7))
+   enddo
+   CoefFits(1:6) = dble( go_Gauss_64(6,couplMatrix(1:6,1:7)) )
+!  CoefFits(1:6) = dble( go_GaussLU(6,couplMatrix(1:6,1:7)) )
+   write(*,"(2X,A,I2,A,6F10.6)") "Bin=",ibin,". Fit coeffs.:",CoefFits(1:6)
+
+
+!--- GRID SETUP -----------
+     dVrange=3.0d0   ! this means variation by +/- dVrange
+     dArange=0.4d0   ! this means variation by +/- dArange
+     Vgrid=60
+     Agrid=40
+!--------------------------
+
+     dVstep=dVrange/dble(Vgrid)
+     dAstep=dArange/dble(Agrid)
+     dV_new=0d0; dA_new=0d0
+     do Vi=0,Vgrid
+        dV_new = Vi * dVstep
+        do Ai=0,Agrid
+           dA_new = Ai * dAstep
+
+
+!           generating the +V +A results        
+            Vcoupl = VcouplSM * ( 1d0 + dV_new )
+            Acoupl = AcouplSM * ( 1d0 + dA_new )
+            couplMatrix_new(1:6) = (/ dcmplx(Acoupl**2), dcmplx(Vcoupl**2), dcmplx(1d0), dcmplx(Acoupl*Vcoupl), dcmplx(Acoupl), dcmplx(Vcoupl) /)
+            NewValue = couplMatrix_new(1)*CoefFits(1) + couplMatrix_new(2)*CoefFits(2) + couplMatrix_new(3)*CoefFits(3)  &
+                     + couplMatrix_new(4)*CoefFits(4) + couplMatrix_new(5)*CoefFits(5) + couplMatrix_new(6)*CoefFits(6)
+            write(NewFileName,"(A,A,I2,A,1F4.2,A,1F4.2,A)") trim(filename_out),"_Hi",iHisto,"_V+",dV_new,"_A+",dA_new,".dat"
+            if( ibin.eq.1 ) then
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential')
+            else
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential',position='append')
+            endif
+            write(unit=10,fmt=fmt1) iHisto,dummy,BinVal(1,ibin),dummy,NewValue,dummy,0d0,dummy,0,dummy
+            close(10)
+
+
+!           generating the +V -A results        
+            Vcoupl = VcouplSM * ( 1d0 + dV_new )
+            Acoupl = AcouplSM * ( 1d0 - dA_new )
+            couplMatrix_new(1:6) = (/ dcmplx(Acoupl**2), dcmplx(Vcoupl**2), dcmplx(1d0), dcmplx(Acoupl*Vcoupl), dcmplx(Acoupl), dcmplx(Vcoupl) /)
+            NewValue = couplMatrix_new(1)*CoefFits(1) + couplMatrix_new(2)*CoefFits(2) + couplMatrix_new(3)*CoefFits(3)  &
+                     + couplMatrix_new(4)*CoefFits(4) + couplMatrix_new(5)*CoefFits(5) + couplMatrix_new(6)*CoefFits(6)
+            write(NewFileName,"(A,A,I2,A,1F4.2,A,1F4.2,A)") trim(filename_out),"_Hi",iHisto,"_V+",dV_new,"_A-",dA_new,".dat"
+            if( ibin.eq.1 ) then
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential')
+            else
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential',position='append')
+            endif
+            write(unit=10,fmt=fmt1) iHisto,dummy,BinVal(1,ibin),dummy,NewValue,dummy,0d0,dummy,0,dummy
+            close(10)
+
+
+!           generating the -V +A results        
+            Vcoupl = VcouplSM * ( 1d0 - dV_new )
+            Acoupl = AcouplSM * ( 1d0 + dA_new )
+            couplMatrix_new(1:6) = (/ dcmplx(Acoupl**2), dcmplx(Vcoupl**2), dcmplx(1d0), dcmplx(Acoupl*Vcoupl), dcmplx(Acoupl), dcmplx(Vcoupl) /)
+            NewValue = couplMatrix_new(1)*CoefFits(1) + couplMatrix_new(2)*CoefFits(2) + couplMatrix_new(3)*CoefFits(3)  &
+                     + couplMatrix_new(4)*CoefFits(4) + couplMatrix_new(5)*CoefFits(5) + couplMatrix_new(6)*CoefFits(6)
+            write(NewFileName,"(A,A,I2,A,1F4.2,A,1F4.2,A)") trim(filename_out),"_Hi",iHisto,"_V-",dV_new,"_A+",dA_new,".dat"
+            if( ibin.eq.1 ) then
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential')
+            else
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential',position='append')
+            endif
+            write(unit=10,fmt=fmt1) iHisto,dummy,BinVal(1,ibin),dummy,NewValue,dummy,0d0,dummy,0,dummy
+            close(10)
+
+
+!           generating the -V -A results        
+            Vcoupl = VcouplSM * ( 1d0 - dV_new )
+            Acoupl = AcouplSM * ( 1d0 - dA_new )
+            couplMatrix_new(1:6) = (/ dcmplx(Acoupl**2), dcmplx(Vcoupl**2), dcmplx(1d0), dcmplx(Acoupl*Vcoupl), dcmplx(Acoupl), dcmplx(Vcoupl) /)
+            NewValue = couplMatrix_new(1)*CoefFits(1) + couplMatrix_new(2)*CoefFits(2) + couplMatrix_new(3)*CoefFits(3)  &
+                     + couplMatrix_new(4)*CoefFits(4) + couplMatrix_new(5)*CoefFits(5) + couplMatrix_new(6)*CoefFits(6)
+            write(NewFileName,"(A,A,I2,A,1F4.2,A,1F4.2,A)") trim(filename_out),"_Hi",iHisto,"_V-",dV_new,"_A-",dA_new,".dat"
+            if( ibin.eq.1 ) then
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential')
+            else
+                open(unit=10,file=trim(NewFileName),form='formatted',access='sequential',position='append')
+            endif
+            write(unit=10,fmt=fmt1) iHisto,dummy,BinVal(1,ibin),dummy,NewValue,dummy,0d0,dummy,0,dummy
+            close(10)
+        enddo
+     enddo
+
+enddo! ibin
 
 
 END SUBROUTINE
+
+
+
 
 FUNCTION Poisson(nu,n)
 ! Poisson distribution = exp(-nu)*nu^n/n!
   implicit none
   integer :: nu,n
-  real(8) :: Poisson,logfac
+  real(8) :: Poisson
     
   Poisson=-nu+n*log(1d0*nu)-logfac(n)
   Poisson=exp(Poisson)
@@ -863,12 +1021,45 @@ end FUNCTION logfac
 
 
 
+FUNCTION go_Gauss_64(N,matrix)
+implicit none
+complex(8), intent(in) :: matrix(1:N,1:N+1)
+integer, intent(in) :: N
+complex(8) :: go_Gauss_64(1:N)
+complex(8) :: work(1:N,1:N+1)
+integer :: i,j
+complex(8) :: mult, tsum
+
+    work(1:N,1:N+1) = matrix(1:N,1:N+1)
+    do i = 1,N
+      if (cdabs(work(i,i)) <= 1.0e-6) then
+         print *, i,N
+         print *, "go_Gauss, Zero pivot element: ",cdabs(work(i,i))
+      endif
+      do j = i+1,N
+        mult = work(j,i)/work(i,i)
+        work(j,1:N+1) = work(j,1:N+1) - mult*work(i,1:N+1)
+      end do
+    end do
+    do i=N,1,-1
+      tsum = work(i,N+1)
+      do j=i+1,N
+        tsum = tsum - work(i,j)*work(j,N+1)
+      end do
+      work(i,N+1) = tsum/work(i,i)
+    end do
+    go_Gauss_64(1:N) = work(1:N,N+1)
+    return
+END FUNCTION
 
 
 
 
 
 
+
+
+END PROGRAM
 
 
 
