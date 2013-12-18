@@ -198,7 +198,7 @@ Eq.~(\ref{Xsec}) expanded up to NLO QCD reads,
 The factor $\chi= -2 \Gamma_t^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_t^{\mrm{tot,LO}} -2 \Gamma_W^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_W^{\mrm{tot,LO}} $ arises from the $\alpha_s$ expansion
 of the total widths in the denominator.
 The virtual corrections are evaluated using a numerical OPP realization \cite{Ossola:2006} of $D$-dimensional generalized unitarity \cite{Ellis:2007br,Giele:2008ve,Ellis:2008ir} (for a review, see Ref.~\cite{Ellis:2011}).
-We extended the framework of \cite{Melnikov:2009dn} to account for color neutral bosons which requires new tree level recursion relations as well as an extention of the OPP procedure as described in e.g. Ref.~\cite{}.
+We extended the framework of Ref.~\cite{Melnikov:2009dn} to account for color neutral bosons which requires new tree level recursion relations as well as an extention of the OPP procedure as described in e.g. Ref.~\cite{}.
 Soft and collinear singularities in the real emission corrections are regularized using the dipole subtractions scheme of Refs.~\cite{Catani:1996vz,Catani:2002hc} supplemented with a cut-off parameter for the
 finite dipole phase space~\cite{Nagy:2003tz,Nagy:2003tz,copy from ttbphoton paper}.
 The virtual and real corrections to the top quark decay and hadronic W decay are implemented analytically. Soft and collinear singularities in the real emission phase space are regularized using subtractions dipoles given in~\cite{see ttbphoton paper}.
@@ -210,10 +210,10 @@ The cancellation of poles in $D-4$ of dimensional regularization between the vir
 We also checked the finite part of the virtual amplitudes against the automated program {\tt GoSam} \cite{Cullen:2011ac} for a few phase space points.  
 At the level of the integrated cross section, we vary the cut-off parameter for the finite dipole phase space by at least one order of magnitude and 
 verify independence on this parameter for the total cross section and kinematic distributions.
-The implementation of production and decay amplitudes is checked by integrating over the full phase space and verifying the factorization into 
+The interface of production and decay amplitudes is checked by integrating over the full phase space and verifying the factorization into 
 inclusive cross-section for stable top quarks and $Z$ boson times by their branching ratios, at NLO QCD.
 % 
-Finally, we compare our results with previous calculation in the literature for stable top quarks and $Z$ boson.
+Finally, we compare our full results with previous calculation in the literature for stable top quarks and $Z$ boson.
 This calculation was first performed in Ref.~\cite{Lazopoulos:2008de}. 
 For completeness, we repeat the parameters used in that calculation. 
 The masses of the top quark, $W$ boson and $Z$ are $m_t=170.9$ GeV, $m_W=80.45$ GeV, and $m_Z=91.19$ GeV. 
@@ -261,9 +261,9 @@ Unless otherwise stated, we use MSTW2008 parton distribution functions \cite{...
 $\alpha_s(M_Z)=0.13939$ and $\alpha_s(M_Z)=0.12018$ at LO and NLO, which we
 evolve to the renormalization scale $\mu$ using 1-loop and 2-loop running, respectively.
 The LO and NLO scale dependence has already been studied in previous works,
-we therefore do not repeat these studies and adopt the central scale \cite{Lazopoulos:2008de}  
-$\mu_0=\mu_\mathrm{ren}=\mu_\mathrm{fact}=m_t + M_Z/2$ 
-for renormalization and factorization scale in our work.
+we therefore do not repeat these studies here and adopt the central scale \cite{Lazopoulos:2008de}  
+$\mu_0=m_t + M_Z/2$ 
+for $\mu=\mu_\mathrm{ren}=\mu_\mathrm{fact}$.
 Since we include NLO QCD corrections to the top quark decay and the hadronically decaying $W$ boson, we need to 
 include their total widths up to NLO,
 \be
@@ -323,7 +323,7 @@ Before turning to the $\ttbZ$ coupling analysis, let us discuss some generic kin
 Fig.~\ref{fig:i}a shows the transverse momemtum of the two leptons arising from the $Z$ boson.
 Similar to the total cross sections we observe a strong reduction in unphysical scale dependence over the entire $\pT$ spectrum.
 Scale bands for LO and NLO predictions are comfortably overlapping. 
-From this plot we read off a average transverse momemtum of the $Z$ boson of almost 100~GeV with a far extending kinematic tail,
+From this plot we read off an average transverse momemtum of the $Z$ boson of almost 100~GeV with a far extending kinematic tail,
 promissing approximately 30 events with $\pT^Z \approx 300~\GeV$ from $300~\mathrm{fb}^{-1}$ at the 13~TeV LHC. 
 Fig.~\ref{fig:i}b shows the azimuthal opening angle between the two leptons from the $Z$ boson decay.
 This observable has been proven to be a good analyzer of the $\ttbZ$ couplings \cite{Baur:2004uw} and we wil consider it in the following analysis.
