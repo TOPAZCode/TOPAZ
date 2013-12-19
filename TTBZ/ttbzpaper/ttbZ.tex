@@ -161,6 +161,8 @@ Finally, we note that the only significant background to $\ttbZ$ is single-top p
 
 The top-$Z$ coupling may also be directly probed through single top production in association with a $Z$-boson. While the inclusive cross-section of $tZ$ plus its charge conjugate process $\bar{t}Z$ is comparable to the inclusive $\ttbZ$ cross-section \cite{Campbell:2013yla}, it should be possible to separate these processes by cutting on forward jets and demanding a high jet multiplicity. We will therefore consider only the $\ttbZ$ process in this paper, and defer the study of the coupling using $tZ+\bar{t}Z$ (or both this and $\ttbZ$) to a later date.
 
+inclusive tZ roughly same as ttbZ, so can also be used to obtain limits. on other hand, can be removed by cuts on final state around top mass, jet mult, etc. so can separate processes and perform ind. analyses. ignore this for the current paper
+
 % Pheno motivation: LHC a top factory, new top measurements; possibility of measuring top couplings; ttbZ $\to \nu \nu$ as background to MET searches for stops. \\
 % Previous NLO calc (w/o top or Z decay): LMMP, KTP \\
 % Prev. analysis of top-Z couplings: Baur et al, Berger et al \\
@@ -428,7 +430,15 @@ f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
 \end{array} \right.\ 
 \end{equation}  
 where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma$, and $\Delta N$ is the combined scale and pdf uncertainty. This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, but instead require it to be within the bounds of the theoretical uncertainty. In determining $\Delta N$, we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
-
+Probing a two-dimensional parameter space $(C_{1,V},C_{1,A})$ requires the computation of the total cross-section and distributions for a large number of values of$C_{1,V}$ and $C_{1,A}$. This is simple enough at LO, and while it is still feasible at NLO, it does place strain on computing resources. We note that a given amplitude at LO or NLO can be written as
+\begin{equation}
+A = A_0 + A_v C_{1,V} + A_A C_{1,A},
+\end{equation}
+so that the differential cross-section is dependent on six coupling stuctures, and can be written as
+\begin{equation}
+d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
+\end{equation}
+Thus, we can evaluate a result for six different choices of couplings $C_{1,V}$ and $C_{1,A}$, solve for $s_i$, and then use these to generate the results for any other coupling choice. This can be done for the total cross-section, or bin-by-bin for a given distribution. In fig.~\ref{fig:magic} we show the distribution for the coupling choice $C_{1,V}=$, $C_{1,A}$, computed using the full calculation, and using the $s_i$ values. Perfect agreement is found. 
 Constraints from $t\bar{t}Z$ cross-section from CMS \\
 
 \subsection{Top-Z coupling constraints from future LHC run}
@@ -458,7 +468,11 @@ We find $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of incor
 \sigma = \sqrt{2}\erf^{-1}(1-\alpha),
 \end{equation}
 where $\erf^{-1}$ is the inverse error function. 
-No mention has yet been made of theoretical (scale+pdf) uncertainty. Following ref.~\cite{Lykken et al}, we do not change the predicted number of events in each bin $\nu_i$. Instead, the observed number of events is multiplied by an uncertainty factor which is uniformly distributed between $1/(1+\Delta N)$ and $1+\Delta N$. The effect of this is to broaden the distributions of $\Lambda$, resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value.
+No mention has yet been made of theoretical (scale+pdf) uncertainty. Following ref.~\cite{Lykken et al}, we do not change the predicted number of events in each bin $\nu_i$. Instead, the observed number of events in each bin of each pseudoexperiment is multiplied by an uncertainty factor which is uniformly distributed between $1/(1+\Delta N)$ and $1+\Delta N$. {\bf why do this?}. The effect of this is to broaden the distributions of $\Lambda$, resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value.
+
+
+
+
 
 Dphill distr with LO and NLO scale bands, and two(three?) non-SM coupl\\
 $\sigma_{NP|} / \sigma_{SM}$ a la Berger, 0907.2191 \\
