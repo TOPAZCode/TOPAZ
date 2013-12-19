@@ -15,13 +15,23 @@
 \newcommand{\Br}{\mathcal{B}}
 \newcommand{\GeV}{\mathrm{GeV}}
 \newcommand{\TeV}{\mathrm{TeV}}
+\newcommand{\SM}{\mathrm{SM}}
+\newcommand{\aTZ}{\mathrm{aTZ}}
 \newcommand{\pT}{p_{\mathrm{T}}}
 \def\DF1A{\Delta F_{1,A}}
 \def\DF1V{\Delta F_{1,V}}
 \def\Dphill{\Delta \phi_{ll}}
+\def\DelFA{\Delta F_{1,A}}
+\def\DelFV{\Delta F_{1,V}}
 \def\ttbZ{t\bar{t}Z}
 \def\ttb{t\bar{t}}
 \def\ptZ{p_{t,Z}}
+\def\sw{\sin \theta_w}
+\def\swsq{\sin^2 \theta_w}
+\def\cw{\cos \theta_w}
+\def\invfb {\mathrm{fb}^{-1}}
+\def\hLambda {\hat{\Lambda}}
+\def\erf{\mathrm{erf}}
 \newcommand{\be}{\begin{eqnarray}}
 \newcommand{\ee}{\end{eqnarray}}
 %\newcommand{\ttb}{t \bar{t}}
@@ -47,12 +57,12 @@ FNAL Preprint No.yyyyyy}
 We study top quark pair production in association with a Z~boson at the LHC 
 %through next-to-leading order QCD
 and investigate the prospects of measuring the couplings of top quarks to the Z boson.
-To the current date these couplings have never been constrained in direct measurements at hadron colliders.
+To date, these couplings have not been constrained in direct measurements at hadron colliders.
 For the first time, such a determination will be possible at the 13~TeV LHC.
 Our calculation improves previous coupling studies through the inclusion of NLO QCD corrections in production and decays of all unstable particles.
 We treat top quarks in the narrow width approximation and retain all NLO QCD spin correlations.
-To determine the sensitivity of a coupling measurement we perform a statistical log-likelihood ratio test
-based on normalization and shape information of the angle between the two leptons from the Z boson.
+To determine the sensitivity of the coupling measurements we perform a statistical log-likelihood ratio test
+based on normalization and shape information of the angle between the two leptons arising from the decay of the Z boson.
 The obtained limits include the leading theoretical uncertainties from
 scale variation and parton distribution functions.
 We find that at the 13~TeV LHC with 300~fb$^{-1}$ the vector and axial $t \bar t Z$-couplings can be
@@ -66,20 +76,21 @@ Using leading-order input alone these limits deteriorate/worsen/weaken to xx\% a
 %\maketitle
 \section{Introduction}
 After run~I and II of the Large Hadron Collider (LHC) at $\sqrt{s}=7$ and 8~TeV we look back at a highly successful research program.
-Already this very first phase of exploring a new energy regime has provided many exciting results:
-The Higgs boson was discovered, its quantum numbers and couplings are highly constrained,
+Already this first phase of exploring a new energy regime has provided many exciting results: 
+the Higgs boson was discovered, its quantum numbers and couplings are highly constrained,
 % and all previously known particles of the Standard Model (SM) were re-discovered within a very short period of time.
-and many Standard Model measurements are competitive with previous determinations if not even exceeding them.
-Also many minimal extensions of the SM are highly disfavored pushing the scale of new physics to larger values.
-This constitues a remarkably fast progress and demonstrates the potential of the LHC in the years to come.
+and many Standard Model measurements are competitive with previous determinations, if not even exceeding them.
+Also many minimal extensions of the SM are highly disfavored, pushing the scale of new physics to larger values.
+This constitues remarkably fast progress and demonstrates the potential of the LHC in the years to come.
 
 One particularly interesting class of SM processes for which we anticipate more progress in the near future is top quark pair production in association with gauge bosons or a Higgs boson.
 % Processes of top quark pairs in association with gauge bosons or a Higgs boson will greatly profit from higher energy and luminosity.
-Due to the relatively high production threshold these processes have never been observed with large event numbers at the Tevatron
-nor in the current LHC data sample.
+%Due to the relatively high production threshold these processes have never been observed with large event numbers at the Tevatron
+%nor in the current LHC data sample.
+Due to the relatively high production threshold these processes were not observed at the Tevatron. Top quark pair production in association with a gauge boson has been observed at the $\sqrt{s}=7$ TeV LHC run \cite{ATLAS-CONF-2012-126,Chatrchyan:2013qca}, but with low event rates.
 In contrast, the high energy and large luminosity of the upcoming LHC run will produce sufficiently many events to allow detailed studies of these processes.
 This will open up a new way to directly access electroweak top quark couplings, many of which are only indirectly constrained or not constrained at all.
-A few prominent examples are the determination of $Q_t$ in $\ttb+\gamma$ production, measurements of electric and magnetic dipole moments in single top$+\gamma$ production, 
+A few prominent examples are the determination of $Q_t$ in $\ttb+\gamma$ production {\bf already constrained}, measurements of electric and magnetic dipole moments in single top$+\gamma$ production {\bf constrained already??}, 
 as well as $y_t$ in the $\ttb+H$ process.
 
 % Top quark phenomenology is one prefered corner to look for sign of new physics.
@@ -94,7 +105,7 @@ as well as $y_t$ in the $\ttb+H$ process.
 
 % The large top mass places it in a special position within the electroweak symmetry breaking framework. For this reaon, a direct determination of the coupling of the top quarks to the massive gauge bosons would be extremely interesting.  A significant deviation from the Standard Model (SM) value could be indicative of new physics {\bf some silly susy example here? I don't think its a good idea...}; on the other hand, confirmation of the SM value would place further constraints on any new physics scenario. Both CMS \cite{Chatrchyan:2013qca} and the ATLAS \cite{ATLAS-CONF-2012-126} have observed top-pair events produced in association with a vector boson, albeit with very low statistics. The question then arises: how well can the upcoming run at higher energy and larger luminosity constrain the top-vector boson coupling?
 
-In this paper, we focus on the determination of the top quark $Z$-boson coupling through $\ttbZ$ production at the LHC. +...+
+In this paper, we focus on the determination of the top quark $Z$-boson coupling through $\ttbZ$ production at the LHC. This process +...+
 Certain extentions of the SM which adress dynamic electroweak symmetry breaking induce large shifts of order 5-10\% \cite{?}.
 % See   http://arxiv.org/abs/hep-ph/0512053v1  for this statement:
 % "For example, it is well known that the vector and axial tbtZ form factors receive large corrections (of order 5-10%)
@@ -130,7 +141,7 @@ The latter calculation was also interfaced to a parton shower \cite{Garzelli:201
 Further hadronization effects were studied in Ref.~\cite{Garzelli:2012bn}.
 Since our coupling analysis relies on studying leptonic opening angles we believe that spin correlations are crucial for a correct interpretation of the results.
 We therefore account for NLO QCD spin correlations in the decay of top quarks and hadronically decaying W bosons.
-This particularly includes the full 1-loop corrections as well as additional soft, collinear and wide angle gluon emission off the top quark decay chain.
+This includes the full 1-loop corrections as well as additional soft, collinear and wide angle gluon emission off the top quark decay chain.
 Spin correlations of the leptonically decaying Z boson are included as well.
 While including all spin correlations, we approximate top quarks and the Z boson as close to on-shell in the narrow-width approximation. +...+
 
@@ -146,6 +157,8 @@ scalar of fermionic top quark partners decaying into top quarks plus dark matter
 While we do not address this issue in this paper, it would be interesting to study the effects of the NLO corrections on this background, using typical selection  cuts of the experimental searches.
 
 Finally we note, .... [no background, tZ is background, only 1/10, but still interesting...]
+Finally, we note that the only significant background to $\ttbZ$ is single-top production in association with a $Z$-boson. Indeed, the inclusive cross-section of $tZ$ plus its charge conjugate process $\bar{t}Z$ is comparable to the inclusive $\ttbZ$ cross-section \cite{Campbell:2013yla}. However, it should be possible to separate these processes by cutting on forward jets and demanding a high jet multiplicity. For this reason, we will neglect this background in our analysis. Furthermore, $tZ$ should also be sensitive to the top-Z coupling, so including it would presumably strengthen, rather than weaken, the bounds on top-Z coupling from $\ttbZ$ production. 
+
 The top-$Z$ coupling may also be directly probed through single top production in association with a $Z$-boson. While the inclusive cross-section of $tZ$ plus its charge conjugate process $\bar{t}Z$ is comparable to the inclusive $\ttbZ$ cross-section \cite{Campbell:2013yla}, it should be possible to separate these processes by cutting on forward jets and demanding a high jet multiplicity. We will therefore consider only the $\ttbZ$ process in this paper, and defer the study of the coupling using $tZ+\bar{t}Z$ (or both this and $\ttbZ$) to a later date.
 
 % Pheno motivation: LHC a top factory, new top measurements; possibility of measuring top couplings; ttbZ $\to \nu \nu$ as background to MET searches for stops. \\
@@ -158,7 +171,7 @@ The top-$Z$ coupling may also be directly probed through single top production i
 In this section, we brielfy discuss the features of our calculation.
 We consider the tri-lepton signature  
 $pp \to \ttb + Z \to t(\to \ell \nu b) \, \bar{t} (\to jj \bar{b}) \, Z(\to \ell \ell)$
-which profits from a large cross section due to the hadronic decay of one $W$ bosons and the lepton multiplicities from the remaining $W$ and $Z$ boson.
+which profits from a large cross section due to the hadronic decay of one $W$ boson and the lepton multiplicities from the remaining $W$ and $Z$ boson.
 In our results we will sum over all combinations of $e^\pm$ and $\mu^\pm$ in the final state, allowing either $t$ or $\bar t$ to decay leptonically.
 Application of the narrow-width approximation for top quarks and the $Z$ boson allows us to separate production and decays stage according to 
 \be
@@ -198,7 +211,7 @@ Eq.~(\ref{Xsec}) expanded up to NLO QCD reads,
 The factor $\chi= -2 \Gamma_t^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_t^{\mrm{tot,LO}} -2 \Gamma_W^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_W^{\mrm{tot,LO}} $ arises from the $\alpha_s$ expansion
 of the total widths in the denominator.
 The virtual corrections are evaluated using a numerical OPP realization \cite{Ossola:2006} of $D$-dimensional generalized unitarity \cite{Ellis:2007br,Giele:2008ve,Ellis:2008ir} (for a review, see Ref.~\cite{Ellis:2011}).
-We extended the framework of Ref.~\cite{Melnikov:2009dn} to account for color neutral bosons which requires new tree level recursion relations as well as an extention of the OPP procedure as described in e.g. Ref.~\cite{}.
+We extended the framework of Ref.~\cite{Melnikov:2009dn} to account for color neutral bosons which requires new tree level recursion relations as well as an extension of the OPP procedure as described in e.g. Ref.~\cite{}.
 Soft and collinear singularities in the real emission corrections are regularized using the dipole subtractions scheme of Refs.~\cite{Catani:1996vz,Catani:2002hc} supplemented with a cut-off parameter for the
 finite dipole phase space~\cite{Nagy:2003tz,Nagy:2003tz,copy from ttbphoton paper}.
 The virtual and real corrections to the top quark decay and hadronic W decay are implemented analytically. Soft and collinear singularities in the real emission phase space are regularized using subtractions dipoles given in~\cite{see ttbphoton paper}.
@@ -232,6 +245,59 @@ However, the NLO cross-section was found to be 3\% higher at 1121 fb, giving a s
 % Comparison with KTP, LMMP - cross-secs, distr \\
 
 \subsection{Top-Z coupling}
+The $\ttbZ$ interaction vertex can be written as
+\begin{equation} \label{Lint1}
+%\begin{split}
+\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr) + \frac{i \sigma_{\mu \nu} q_{\nu}}{M} \bigl(C_{2,V} + i\gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu},
+%\end{split}
+\end{equation}
+where $e$ is the electromagnetic coupling, $\sigma_{\mu \nu}=\frac{i}{2} [ \gamma_{\mu},\gamma_{\nu} ]$, $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$ and the second term is suppressed by a mass scale $M$ which is typically chosen to be $m_Z$. 
+
+In the SM, the four couplings are 
+\begin{equation}
+\begin{split}
+C_{1,V} =& \frac{T^3 - 2Q_t \swsq}{2\sw \cw}  \hspace{2cm} C_{1,A} = \frac{-T^3}{2 \sw \cw}  \\
+C_{2,V}= & C_{2,A}=0,
+\end{split}
+\end{equation}
+{\bf NB: Markus -- this has a minus sign in $C_A$ relative to the code. This is because the coupl is defined as $\gamma_{\mu} \gamma_5$ rather than $\gamma_5 \gamma_{\mu}$}.
+where $Q_t = 2/3$ is the top charge, $T^3=1/2$ and $\theta_w$ is the weak mixing angle. In the effective field theory approach, the deviations of the above couplings from their SM values can be expressed in terms of dimension six (or higher) operators. Assuming that these operators are electroweak gauge invariant, equation \eqref{Lint1} is the most general form of the interaction vertex, even if one or both of the tops are off-shell~\cite{}. 
+{\bf do we want sth here about the old, form factor approach? to make connection w Baur???} 
+As pointed out in ref.~\cite{}, the $q$ terms vanish if the $Z$-boson couples to massless external fermions, by the Dirac equation. This implies that this term is only directly probed in massive $Z$-decays. Since we consider the $Z$ decaying to massless leptons in the current paper, we neglect these terms. This leaves only the terms
+
+
+ {\bf formatting of the above eqn...}
+%The traditional approach to writing an effective Lagrangian for the coupling of top quarks to $Z$-bosons is in terms of form factors (see e.g. \cite{Baur:2004uw})
+%\begin{equation} \label{Lint1}
+%\mathcal{L} \supset \mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F_1^V(p_Z^2) + \gamma_5 F_1^A(p_Z^2) \bigr) + \frac{\sigma_{\mu \nu}}{2m_t}(p_t+p_{\bar{t}}) \bigl( iF_2^V(p_Z^2) + \gamma_5 F_2^A(p_Z^2) \bigr) \Biggr] v(p_{\bar{t}}
+%),
+%\end{equation}
+%where $p_Z$ is the momentum of the $Z$-boson, $p_{t}$ and $p_{\bar{t}}$ are the momenta of the top and antitop respectively, $m_t$ is the top mass, and $\sigma_{\mu \nu} = \frac{i}{2} \bigl[ \gamma_{\mu},\gamma_{\nu} \bigr]$.
+%In the low-energy limit, $F_2^{V}$ and $F_2^{A}$ are related to the weak analog of the magnetic and electric dipole moments, while $F_1^{V,A}$ give the Standard Model couplings
+%\begin{equation}
+%\begin{split}
+%F_1^V(0) =& F^V_{\mathrm{SM}}  = \frac{1}{2\sin \theta_w \cos \theta_w}\Biggl(\frac{1}{2} - 2 Q_t \sin^2 \theta_w \Biggr) \\
+%F_2^A(0) =& F^A_{\mathrm{SM}} = -\frac{1}{4\sin \theta_w \cos \theta_w} .
+%\end{split}
+%\end{equation}
+%A more modern approach is to use an effective Lagrangian containing operators of dimension four, six, and higher if needed. In this case, the most general Lagrangian that can be written down is
+%\begin{equation} \label{Lint2}
+%\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F_1^V + \gamma_5 F_1^A \bigr) + \sigma_{\mu \nu}(p_Z) \bigl( iF_2^V + \gamma_5 F_2^A \bigr) \Biggr] v(p_{\bar{t}}).
+%\end{equation}
+%This is the most general Lagrangian even if the spinors $\bar{u}$ and $v$ are off-shell, assuming that the higher-dimensional operators are electroweak gauge invariant~\cite{AlcarazMaestre:2012vp}. Unlike in equation \eqref{Lint}, the couplings in equation \eqref{Lint2} are not 
+%This has the advantage of providing a completely  general description that can be used in any context. {\bf read that screed by Mattelaer and friends for the benefits of eff Lag and summariz ehere - this is juts taken straight frmo Yang Bai's contribution to the snowmass rept}. In this context, the above Lagrangian may be recast in terms of the coefficients of dimension four and dimension six operators \cite{AlcarazMaestre:2012vp}, and the couplings are functions of these operators, rather than of some unknown momentum-squared $k^2$. The terms proportional to $p_Z$ vanish if the $Z$ boson couples to massless fermions \cite{AlcarazMaestre:2012vp}, so we need only consider the first two terms of \eqref{Lint1}, which have the same Lorentz structure as the Standard Model top-$Z$ vertex.
+%We therefore consider an interaction Lagrangian 
+%\begin{equation} \label{Lint2}
+%\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F^V + \gamma_5 F^A \bigr) \Biggr] v(p_{\bar{t}}),
+%\end{equation}
+%and define the deviations from the SM vector and axial-vector couplings $\DelFA$ and $\DelFV$ as
+%\begin{equation}
+%\begin{split}
+%\DelFV =& \frac{F^V}{ F^V_{\mathrm{SM}}} \\
+%\DelFA =& \frac{F^A}{ F^A_{\mathrm{SM}}} 
+%\end{split}
+%\end{equation}
+%
 Definition of top-Z couplings - vector, axial-vector, left and right handed \\
 Focus of D=4 operators -- D=6 for later (unclear how to implement unitarity for such operators) \\
 Definition of DF1V and DF1A
@@ -346,10 +412,57 @@ We find that leptons from the $Z$ boson have a typically harder spectrum.
 This is already true for LO while significatly different $K$-factors enhance this behavior even further at NLO.
 
 
-\subsection{Top-Z coupling results}
+\subsection{Top-Z coupling results from current CMS data}
+The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, with CMS observing nine events \cite{}, and ATLAS observing one event with more stringent selection criteria \cite{}. This enables ATLAS to place an upper bound on the $\ttbZ$ cross-section, while CMS are able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03} \mathrm{(sys.)}$ pb. Both are consistent with the NLO prediction of 0.137pb \cite{}. In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z coupling. These will constitute the first direct constraints on this coupling.
+In order to do so, we make use of a simple $\chi^2$-test 
+\begin{equation}
+\chi^2 = \frac{f \sigma - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
+\end{equation}
+where $\sigma=\sigma(C_{1,V},C_{1,A})$ is the predicted cross-section, $\sigma_{\mathrm{CMS}}$ is the cross-section measured by CMS, with error $\Delta \sigma_{\mathrm{CMS}}$ taken by adding the larger statistical and systematic errors in quadrature, $\Delta \sigma_{\mathrm{CMS}}=\sqrt{0.14^2+0.06^2}$. The factor $f$ takes into account the uncertainties in the theoretical predicion due to the scale and pdf choices. It is defined as
+ \begin{equation}
+f = \left\{ 
+\begin{array} {l l}
+(1+\Delta N)  & \quad \mathrm{if}~ f^* > 1 + \Delta N \\
+1/(1+\Delta N)  & \quad \mathrm{if}~ f^* < 1/(1 + \Delta N) \\
+f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
+\end{array} \right.\ 
+\end{equation}  
+where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma$, and $\Delta N$ is the combined scale and pdf uncertainty. This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, but instead require it to be within the bounds of the theoretical uncertainty. In determining $\Delta N$, we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
+
 Constraints from $t\bar{t}Z$ cross-section from CMS \\
+
+\subsection{Top-Z coupling constraints from future LHC run}
+We now move on to the future constraints that the high energy run of the LHC can place on the top-Z coupling. For this, we assume a centre-of-mass energy of $\sqrt{s}=13$ TeV, and consider the integrated luminosity as $30 \invfb$, $300 \invfb$, and $3000 \invfb$. We will consider only the trileptonic channel. We look at both the shape and overall normalization of $\Dphill$, the azimuthal angle between the leptons originating from the $Z$ decay, which was identified in ref.~\cite{baur} as being sensitive to the top-Z coupling. 
+Since no data is yet available, we are interested in determining the statistical separation possible between theoretical predictions. This is equivalent to posing the question: assuming a SM result, what bounds can be placed on the top-Z coupling? 
+We use a log-likelihood ratio as a test statistic for this analysis. We begin by defining two hypotheses: the SM hypothesis $\mathcal{H}_{\mathrm{SM}}$, and some anomalous coupling $\mathcal{H}_{aTZ}$. The predicted number of events in each bin $i$ for the two hypotheses is $\nu_i^{\mathrm{SM}}$ and $\nu_i^{\aTZ}$, and is obtained by simply multiplying the differential cross-section by the luminosity. We then perform a pseudoexperiment, in which the observed number of events $n_i^{\SM}$ in bin $i$ is Poisson distributed about the $\nu_i^{\mathrm{SM}}$, the predicted number of events in that bin under the SM hypothesis.  The binned log-likelihood function is then computed based on the $\mathcal{H}_{SM}$ and $\mathcal{H}_{aTZ}$ predictions
+\begin{equation}
+\begin{split}
+\log\mathcal{L}_{\SM}  =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\SM})-\log(n_i^{\SM}!) -\nu_i^{\SM} \bigr] \\
+\log\mathcal{L}_{\aTZ}  =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\aTZ})-\log(n_i^{\SM}!) -\nu_i^{\aTZ} \bigr]. \\
+\end{split}
+\end{equation}
+The test statistic $\Lambda_{\SM}$ is the ratio between these two functions 
+\begin{equation}
+\Lambda_{\SM} = \sum_{i=1}^N \bigl[ n_i^{\SM}\log \bigl( \frac{\nu_i^{\SM}}{\nu_i^{\aTZ}} \bigr) -\nu_i^{\SM} + \nu_i^{\aTZ} \bigr]. 
+\end{equation}.
+By performing a large number of pseudoexperiments we obtain a distribution for $\Lambda_{\SM}$. We then repeat this, but using the second hypothesis to generate events $n_i^{\aTZ}$ according to a Poisson distribution from the prediction $\nu_i^{\aTZ}$. We then compute $\log\mathcal{L}_{\SM}$ and $\log\mathcal{L}_{\SM}$ again, and find the ratio $\Lambda_{\aTZ}$. We now have two distributions: $P(\Lambda_{\SM})$ and P($\Lambda_{\aTZ})$. For a given value $\hat{\Lambda}$, the type I error (probability of accepting $\mathcal{H}_{\aTZ}$ even though $\mathcal{H}_{\SM}$ is correct) is
+\begin{equation}
+\alpha = \int_{\hLambda}^{\infty} d\Lambda P(\Lambda_{\SM}).
+\end{equation}
+Similarly, the type II error (probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\aTZ}$ is correct) is 
+\begin{equation}
+\beta = \int^{\hLambda}_{-\infty} d\Lambda P(\Lambda_{\aTZ}).
+\end{equation}
+We find $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of incorrectly rejecting one hypothesis in favor of the other. This value of $\alpha$ is then a measure of statistical discrimination possible between the two hypotheses. This can be translated into the more familiar number of standard deviations by 
+\begin{equation}
+\sigma = \sqrt{2}\erf^{-1}(1-\alpha),
+\end{equation}
+where $\erf^{-1}$ is the inverse error function. 
+No mention has yet been made of theoretical (scale+pdf) uncertainty. Following ref.~\cite{Lykken et al}, we do not change the predicted number of events in each bin $\nu_i$. Instead, the observed number of events is multiplied by an uncertainty factor which is uniformly distributed between $1/(1+\Delta N)$ and $1+\Delta N$. The effect of this is to broaden the distributions of $\Lambda$, resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value.
+
 Dphill distr with LO and NLO scale bands, and two(three?) non-SM coupl\\
 $\sigma_{NP|} / \sigma_{SM}$ a la Berger, 0907.2191 \\
+
 Description of analysis Binned log likelihood, how we handle scale uncertainty (cf. Lykken et al) \\
 alpha plots - LO, NLO, rescaled (k-factor and reduced scale uncertainty) LO at 30, 300, 3000 fb-1\\
 Dphill distr normalized to $t\bar{t}$ cross-section  - 1 uncertainty from k-factors at 30, 300, 3000\\
@@ -361,7 +474,7 @@ Future work: extension to dim 6 operators, incl single top + Z results, more adv
 
 \acknowledgments
 We acknowledge helpful conversations with Y.~Gao, A.~Gritsan, N.~Tran and P.~Argrawal. 
-
+Some of the numeric calculations wree done at NERSC.
 
 
 \appendix
