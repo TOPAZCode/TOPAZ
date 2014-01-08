@@ -17,6 +17,7 @@
 \newcommand{\TeV}{\mathrm{TeV}}
 \newcommand{\SM}{\mathrm{SM}}
 \newcommand{\aTZ}{\mathrm{aTZ}}
+\newcommand{\alt}{\mathrm{alt}}
 \newcommand{\pT}{p_{\mathrm{T}}}
 \def\DF1A{\Delta F_{1,A}}
 \def\DF1V{\Delta F_{1,V}}
@@ -32,6 +33,12 @@
 \def\invfb {\mathrm{fb}^{-1}}
 \def\hLambda {\hat{\Lambda}}
 \def\erf{\mathrm{erf}}
+\def\A1C{C_{1,A}}
+\def\V1C{C_{1,V}}
+\def\DA1C{\Delta C_{1,A}}
+\def\DV1C{\Delta C_{1,V}}
+\def\HSM{\mathcal{H}_{\mathrm{SM}}}
+\def\Halt{\mathcal{H}_{\mathrm{alt}}}
 \newcommand{\be}{\begin{eqnarray}}
 \newcommand{\ee}{\end{eqnarray}}
 %\newcommand{\ttb}{t \bar{t}}
@@ -246,6 +253,7 @@ However, the NLO cross-section was found to be 3\% higher at 1121 fb, giving a s
 %Checks: poles, factorization, alpha-param \\
 % Comparison with KTP, LMMP - cross-secs, distr \\
 
+
 \subsection{Top-Z coupling}
 The $\ttbZ$ interaction vertex can be written as
 \begin{equation} \label{Lint1}
@@ -413,14 +421,25 @@ In Fig.~\ref{fig:ii}a and Fig.~\ref{fig:ii}b we compare the transverse momentum 
 We find that leptons from the $Z$ boson have a typically harder spectrum. 
 This is already true for LO while significatly different $K$-factors enhance this behavior even further at NLO.
 
-
+%tagCMSdata
 \subsection{Top-Z coupling results from current CMS data}
-The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, with CMS observing nine events \cite{}, and ATLAS observing one event with more stringent selection criteria \cite{}. This enables ATLAS to place an upper bound on the $\ttbZ$ cross-section, while CMS are able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03} \mathrm{(sys.)}$ pb. Both are consistent with the NLO prediction of 0.137pb \cite{}. In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z coupling. These will constitute the first direct constraints on this coupling.
-In order to do so, we make use of a simple $\chi^2$-test 
+In this section and the next, we will use our calculation to investigate the contraints that can be placed on the top-Z coupling, using both existing and anticipated LHC data. To do so, we will need to compute the total cross-section and distributions for a large number of values of both $C_{1,V}$ and $C_{1,A}$. This is simple enough at LO, and while it is still feasible at NLO, it does place a strain on computing resources. As a convenient alternative, we note that $\ttbZ$ production and decay amplitude at LO or NLO can be written as
 \begin{equation}
-\chi^2 = \frac{f \sigma - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
+A = A_0 + A_V C_{1,V} + A_A C_{1,A},
 \end{equation}
-where $\sigma=\sigma(C_{1,V},C_{1,A})$ is the predicted cross-section, $\sigma_{\mathrm{CMS}}$ is the cross-section measured by CMS, with error $\Delta \sigma_{\mathrm{CMS}}$ taken by adding the larger statistical and systematic errors in quadrature, $\Delta \sigma_{\mathrm{CMS}}=\sqrt{0.14^2+0.06^2}$. The factor $f$ takes into account the uncertainties in the theoretical predicion due to the scale and pdf choices. It is defined as
+so that the differential cross-section is dependent on six coupling stuctures, and can be written as
+\begin{equation}
+d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
+\end{equation}
+Evaluating the cross-section for six values of $(C_{1,V},C_{1,A})$ allows us to solve for the coefficients $s_i$. These can then be used to generate results for any values of $C_{1,V}$ and $C_{1,A}$. Furthermore, this can be done for the total cross-section, or bin-by-bin for a given distribution. As a check on this approach, we have evaluated the cross-sections and distributions for several points in the $(C_{1,V},C_{1,A})$ parameter space, both by an explicit calculation and by using the values of the $s_i$ coefficients. Excellent agreement is found in all cases. As an example, we show the comparison for the {\bf which?} distribution for $C_{1,V}=, C_{1,A}=$ {\bf fill in values} in figure \ref{fig:magic}. {\bf should this explanation be herre? if not, then where?}
+
+We turn now to an analysis based on current LHC data. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, with CMS observing nine events \cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria \cite{ATLAS-CONF-2012-126}. This enables ATLAS to place an upper bound on the $\ttbZ$ cross-section, while CMS are able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$ pb. Both are consistent with the NLO prediction of 0.137pb \cite{Garzelli:2011is}. In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z coupling. These constitute the first direct constraints on this coupling.
+
+We make use of a simple $\chi^2$-test 
+\begin{equation}
+\chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
+\end{equation}
+where $\sigma_{\mathrm{pred}}=\sigma_{\mathrm{pred}}(C_{1,V},C_{1,A})$ is the predicted cross-section at LO or NLO, $\sigma_{\mathrm{CMS}}$ is the cross-section measured by CMS, with error $\Delta \sigma_{\mathrm{CMS}}$ taken by adding the larger statistical and systematic errors in quadrature, $\Delta \sigma_{\mathrm{CMS}}=\sqrt{0.14^2+0.06^2}$. The factor $f$ takes into account the uncertainties in the theoretical predicion due to the scale and pdf choices. It is defined as \cite{Baur:2004uw,Baur:2005wi}
  \begin{equation}
 f = \left\{ 
 \begin{array} {l l}
@@ -429,16 +448,17 @@ f = \left\{
 f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
 \end{array} \right.\ 
 \end{equation}  
-where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma$, and $\Delta N$ is the combined scale and pdf uncertainty. This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, but instead require it to be within the bounds of the theoretical uncertainty. In determining $\Delta N$, we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
-Probing a two-dimensional parameter space $(C_{1,V},C_{1,A})$ requires the computation of the total cross-section and distributions for a large number of values of$C_{1,V}$ and $C_{1,A}$. This is simple enough at LO, and while it is still feasible at NLO, it does place strain on computing resources. We note that a given amplitude at LO or NLO can be written as
-\begin{equation}
-A = A_0 + A_v C_{1,V} + A_A C_{1,A},
-\end{equation}
-so that the differential cross-section is dependent on six coupling stuctures, and can be written as
-\begin{equation}
-d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
-\end{equation}
-Thus, we can evaluate a result for six different choices of couplings $C_{1,V}$ and $C_{1,A}$, solve for $s_i$, and then use these to generate the results for any other coupling choice. This can be done for the total cross-section, or bin-by-bin for a given distribution. In fig.~\ref{fig:magic} we show the distribution for the coupling choice $C_{1,V}=$, $C_{1,A}$, computed using the full calculation, and using the $s_i$ values. Perfect agreement is found. 
+where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma_{\mathrm{pred}}$, and $\Delta N$ is the combined scale and pdf uncertainty. This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, but instead require it to be within the bounds of the theoretical uncertainty. In determining $\Delta N$, we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
+%Probing a two-dimensional parameter space $(C_{1,V},C_{1,A})$ requires the computation of the total cross-section and distributions for a large number of values of$C_{1,V}$ and $C_{1,A}$. This is simple enough at LO, and while it is still feasible at NLO, it does place strain on computing resources. We note that a given amplitude at LO or NLO can be written as
+%\begin{equation}
+%A = A_0 + A_v C_{1,V} + A_A C_{1,A},
+%\end{equation}
+%so that the differential cross-section is dependent on six coupling stuctures, and can be written as
+%\begin{equation}
+%d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
+%\end{equation}
+%Thus, we can evaluate a result for six different choices of couplings $C_{1,V}$ and $C_{1,A}$, solve for $s_i$, and then use these to generate the results for any other coupling choice. This can be done for the total cross-section, or bin-by-bin for a given distribution. In fig.~\ref{fig:magic} we show the distribution for the coupling choice $C_{1,V}=$, $C_{1,A}$, computed using the full calculation, and using the $s_i$ values. Perfect agreement is found. 
+
 Constraints from $t\bar{t}Z$ cross-section from CMS \\
 
 \subsection{Top-Z coupling constraints from future LHC run}
@@ -479,37 +499,53 @@ Since no data is yet available, we are interested in determining the statistical
 We use a log-likelihood ratio as a test statistic for this analysis. We begin by defining two hypotheses: the SM hypothesis $\mathcal{H}_{\mathrm{SM}}$, and some anomalous coupling $\mathcal{H}_{aTZ}$. The predicted number of events in each bin $i$ for the two hypotheses is $\nu_i^{\mathrm{SM}}$ and $\nu_i^{\aTZ}$, and is obtained by simply multiplying the differential cross-section by the luminosity. We then perform a pseudoexperiment, in which the observed number of events $n_i^{\SM}$ in bin $i$ is Poisson distributed about the $\nu_i^{\mathrm{SM}}$, the predicted number of events in that bin under the SM hypothesis.  The binned log-likelihood function is then computed based on the $\mathcal{H}_{SM}$ and $\mathcal{H}_{aTZ}$ predictions
 \begin{equation}
 \begin{split}
-\log\mathcal{L}_{\SM}  =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\SM})-\log(n_i^{\SM}!) -\nu_i^{\SM} \bigr] \\
-\log\mathcal{L}_{\aTZ}  =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\aTZ})-\log(n_i^{\SM}!) -\nu_i^{\aTZ} \bigr]. \\
+\log\mathcal{L}_{\SM}(\HSM)   =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\SM}) -\log(n_i^{\SM}!) -\nu_i^{\SM}  \bigr] \\
+\log\mathcal{L}_{\alt}(\HSM)  =& \sum_{i=1}^N \bigl[ n_i^{\SM}\log(\nu_i^{\alt})-\log(n_i^{\SM}!) -\nu_i^{\alt} \bigr],
 \end{split}
 \end{equation}
-The test statistic $\Lambda_{\SM}$ is the ratio between these two functions 
+and the test statistic $\Lambda$ is the difference between these two functions 
 \begin{equation}
-\Lambda_{\SM} = \sum_{i=1}^N \bigl[ n_i^{\SM}\log \bigl( \frac{\nu_i^{\SM}}{\nu_i^{\aTZ}} \bigr) -\nu_i^{\SM} + \nu_i^{\aTZ} \bigr]. 
+\begin{split}
+\Lambda(\HSM) &= \log \biggl( \mathcal{L}_{\SM}(\HSM) /  \mathcal{L}_{\alt}(\HSM) \biggr)  \\
+ & = \sum_{i=1}^N \biggl[ n_i^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr]. 
+\end{split}
 \end{equation}.
-By performing a large number of pseudoexperiments we obtain a distribution for $\Lambda_{\SM}$. We then repeat this, but using the second hypothesis to generate events $n_i^{\aTZ}$ according to a Poisson distribution from the prediction $\nu_i^{\aTZ}$. We then compute $\log\mathcal{L}_{\SM}$ and $\log\mathcal{L}_{\SM}$ again, and find the ratio $\Lambda_{\aTZ}$. We now have two distributions: $P(\Lambda_{\SM})$ and P($\Lambda_{\aTZ})$. For a given value $\hat{\Lambda}$, the type I error (probability of accepting $\mathcal{H}_{\aTZ}$ even though $\mathcal{H}_{\SM}$ is correct) is
+By performing a large number of pseudoexperiments we obtain a probability distribution $P(\Lambda|\HSM)$ for $\Lambda$. We then repeat this procedure, using $\Halt$ to generate events $n_i^{\alt}$ according to a Poisson distribution from the prediction $\nu_i^{\alt}$. We compute $\log\mathcal{L}_{\SM}(\Halt)$ and $\log\mathcal{L}_{\alt}(\Halt)$ again, and find the distribution $P(\Lambda | \Halt)$. For a given value $\hat{\Lambda}$, the type I error (probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct) is
 \begin{equation}
-\alpha = \int_{\hLambda}^{\infty} d\Lambda P(\Lambda_{\SM}).
+\alpha = \int_{\hLambda}^{\infty} d\Lambda P(\Lambda | {\HSM}).
 \end{equation}
-Similarly, the type II error (probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\aTZ}$ is correct) is 
+Similarly, the type II error (probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\alt}$ is correct) is 
 \begin{equation}
-\beta = \int^{\hLambda}_{-\infty} d\Lambda P(\Lambda_{\aTZ}).
+\beta = \int^{\hLambda}_{-\infty} d\Lambda P(\Lambda|\Halt).
 \end{equation}
-We find $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of incorrectly rejecting one hypothesis in favor of the other. This value of $\alpha$ is then a measure of statistical discrimination possible between the two hypotheses. This can be translated into the more familiar number of standard deviations by 
+We define $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of incorrectly rejecting one hypothesis in favor of the other. This value of $\alpha$ is then a measure of statistical discrimination possible between the two hypotheses. This can be translated into the more familiar number of standard deviations by 
 \begin{equation}
 \sigma = \sqrt{2}\erf^{-1}(1-\alpha),
 \end{equation}
 where $\erf^{-1}$ is the inverse error function. 
-No mention has yet been made of theoretical (scale+pdf) uncertainty. Following ref.~\cite{Lykken et al}, we do not change the predicted number of events in each bin $\nu_i$. Instead, the observed number of events in each bin of each pseudoexperiment is multiplied by an uncertainty factor which is uniformly distributed between $1/(1+\Delta N)$ and $1+\Delta N$. {\bf why do this?}. The effect of this is to broaden the distributions of $\Lambda$, resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value.
 
 
+The above discussion made no mention of theoretical (scale+pdf) uncertainty. Following ref.~\cite{Lykken et al}, the uncertainty is included when generating the pseudoexperimental data from the theoretical prediction, by multiplying the observed number of events $n_i$ by an random uncertainty factor uniformly distributed between $1/(1+\Delta N)$ and $1+\Delta N$. {\bf does this need explanation/justification? something along the lines of: this is a reflection of the fact that we dont know the scale at which the event occurs, so that the data may be within the uncertainty of the th. prediction??} The effect of this is to broaden the distributions of $\Lambda$, resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value and less discriminatory power.
 
+We show the results in figure \ref{fig:LHC13sigLO}, using both the LO and NLO results and uncertainties. It is immediately apparent that $\A1C$ can be constrained far better than $\V1C$. At LO, the value of $\DA1C$ lies between roughly -0.5 and 0.5, implying that this coupling can be constrained to within a factor of half of its value. On the other hand, the value of $\DV1C$ can be as low as -4 or as high as 3. Another noticeable feature is that large values of $| \DV1C |$ can conspire with low values of $\DA1C$ to create regions of parameter space which are indistinguishable from the SM. Both of these features are qualitatively similar to the results obtained by ref. ~\cite{baur}. 
+\begin{figure}
+\includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
+\includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
+\caption{Significance levels for deviations from SM vector and axial couplings $\DV1C$ and $DA1C$,  using 300 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.} \label{fig:LHC13sigLO} 
+\end{figure}
+The constraints are far stronger when NLO results and uncertainties are used, driven by the reduced uncertainty and a large $k$-factor of approximately 1.5. At this accuracy, the axial coupling can be constrained at $-0.2 \lesssim \DA1C \lesssim 0.15$ at the 1-$\sigma$ level and $-0.4 \lesssim \DA1C \lesssim 0.25$ at the 3-$\sigma$ level, independent of the value of $\V1C$. Constraints on the vector coupling $\V1C$ are still much looser: $-3 \lesssim \DV1C \lesssim 1.5$ at 1-$\sigma$ level and $-3 \lesssim \DV1C \lesssim 2.5$ at the 3-$\sigma$ level.
 
+A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DV1C|$ and large negative values of $\DA1C$. This is best explained by considering the LO results for two points in the coupling parameter space, $(\DV1C,\DA1C)=(-0.40,+1.50)$ and $(\DV1C,\DA1C)=(-0.40,+2.00)$. These points lie 1.3 and 2.5 deviations from the SM hypothesis respectively; however, in the absence of theoretical uncertainties, the two hypotheses are 3.7 and 3.0 deviations away from the SM, respectively. The effect of introducing the uncertainties into the analysis is much more pronounced for the first point than for the second. The reason for this is that the main difference between the first point and the SM is the overall rate, whereas the second point has a similar rate to the SM but a significantly different shape (see fig.~\ref{fig:coupl_distr}). Then, for the second coupling choice, the values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are similar, and the log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. This means that the significance values are not greatly reduced by the theoretical uncertainty. The tongue of large $\sigma$-values therefore represents a set of points for which the distinction between the SM and alternate hypotheses is made based not on the overall rate, but rather on the shape of the $\Dphill$ distributions, which is relatively insensitive to the theoretical uncertainty. This also explains why the tongue is more prominent in the LO analysis.
 
-Dphill distr with LO and NLO scale bands, and two(three?) non-SM coupl\\
+%As can be seen in figure \ref{fig:coupl_distr}, there are significant shape changes for these values of the couplings, resulting in a large separation between the hypotheses. At the same time, the overall rate is similar to the SM one.  The values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are therefore similar, and the log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. This means that the large significance values are not greatly reduced by the theoretical uncertainty.  
+{\bf would this be seen in some other treatment of the scale uncertainty? corresponds to what you'd think, or not? on the one hand, the shape change should be less sensitive to the uncertainty than the overall cross-section. on the other, in each bin the number is similar to that of the SM, we should be able to wiggle them so that they coincide with the SM, whereas if the overall cross-section is very different from the SM, then the scale uncertainty can't do much. } 
+
+In figure \ref{fig:LHC13data}, we show results of the analysis for 30 and 3000 $\invfb$ of data. 30 $\invfb$ of data should be available after the first year or so of the high energy run, while 3000 $\invfb$ is the benchmark value for the complete dataset over the lifetime of the LHC. 
+
+%Dphill distr with LO and NLO scale bands, and two(three?) non-SM coupl\\
 $\sigma_{NP|} / \sigma_{SM}$ a la Berger, 0907.2191 \\
 
-Description of analysis Binned log likelihood, how we handle scale uncertainty (cf. Lykken et al) \\
+%Description of analysis Binned log likelihood, how we handle scale uncertainty (cf. Lykken et al) \\
 alpha plots - LO, NLO, rescaled (k-factor and reduced scale uncertainty) LO at 30, 300, 3000 fb-1\\
 Dphill distr normalized to $t\bar{t}$ cross-section  - 1 uncertainty from k-factors at 30, 300, 3000\\
 
