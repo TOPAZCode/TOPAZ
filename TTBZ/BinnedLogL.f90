@@ -92,7 +92,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 
   write(14,*) "Performing binned log-likelihood analysis."
   write(14,"(A,I2,A,F10.6,A,I9,A,F9.6)") "Reading histogram ",Histo," for likelihood analysis with Lumi=",Data,"fb^-1 using ",NPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
-  write(14,*) 'Using input files:', trim(H0_infile),trim(H1_infile)
+  write(14,*) 'Using input files:', trim(H0_infile)," and  ", trim(H1_infile)
   write(14,*) "Writing output to files : ", trim(filename_out1), " and ", trim(filename_out2)
 
 
@@ -108,7 +108,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      
      read(unit=112,fmt=fmt1) NHisto(1),dummy,BinVal(1,NumBins0+1),dummy,Value(1,NumBins0+1),dummy,Error(1,NumBins0+1),dummy,Hits(1,NumBins0+1),dummy
 
-    if( NHisto(1).ne.1 ) cycle
+!    if( NHisto(1).ne.1 ) cycle
+    if( NHisto(1).ne.Histo ) cycle
      NumBins0=NumBins0 + 1
   enddo
   
@@ -118,7 +119,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      backspace(unit=113) ! go to the beginning of the line
      
      read(unit=113,fmt=fmt1) NHisto(2),dummy,BinVal(2,NumBins1+1),dummy,Value(2,NumBins1+1),dummy,Error(2,NumBins1+1),dummy,Hits(2,NumBins1+1),dummy
-    if( NHisto(2).ne.1 ) cycle
+!    if( NHisto(2).ne.1 ) cycle
+    if( NHisto(2).ne.Histo ) cycle
      NumBins1=NumBins1 + 1
   enddo
 
@@ -178,6 +180,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   NumExpectedEvents(2) = int(Data * sigmatot(2) * PreFactor) 
   write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
   write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
+  write(14,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
+  write(14,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
 
 !  check(1:2) = 0d0
 !  do iBin=1,NumBins! check
@@ -275,6 +279,9 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
         if (ObsEvents(iHypothesis,iBin) .ne. 0 .and. ExpectedEvents(1,iBin) .ne. 0 .and. &
              & ExpectedEvents(2,iBin) .ne. 0) then
            LLRatio=LLRatio+ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin))
+!           if (iPseudoExp .eq. 1) then
+           write(301,*) iBin, ObsEvents(iHypothesis,iBin),dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),LLRatio
+!        endif
         endif
      enddo
 
