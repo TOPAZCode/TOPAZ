@@ -941,8 +941,8 @@ real(8) :: tau,eta1,eta2,sHatJacobi,PreFac,FluxFac,PDFFac_a(1:2),PDFFac_b(1:2),P
 integer :: NHisto,NBin(1:NumMaxHisto),npdf,ParityFlip=1,PhotonCouplCorr=2d0,nHel(1:2),NRndHel,qf
 integer :: ZQcoupl,npdfmax,npdfmin
 integer,parameter :: up=1,dn=2
-complex(8) :: couplZQQ_left_dyn_old,couplZQQ_right_dyn_old,couplZTT_left_dyn_old,couplZTT_right_dyn_old,RenormAmp(1:2)
-real(8) :: Ren_Res_Pol,Ren_Res_UnPol,R_V,R_A,prim_opp_err(1:10)
+complex(8) :: couplZTT_left_dyn_old,couplZTT_right_dyn_old,RenormAmp(1:2)
+real(8) :: Ren_Res_Pol,Ren_Res_UnPol,R_V,R_A,prim_opp_err(1:10),tmpVcoupl,tmpAcoupl
 include 'misc/global_import'
 include "vegas_common.f"
 
@@ -1060,6 +1060,7 @@ include "vegas_common.f"
       return
    endif
 
+
 ! we still need this for the massless qqZ couplings
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
 
@@ -1088,6 +1089,7 @@ include "vegas_common.f"
 !         nHel(2)=NumHelicities/2
 !         PreFac=PreFac*2d0
 !    endif
+
 
    LO_Res_Unpol             = (0d0,0d0)
    NLO_Res_Unpol(-2:1)      = (0d0,0d0)
@@ -1156,6 +1158,7 @@ IF( CORRECTION.EQ.0 ) THEN
      enddo!helicity loop
   enddo! npdf loop
   !   call swapMom(MomExt(1:4,1),MomExt(1:4,2))   ! swap back to original order, for ID below
+
   !print * , "remove swap"
 
 
@@ -1220,7 +1223,6 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
       LO_Res_Pol = (0d0,0d0)
      
       LO_Res_Pol =  ColLO_ttbqqb(1,1) * ( LOPartAmp(up)*dconjg(LOPartAmp(up))*PDFFac(up) + LOPartAmp(dn)*dconjg(LOPartAmp(dn))*PDFFac(dn))
-
       LO_Res_UnPol = LO_Res_UnPol + LO_Res_Pol
 
       if (Zdecays .eq. 0) then
@@ -1282,7 +1284,8 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
          endif
 
          AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
-         if ( AccPoles .gt. DPtol .or. prim_opp_err(APrimAmp) .gt. 1d-2) then
+        if ( AccPoles .gt. DPtol .or. prim_opp_err(APrimAmp) .gt. 1d-2) then
+!         if (.true.) then
             useQP=useQP+1
             PrimAmps(APrimAmp)%Result=(0d0,0d0)
 
@@ -1296,7 +1299,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
                call SingCut_128(PrimAmps(jPrimAmp))
                call EvalMasterIntegrals(PrimAmps(jPrimAmp),MuRen**2)
                if (jPrimAmp .eq. 1 .or. jPrimAmp .eq. 3 .or. jPrimAmp .eq. 5  .or. jPrimAmp .eq. 10) then
-                  call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen*2)
+                  call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen**2)
                endif
                PrimAmps(jPrimAmp)%Result(-2:1) = (0d0,1d0) * PrimAmps(jPrimAmp)%Result(-2:1)               
             enddo
@@ -1402,7 +1405,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
                call SingCut_128(PrimAmps(jPrimAmp))
                call EvalMasterIntegrals(PrimAmps(jPrimAmp),MuRen**2)
                if (jPrimAmp .eq. 1 .or. jPrimAmp .eq. 3 .or. jPrimAmp .eq. 5  .or. jPrimAmp .eq. 10) then
-                  call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen*2)
+                  call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen**2)
                endif
                PrimAmps(jPrimAmp)%Result(-2:1) = -(0d0,1d0) * PrimAmps(jPrimAmp)%Result(-2:1)               
             enddo
@@ -1535,7 +1538,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
             call SingCut_128(PrimAmps(jPrimAmp))
             call EvalMasterIntegrals(PrimAmps(jPrimAmp),MuRen**2)
             if (jPrimAmp .eq. 1 .or. jPrimAmp .eq. 3 .or. jPrimAmp .eq. 5  .or. jPrimAmp .eq. 10) then
-               call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen*2)
+               call RenormalizeUV(PrimAmps(jPrimAmp),BornAmps(jPrimAmp),MuRen**2)
             endif
             PrimAmps(jPrimAmp)%Result(-2:1) = -(0d0,1d0) * PrimAmps(jPrimAmp)%Result(-2:1)               
          enddo
@@ -1579,7 +1582,33 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
      NLO_Res_Pol(-2:1) = Col1L_ttbqqb(1,1) *( dreal(LOPartAmp(up)*dconjg(FermionPartAmp(up,-2:1)))*PDFFac(up) &
                                             + dreal(LOPartAmp(dn)*dconjg(FermionPartAmp(dn,-2:1)))*PDFFac(dn) )
 
-      NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1) + NLO_Res_Pol(-2:1)
+      NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) + NLO_Res_Pol(-2:1)
+
+! gamma-5 renormalization
+! HV
+      R_V=0d0
+      R_A=-4d0/3d0*two
+      
+      couplZTT_left_dyn_old  = couplZTT_left_dyn
+      couplZTT_right_dyn_old = couplZTT_right_dyn
+      tmpVcoupl=couplZTT_V*R_V
+      tmpAcoupl=couplZTT_A*R_A
+      couplZTT_left_dyn  = (tmpVcoupl + tmpAcoupl)/1d0
+      couplZTT_right_dyn = (tmpVcoupl - tmpAcoupl)/1d0
+      
+      
+      BornAmps(1)%Result=(0d0,0d0)
+      call EvalTree(BornAmps(1))
+      
+      RenormAmp(up)=BornAmps(1)%Result
+      RenormAmp(dn)=BornAmps(1)%Result
+      Ren_Res_Pol = ColLO_ttbqqb(1,1) * dreal( LOPartAmp(up)*dconjg(RenormAmp(up)))
+      
+      Ren_Res_UnPol=Ren_Res_UnPol + Ren_Res_Pol 
+      couplZTT_left_dyn  = couplZTT_left_dyn_old
+      couplZTT_right_dyn = couplZTT_right_dyn_old
+      
+!        end gamma--5 renorm                                                    
 
     enddo!helicity loop
  enddo ! npdf
@@ -1602,7 +1631,7 @@ ELSEIF( CORRECTION.EQ.1 ) THEN
 
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
-
+   NLO_Res_UnPol(0) = NLO_Res_UnPol(0)+Ren_Res_UnPol    ! gamma-5 renormalization
 
 !  normalization
    LO_Res_Unpol = LO_Res_Unpol                         * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha4Pi
