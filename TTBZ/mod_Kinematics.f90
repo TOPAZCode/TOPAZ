@@ -39,6 +39,7 @@ type(Histogram),allocatable   :: Histo(:)
 
 real(8) :: pT_jet_cut, pT_bjet_cut, pT_lep_cut, Rsep_jet, Rsep_LepJet, pT_miss_cut, eta_sepa_cut, MInv_jets_cut, eta_lep_cut, eta_jet_cut, eta_bjet_cut, HT_cut, pT_hardestjet_cut
 real(8) :: pT_pho_cut,Rsep_Pj,Rsep_Pbj,Rsep_Plep,eta_pho_cut,MTW_cut, Mttbar_cut,Rsep_jetlep
+real(8) :: pT_lepZ_cut,pt_lept_cut,pT_ll_cut,HT_jet_cut,Frac_sep_jetlep
 
 real(8),public ::MInv_LB
 
@@ -47,7 +48,7 @@ real(8),public ::MInv_LB
 
 !DEC$ IF(_UseMPIVegas.EQ.1)
 integer,public,parameter :: NUMHISTO=30       ! this has to match the constants in pvegas_mpi.c
-integer,public,parameter :: MXHISTOBINS=55
+integer,public,parameter :: MXHISTOBINS=100
 type, BIND(C) :: ReducedHistogram
     real(8) :: Value(1:MXHISTOBINS)
     real(8) :: Value2(1:MXHISTOBINS)
@@ -626,6 +627,23 @@ ELSEIF( ObsSet.EQ.53 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar dec
     eta_lep_cut = 2.5d0
     Rsep_jetlep = 0.4d0
 
+ELSEIF( ObsSet.EQ.54 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar decays and di-lept. Z decay from 7 TeV CMS data)
+
+   Rsep_jet    = 0.5d0
+   pT_bjet_cut = 20d0*GeV
+   eta_bjet_cut= 2.4d0
+   pT_jet_cut  = 20d0*GeV
+   eta_jet_cut = 2.4d0
+
+   eta_lep_cut = 2.5d0
+   pT_lepZ_cut  = 20d0*GeV
+   pT_lept_cut  = 10d0*GeV
+   pT_ll_cut  = 35d0*GeV
+   HT_jet_cut = 120*GeV  
+
+
+   Rsep_jetlep = 0.3d0
+   Frac_sep_jetlep=0.15d0
 
 ELSEIF( ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay ) same as 52 but no cuts
 
@@ -3761,6 +3779,127 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(25)%SmearSigma=1d0
 
 
+       ELSEIF( ObsSet.EQ.54 .or. ObsSet.EQ.58 ) THEN 
+! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+! observed at CMS at sqrt(s)=7 TeV
+          if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
+          if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
+!          print *, Collider
+!          if (Collider .ne. 11) call Error("Collider needs to be 11 for sqrt{s}=7 TeV")
+          NumHistograms = 25
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+          Histo(1)%Info   = "pT(lep+)"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 20d0*GeV
+          Histo(1)%LowVal =  0d0*GeV
+          Histo(1)%SetScale= 100d0
+
+          Histo(2)%Info   = "pT(mu-)"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 20d0*GeV
+          Histo(2)%LowVal =  0d0*GeV
+          Histo(2)%SetScale= 100d0
+
+          Histo(3)%Info   = "pT(mu+)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 20d0*GeV
+          Histo(3)%LowVal =  0d0*GeV
+          Histo(3)%SetScale= 100d0
+
+          Histo(4)%Info   = "pT(b1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 20d0*GeV
+          Histo(4)%LowVal =  0d0*GeV
+          Histo(4)%SetScale= 100d0
+
+          Histo(5)%Info   = "pT(b2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 20d0*GeV
+          Histo(5)%LowVal =  0d0*GeV
+          Histo(5)%SetScale= 100d0
+
+          Histo(6)%Info   = "pT(j1)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 20d0*GeV
+          Histo(6)%LowVal =  0d0*GeV
+          Histo(6)%SetScale= 100d0
+
+          Histo(7)%Info   = "pT(j2)"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 20d0*GeV
+          Histo(7)%LowVal =  0d0*GeV
+          Histo(7)%SetScale= 100d0
+
+          Histo(8)%Info   = "pT(miss)"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 20d0*GeV
+          Histo(8)%LowVal =  0d0*GeV
+          Histo(8)%SetScale= 100d0
+
+          Histo(9)%Info   = "y(lep+)"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 0.5d0
+          Histo(9)%LowVal =-5.0d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "y(mu-)"
+          Histo(10)%NBins  = 20
+          Histo(10)%BinSize= 0.5d0
+          Histo(10)%LowVal =-5.0d0
+          Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "y(mu+)"
+          Histo(11)%NBins  = 20
+          Histo(11)%BinSize= 0.5d0
+          Histo(11)%LowVal =-5.0d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "pT(Z)"
+          Histo(12)%NBins  = 50
+          Histo(12)%BinSize= 20d0*GeV
+          Histo(12)%LowVal =  0d0*GeV
+          Histo(12)%SetScale= 100d0
+
+          Histo(13)%Info   = "y(Z)"
+          Histo(13)%NBins  = 20
+          Histo(13)%BinSize= 0.5d0
+          Histo(13)%LowVal =-5.0d0
+          Histo(13)%SetScale= 1d0
+
+          Histo(14)%Info   = "pT(top)"
+          Histo(14)%NBins  = 50
+          Histo(14)%BinSize= 20d0*GeV
+          Histo(14)%LowVal =  0d0*GeV
+          Histo(14)%SetScale= 100d0
+
+          Histo(15)%Info   = "y(top)"
+          Histo(15)%NBins  = 20
+          Histo(15)%BinSize= 0.5d0
+          Histo(15)%LowVal =-5.0d0
+          Histo(15)%SetScale= 1d0
+
+          Histo(16)%Info   = "y(antitop)"
+          Histo(16)%NBins  = 20
+          Histo(16)%BinSize= 0.5d0
+          Histo(16)%LowVal =-5.0d0
+          Histo(16)%SetScale= 1d0
+
+          Histo(17)%Info   = "phi(mu-,mu+)"
+          Histo(17)%NBins  = 26
+          Histo(17)%BinSize= 0.25d0/2d0
+          Histo(17)%LowVal = 0d0
+          Histo(17)%SetScale= 1d0
+
+          Histo(18)%Info   = "HTTOT"
+          Histo(18)%NBins  = 50
+          Histo(18)%BinSize= 20d0*GeV
+          Histo(18)%LowVal = 0d0*GeV
+          Histo(18)%SetScale= 100d0
+
+          
 
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -7253,7 +7392,9 @@ real(8) :: pT_lep(4),ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
 real(8) :: eta_ATop,eta_Top,eta_lep(1:4),pseudo_Z, pseudo_top, pseudo_tbar
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,mT_bln(1:2),pT_Z,eta_Z
 real(8) :: R_lj(1:5),R_PlepM,pT_lept,ET_lept,mT,dPhiLL,CosTheta1,DphiZt,Dphittbar
+real(8) :: pT_ll,HT_jet,WithinCone(1:3),RLept
 integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z,jlabel
+integer :: iLept,jLept,jJet,JetIndex(1:4),LepIndex(1:3)
 
 
 
@@ -7523,6 +7664,32 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
     NBin(22) = WhichBin(22,pseudo_top)
     NBin(23) = WhichBin(23,pseudo_tbar)
 
+       
+    if( present(PObs) ) then
+      PObs(1) = pT_Lep(1)
+      PObs(2) = pT_Lep(2)
+      PObs(3) = pT_Z
+      PObs(4) = pT_top
+      PObs(5) = pT_atop
+      PObs(6) = pT_jet(1)
+      PObs(7) = pT_jet(2)
+      PObs(8) = pT_jet(3)
+      PObs(9) = pT_jet(4)
+      PObs(10) = pT_miss
+      PObs(11) = eta_Lep(1)
+      PObs(12) = eta_Lep(2)
+      PObs(13) = eta_Z
+      PObs(14) = eta_top
+      PObs(15) = eta_atop
+      PObs(16) = eta_jet(1)
+      PObs(17) = eta_jet(1)
+      PObs(18) = eta_Lep(3)
+      PObs(19) = eta_Lep(4)
+      PObs(20) = dphill
+      PObs(21) = pseudo_Z
+      PObs(22) = pseudo_top
+      PObs(23) = pseudo_tbar
+    endif
 
 
 
@@ -7699,7 +7866,113 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
     endif
 
 !-------------------------------------------------------
-else
+
+elseif (ObsSet .eq. 54 .or. ObsSet .eq. 58) then    ! this is for the observed CMS set at 7 TeV
+
+   ! request at least three jets where two are b-jets
+   NObsJet_Tree = 3
+   ! Ask Markus: how does this enforce 2 bjet requirement???
+   if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+      applyPSCut = .true.
+      RETURN
+    endif
+
+    LepIndex=(/LepP,ferm_Z,Aferm_Z/)
+    JetIndex=(/1,2,3,4/)
+    
+    pT_jet(1) = get_PT(MomJet(1:4,1))
+    pT_jet(2) = get_PT(MomJet(1:4,2))
+    pT_jet(3) = get_PT(MomJet(1:4,3))
+    pT_jet(4) = get_PT(MomJet(1:4,4))
+    HT_jet=pT_jet(1)+pT_jet(2)+pT_jet(3)+pT_jet(4)
+    eta_jet(1) = get_ETA(MomJet(1:4,1))
+    eta_jet(2) = get_ETA(MomJet(1:4,2))
+    eta_jet(3) = get_ETA(MomJet(1:4,3))
+    eta_jet(4) = get_ETA(MomJet(1:4,4))
+
+
+    pT_Lep(1)  = get_PT(Mom(1:4,LepP))
+    eta_Lep(1) = get_ETA(Mom(1:4,LepP))
+    pT_Lep(2)  = get_PT(Mom(1:4,ferm_Z))
+    eta_Lep(2) = get_ETA(Mom(1:4,ferm_Z))
+    pT_Lep(3)  = get_PT(Mom(1:4,Aferm_Z))
+    eta_Lep(3) = get_ETA(Mom(1:4,Aferm_Z))
+
+    pT_ll=get_PT( (Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z)) )
+
+    pT_miss = get_PT(Mom(1:4,nu))
+    
+    if( pT_jet(1).lt.pT_bjet_cut .OR. pT_jet(2).lt.pT_bjet_cut ) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+    if( abs(eta_jet(1)).gt.eta_bjet_cut .OR. abs(eta_jet(2)).gt.eta_bjet_cut) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+    if( pT_jet(3).lt.pT_jet_cut .OR. pT_jet(4).lt.pT_jet_cut ) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+    if( abs(eta_jet(3)).gt.eta_jet_cut .OR. abs(eta_jet(4)).gt.eta_jet_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_lep(1)).gt.eta_lep_cut .OR. abs(eta_lep(2)).gt.eta_lep_cut  .OR. abs(eta_lep(3)).gt.eta_lep_cut ) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+    if (pT_lep(2).lt.pT_lepZ_cut .OR. pT_lep(3).lt.pT_lepZ_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_lep(1).lt.pT_lept_cut ) then 
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if (pT_ll .le. pT_ll_cut) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+
+    if (HT_jet .le. HT_jet_cut) then
+       applyPSCut = .true.
+       RETURN
+    endif
+
+    WithinCone=0d0
+    do iLept=1,3
+       do jLept=1,3
+          if (jLept .eq. iLept) cycle
+          RLept=Get_R(Mom(1:4,LepIndex(iLept)),Mom(1:4,LepIndex(jLept)))
+          if (Rlept .le. Rsep_jetlep ) then
+             WithinCone(iLept)=WithinCone(iLept)+get_PT(Mom(1:4,LepIndex(jLept))) &
+                  &+Mom(1,LepIndex(jLept))
+          endif
+       enddo
+       do jJet=1,NJet
+          RLept=Get_R(Mom(1:4,LepIndex(iLept)),MomJet(1:4,Jetindex(jJet)))
+          if (Rlept .le. Rsep_jetlep ) then
+             WithinCone(iLept)=WithinCone(iLept)+get_PT(MomJet(1:4,JetIndex(jJet))) &
+                  &+MomJet(1,JetIndex(jJet))
+          endif
+       enddo
+       if ( WithinCone(iLept) .ge. Frac_sep_jetlep*get_PT(Mom(1:4,LepIndex(iLept))) ) then
+          applyPSCut = .true.
+          RETURN
+       endif
+    enddo
+
+ else
+
   print *, "ObsSet not implemented",ObsSet
   stop
 endif
@@ -10543,12 +10816,20 @@ real(8) :: LowerBinValue,UpperBinValue,NeighbBinValue,ErrorFunct
         if( .not. present(BinValue) ) call Error("Argument BinValue is missing in call to IntoHisto.")
         LowerBinValue=(NBin-1)*Histo(NHisto)%BinSize + Histo(NHisto)%LowVal
         UpperBinValue=LowerBinValue + Histo(NHisto)%BinSize
-        if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
+        if (NBin .eq. 1) then
+           NeighbBin=2
            NeighbBinValue=UpperBinValue
-           NeighbBin=NBin+1
-        else
+        elseif (NBin.eq.Histo(NHisto)%NBins) then
+           NeighbBin=Nbin-1
            NeighbBinValue=LowerBinValue
-           NeighbBin=NBin-1
+        else
+           if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
+              NeighbBinValue=UpperBinValue
+              NeighbBin=NBin+1
+           else
+              NeighbBinValue=LowerBinValue
+              NeighbBin=NBin-1
+           endif
         endif
            ! ErrorFunct ranges between 0...+1
            ! erf(0)=0, erf(1/sqrt2)=0.68, erf(2/sqrt2)=0.95, erf(3/sqrt2)=0.99
