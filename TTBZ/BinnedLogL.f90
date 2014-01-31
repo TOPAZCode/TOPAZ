@@ -1,7 +1,10 @@
+! Compile:  ifort -o BinnedLogL BinnedLogL.f90
+! Compile:  mpif90 -D_UseMPI=1 -o BinnedLogL BinnedLogL.f90
+! Compile:  safety options:  -O0 -fpp -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv
 program BinnedLogL
   use ifport
   implicit none
-  integer :: NumArgs,Histo,NPseudoExp
+  integer :: NumArgs,Histo,NPseudoExp,NPseudoExp_Worker
   real(8) :: PreFactor,Data
   character :: operation*(10),H0_infile*(50),H1_infile*(50),Data_str*(5),Histo_str*(5),NPseudoExp_str*(9),dummy*(1),outfile*(50),DeltaN_str*(5),filename_out1*(50),filename_out2*(50)
   character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
@@ -16,9 +19,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   real(8) :: nran(1:2),offset,sran,DeltaN
   real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
   real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),alpha_ave,beta_ave,sigs
-  real(8) :: LLRatio_array(1:2,1:MaxExp),LLRatio_min,LLRatio_max,WhichBin
-  
-  integer :: j,i,s,SUA
+  real(8) :: LLRatio_array(1:2,1:MaxExp),LLRatio_array_tmp(1:2,1:MaxExp),LLRatio_min,LLRatio_max,WhichBin
+  integer :: j,i,s,SUA,MPI_Rank,worker,MPI_NUM_PROCS,ierror
   type :: Histogram
      integer :: NBins
      real(8) :: BinSize
@@ -26,6 +28,18 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      integer :: Hits(1:1000)
   end type Histogram
   type(Histogram) :: LLHisto(1:2)
+!DEC$ IF(_UseMPI .EQ.1)
+  include 'mpif.h'
+  integer status(MPI_STATUS_SIZE)
+     call MPI_INIT(ierror)
+     call MPI_COMM_RANK(MPI_COMM_WORLD,MPI_Rank,ierror)
+     call MPI_COMM_SIZE (MPI_COMM_WORLD,MPI_NUM_PROCS,ierror)
+!DEC$ ELSE
+     MPI_Rank=0
+     MPI_NUM_PROCS=1
+!DEC$ ENDIF
+
+
 
   LLHisto(1)%NBins   = 1000
   LLHisto(1)%BinSize = 1d0
@@ -82,7 +96,6 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 !--------------------------------------------------
 !          1. reading input files
 !--------------------------------------------------
-
   open(unit=112,file=trim(H0_infile),form='formatted',access='sequential')  ! open input file1
   open(unit=113,file=trim(H1_infile),form='formatted',access='sequential')  ! open input file
   open(unit=12,file=trim(H0_infile),form='formatted',access='sequential')  ! open input file1
@@ -142,7 +155,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   Hits=0
 
 !------------------------------------------------------------------------- 
-! 1b. Now read in the actual ditribution of interest
+! 1b. Now read in the actual distribution of interest
 !-------------------------------------------------------------------------
 
   do while(.not.eof(12))!   reading input file 1
@@ -231,9 +244,14 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 ! -----------------------------------------------------------------
 ! 3.1 Generate Poisson distribution about expected null value in each bin
 ! -----------------------------------------------------------------
+  NPseudoExp_Worker = NPseudoExp/(MPI_NUM_PROCS)
+  print *, "MPI rank ",MPI_Rank," running ",NPseudoExp_Worker," pseudoexperiments"
+!DEC$ IF(_UseMPI .EQ.1)
+  call MPI_BARRIER(MPI_COMM_WORLD,ierror)
+!DEC$ ENDIF
   PlotObsEvts=0
   do iHypothesis=1,2
-     do iPseudoExp=1,NPseudoExp
+     do iPseudoExp=1,NPseudoExp_Worker
 !        if( mod(iPseudoExp,10000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NPseudoExp
         GotNumEvents=.false.
         do iBin=1,NumBins
@@ -276,8 +294,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 
      LLRatio=0d0
      do iBin=1,NumBins
-        if (ObsEvents(iHypothesis,iBin) .ne. 0 .and. ExpectedEvents(1,iBin) .ne. 0 .and. &
-             & ExpectedEvents(2,iBin) .ne. 0) then
+        if (ObsEvents(iHypothesis,iBin) .ne. 0 .and. ExpectedEvents(1,iBin) .ne. 0 .and. ExpectedEvents(2,iBin) .ne. 0) then
            LLRatio=LLRatio+ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin))
 !           if (iPseudoExp .eq. 1) then
            write(301,*) iBin, ObsEvents(iHypothesis,iBin),dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),LLRatio
@@ -298,15 +315,32 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      endif
      LLRatio_array(iHypothesis,iPseudoExp)=LLRatio
         
-  enddo
+  enddo!  iPseudoExp
 
   do i=1,1000
      s=101+iHypothesis
      write(s,*) i,PlotObsEvts(iHypothesis,i)
   enddo
-enddo
+
+enddo!   iHypothesis
+
+  print *, "MPI rank ",MPI_Rank," finished"
+!DEC$ IF(_UseMPI .EQ.1)
+  call MPI_BARRIER(MPI_COMM_WORLD,ierror)
+   if( MPI_Rank.eq.0 ) then
+      do worker=1,MPI_NUM_PROCS-1
+        call MPI_Recv(LLRatio_array_tmp, 2*MaxExp,MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE ,1,MPI_COMM_WORLD, status,ierror)
+        print *, "received array from worker",worker
+        LLRatio_array(1,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(1,1:NPseudoExp_Worker)
+        LLRatio_array(2,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(2,1:NPseudoExp_Worker)
+      enddo
+   elseif( MPI_Rank.gt.0 ) then
+        call MPI_Send(LLRatio_array, 2*MaxExp,MPI_DOUBLE_PRECISION, 0 ,1,MPI_COMM_WORLD,ierror)
+   endif
+!DEC$ ENDIF
 
 
+if( MPI_Rank.eq.0 ) then 
 
 !     if (iHypothesis .eq. 1 .and. iPseudoExp .eq. 1) then
 !        print *, LLRatio,offset
@@ -457,8 +491,11 @@ write(15,"(1PE16.8)") beta_ave
 write(15,"(1PE16.8)") sigs
 
 
+endif! MPI_Rank
 
-
+!DEC$ IF(_UseMPI .EQ.1)
+   call MPI_FINALIZE(ierror)
+!DEC$ ENDIF
 
 
 
