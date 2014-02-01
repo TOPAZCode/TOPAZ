@@ -239,8 +239,8 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      enddo
   enddo
   
-  call random_seed()
-
+!  call random_seed()
+  call init_random_seed()
 ! -----------------------------------------------------------------
 ! 3.1 Generate Poisson distribution about expected null value in each bin
 ! -----------------------------------------------------------------
@@ -249,8 +249,11 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 !DEC$ IF(_UseMPI .EQ.1)
   call MPI_BARRIER(MPI_COMM_WORLD,ierror)
 !DEC$ ENDIF
+!  call random_seed()
   PlotObsEvts=0
   do iHypothesis=1,2
+!           call random_seed()
+     print *, 'Hypothesis ', iHypothesis
      do iPseudoExp=1,NPseudoExp_Worker
 !        if( mod(iPseudoExp,10000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NPseudoExp
         GotNumEvents=.false.
@@ -274,7 +277,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
               ObsEvents(iHypothesis,iBin)=ObsEvents(iHypothesis,iBin)*sran
            endif
 
-           if (iBin .eq. 1) then
+           if (iBin .eq. 1 .and. ObsEvents(iHypothesis,iBin) .gt. 0) then
               PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))=PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))+1
            endif
 
@@ -311,7 +314,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      LLRatio=LLRatio+offset
 
      if (iPseudoExp .eq. 1) then
-        print *, 'LLRatio=',LLRatio
+        print *, 'LLRatio=',iHypothesis,LLRatio
      endif
      LLRatio_array(iHypothesis,iPseudoExp)=LLRatio
         
@@ -368,66 +371,66 @@ if( MPI_Rank.eq.0 ) then
 !   do iPseudoExp=1,1000    ! this is just a check 
 !      write(201,*) iPseudoExp,PlotObsEvts(1,iPseudoExp)
 !   enddo
-
-LLRatio_max=-1d-6
-LLRatio_min=1d6
-
-do iHypothesis=1,2
-   do iPseudoExp=1,NPseudoExp
-      if (LLRatio_array(iHypothesis,iPseudoExp) .gt. LLRatio_max) then
-         LLRatio_max=LLRatio_array(iHypothesis,iPseudoExp) 
-      endif
-      if (LLRatio_array(iHypothesis,iPseudoExp) .lt. LLRatio_min) then
-         LLRatio_min=LLRatio_array(iHypothesis,iPseudoExp) 
-      endif
+   
+   LLRatio_max=-1d-6
+   LLRatio_min=1d6
+   
+   do iHypothesis=1,2
+      do iPseudoExp=1,NPseudoExp
+         if (LLRatio_array(iHypothesis,iPseudoExp) .gt. LLRatio_max) then
+            LLRatio_max=LLRatio_array(iHypothesis,iPseudoExp) 
+         endif
+         if (LLRatio_array(iHypothesis,iPseudoExp) .lt. LLRatio_min) then
+            LLRatio_min=LLRatio_array(iHypothesis,iPseudoExp) 
+         endif
+      enddo
    enddo
-enddo
 
-LLRatio_max=ceiling(LLRatio_max)
-LLRatio_min=floor(LLRatio_min)
-
-if (LLRatio_max .lt. LLRatio_min) then
-   print *, 'ERROR: MAX OF LL RATIO IS SMALLER THAN MIN!'
-   print *, LLRatio_max,LLRatio_min
-   stop
-endif
-if (LLRatio_min .eq. LLRatio_max) then
-   LLRatio_max=LLRatio_max+1d0
-   LLRatio_min=LLRatio_min-1d0
-endif
-print *, LLRatio_min,LLRatio_max
-
-LLHisto(1)%NBins   = 1000
-LLHisto(1)%BinSize = (LLRatio_max-LLRatio_min)/LLHisto(1)%NBins
-LLHisto(1)%LowVal  = LLRatio_min
-LLHisto(1)%Hits(:) = 0
-print *, 'using ', LLHisto(1)%BinSize, ' bins in range ',LLRatio_min, LLRatio_max
-LLHisto(2)%NBins   = LLHisto(1)%NBins
-LLHisto(2)%BinSize = LLHisto(1)%BinSize
-LLHisto(2)%LowVal  = LLHisto(1)%LowVal
-LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
-
-do iHypothesis=1,2
-   do iPseudoExp=1,NPseudoExp
-      LLRatio=LLRatio_array(iHypothesis,iPseudoExp)
-      WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
-      WhichBin=int(WhichBin)
-      if( WhichBin.lt.0 ) WhichBin = 1
-      if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
-      LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
-   enddo
+   LLRatio_max=ceiling(LLRatio_max)
+   LLRatio_min=floor(LLRatio_min)
+   
+   if (LLRatio_max .lt. LLRatio_min) then
+      print *, 'ERROR: MAX OF LL RATIO IS SMALLER THAN MIN!'
+      print *, LLRatio_max,LLRatio_min
+      stop
+   endif
+   if (LLRatio_min .eq. LLRatio_max) then
+      LLRatio_max=LLRatio_max+1d0
+      LLRatio_min=LLRatio_min-1d0
+   endif
+   print *, LLRatio_min,LLRatio_max
+   
+   LLHisto(1)%NBins   = 1000
+   LLHisto(1)%BinSize = (LLRatio_max-LLRatio_min)/LLHisto(1)%NBins
+   LLHisto(1)%LowVal  = LLRatio_min
+   LLHisto(1)%Hits(:) = 0
+   print *, 'using ', LLHisto(1)%BinSize, ' bins in range ',LLRatio_min, LLRatio_max
+   LLHisto(2)%NBins   = LLHisto(1)%NBins
+   LLHisto(2)%BinSize = LLHisto(1)%BinSize
+   LLHisto(2)%LowVal  = LLHisto(1)%LowVal
+   LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
+   
+   do iHypothesis=1,2
+      do iPseudoExp=1,NPseudoExp
+         LLRatio=LLRatio_array(iHypothesis,iPseudoExp)
+         WhichBin = (LLRatio-LLHisto(iHypothesis)%LowVal)/LLHisto(iHypothesis)%BinSize + 1
+         WhichBin=int(WhichBin)
+         if( WhichBin.lt.0 ) WhichBin = 1
+         if( WhichBin.gt.LLHisto(iHypothesis)%NBins ) WhichBin = LLHisto(iHypothesis)%NBins
+         LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
+      enddo
 
 ! -----------------------------------------------------------------
 ! 4. Calculate the integral of the log likelihood ratio curve, at each bin
 ! -----------------------------------------------------------------
 
 
-   do LLbin=1,LLHisto(iHypothesis)%NBins
-      IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)+&
-           LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
-      alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)
+      do LLbin=1,LLHisto(iHypothesis)%NBins
+         IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)+&
+              LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+         alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)
+      enddo
    enddo
-enddo
 
 !  do LLbin=1,LLHisto1%NBins
 !     IntH0=IntH0+LLHisto1%BinSize*LLHisto1%Hits(LLbin)
@@ -435,13 +438,13 @@ enddo
 !     print *, LLbin, LLHisto1%LowVal + LLbin*LLHisto1%BinSize, LLHisto1%Hits(LLbin), alpha(LLBin)
 !  enddo
 
-print *, ""
-print *, "Writing log-likelihood distribution to output file"
-print *, ""
-do LLbin=1,LLHisto(1)%NBins
-   !         print *, LLBin
-   write(14,"(2X,I4,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,1PE16.8)") LLbin, LLHisto(1)%LowVal+LLbin*LLHisto(1)%BinSize, LLHisto(1)%Hits(LLbin),LLHisto(2)%LowVal+LLbin*LLHisto(2)%BinSize, LLHisto(2)%Hits(LLbin),alpha(1,LLBin),alpha(2,LLBin)
-enddo
+   print *, ""
+   print *, "Writing log-likelihood distribution to output file"
+   print *, ""
+   do LLbin=1,LLHisto(1)%NBins
+      !         print *, LLBin
+      write(14,"(2X,I4,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,1PE16.8)") LLbin, LLHisto(1)%LowVal+LLbin*LLHisto(1)%BinSize, LLHisto(1)%Hits(LLbin),LLHisto(2)%LowVal+LLbin*LLHisto(2)%BinSize, LLHisto(2)%Hits(LLbin),alpha(1,LLBin),alpha(2,LLBin)
+   enddo
 
 
 !************************************************************
@@ -449,47 +452,47 @@ enddo
 !************************************************************
 
 ! for the time being, I'm going to assume that both distributions have the same range and binning - can change this later
-do LLbin=1,LLHisto(1)%NBins
-   checkalpha(LLBin)=alpha(1,LLBin)+alpha(2,LLBin)-1d0
-!   print *, LLBIn,alpha(1,LLBin),alpha(2,LLBin),checkalpha(LLBin)
-   if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
-      alphamin=alpha(1,LLBin-1)
-      alphamax=alpha(1,LLBin)
-      betamin =alpha(2,LLBin-1)
-      betamax =alpha(2,LLBin)
-      
-      if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
-         ! this is comparing two identical hypotheses!
-         alphamin=0.5d0
-         alphamax=0.5d0
-         betamin =0.5d0
-         betamax =0.5d0
+   do LLbin=1,LLHisto(1)%NBins
+      checkalpha(LLBin)=alpha(1,LLBin)+alpha(2,LLBin)-1d0
+      !   print *, LLBIn,alpha(1,LLBin),alpha(2,LLBin),checkalpha(LLBin)
+      if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
+         alphamin=alpha(1,LLBin-1)
+         alphamax=alpha(1,LLBin)
+         betamin =alpha(2,LLBin-1)
+         betamax =alpha(2,LLBin)
+         
+         if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
+            ! this is comparing two identical hypotheses!
+            alphamin=0.5d0
+            alphamax=0.5d0
+            betamin =0.5d0
+            betamax =0.5d0
+         endif
       endif
-   endif
-enddo
+   enddo
 
+   
+   alpha_ave=(alphamin+alphamax)/2d0
+   beta_ave=(betamin+betamax)/2d0
+   sigs=dsqrt(2d0)*inverf(1d0-alpha_ave)
+   
+   print *, 'alpha value in range:', alphamin,alphamax
+   print *, 'beta value in range:', betamin,betamax 
+   print *, 'alpha average :', alpha_ave
+   print *, 'beta average :', beta_ave
+   print *, 'sigma value :', sigs
+   
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha average:", alpha_ave 
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta average:", beta_ave   
+   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# sigma value: ", sigs
+   
 
-alpha_ave=(alphamin+alphamax)/2d0
-beta_ave=(betamin+betamax)/2d0
-sigs=dsqrt(2d0)*inverf(1d0-alpha_ave)
-
-print *, 'alpha value in range:', alphamin,alphamax
-print *, 'beta value in range:', betamin,betamax 
-print *, 'alpha average :', alpha_ave
-print *, 'beta average :', beta_ave
-print *, 'sigma value :', sigs
-
-write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
-write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
-write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha average:", alpha_ave 
-write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta average:", beta_ave   
-write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# sigma value: ", sigs
-
-
-write(15,"(1PE16.8)") alpha_ave
-write(15,"(1PE16.8)") beta_ave
-write(15,"(1PE16.8)") sigs
-
+   write(15,"(1PE16.8)") alpha_ave
+   write(15,"(1PE16.8)") beta_ave
+   write(15,"(1PE16.8)") sigs
+   
 
 endif! MPI_Rank
 
@@ -586,6 +589,58 @@ contains
     return
 
   end function INVERF_COEFF           
+
+
+  subroutine init_random_seed()
+! this ensures that each of the workers uses a random seed
+! taken from http://gcc.gnu.org/onlinedocs/gfortran/RANDOM_005fSEED.html
+    implicit none
+    integer, allocatable :: seed(:)
+    integer :: i, n, un, istat, dt(8), pid, t(2), s
+    integer(8) :: count, tms
+    
+    call random_seed(size = n)
+    allocate(seed(n))
+    ! First try if the OS provides a random number generator
+!    open(newunit=un, file="/dev/urandom", access="stream", &
+!         form="unformatted", action="read", status="old", iostat=istat)
+!    if (istat == 0) then
+!       read(un) seed
+!       close(un)
+!    else
+       ! Fallback to XOR:ing the current time and pid. The PID is
+       ! useful in case one launches multiple instances of the same
+       ! program in parallel.
+       call system_clock(count)
+       if (count /= 0) then
+          t = transfer(count, t)
+       else
+          call date_and_time(values=dt)
+          tms = (dt(1) - 1970) * 365_8 * 24 * 60 * 60 * 1000 &
+               + dt(2) * 31_8 * 24 * 60 * 60 * 1000 &
+               + dt(3) * 24 * 60 * 60 * 60 * 1000 &
+               + dt(5) * 60 * 60 * 1000 &
+               + dt(6) * 60 * 1000 + dt(7) * 1000 &
+               + dt(8)
+          t = transfer(tms, t)
+       end if
+       s = ieor(t(1), t(2))
+       pid = getpid() + 1099279 ! Add a prime
+       s = ieor(s, pid)
+       if (n >= 3) then
+          seed(1) = t(1) + 36269
+          seed(2) = t(2) + 72551
+          seed(3) = pid
+          if (n > 3) then
+             seed(4:) = s + 37 * (/ (i, i = 0, n - 4) /)
+          end if
+       else
+          seed = s + 37 * (/ (i, i = 0, n - 1 ) /)
+       end if
+!    end if
+    call random_seed(put=seed)
+  end subroutine init_random_seed
+
 
 
 end program BinnedLogL
