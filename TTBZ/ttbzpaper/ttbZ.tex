@@ -33,10 +33,14 @@
 \def\invfb {\mathrm{fb}^{-1}}
 \def\hLambda {\hat{\Lambda}}
 \def\erf{\mathrm{erf}}
-\def\A1C{C_{1,A}}
-\def\V1C{C_{1,V}}
-\def\DA1C{\Delta C_{1,A}}
-\def\DV1C{\Delta C_{1,V}}
+\def\ConeA{C_{1,A}}
+\def\ConeV{C_{1,V}}
+\def\CtwoA{C_{2,A}}
+\def\CtwoV{C_{2,V}}
+\def\ConeVSM{C_{V}^{\mrm{SM}}}
+\def\ConeASM{C_{A}^{\mrm{SM}}}
+\def\DConeA{\Delta C_{1,A}}
+\def\DConeV{\Delta C_{1,V}}
 \def\HSM{\mathcal{H}_{\mathrm{SM}}}
 \def\Halt{\mathcal{H}_{\mathrm{alt}}}
 \newcommand{\be}{\begin{eqnarray}}
@@ -273,62 +277,41 @@ However, the NLO cross-section was found to be 3\% higher at 1121 fb, giving a s
 
 
 \subsection{Top-Z coupling}
-The $\ttbZ$ interaction vertex can be written as
-\begin{equation} \label{Lint1}
-%\begin{split}
-\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr) + \frac{i \sigma_{\mu \nu} q_{\nu}}{M} \bigl(C_{2,V} + i\gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu},
-%\end{split}
+The $\ttbZ$ interaction vertex in the SM is written as
+\begin{equation} \label{L_SM}
+\mathcal{L}_{\ttbZ}^{\mrm{SM}} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( \ConeVSM + \gamma_5 \ConeASM \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
 \end{equation}
-where $e$ is the electromagnetic coupling, $\sigma_{\mu \nu}=\frac{i}{2} [ \gamma_{\mu},\gamma_{\nu} ]$, $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$ and the second term is suppressed by a mass scale $M$ which is typically chosen to be $m_Z$. 
-
-In the SM, the four couplings are 
+where $e$ is the electromagnetic coupling. The SM couplings are 
 \begin{equation}
 \begin{split}
-C_{1,V} =& \frac{T^3 - 2Q_t \swsq}{2\sw \cw}  \hspace{2cm} C_{1,A} = \frac{-T^3}{2 \sw \cw}  \\
-C_{2,V}= & C_{2,A}=0,
+\ConeVSM =& \frac{T^3 - 2Q_t \swsq}{2\sw \cw} \\
+\ConeASM =& \frac{-T^3}{2 \sw \cw},  
 \end{split}
 \end{equation}
-{\bf NB: Markus -- this has a minus sign in $C_A$ relative to the code. This is because the coupl is defined as $\gamma_{\mu} \gamma_5$ rather than $\gamma_5 \gamma_{\mu}$}.
-where $Q_t = 2/3$ is the top charge, $T^3=1/2$ and $\theta_w$ is the weak mixing angle. In the effective field theory approach, the deviations of the above couplings from their SM values can be expressed in terms of dimension six (or higher) operators. Assuming that these operators are electroweak gauge invariant, equation \eqref{Lint1} is the most general form of the interaction vertex, even if one or both of the tops are off-shell~\cite{}. 
-{\bf do we want sth here about the old, form factor approach? to make connection w Baur???} 
-As pointed out in ref.~\cite{}, the $q$ terms vanish if the $Z$-boson couples to massless external fermions, by the Dirac equation. This implies that this term is only directly probed in massive $Z$-decays. Since we consider the $Z$ decaying to massless leptons in the current paper, we neglect these terms. This leaves only the terms
+where $Q_t = 2/3$ is the top charge, $T^3=1/2$ and $\theta_w$ is the weak mixing angle. Alternatively, the Lagrangian may be written in terms of left- and right-handed couplings
+\begin{equation} \label{L_SM}
+\mathcal{L}_{\ttbZ}^{\mrm{SM}} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( C_{L}^{\mrm{SM}}\gamma_L + \gamma_R C_{R}^{\mrm{SM}} \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
+\end{equation}
+with $\gamma_L=1/2(1-\gamma_{\mu})$, $\gamma_R=1/2(1+\gamma_{\mu})$, and $C_L^{\mrm{SM}}=(T^3 - Q_t \swsq) / (\sw \cw) \\$ and $C_R^{\mrm{SM}}=-Q_t\sw / \cw$. 
+ 
+New physics contributions to the top-Z couplings may be parametrized by higher dimensional operators in the language of effective field theory. Assuming gauge-invariant dimension-six operators, the fully general Lagrangian may be written as \cite{AlcarazMaestre:2012vp,0811.3842}
+\begin{equation} \label{L_NP}
+\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr) + \frac{i \sigma_{\mu \nu} q_{\nu}}{M} \bigl(C_{2,V} + i\gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu},
+\end{equation}
+where $\sigma_{\mu \nu}=\frac{i}{2} [ \gamma_{\mu},\gamma_{\nu} ]$, $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$ and the second term is suppressed by a mass scale $M$ which is typically chosen to be $m_Z$. The couplings $C_{2,A}$ and $C_{2,V}$ are related to the weak electric and magnetic dipole moments of the top, and are zero at tree-level in the SM. In an effective field theory, the couplings $\ConeA$ and $\ConeV$ are related to the real part of the difference between two dimension-six operators, as well as the real part of a third operator. The dipole terms are related to a further two dimension-six operators \cite{}.
+
+In this paper, we will interpret the $\ConeV$, $\ConeV$, $\CtwoV$ and $\CtwoA$ as anomalous coupling coefficients which are independent of the kinematics of the tops or the Z-boson. 
+The dipole terms introduce non-renormalizable amplitudes at NLO, and while it is possible to handle these in the $D$-dimensional unitarity approach \cite{}, it is a non-trivial extension. For this reason, we will focus on the capability of the LHC to constrain the couplings $\ConeA$ and $\ConeV$ in this paper, deferring the analysis of the effects of the dipole couplings $\CtwoV$ and $\CtwoA$ to a future work. We therefore set these couplings to zero throughout the rest of this paper. The anomalous values of the other two couplings are written as relative deviations from their SM values
+\begin{equation}
+%\begin{split}
+\DConeV =  1-\frac{\ConeV}{\ConeVSM} ; \hspace{2cm} \DConeA = 1-\frac{\ConeA}{\ConeASM}.
+\end{equation}
 
 
- {\bf formatting of the above eqn...}
-%The traditional approach to writing an effective Lagrangian for the coupling of top quarks to $Z$-bosons is in terms of form factors (see e.g. \cite{Baur:2004uw})
-%\begin{equation} \label{Lint1}
-%\mathcal{L} \supset \mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F_1^V(p_Z^2) + \gamma_5 F_1^A(p_Z^2) \bigr) + \frac{\sigma_{\mu \nu}}{2m_t}(p_t+p_{\bar{t}}) \bigl( iF_2^V(p_Z^2) + \gamma_5 F_2^A(p_Z^2) \bigr) \Biggr] v(p_{\bar{t}}
-%),
-%\end{equation}
-%where $p_Z$ is the momentum of the $Z$-boson, $p_{t}$ and $p_{\bar{t}}$ are the momenta of the top and antitop respectively, $m_t$ is the top mass, and $\sigma_{\mu \nu} = \frac{i}{2} \bigl[ \gamma_{\mu},\gamma_{\nu} \bigr]$.
-%In the low-energy limit, $F_2^{V}$ and $F_2^{A}$ are related to the weak analog of the magnetic and electric dipole moments, while $F_1^{V,A}$ give the Standard Model couplings
-%\begin{equation}
-%\begin{split}
-%F_1^V(0) =& F^V_{\mathrm{SM}}  = \frac{1}{2\sin \theta_w \cos \theta_w}\Biggl(\frac{1}{2} - 2 Q_t \sin^2 \theta_w \Biggr) \\
-%F_2^A(0) =& F^A_{\mathrm{SM}} = -\frac{1}{4\sin \theta_w \cos \theta_w} .
-%\end{split}
-%\end{equation}
-%A more modern approach is to use an effective Lagrangian containing operators of dimension four, six, and higher if needed. In this case, the most general Lagrangian that can be written down is
-%\begin{equation} \label{Lint2}
-%\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F_1^V + \gamma_5 F_1^A \bigr) + \sigma_{\mu \nu}(p_Z) \bigl( iF_2^V + \gamma_5 F_2^A \bigr) \Biggr] v(p_{\bar{t}}).
-%\end{equation}
-%This is the most general Lagrangian even if the spinors $\bar{u}$ and $v$ are off-shell, assuming that the higher-dimensional operators are electroweak gauge invariant~\cite{AlcarazMaestre:2012vp}. Unlike in equation \eqref{Lint}, the couplings in equation \eqref{Lint2} are not 
-%This has the advantage of providing a completely  general description that can be used in any context. {\bf read that screed by Mattelaer and friends for the benefits of eff Lag and summariz ehere - this is juts taken straight frmo Yang Bai's contribution to the snowmass rept}. In this context, the above Lagrangian may be recast in terms of the coefficients of dimension four and dimension six operators \cite{AlcarazMaestre:2012vp}, and the couplings are functions of these operators, rather than of some unknown momentum-squared $k^2$. The terms proportional to $p_Z$ vanish if the $Z$ boson couples to massless fermions \cite{AlcarazMaestre:2012vp}, so we need only consider the first two terms of \eqref{Lint1}, which have the same Lorentz structure as the Standard Model top-$Z$ vertex.
-%We therefore consider an interaction Lagrangian 
-%\begin{equation} \label{Lint2}
-%\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\Biggl[ \gamma_{\mu} \bigl( F^V + \gamma_5 F^A \bigr) \Biggr] v(p_{\bar{t}}),
-%\end{equation}
-%and define the deviations from the SM vector and axial-vector couplings $\DelFA$ and $\DelFV$ as
-%\begin{equation}
-%\begin{split}
-%\DelFV =& \frac{F^V}{ F^V_{\mathrm{SM}}} \\
-%\DelFA =& \frac{F^A}{ F^A_{\mathrm{SM}}} 
-%\end{split}
-%\end{equation}
-%
-Definition of top-Z couplings - vector, axial-vector, left and right handed \\
-Focus of D=4 operators -- D=6 for later (unclear how to implement unitarity for such operators) \\
-Definition of DF1V and DF1A
+
+%Definition of top-Z couplings - vector, axial-vector, left and right handed \\
+%Focus of D=4 operators -- D=6 for later (unclear how to implement unitarity for such operators) \\
+%Definition of DF1V and DF1A
 
 \section{Results}
 \subsection{NLO Results}
@@ -600,15 +583,15 @@ resulting in a larger overlap between the two distributions, and consequently a 
 
 We now present the results of our analysis in Figure~\ref{fig:xx}, using both the LO and NLO results and uncertainties.
 Using the interpolation of Eq.~\ref{} we generate $10^4$ distributions in $\Delta \phi_{\ell\ell}$ for a grid of $xx \, C_V \times yy\, C_A$ couplings choices in the range $\pm 3$ and $\pm 0.4$, respectively. 
-It is immediately apparent that $\A1C$ can be constrained far better than $\V1C$. At LO, the value of $\DA1C$ lies between roughly -0.5 and 0.5, implying that this coupling can be constrained to within a factor of half of its value. On the other hand, the value of $\DV1C$ can be as low as -4 or as high as 3. Another noticeable feature is that large values of $| \DV1C |$ can conspire with low values of $\DA1C$ to create regions of parameter space which are indistinguishable from the SM. Both of these features are qualitatively similar to the results obtained by ref. ~\cite{baur}. 
+It is immediately apparent that $\ConeA$ can be constrained far better than $\ConeV$. At LO, the value of $\DConeA$ lies between roughly -0.5 and 0.5, implying that this coupling can be constrained to within a factor of half of its value. On the other hand, the value of $\DConeV$ can be as low as -4 or as high as 3. Another noticeable feature is that large values of $| \DConeV |$ can conspire with low values of $\DConeA$ to create regions of parameter space which are indistinguishable from the SM. Both of these features are qualitatively similar to the results obtained by ref. ~\cite{baur}. 
 \begin{figure}
 \includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
 \includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
-\caption{Significance levels for deviations from SM vector and axial couplings $\DV1C$ and $DA1C$,  using 300 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.} \label{fig:LHC13sigLO} 
+\caption{Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $DConeA$,  using 300 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.} \label{fig:LHC13sigLO} 
 \end{figure}
-The constraints are far stronger when NLO results and uncertainties are used, driven by the reduced uncertainty and a large $k$-factor of approximately 1.5. At this accuracy, the axial coupling can be constrained at $-0.2 \lesssim \DA1C \lesssim 0.15$ at the 1-$\sigma$ level and $-0.4 \lesssim \DA1C \lesssim 0.25$ at the 3-$\sigma$ level, independent of the value of $\V1C$. Constraints on the vector coupling $\V1C$ are still much looser: $-3 \lesssim \DV1C \lesssim 1.5$ at 1-$\sigma$ level and $-3 \lesssim \DV1C \lesssim 2.5$ at the 3-$\sigma$ level.
+The constraints are far stronger when NLO results and uncertainties are used, driven by the reduced uncertainty and a large $k$-factor of approximately 1.5. At this accuracy, the axial coupling can be constrained at $-0.2 \lesssim \DConeA \lesssim 0.15$ at the 1-$\sigma$ level and $-0.4 \lesssim \DConeA \lesssim 0.25$ at the 3-$\sigma$ level, independent of the value of $\ConeV$. Constraints on the vector coupling $\ConeV$ are still much looser: $-3 \lesssim \DConeV \lesssim 1.5$ at 1-$\sigma$ level and $-3 \lesssim \DConeV \lesssim 2.5$ at the 3-$\sigma$ level.
 
-A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DV1C|$ and large negative values of $\DA1C$. This is best explained by considering the LO results for two points in the coupling parameter space, $(\DV1C,\DA1C)=(-0.40,+1.50)$ and $(\DV1C,\DA1C)=(-0.40,+2.00)$. These points lie 1.3 and 2.5 deviations from the SM hypothesis respectively; however, in the absence of theoretical uncertainties, the two hypotheses are 3.7 and 3.0 deviations away from the SM, respectively. The effect of introducing the uncertainties into the analysis is much more pronounced for the first point than for the second. The reason for this is that the main difference between the first point and the SM is the overall rate, whereas the second point has a similar rate to the SM but a significantly different shape (see fig.~\ref{fig:coupl_distr}). Then, for the second coupling choice, the values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are similar, and the 
+A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DConeV|$ and large negative values of $\DConeA$. This is best explained by considering the LO results for two points in the coupling parameter space, $(\DConeV,\DConeA)=(-0.40,+1.50)$ and $(\DConeV,\DConeA)=(-0.40,+2.00)$. These points lie 1.3 and 2.5 deviations from the SM hypothesis respectively; however, in the absence of theoretical uncertainties, the two hypotheses are 3.7 and 3.0 deviations away from the SM, respectively. The effect of introducing the uncertainties into the analysis is much more pronounced for the first point than for the second. The reason for this is that the main difference between the first point and the SM is the overall rate, whereas the second point has a similar rate to the SM but a significantly different shape (see fig.~\ref{fig:coupl_distr}). Then, for the second coupling choice, the values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are similar, and the 
 log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. This means that the significance values are not greatly reduced by the theoretical uncertainty. The tongue of large $\sigma$-values therefore represents a set of points for which the distinction between the SM and alternate hypotheses is made based not on the overall rate, but rather on the shape of the $\Dphill$ distributions, which is relatively insensitive to the theoretical uncertainty. This also explains why the tongue is more prominent in the LO analysis.
 
 %As can be seen in figure \ref{fig:coupl_distr}, there are significant shape changes for these values of the couplings, resulting in a large separation between the hypotheses. At the same time, the overall rate is similar to the SM one.  The values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are therefore similar, and the log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. This means that the large significance values are not greatly reduced by the theoretical uncertainty.  
