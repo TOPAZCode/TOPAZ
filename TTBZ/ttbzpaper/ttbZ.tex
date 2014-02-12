@@ -546,52 +546,51 @@ This error can finally be translated into the more familiar confidence level in 
 
 
 In the following we will describe the procedure outlined above more precisely and illustrate how NLO QCD input can be used.
-%The starting point is the binned likelihood function 
-%\be
-%\label{lili}
-%   \mathcal{L}(\mathcal{H}|\vec{n}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i|\nu%_{i}^\mathcal{H})
-%\ee
-%with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^\mathcal{H}$ for hypothesis $\mathcal{H}$. 
-% This expected value is obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
 The starting point is the binned likelihood function 
 \be
 \label{lili}
-   \mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i^{\mathcal{H}_a}|\nu_{i}^{\mathcal{H}_t})
+   \mathcal{L}(\mathcal{H}|\vec{n}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i|\nu_{i}^\mathcal{H})
 \ee
-with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
-The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential 
-cross-section in bin $i$ by the assumed luminosity.
+with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^\mathcal{H}$ for hypothesis $\mathcal{H}$. 
+% This expected value is obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
+%The starting point is the binned likelihood function 
+%\be
+%\label{lili}
+%   \mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i^{\mathcal{H}_a}|\nu_{i}^{\mathcal{H}_t})
+%\ee
+%with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
+%The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
 
-%Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
+Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
+\be
+\label{lilifunct}
+\begin{split}
+  \log\mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\SM}) -\log(n_{i,\mathrm{obs}}!) -\nu_i^{\SM}  \bigr], \\
+  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
+\end{split}
+\ee
+%Consequently there are the log-likelihood functions for a test hypothesis $\mathcal{H}_t$ under the assumption of a hypothesis $\mathcal{H}_a$
 %\be
 %\label{lilifunct}
 %\begin{split}
-%  \log\mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\SM}) -\log(n_{i,\mathrm{obs}}!) -\nu_i^{\SM}  \bigr], \\
-%  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
-%\end{split}
-%\ee
-Consequently there are the log-likelihood functions for a test hypothesis $\mathcal{H}_t$ under the assumption of a hypothesis $\mathcal{H}_a$
-\be
-\label{lilifunct}
-%\begin{split}
-  \log\mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu})  = \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\mathcal{H}_a}\log(\nu_i^{\mathcal{H}_t}) -\log(n_i^{\mathcal{H}_a}!) -\nu_i^{\mathcal{H}_t}  \bigr],% \\
+%  \log\mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu})  = \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\mathcal{H}_a}\log(\nu_i^{\mathcal{H}_t}) -\log(n_i^{\mathcal{H}_a}!) -\nu_i^{\mathcal{H}_t}  \bigr],% \\
 %  \log\mathcal{L}(\HSM,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\SM}) -\log(n_i^{\SM}!) -\nu_i^{\SM}  \bigr], \\
 %  \log\mathcal{L}(\HSM,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\alt}) -\log(n_i^{\SM}!) -\nu_i^{\alt}  \bigr], \\
 %  \log\mathcal{L}(\Halt,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\SM}) -\log(n_i^{\alt}!) -\nu_i^{\SM}  \bigr], \\
 %  \log\mathcal{L}(\Halt,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\alt}) -\log(n_i^{\alt}!) -\nu_i^{\alt}  \bigr], 
 %  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
 %\end{split}
-\ee
+%\ee
 
 %where $n_{i,\mathrm{obs}}$ is the observed number of events in the $i$-th bin of the $\Delta \phi_{\ell\ell}$ distribution. 
 Eqs.~\ref{lilifunct} allow us to construct the test statistic as the log-likelihood ratio
-%\be
-%\begin{split}
-%  \Lambda(\vec{n}_\mathrm{obs}) =& -2 \, \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
-%                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr]. 
-%\end{split}
-%\ee
-
+\be
+\begin{split}
+  \Lambda(\vec{n}_\mathrm{obs}) =& -2 \, \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
+                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+\end{split}
+\ee
+where $\vec{n}_{\mrm{obs}}$ are generated by a bin-by-bin Poisson distribution of $\nu_i^{\SM}$ and $\nu_i^{\alt}$, yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
 
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
@@ -604,24 +603,24 @@ with $\delta_V=x.xx$, $\delta_A=y.yy$. The left plot shows the separating power 
 \end{figure}
 
 
-
-\be
-\begin{split}
-  \Lambda(\HSM) =& -2 \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-\end{split}
-\ee
-and similarly
-\be
-\begin{split}
-  \Lambda(\Halt) =& -2 \, \log \biggl( \mathcal{L}(\Halt,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\Halt,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-\end{split}
-\ee
+%\be
+%\begin{split}
+%  \Lambda(\HSM) =&  \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
+%                                =& \, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+%\end{split}
+%\ee
+%and similarly
+%\be
+%\begin{split}
+%  \Lambda(\Halt) =& -2 \, \log \biggl( \mathcal{L}(\Halt,\vec{n}|\HSM,\vec{\nu})%  \big/ \mathcal{L}(\Halt,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
+%                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+%\end{split}
+%\ee
 
 %This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
-%Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$
-Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
+
+Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
+%Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
 An example of two such probability distributions is shown in Fig.~\ref{fig:vi}a and Fig.~\ref{fig:vi}b for LO and NLO QCD, respectively. 
 For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
 \begin{equation}
