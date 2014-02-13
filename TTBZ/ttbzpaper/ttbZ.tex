@@ -190,7 +190,7 @@ In our results we will sum over all combinations of $e^\pm$ and $\mu^\pm$ in the
 Application of the narrow-width approximation for top quarks and the $Z$ boson allows us to separate production and decays stage according to 
 \be
  \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj} = \rd \sigma_{pp\to\ttb+Z} \; \rd\Br_{t\to b \ell\nu} \; \rd\Br_{\bar{t} \to \bar{b} jj} \; \rd\Br_{Z\to \ell\ell}
- \quad+ \mathcal{O}(\Gamma_t/m_t, \, \Gamma_Z/M_Z)
+ \;+\; \mathcal{O}(\Gamma_t/m_t, \, \Gamma_Z/M_Z)
 , \label{Xsec}
 \ee
 where $\rd \sigma$ denotes the production cross section and $\rd\Br_{X\to Y}= \rd \Gamma_{X\to Y} \big/ \Gamma^\mrm{tot}_X$ are the partial branching fractions.
@@ -257,7 +257,7 @@ Figure~\ref{fig:i} demonstrates good agreement in shape for the $p_{\mathrm{T}}$
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./Troc_pTtop.eps}
-\caption{\label{fig:i} Shape comparison of our results (RS) for stable top quarks and Z boson with the results of Ref.~\cite{1208} (KPT) for 
+\caption{\label{fig:i} Shape comparison of our results (RS) for stable top quarks and Z boson with the results of Ref.~\cite{1208} (GKPT) for 
 the transverse momentum spectrum of the top quark at NLO QCD. 
 }
 \end{figure}
@@ -265,33 +265,42 @@ the transverse momentum spectrum of the top quark at NLO QCD.
 \subsection{Top-Z coupling}
 The $\ttbZ$ interaction vertex in the SM is written as
 \begin{equation} \label{L_SM}
-\mathcal{L}_{\ttbZ}^{\mrm{SM}} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( \ConeVSM + \gamma_5 \ConeASM \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
+\mathcal{L}_{\ttbZ}^{\mrm{SM}} = \mathrm{i} e \, \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( \ConeVSM + \gamma_5 \ConeASM \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu}
++ (\mathrm{h.c.??})
+,
 \end{equation}
-where $e$ is the electromagnetic coupling. The SM couplings are 
+where $e$ is the electromagnetic coupling. The vector and axial couplings are 
 \begin{equation}
 \begin{split}
-\ConeVSM =& \frac{T^3 - 2Q_t \swsq}{2\sw \cw} \\
-\ConeASM =& \frac{-T^3}{2 \sw \cw},  
+\ConeVSM =& \frac{T^3_t - 2Q_t \swsq}{2\sw \cw}, \\
+\ConeASM =& \frac{-T^3_t}{2 \sw \cw},  
 \end{split}
 \end{equation}
-where $Q_t = 2/3$ is the top charge, $T^3=1/2$ and $\theta_w$ is the weak mixing angle. Alternatively, the Lagrangian may be written in terms of left- and right-handed couplings
-\begin{equation} \label{L_SM}
-\mathcal{L}_{\ttbZ}^{\mrm{SM}} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( C_{L}^{\mrm{SM}}\gamma_L + \gamma_R C_{R}^{\mrm{SM}} \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
-\end{equation}
-with $\gamma_L=1/2(1-\gamma_{\mu})$, $\gamma_R=1/2(1+\gamma_{\mu})$, and $C_L^{\mrm{SM}}=(T^3 - Q_t \swsq) / (\sw \cw) \\$ and $C_R^{\mrm{SM}}=-Q_t\sw / \cw$. 
+where $Q_t = 2/3$ is the top quark charge, $T^3_t=1/2$ and $\theta_w$ is the weak mixing angle. 
+% Alternatively, the Lagrangian may be written in terms of left- and right-handed couplings
+% \begin{equation} \label{L_SM}
+% \mathcal{L}_{\ttbZ}^{\mrm{SM}} = \mathrm{i} e \, \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( C_{L}^{\mrm{SM}}\gamma_L + \gamma_R C_{R}^{\mrm{SM}} \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
+% \end{equation}
+% with $\gamma_L=1/2(1-\gamma_{\mu})$, $\gamma_R=1/2(1+\gamma_{\mu})$, and $C_L^{\mrm{SM}}=(T^3 - Q_t \swsq) / (\sw \cw) \\$ and $C_R^{\mrm{SM}}=-Q_t\sw / \cw$. 
  
-New physics contributions to the top-Z couplings may be parametrized by higher dimensional operators in the language of effective field theory. Assuming gauge-invariant dimension-six operators, the fully general Lagrangian may be written as \cite{AlcarazMaestre:2012vp,0811.3842}
+New physics contributions to the top-$Z$ couplings may be parametrized by higher dimensional operators in the language of effective field theory. 
+Assuming gauge-invariant dimension-six operators, the fully general Lagrangian may be written as \cite{AlcarazMaestre:2012vp,0811.3842}
 \begin{equation} \label{L_NP}
-\mathcal{L}_{\ttbZ} = i e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr) + \frac{i \sigma_{\mu \nu} q_{\nu}}{M} \bigl(C_{2,V} + i\gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu},
+\mathcal{L}_{\ttbZ} = \mathrm{i} e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr) + \frac{\mathrm{i} \sigma_{\mu \nu} q_{\nu}}{M} 
+\bigl(C_{2,V} + \mathrm{i} \gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu},
 \end{equation}
-where $\sigma_{\mu \nu}=\frac{i}{2} [ \gamma_{\mu},\gamma_{\nu} ]$, $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$ and the second term is suppressed by a 
-mass scale $M$ which is typically chosen to be $m_Z$. 
-The couplings $C_{2,A}$ and $C_{2,V}$ are related to the weak electric and magnetic dipole moments of the top, and are zero at tree-level in the SM. 
-In an effective field theory, the couplings $\ConeA$ and $\ConeV$ are related to the real part of the difference between two dimension-six operators, 
-as well as the real part of a third operator. The dipole terms are related to a further two dimension-six operators \cite{}.
+where $\sigma_{\mu \nu}=\frac{i}{2} [ \gamma_{\mu},\gamma_{\nu} ]$, $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$ and the 
+% second term is suppressed by a  MARKUS comment: is is not really supressed because q^2/MZ~1, the M is just making it dimensionless
+mass scale $M$ is typically chosen to be $M_Z$. 
+The couplings $C_{2,A}$ and $C_{2,V}$ are related to the weak electric and magnetic dipole moments of the top quark, and are zero at tree-level in the SM. 
+Higher order corrections enter at ... and lead to a shift of .. \cite{}.
+In an effective field theory for physics beyond the SM, the couplings $\ConeA$ and $\ConeV$ receive contributions from the real part of the difference 
+between two dimension-six operators, 
+as well as the real part of a third operator~\cite{}. 
+The dipole terms $C_{2,V/A}$ are related to a further two dimension-six operators.
 
 In this paper, we will interpret the $\ConeV$, $\ConeV$, $\CtwoV$ and $\CtwoA$ as anomalous coupling coefficients which are independent of the kinematics of 
-the tops or the Z-boson. 
+the top quarks or the $Z$-boson. 
 The dipole terms introduce non-renormalizable amplitudes at NLO, and while it is possible to handle these in the $D$-dimensional unitarity approach \cite{}, 
 it is a non-trivial extension. For this reason, we will focus on the capability of the LHC to constrain the couplings $\ConeA$ and $\ConeV$ in this paper, 
 deferring the analysis of the effects of the dipole couplings $\CtwoV$ and $\CtwoA$ to a future work. We therefore set these couplings to zero throughout 
@@ -725,13 +734,13 @@ penalties from small branching fractions
 % small branching into a final state with two or more leptons 
 this process was never observed at the Tevatron.
 Even at the 7 and 8~TeV run of the LHC only a few candidate events were collected.
-As a consequence there is no {\it direct} measurement of the top quark to Z-boson coupling to this date. 
+As a consequence there is no {\it direct} measurement of the top quark to Z-boson couplings to this date. 
 This situation will change once the high energy LHC delievers its first 100~$\invfb$ of data.
 We therefore study the process $pp\to\ttbZ$ at 13~TeV and assume the tri-lepton final state  
 which provides the best compromise between clean signature and large enough cross section. 
 Our theoretical description of production and decay dynamics is accurate to next-to-leading order QCD and
 accounts for all spin correlations at this order in perturbation theory. 
-Top quarks and the Z-boson are treated in the narrow-width approximation which is parameterically valid up to $\mathcal{O}(\Gamma \big/ m)$.
+% Top quarks and the Z-boson are treated in the narrow-width approximation which is parameterically valid up to $\mathcal{O}(\Gamma \big/ m)$.
 Our analysis for estimating the sensitivity to $\ttbZ$-couplings is preformed through a binned log-likelihood ratio test which is based on the 
 distribution of the opening angle of the two leptons from the Z-boson decay.
 To this end we generated a grid of $10^4$ different couplings and their corresponding kinematic distributions at NLO QCD. 
