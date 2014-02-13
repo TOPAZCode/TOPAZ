@@ -33,14 +33,14 @@
 \def\invfb {\mathrm{fb}^{-1}}
 \def\hLambda {\hat{\Lambda}}
 \def\erf{\mathrm{erf}}
-\def\ConeA{C_{1,A}}
-\def\ConeV{C_{1,V}}
-\def\CtwoA{C_{2,A}}
-\def\CtwoV{C_{2,V}}
-\def\ConeVSM{C_{V}^{\mrm{SM}}}
-\def\ConeASM{C_{A}^{\mrm{SM}}}
-\def\DConeA{\Delta C_{1,A}}
-\def\DConeV{\Delta C_{1,V}}
+\def\ConeA{C_{1,\mathrm{A}}}
+\def\ConeV{C_{1,\mathrm{V}}}
+\def\CtwoA{C_{2,\mathrm{A}}}
+\def\CtwoV{C_{2,\mathrm{V}}}
+\def\ConeVSM{C_\mathrm{V}^{\mrm{SM}}}
+\def\ConeASM{C_\mathrm{A}^{\mrm{SM}}}
+\def\DConeA{\Delta C_{1,\mathrm{A}}}
+\def\DConeV{\Delta C_{1,\mathrm{V}}}
 \def\HSM{\mathcal{H}_{\mathrm{SM}}}
 \def\Halt{\mathcal{H}_{\mathrm{alt}}}
 \newcommand{\be}{\begin{eqnarray}}
@@ -253,7 +253,7 @@ This has to be compared with the results of Ref.~\cite{1208} which are xxx~fb an
 The NLO QCD cross sections agree within about 9~permille, which turns out to be slightly larger than the integration error.
 We attribute this to minor mismatch of input parameters, an issue that could be resolved through a tuned comparison.  
 In any case, this small difference has no phenomenlogicaly relevant consequences.
-Figure~\ref{fig:i} demonstrates good agreement in shape for the $p_{\mathrm{T}}$ distribution of the top quark as well.
+Figure~\ref{fig:i} also demonstrates good agreement in shape for the top quark $p_{\mathrm{T}}$ distribution between our results and Fig.~1a in Ref.~\cite{1208}.
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./Troc_pTtop.eps}
@@ -431,34 +431,36 @@ We find that leptons from the $Z$ boson have a typically harder spectrum.
 This is already true for LO while significatly different $K$-factors enhance this behavior even further at NLO.
 
 %tagCMSdata
-\subsection{Top-Z coupling results from current CMS data}
+% \subsection{Top-Z coupling results from current CMS data}
+\subsection{Coupling extrapolation and first results from current CMS data}
 
 In this section and the next, we will use our calculation to investigate the constraints that can be placed on the top-Z coupling, using both existing and anticipated LHC data. 
-To do so, we will need to compute the total cross-section and distributions for a large number of values of both $C_{1,V}$ and $C_{1,A}$. 
+To do so, we will need to compute the total cross-section and differential distributions for a large number of values of both $C_{1,V}$ and $C_{1,A}$. 
 This is simple enough at LO, and while it is still feasible at NLO, it does place a strain on computing resources. 
-As a convenient alternative, we note that $\ttbZ$ production and decay amplitude at LO or NLO can be written as
+As a convenient alternative, we note that $\ttbZ$ production and decay amplitude at LO or NLO QCD can be written as
 \begin{equation}
-  A = A_0 + A_V C_{1,V} + A_A C_{1,A},
+  \mathcal{M} = \mathcal{M}_0 +  \ConeV \mathcal{M}_\mathrm{V} +  \ConeA \mathcal{M}_\mathrm{A},
 \end{equation}
-with the coefficients $A_i$ encoding both the kinematics and all couplings other than the top-Z coupling. 
+with the coefficients $\mathcal{M}_i$ encoding both the kinematics and all couplings other than the top-Z coupling. 
 The differential cross-section is then dependent on six coupling stuctures, and can be written as
 \begin{equation}
-\label{eq:couplfit}
+\label{couplfit}
   d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
 \end{equation}
 Evaluating the cross-section for six values of $(C_{1,V},C_{1,A})$ allows us to solve for the coefficients $s_i$. 
-These can then be used to generate results for any values of $C_{1,V}$ and $C_{1,A}$. 
-Furthermore, this can be done for the total cross-section, or bin-by-bin for a given distribution. 
-As a check on this approach, we have evaluated the cross-sections and distributions for several points in the $(C_{1,V},C_{1,A})$ parameter space, 
-both by an explicit calculation and by using the values of the $s_i$ coefficients. Excellent agreement is found in all cases. 
-As an example, we show the comparison for the {\bf which?} distribution for $C_{1,V}=, C_{1,A}=$ {\bf fill in values} in figure \ref{fig:magic}. 
-{\bf should this explanation be herre? if not, then where?}
+These can then be used to extrapolate results for any values of $C_{1,V}$ and $C_{1,A}$. 
+Furthermore, this fitting procedure can not only be done for the total cross-section but also bin-by-bin for a given distribution, 
+retaining the effects of spin correlations and selction cuts.
+As a check of this approach, we have evaluated the cross-sections and distributions for a few points in the $(C_{1,V},C_{1,A})$ parameter space, 
+both by an explicit calculation and by using the fit for the $s_i$ coefficients. Excellent agreement is found in all cases. 
+As an example, we show one comparison in Fig.~\ref{fig:iv} for the  $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution, which we will later use in the coupling analysis.
+As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are correctly reproduced by the fitting procedure.
 
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./LHC_53_Fig17d.eps}
 \caption{\label{fig:iv} Validation of our fitting procedure. Shown is the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution from an explicit NLO QCD calculation 
-for the non-SM coupling choice $(\delta_V,\delta_A)=(1.00,0.1)$, and from the fit described in Eq.~\cite{eq:couplfit}. }
+for the non-SM coupling choice $(\delta_V,\delta_A)=(1.00,0.1)$, and from the fit described in Eq.~3.8. }
 \end{figure}
 We turn now to an analysis based on current LHC data. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events \cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria \cite{ATLAS-CONF-2012-126}. 
@@ -493,7 +495,7 @@ We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delt
 
 Constraints from $t\bar{t}Z$ cross-section from CMS \\
 
-\subsection{Top-Z coupling constraints from future LHC run}
+\subsection{Top-Z coupling constraints from future LHC runs}
 
 
 
@@ -661,12 +663,25 @@ see fig something. Consequently, the lower uncertainty associated with the NLO r
 
 \begin{figure}[t]
 \centering
-\includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps}
-\caption{ \label{fig:viii} Total NLO QCD cross sections including the selection cuts of Eq.~\ref{xx} for a 
-grid of $ 100 \times 100 $ choices of vector and axial couplings. }
+\includegraphics[scale=0.6]{LHC_53_SigmaNLO.eps}
+\caption{ \label{fig:vii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. to the SM.
+The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described in Eq.~3.8. }
 \end{figure}
 
-We now present the results of our analysis in Figure~\ref{fig:xx}, using both the LO and NLO results and uncertainties.
+We now present the results of our analysis in Figs.~\ref{fig:vii} and~\ref{fig:viii}.
+The first Figure shows the NLO QCD cross section (relative to the SM cross section) 
+including selection cuts of Eq.~\ref{selectioncuts} for a wide range of top-Z vector and axial couplings.
+This grid of 3200 NLO QCD cross sections is generated with the fit described around Eq.~\ref{couplfit}, at low computational cost.
+We find that within the given range the cross section varies by about $\pm 50\%$.
+Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the lightest color band/area inside the dotted band in Fig.~\ref{fig:vii}.
+Within this band a rate measurement alone is not sensitive to any deviation of the coupling, this is true for example for $(\Delta\ConeV,\Delta\ConeA)=(1.7,-0.3)$ which is far off the SM value.
+We will later see that adding shape information will improve this situation.
+It is clearly noticable that cross sections in Fig.~\ref{fig:vii} are symmetric around the axis $\Delta\ConeV=-1$. This feature can be easily understood
+from the fact that the LO cross section is proportional to $\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
+We expect to see a similar symmetry around $\Delta\ConeA=-1$ but we do not consider it here since the sign of the axial coupling is already highly constrained from 
+the LEP measurements ({\bf check or remove!!}).
+
+, using both the LO and NLO results and uncertainties.
 Using the interpolation of Eq.~\ref{} we generate $10^4$ distributions in $\Delta \phi_{\ell\ell}$ for a grid of $xx \, C_V \times yy\, C_A$ couplings 
 choices in the range $\pm 3$ and $\pm 0.4$, respectively. 
 It is immediately apparent that $\ConeA$ can be constrained far better than $\ConeV$. 
@@ -683,8 +698,8 @@ Both of these features are qualitatively similar to the results obtained by ref.
 \\
 \includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
 \includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
-\caption{Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
-The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.} \label{fig:LHC13sigLO} 
+\caption{\label{fig:viii} Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
+The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.}
 \end{figure}
 
 
