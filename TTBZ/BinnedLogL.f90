@@ -246,6 +246,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 ! -----------------------------------------------------------------
   NPseudoExp_Worker = NPseudoExp/(MPI_NUM_PROCS)
   print *, "MPI rank ",MPI_Rank," running ",NPseudoExp_Worker," pseudoexperiments"
+
 !DEC$ IF(_UseMPI .EQ.1)
   call MPI_BARRIER(MPI_COMM_WORLD,ierror)
 !DEC$ ENDIF
@@ -306,13 +307,15 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      enddo
 
 ! offset to get the distributions with the histogram limits
+!DEC$ IF(_UseMPI .NE.1)
+
      if (iHypothesis .eq. 1 .and. iPseudoExp .eq. 1) then
         offset=-100d0*(int(LLRatio)/100)
         print *, 'using offset of ', offset
      endif
      
      LLRatio=LLRatio+offset
-
+!DEC$ ENDIF
      if (iPseudoExp .eq. 1) then
         print *, 'LLRatio=',iHypothesis,LLRatio
      endif
@@ -334,9 +337,17 @@ enddo!   iHypothesis
       do worker=1,MPI_NUM_PROCS-1
         call MPI_Recv(LLRatio_array_tmp, 2*MaxExp,MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE ,1,MPI_COMM_WORLD, status,ierror)
         print *, "received array from worker",worker
+
         LLRatio_array(1,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(1,1:NPseudoExp_Worker)
         LLRatio_array(2,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(2,1:NPseudoExp_Worker)
+        if (worker.eq.1) then
+           offset=-100d0*(int(LLRatio_array(1,1))/100)
+        endif
+        print *, "using offset of ", offset
+
       enddo
+        LLRatio_array=LLRatio_array+offset
+
    elseif( MPI_Rank.gt.0 ) then
         call MPI_Send(LLRatio_array, 2*MaxExp,MPI_DOUBLE_PRECISION, 0 ,1,MPI_COMM_WORLD,ierror)
    endif
