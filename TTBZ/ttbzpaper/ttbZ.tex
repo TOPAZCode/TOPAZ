@@ -99,7 +99,7 @@ opens up new ways for % more sophisticated
 experimental searches and theoretical model building.
 These developments represent a remarkably fast progress and demonstrate the potential of the LHC in the years to come.
 
-One particularly interesting/promissing class of SM processes is top quark pair production in association with gauge bosons or a Higgs boson.
+One particularly promissing class of SM processes is top quark pair production in association with gauge bosons or a Higgs boson.
 % for which we anticipate more progress in the near future 
 % Processes of top quark pairs in association with gauge bosons or a Higgs boson will greatly profit from higher energy and luminosity.
 %Due to the relatively high production threshold these processes have never been observed with large event numbers at the Tevatron
@@ -167,7 +167,7 @@ We therefore account for NLO QCD spin correlations in the decay of top quarks an
 This includes the full one-loop corrections as well as soft, collinear and wide angle gluon emission off the top quark decay chain.
 Spin correlations of the leptonically decaying Z boson are included as well.
 While including all spin correlations, we approximate top quarks and the Z boson as close to on-shell in the narrow-width approximation.
-This approximation is parametric in $\Gamma/m$ and its wide range of validity has been studied in Refs.~\cite{}.
+This approximation is parametric in $\Gamma/m$ and its wide range of validity in $\ttb$ production has been studied in Refs.~\cite{}.
 
 It is interesting to note that the top-$Z$ coupling may also be directly probed through single top production in association with a $Z$-boson. 
 Indeed, the inclusive cross-section of $tZ$ plus its charge conjugate process $\bar{t}Z$ is comparable to the inclusive $\ttbZ$ cross-section 
@@ -214,7 +214,7 @@ We also neglect the contribution from the decay $t \to Wb+Z$ since the available
 At LO, the production of $\ttbZ$ occurs through the $gg$ and $q\bar{q}$ partonic channels. 
 At NLO QCD, these channels receive real and virtual corrections, while real emission corrections open up the partonic channels $qg$ and $\bar{q}g$. 
 We also include NLO QCD corrections to the top quark decays and the hadronically decaying $W$ boson; consequently their total widths are included at LO and NLO as well.
-Eq.~(\ref{Xsec}) expanded up to NLO QCD reads,
+Eq.~(\ref{Xsec}) expanded up to NLO accuracy reads,
 \be
  \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj}^\mrm{NLO} &=& 
  \rd \sigma_{pp\to\ttbZ}^\mrm{LO} \; \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} \; \rd\Br_{Z\to \ell\ell}
@@ -231,11 +231,16 @@ The virtual corrections are evaluated using a numerical OPP realization \cite{Os
 We extended the framework of Ref.~\cite{Melnikov:2009dn} to account for color neutral bosons which requires new tree level recursion relations as well as an extension of the OPP procedure as described in e.g. Ref.~\cite{}.
 Soft and collinear singularities in the real emission corrections are regularized using the dipole subtractions scheme of Refs.~\cite{Catani:1996vz,Catani:2002hc} supplemented with a cut-off parameter for the
 finite dipole phase space~\cite{Nagy:2003tz,Nagy:2003tz,copy from ttbphoton paper}.
-The virtual and real corrections to the top quark decay and hadronic W decay are implemented analytically. Soft and collinear singularities in the real emission phase space are regularized using subtractions dipoles given in~\cite{see ttbphoton paper}.
+The virtual and real corrections to the top quark decay and hadronic W decay are implemented analytically. 
+Soft and collinear singularities in the real emission phase space are regularized using subtractions dipoles given in~\cite{see ttbphoton paper}.
+We would also like to point out that we make extended use of parallel computing. 
+We implemented a version of the Vegas integration algorithm which allows parallelization via the Message-Passing-Interface (MPI) \cite{}. 
+We observe an almost linear scaling of the run-time with the number of CPU cores used. 
+This allows to obtain a full NLO QCD prediction for the total cross section within a few hours on a modern desktop computer with e.g. 8 cores.
 % The NLO amplitudes for the decay of the top quarks well-known, and are given in \cite{Jezabek:1988iv,Czarnecki:1990pe,Czarnecki:1990kv,Li:1990qf,Campbell:2004ch,}. In the NWA, the NLO cross-section for the production and decay is written as \cite{Campbell:2004ch,Melnikov:2009dn}
-\\
+
 We perform several checks to ensure the correctness of our calculation. 
-The squared amplitudes for tree level and real emission corrections are checked against MadGraph~v.2.49~\cite{Stelzer:1994ta}. 
+The squared amplitudes for tree level and real emission corrections are checked against MadGraph v.2.49~\cite{Stelzer:1994ta}. 
 The cancellation of poles in $D-4$ of dimensional regularization between the virtual corrections and integrated dipoles has been verified for several phase space points.
 We also checked the finite part of the virtual amplitudes against the automated program {\tt GoSam} \cite{Cullen:2011ac} for a few phase space points and find
 very good agreement. 
@@ -329,7 +334,7 @@ non-renormalizable amplitudes at NLO.
 While it is straightforward to handle such contributions our current implemenation of the OPP integrand reduction method 
 does not allow tensor ranks larger than $N$ for $N$-point loop integrals.
 Such an extension of the OPP reduction algorithm has been outlined in the Appendix of Ref.~\cite{}. 
-We will come back to this issue in a separate publication.
+We will come back to this issue in a separate publication and study the phenomenlogical implicications of electroweak dipole moments in $\ttbZ$ production.
 % These contributions introduce deviations to the SM interaction strength such that Eq.~\ref{L_SM} becomes
 % \be
 % \label{Cone_NP}
@@ -464,7 +469,7 @@ The bands represent the LO (light) and NLO (dark) results for scale variation by
 \end{figure}
 
 Before turning to the $\ttbZ$ coupling analysis, let us discuss some generic kinematic distributions.
-Fig.~\ref{fig:ii}a shows the transverse momemtum of the two leptons arising from the $Z$ boson.
+Fig.~\ref{fig:ii}a shows the transverse momemtum of two lepton system reconstructing the $Z$ boson.
 Similar to the total cross sections we observe a strong reduction in unphysical scale dependence over the entire $\pT$ spectrum.
 Scale bands for LO and NLO predictions are comfortably overlapping. 
 From this plot we read off an average transverse momemtum of the $Z$ boson of almost 100~GeV with a far extending kinematic tail,
@@ -484,8 +489,9 @@ This is already true for LO while significatly different $K$-factors enhance thi
 % \subsection{Top-Z coupling results from current CMS data}
 \subsection{Coupling extrapolation and first results from current CMS data}
 
-In this section and the next, we will use our calculation to investigate the constraints that can be placed on the top-Z coupling, using both existing and anticipated LHC data. 
-To do so, we will need to compute the total cross-section and differential distributions for a large number of values of both $C_{1,V}$ and $C_{1,A}$. 
+In this section and the next, we will use our calculation to investigate the constraints that can be placed on top-Z couplings, using both existing and anticipated LHC data. 
+To do so, we need to determine how normalization and shapes depend on variations of the couplings. 
+Hence total cross-sections and differential distributions need to be calculated for a large grid of $C_{1,V}$ and $C_{1,A}$ values. 
 This is simple enough at LO, and while it is still feasible at NLO, it does place a strain on computing resources. 
 As a convenient alternative, we note that $\ttbZ$ production and decay amplitude at LO or NLO QCD can be written as
 \begin{equation}
@@ -516,15 +522,15 @@ As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are
 \caption{\label{fig:iv} Validation of our fitting procedure. Shown is the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution from an explicit NLO QCD calculation 
 for the non-SM coupling choice $(\DConeV,\DConeA)=(1.00,0.1)$, and from the fit described in Eq.~3.8. }
 \end{figure}
+
 We turn now to an analysis based on current LHC data. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events \cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria \cite{ATLAS-CONF-2012-126}. 
 This enables ATLAS to place an upper bound on the $\ttbZ$ cross-section, 
 while CMS are able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$ pb. 
-Both are consistent with the NLO prediction of 0.137pb \cite{Garzelli:2011is}. 
-In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z coupling. 
-These constitute the first direct constraints on this coupling.
-
-We make use of a simple $\chi^2$-test 
+Clearly, error bars from these very first measurements are huge but they are consistent with the NLO prediction of 0.137pb in Ref.~\cite{Garzelli:2011is} or this work. 
+In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z couplings. 
+This constitutes the first direct constraints on these couplings.
+We perform a simple $\chi^2$-test 
 \begin{equation}
 \chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
 \end{equation}
@@ -589,14 +595,16 @@ Hence, a measurement of the rate alone would not reveal the deviations from thei
 Let us now outline the basic idea of our statistical analysis.
 We are interested in answering the question: What are the bounds that can be placed on top-Z couplings? 
 Obviously, the answer will depend on the assumed integrated luminosity of the data sample as well as theoretical and experimental uncertainties. 
-However, we emphasize again that we do not take experimental effects into account for this analysis.
+However, we emphasize again that we do not take experimental effects into account apart from the cuts in Eq.~\ref{selectioncuts} to account for detector acceptances.
 Since at the current point in time there is no experimental data available, we assume the SM prediction as our null hypothesis $\mathcal{H}_{\mathrm{SM}}$ ($\DConeV=\DConeA=0$),
-against which we test alternative hypotheses $\Halt$ with $(\DConeV,DConeA \ne (0,0)$.
+against which we test alternative hypotheses $\Halt$ with $(\DConeV,\DConeA \ne (0,0)$.
 Once experiments have accumulated real events, the alternative hypothesis can be replaced by observed data to test for consistency with the SM prediction. 
 The null hypothesis could then be replaced by  other points in $(\DConeV,\DConeA)$ parameter space, and tested against the data. 
 This will enable the exclusion of parts of the parameter space at a given confidence level (e.g. 3-$\sigma$). 
-Assuming that the data agree with the SM, and ignoring experimental effects which may be significant, the bounds on the top-Z coupling 
-obtained in this section should approximate those obtained from the data. 
+Assuming that the data agree with the SM, 
+% and ignoring experimental effects which may be significant, 
+the bounds on the top-Z coupling 
+obtained in this section should approximate those obtained from real data in the future. 
 
 We begin by constructing two likelihood functions $\mathcal{L}_{\SM}$ and $\mathcal{L}_{\alt}$ which allow us to define a test 
 statistic $\Lambda = \log \left( \mathcal{L}_{\SM} / \mathcal{L}_{\alt} \right)$.
@@ -625,7 +633,6 @@ with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given th
 %\ee
 %with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
 %The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
-
 Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
 \be
 \label{lilifunct}
@@ -646,7 +653,6 @@ Consequently the two log-likelihood functions for the SM and the alternative hyp
 %  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
 %\end{split}
 %\ee
-
 %where $n_{i,\mathrm{obs}}$ is the observed number of events in the $i$-th bin of the $\Delta \phi_{\ell\ell}$ distribution. 
 Eqs.~\ref{lilifunct} allow us to construct the test statistic as the log-likelihood ratio
 \be
@@ -655,19 +661,19 @@ Eqs.~\ref{lilifunct} allow us to construct the test statistic as the log-likelih
                                 =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
 \end{split}
 \ee
-where $\vec{n}_{\mrm{obs}}$ are generated by a bin-by-bin Poisson distribution of $\nu_i^{\SM}$ and $\nu_i^{\alt}$, yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
-
+where $\vec{n}_{\mrm{obs}}$ are generated by a Poisson distribution of $\nu_i^{\SM}$ and $\nu_i^{\alt}$
+from the $\Delta \phi_{\ell\ell}$ histograms for $\HSM$ and $\Halt$, respectively.
+% , yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.45\textwidth]{./LogLikelihoods_LO.eps}
 \hfill
 \includegraphics[width=0.45\textwidth]{./LogLikelihoods_NLO.eps}\caption{\label{fig:vi}
 Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or the alternative hypothesis (blue) 
-with $\delta_V=x.xx$, $\delta_A=y.yy$. The left plot shows the separating power using LO input, the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
+with $\delta_V=x.xx$, $\delta_A=y.yy$. The left plot shows the separating power using LO input, 
+the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
 }
 \end{figure}
-
-
 %\be
 %\begin{split}
 %  \Lambda(\HSM) =&  \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
@@ -681,9 +687,8 @@ with $\delta_V=x.xx$, $\delta_A=y.yy$. The left plot shows the separating power 
 %                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
 %\end{split}
 %\ee
-
-%This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
-
+%This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the 
+% $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
 Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
 %Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
 An example of two such probability distributions is shown in Fig.~\ref{fig:vi}a and Fig.~\ref{fig:vi}b for LO and NLO QCD, respectively. 
@@ -723,15 +728,15 @@ The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described
 \end{figure}
 
 We now present the results of our analysis in Figs.~\ref{fig:vii} and~\ref{fig:viii}.
-The first Figure shows the NLO QCD cross section (relative to the SM cross section) 
+The first Figure shows the NLO QCD cross section relative to the SM cross section 
 including selection cuts of Eq.~\ref{selectioncuts} for a wide range of top-Z vector and axial couplings.
 This grid of 3200 NLO QCD cross sections is generated with the fit described around Eq.~\ref{couplfit}, at low computational cost.
 We find that within the given range the cross section varies by about $\pm 50\%$.
-Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the lightest color band/area inside the dotted band in Fig.~\ref{fig:vii}.
+Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the area inside the dotted band in Fig.~\ref{fig:vii}.
 Within this band a rate measurement alone is not sensitive to any deviation of the coupling, this is true for example for $(\Delta\ConeV,\Delta\ConeA)=(1.7,-0.3)$ which is far off the SM value.
 We will later see that adding shape information will improve this situation.
 It is clearly noticable that cross sections in Fig.~\ref{fig:vii} are symmetric around the axis $\Delta\ConeV=-1$. This feature can be easily understood
-from the fact that the LO cross section is proportional to $\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
+from the fact that the LO cross section is dominantly proportional to $\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
 We expect to see a similar symmetry around $\Delta\ConeA=-1$ but we do not consider it here since the sign of the axial coupling is already highly constrained from 
 the LEP measurements ({\bf check or remove!!}).
 
