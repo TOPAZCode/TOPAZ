@@ -488,6 +488,7 @@ This is already true for LO while significatly different $K$-factors enhance thi
 %tagCMSdata
 % \subsection{Top-Z coupling results from current CMS data}
 \subsection{Coupling extrapolation and first results from current CMS data}
+\label{sect:CMS}
 
 In this section and the next, we will use our calculation to investigate the constraints that can be placed on top-Z couplings, using both existing and anticipated LHC data. 
 To do so, we need to determine how normalization and shapes depend on variations of the couplings. 
@@ -723,7 +724,7 @@ see fig something. Consequently, the lower uncertainty associated with the NLO r
 \begin{figure}[t]
 \centering
 \includegraphics[scale=0.6]{LHC_53_SigmaNLO.eps}
-\caption{ \label{fig:vii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. to the SM.
+\caption{ \label{fig:vii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. the SM.
 The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described in Eq.~3.8. }
 \end{figure}
 
@@ -795,11 +796,62 @@ In figure \ref{fig:LHC13data}, we show results of the analysis for 30 and 3000 $
 the first year or so of the high energy run, while 3000 $\invfb$ is the benchmark value for the complete dataset over the lifetime of the LHC. 
 
 %Dphill distr with LO and NLO scale bands, and two(three?) non-SM coupl\\
-$\sigma_{NP|} / \sigma_{SM}$ a la Berger, 0907.2191 \\
+% $\sigma_{NP|} / \sigma_{SM}$ a la Berger, 0907.2191 \\
 
 %Description of analysis Binned log likelihood, how we handle scale uncertainty (cf. Lykken et al) \\
-alpha plots - LO, NLO, rescaled (k-factor and reduced scale uncertainty) LO at 30, 300, 3000 fb-1\\
-Dphill distr normalized to $t\bar{t}$ cross-section  - 1 uncertainty from k-factors at 30, 300, 3000\\
+% alpha plots - LO, NLO, rescaled (k-factor and reduced scale uncertainty) LO at 30, 300, 3000 fb-1\\
+% Dphill distr normalized to $t\bar{t}$ cross-section  - 1 uncertainty from k-factors at 30, 300, 3000\\
+
+
+
+\subsection{Limits on higher dimensional operators}
+
+
+Having presented our main results in Figs.~\ref{fig:CMS} and Figs.~\ref{fig:viii}, we can use these limits to put constraints on 
+possible effects of physics beyond the SM. 
+The dimension-6 operators relevant for this work have been presented in Eq.~\ref{EFTOp}.
+We begin by using the CMS cross section measurement at 7~TeV (see Sect.~\ref{sect:CMS}). 
+The limits on the total $\ttbZ$ cross section as a function of $\DConeV$ and $\DConeA$ directly
+translate into limits on the three operators in Eq.~\ref{EFTOp}. 
+Diagonalizing the dependence in Eq.~\ref{Cone_NP}, we find
+\be
+ xx &\le \left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q}  \right]   \le & yy ,
+  \\
+ xx&\le  \left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(33}_{\phi u} \right]  \le &yy .
+\ee
+Clearly this result can only be seen as a first example for how constraints could be placed.
+Meaningful limits are only obtained once more data is accumulated.
+To estimate how limits will improve in such case, we use our results for the normalization and $\Delta \phi_{\ell\ell}$ shape 
+analysis for the case of 30, 300, and 3000~$\invfb$.
+We find
+\be
+ \left. \begin{array}{l}
+ xx \\
+ xx \\
+ xx  
+ \end{array} \right\}
+ \le \left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q}  \right]  \le  
+ \left\{ \begin{array}{ll}
+ yy & \quad 30  \, \invfb \\
+ yy & \quad 300 \, \invfb \\
+ yy & \quad 3000\, \invfb  
+ \end{array} \right.
+ ,\\
+ \left. \begin{array}{l}
+ xx \\
+ xx \\
+ xx  
+ \end{array} \right\}
+ \le  \left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(33}_{\phi u} \right]  \le yy
+ \left\{ \begin{array}{ll}
+ yy & \quad 30  \, \invfb \\
+ yy & \quad 300 \, \invfb \\
+ yy & \quad 3000\, \invfb  
+ \end{array} \right. .
+\ee
+As can be seen from the above results, something something...
+
+
 
 \section{Conclusion}
 In this article we studied top quark pair production in association with a Z-boson.
