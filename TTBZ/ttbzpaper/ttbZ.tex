@@ -236,7 +236,7 @@ Soft and collinear singularities in the real emission phase space are regularize
 We would also like to point out that we make extended use of parallel computing. 
 We implemented a version of the Vegas integration algorithm which allows parallelization via the Message-Passing-Interface (MPI) \cite{}. 
 We observe an almost linear scaling of the run-time with the number of CPU cores used. 
-This allows to obtain a full NLO QCD prediction for the total cross section within a few hours on a modern desktop computer with e.g. 8 cores.
+This allows to obtain a full NLO QCD prediction for the total cross section within a few hours on a modern desktop computer with 8 cores.
 % The NLO amplitudes for the decay of the top quarks well-known, and are given in \cite{Jezabek:1988iv,Czarnecki:1990pe,Czarnecki:1990kv,Li:1990qf,Campbell:2004ch,}. In the NWA, the NLO cross-section for the production and decay is written as \cite{Campbell:2004ch,Melnikov:2009dn}
 
 We perform several checks to ensure the correctness of our calculation. 
@@ -897,8 +897,15 @@ At NLO QCD we find
  yy & \quad 3000\, \invfb  
  \end{array} \right. .
 \ee
+A graphical representaion of these limits are given in Fig.~\ref{fig:ix} for $\Lambda=$1~TeV, including the experimental LEP constraints.
 As can be seen from the above results, something something...
 
+
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.8]{OperatorLimits1TeVNLO.eps} 
+\caption{\label{fig:ix} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$}
+\end{figure}
 
 
 \section{Conclusion}
