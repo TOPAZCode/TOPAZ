@@ -64,21 +64,23 @@
 \preprint{CERN Preprint No.xxxxxx\\
 FNAL Preprint No.yyyyyy}
 
+
 \abstract{
-We study top quark pair production in association with a Z~boson at the Large Hadron Collider (LHC)
+We study top quark pair production in association with a $Z$~boson at the Large Hadron Collider (LHC)
 %through next-to-leading order QCD
-and investigate the prospects of measuring the couplings of top quarks to the Z boson.
+and investigate the prospects of measuring the couplings of top quarks to the $Z$ boson.
 To this date these couplings have not been constrained in direct measurements and 
 only the high energy LHC will allow such a determination for the first time.
 Our calculation improves previous coupling studies through the inclusion of next-to-leading order (NLO) QCD corrections in production and decays of all unstable particles.
 We treat top quarks in the narrow width approximation and retain all NLO spin correlations.
-To determine the sensitivity of the coupling measurements we perform a statistical log-likelihood ratio test
-based on normalization and shape information of the angle between the leptons from the Z boson decay.
+To determine the sensitivity of a coupling measurement we perform a binned log-likelihood ratio test
+based on normalization and shape information of the angle between the leptons from the $Z$ boson decay.
 The obtained limits include the leading theoretical uncertainties from
 scale variation and parton distribution functions.
 We find that with 300~fb$^{-1}$ of data at an energy of 13~TeV the vector $t \bar t Z$-coupling can be
-constrained within a factor of x.xx, whereas the axial coupling can be determined to yy\% precision at the 1$\sigma$~C.L..
+constrained within a factor of x.xx, whereas the axial coupling can be determined to yy\% precision at the 68\%~C.L.
 This is an improvement by a factor of $x.x$ compared to an analysis based on leading-order input alone.
+We also translate these results into limits on dimension-six operators contributing to the $t \bar t Z$-interactions.
 }
 
 
@@ -553,14 +555,15 @@ As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./LHC_53_Fig17d.eps}
 \caption{\label{fig:iv} Validation of our fitting procedure. Shown is the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution from an explicit NLO QCD calculation 
-for the non-SM coupling choice $(\DConeV,\DConeA)=(1.00,0.1)$, and from the fit described in Eq.~3.8. }
+for the non-SM coupling choice $(\DConeV,\DConeA)=(1.0,0.1)$, and from the fit described in Eq.~3.8. }
 \end{figure}
 
+{\bf MARKUS NOTE: I think we have to be careful with the word observed. This is typically only used for 5sigma signals, which is not the case here at all.}
 We turn now to an analysis based on current LHC data. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events~\cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria~\cite{ATLAS-CONF-2012-126}. 
 This enables ATLAS to place an upper bound on the $\ttbZ$ cross-section, 
-while CMS are able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$ pb. 
-Clearly, error bars from these very first measurements are huge but they are consistent with the NLO prediction of 0.137pb in Ref.~\cite{Garzelli:2011is} or this work. 
+while CMS is able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$~pb. 
+Clearly, error bars from these very first measurements are huge nevertheless they are consistent with the NLO QCD prediction of 0.137~pb in Ref.~\cite{Garzelli:2011is} or this work. 
 In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross-section to place bounds on the top-Z couplings. 
 This constitutes the first direct constraints on these couplings.
 We perform a simple $\chi^2$-test 
@@ -580,21 +583,39 @@ f = \left\{
 f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
 \end{array} \right.\ 
 \end{equation}  
-where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma_{\mathrm{pred}}$, and $\Delta N$ is the combined scale and pdf uncertainty. 
+where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma_{\mathrm{pred}}$, and $\Delta N$ is the theoretical  uncertainty. 
 This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, 
 but instead require it to be within the bounds of the theoretical uncertainty. 
-In determining $\Delta N$, we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. 
-We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
+In determining $\Delta N$, we found in the previous section scale uncertainties of 30\% at LO and 15\% at NLO QCD.
+Uncertainties related to using different parton distribution functions amount to 17\% at LO and 7\% at NLO. 
+Since the latter uncertainties are comfortably within the variation of renormalization and factorization scales, we 
+choose here and in the following analysis $\Delta N = 0.30$ at LO and $\Delta N = 0.15$ at NLO.
+% we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. 
+% We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
 
-Constraints from $t\bar{t}Z$ cross-section from CMS \\
+Figure~\ref{fig:v} shows the results of the $\chi^2$-test obtained from our leading order (left) and next-to-leading order (right) calculations
+which relate the total cross section with the $\ttbZ$-couplings.
+In the plane of relative deviations of vector and axial couplings, the point $(\DConeV,\DConeA)=(0.0,0.0)$ corresponds to the SM value.
+The broad black band represents coupling choices which are indistinguishable from the SM prediction within our simple analysis.
+With the given experimental data set those couplings can extend to $(\DConeV,\DConeA)=(-600\%,-200\%)$.
+By comparing left and right plots we clearly notice the stronger constraints when NLO input is used.
+In particular, the region around the point $(\DConeV,\DConeA)=(-1.0,-1.2)$ can be much stronger excluded at NLO. 
+Since this area corresponds to very small cross sections, next-to-leading order data favors the experimental observation of the $\ttbZ$ final state even more.
+Of course, the obtained limits have to be interpreted with care since very few events have been observed by the experiments so far.
+Only a larger data set and detailed analysis of backgrounds and detector effects will provide more reliable constraints on the $\ttbZ$-couplings.
+We still belive that these results are interesting to consider, especially when being put in context with limits
+obtained from the future high-energy LHC which we study in the next section.
+
+
 
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
-\includegraphics[width=0.45\textwidth]{./CMSLO_Delta0.40_0213.eps}
-\hfill
-\includegraphics[width=0.45\textwidth]{./CMSNLO_Delta0.20_0213.eps}
+\includegraphics[width=0.495\textwidth]{./CMSLO_Delta0.40_0213.eps}
+\includegraphics[width=0.495\textwidth]{./CMSNLO_Delta0.20_0213.eps}
 \caption{\label{fig:v}
-xxx.
+Significance as a function of relative deviations for vector and axial couplings wrt. the SM value. 
+The limits are obtained from the first measurement of the $\ttbZ$ cross section by CMS~\cite{Chatrchyan:2013qca}. 
+The left~(right) plot shows the limits obtained from LO~(NLO QCD) input.
 }
 \end{figure}
 
@@ -610,12 +631,12 @@ We focus on the trileptonic final state and employ the azimuthal angle between t
 from the $Z$ decay to perform our analysis.
 This angle has been identified as being particularly sensitive to the top-Z coupling in Ref.~\cite{Baur:2004uw}.
 We already discussed the strong reduction in scale uncertainty when going from LO to NLO QCD for this observable.
-Here, in Fig.~\ref{fig:v}(a) we show the effect of NLO QCD corrections on the shape of the normalized $\Delta \phi_{\ell\ell}$ distribution.
+Here, in Fig.~\ref{fig:vi}(a) we show the effect of NLO QCD corrections on the shape of the normalized $\Delta \phi_{\ell\ell}$ distribution.
 Higher order effects tend to shift events from larger to smaller opening angles.
-In Fig.~\ref{fig:v}(b) we show that similar shape changes can arise due to variations of the vector and axial $\ttbZ$-couplings.
+In Fig.~\ref{fig:vi}(b) we show that similar shape changes can arise due to variations of the vector and axial $\ttbZ$-couplings.
 This emphasizes the importance of precise predictions since missing higher order effects might be misinterpreted as deviations from the SM.
 To illustrate that the $\Delta \phi_{\ell\ell}$ shape is a useful discriminator for our coupling analysis, we have chosen 
-values $\delta_V$ and $\delta_A$ in Fig.~\ref{fig:v}(b) such that the total cross sections approximately coincide with the SM value.
+values $\delta_V$ and $\delta_A$ in Fig.~\ref{fig:vi}(b) such that the total cross sections approximately coincide with the SM value.
 Hence, a measurement of the rate alone would not reveal the deviations from their Standard Model value.
 % , and a combination of normalization and shape information provides the best sensitivity.
  
@@ -626,7 +647,7 @@ Hence, a measurement of the rate alone would not reveal the deviations from thei
 \includegraphics[width=0.45\textwidth]{./LHC_53_Fig17a.eps}
 \hfill
 \includegraphics[width=0.45\textwidth]{./LHC_53_Fig17b.eps}
-\caption{\label{fig:v}
+\caption{\label{fig:vi}
 Normalized distributions of the azimuthal opening angle of the opposite sign leptons from the $Z$ boson decay at the 13~TeV LHC.
 In the left Figure~(a), shapes of LO and NLO QCD predictions are compared for SM $\ttbZ$-couplings.
 Shape changes due to deviations from the SM values are shown in the right Figure~(b).
@@ -700,8 +721,8 @@ Consequently the two log-likelihood functions for the SM and the alternative hyp
 Eqs.~\ref{lilifunct} allow us to construct the test statistic as the log-likelihood ratio
 \be
 \begin{split}
-  \Lambda(\vec{n}_\mathrm{obs}) =& -2 \, \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
-                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+  \Lambda(\vec{n}_\mathrm{obs}) =& \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
+                                =& \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
 \end{split}
 \ee
 where $\vec{n}_{\mrm{obs}}$ are generated by a Poisson distribution of $\nu_i^{\SM}$ and $\nu_i^{\alt}$
@@ -709,11 +730,11 @@ from the $\Delta \phi_{\ell\ell}$ histograms for $\HSM$ and $\Halt$, respectivel
 % , yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
-\includegraphics[width=0.45\textwidth]{./LogLikelihoods_LO.eps}
+\includegraphics[width=0.49\textwidth]{./LogLikelihoods_LO.eps}
 \hfill
-\includegraphics[width=0.45\textwidth]{./LogLikelihoods_NLO.eps}\caption{\label{fig:vi}
+\includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.eps}\caption{\label{fig:vii}
 Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or the alternative hypothesis (blue) 
-with $\delta_V=x.xx$, $\delta_A=y.yy$. The left plot shows the separating power using LO input, 
+with $(\DConeV,\DConeA)=(0.8,0.24)$. The left plot shows the separating power using LO input, 
 the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
 }
 \end{figure}
@@ -734,14 +755,14 @@ the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathc
 % $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
 Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
 %Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
-An example of two such probability distributions is shown in Fig.~\ref{fig:vi}a and Fig.~\ref{fig:vi}b for LO and NLO QCD, respectively. 
+An example of two such probability distributions is shown in Fig.~\ref{fig:vii}a and Fig.~\ref{fig:vii}b for LO and NLO QCD, respectively. 
 For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
 \begin{equation}
-    \alpha = \int_{\hLambda}^{\infty} \mathrm{d}\Lambda \; P(\Lambda | {\HSM}).
+    \alpha = \int^{\hLambda}_{-\infty} \mathrm{d}\Lambda \; P(\Lambda | {\HSM}).
 \end{equation}
 Similarly, the probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\alt}$ is correct (type-II error) is given as 
 \begin{equation}
-    \beta = \int^{\hLambda}_{-\infty} \mathrm{d}\Lambda \; P(\Lambda|\Halt).
+    \beta = \int_{\hLambda}^{\infty} \mathrm{d}\Lambda \; P(\Lambda|\Halt).
 \end{equation}
 We define $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of {\it incorrectly} rejecting one hypothesis in favor of the other. 
 The value $\alpha(\hLambda)$ is then a measure of statistical discrimination between the two hypotheses. 
@@ -766,24 +787,24 @@ see fig something. Consequently, the lower uncertainty associated with the NLO r
 \begin{figure}[t]
 \centering
 \includegraphics[scale=0.6]{LHC_53_SigmaNLO.eps}
-\caption{ \label{fig:vii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. the SM.
+\caption{ \label{fig:viii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. the SM.
 The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described in Eq.~3.8. }
 \end{figure}
 
-We now present the results of our analysis in Figs.~\ref{fig:vii} and~\ref{fig:viii}.
+We now present the results of our analysis in Figs.~\ref{fig:viii} and~\ref{fig:ix}.
 The first Figure shows the NLO QCD cross section relative to the SM cross section 
 including selection cuts of Eq.~\ref{selectioncuts} for a wide range of top-Z vector and axial couplings.
 This grid of 3200 NLO QCD cross sections is generated with the fit described around Eq.~\ref{couplfit}, at low computational cost.
 We find that within the given range the cross section varies by about $\pm 50\%$.
-Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the area inside the dotted band in Fig.~\ref{fig:vii}.
+Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the area inside the dotted band in Fig.~\ref{fig:viii}.
 Within this band a rate measurement alone is not sensitive to any deviation of the coupling, this is true for example for $(\Delta\ConeV,\Delta\ConeA)=(1.7,-0.3)$ which is far off the SM value.
 We will later see that adding shape information will improve this situation.
-It is clearly noticable that cross sections in Fig.~\ref{fig:vii} are symmetric around the axis $\Delta\ConeV=-1$. This feature can be easily understood
+It is clearly noticable that cross sections in Fig.~\ref{fig:viii} are symmetric around the axis $\Delta\ConeV=-1$. This feature can be easily understood
 from the fact that the LO cross section is dominantly proportional to $\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
 We expect to see a similar symmetry around $\Delta\ConeA=-1$ but we do not consider it here since the sign of the axial coupling is already highly constrained from 
 the LEP measurements ({\bf check or remove!!}).
 We also would like to note that we studied the effects of coupling shifts on the top quark forward-backward asymmetry at the Tevatron.
-At leading order, we considered the parity-violating process $q \bar{q} \to Z/\gamma^* \to \ttb$ with shifts in $\ttbZ$ couplings as assumed in Fig.~\ref{fig:vii}.
+At leading order, we considered the parity-violating process $q \bar{q} \to Z/\gamma^* \to \ttb$ with shifts in $\ttbZ$ couplings as assumed in Fig.~\ref{fig:viii}.
 We find that within this range no significant contribution to the forward-backward asymmetry is obtained.
 
 Using the interpolation of Eq.~\ref{} we generate $10^4$ distributions in $\Delta \phi_{\ell\ell}$ for a grid of $xx \, C_V \times yy\, C_A$ couplings 
@@ -802,7 +823,7 @@ Both of these features are qualitatively similar to the results obtained by Ref.
 \\
 \includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
 \includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
-\caption{\label{fig:viii} Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
+\caption{\label{fig:ix} Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
 The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.}
 \end{figure}
 
@@ -848,10 +869,11 @@ the first year or so of the high energy run, while 3000 $\invfb$ is the benchmar
 
 
 
-\subsection{Limits on higher dimensional operators}
+\subsection{Limits on dimension-six operators}
 
 
-Having presented our main results in Figs.~\ref{fig:CMS} and Figs.~\ref{fig:viii}, we can use the obtained limits to put constraints on 
+
+Having presented our main results in Figs.~\ref{fig:CMS} and Figs.~\ref{fig:ix}, we can use the obtained limits to put constraints on 
 possible effects of physics beyond the SM. 
 The relevant dimension-6 operators have been presented in Sect.~\ref{sect:ttzcoupl}.
 In this Section we also pointed out that the excellent agreement between experiment and prediction
@@ -944,7 +966,7 @@ At NLO QCD we find
  yy & \quad 3000\, \invfb  
  \end{array} \right. .
 \ee
-A graphical representaion of these limits, including their mutual dependence, is given in Fig.~\ref{fig:ix} for $\Lambda=$1~TeV. 
+A graphical representaion of these limits, including their mutual dependence, is given in Fig.~\ref{fig:x} for $\Lambda=$1~TeV. 
 We also include the indirect constraints from LEP measurements of $\varepsilon_1$ and $\varepsilon_b$.
 As can be seen from the above results, something something...
 
@@ -952,7 +974,7 @@ As can be seen from the above results, something something...
 \begin{figure}[t]
 \centering
 \includegraphics[scale=0.8]{OperatorLimits1TeVNLO.eps} 
-\caption{\label{fig:ix} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$}
+\caption{\label{fig:x} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$}
 \end{figure}
 
 
