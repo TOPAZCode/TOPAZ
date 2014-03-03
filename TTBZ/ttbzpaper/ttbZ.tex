@@ -732,10 +732,13 @@ from the $\Delta \phi_{\ell\ell}$ histograms for $\HSM$ and $\Halt$, respectivel
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./LogLikelihoods_LO.eps}
 \hfill
-\includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.eps}\caption{\label{fig:vii}
-Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or the alternative hypothesis (blue) 
-with $(\DConeV,\DConeA)=(0.8,0.24)$. The left plot shows the separating power using LO input, 
-the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
+\includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.eps}
+\caption{\label{fig:vii}
+Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or an alternative hypothesis (blue) 
+with $(\DConeV,\DConeA)=(0.8,0.24)$.
+The solid lines include statistic and systematic uncertainties as described in the text, whereas the dashed lines only include statistic uncertainties.
+The left plot shows the separating power using LO input with $\Delta_\mathrm{syst.}=30\%$, 
+the right plot is obtained at NLO QCD with $\Delta_\mathrm{syst.}=15\%$, assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
 }
 \end{figure}
 %\be
@@ -755,7 +758,7 @@ the right plot is obtained from NLO QCD assuming $\sqrt{s}=13\,\TeV$ and $\mathc
 % $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
 Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
 %Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
-An example of two such probability distributions is shown in Fig.~\ref{fig:vii}a and Fig.~\ref{fig:vii}b for LO and NLO QCD, respectively. 
+An example of two such probability distributions is shown in Figs.~\ref{fig:vii} for LO and NLO QCD, respectively. 
 For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
 \begin{equation}
     \alpha = \int^{\hLambda}_{-\infty} \mathrm{d}\Lambda \; P(\Lambda | {\HSM}).
@@ -772,17 +775,29 @@ It can be translated into the more familiar number of standard deviations by
 \end{equation}
 where $\erf^{-1}$ is the inverse error function. 
 
-The above discussion made so far no mention of theoretical uncertainties such as unphysical scale dependence and errors associated with parton distribution functions.
-Following Ref.~\cite{Lykken et al}, we include those when generating the pseudo-experiments from the theoretical predictions. 
-The observed number of events $n_{i,\mathrm{obs}}$ are multiplied by a random uncertainty factor uniformly distributed 
-between $1/(1+\Delta_\mathrm{unc.})$ and $1+\Delta_\mathrm{unc.}$.
-We choose $\Delta_\mathrm{unc.} = 30\% (\mathrm{scale}) + 10\%(\mathrm{pdfs})$ at LO
-and $\Delta_\mathrm{unc.} = 15\% (\mathrm{scale}) + 5\%(\mathrm{pdfs})$ at NLO QCD, cf. Eqs.~(\ref{crossections}).
-For reasons of simplicity we neglect systematic experimental uncertainties in our analysis. 
+The above discussion made so far no mention of systematic uncertainties.
+In this work we would like to include the leading theoretical uncertainties from unphysical scale dependence and errors associated with parton distribution functions.
+For simplicity we neglect experimental systematics such as efficiencies or momentum smearing effects.
+Note however that we include realistic detector acceptances through the cuts in Eq.~\ref{selectioncuts}.
 Statistical fluctuations are obviously included through the Poisson distribution in Eq.~(\ref{lili}).
+Following Ref.~\cite{Conway}, we include the theoretical uncertainties 
+by integrating the expected number of events over the range $(1 \pm \Delta_\mathrm{unc.})$ 
+when generating the pseudo-experiments.
+This is achieved by modifying the likelihood function in Eq.~\ref{lili} according to
+\be
+  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}  (1 \pm \Delta_\mathrm{unc.}) \right),
+\ee
+where we choose $\mathcal{G}$ to be a normalized function uniformly distributed around $\tilde{\nu}_i^\mathcal{H}$ with spead $\Delta_\mathrm{unc.}$.
+The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the cross section and the assumed luminosity.
+As mentioned in the previous Section, we choose $\Delta_\mathrm{unc.} = 30\%$ at LO
+and $\Delta_\mathrm{unc.} = 15\%$ at NLO QCD in our analysis.
 The effect of these additional uncertainties is to broaden the distributions in $\Lambda$, 
-resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value and less discriminatory power between the two hypotheses, 
-see fig something. Consequently, the lower uncertainty associated with the NLO results allows for better statistical discrimination between the hypotheses.
+resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value and less discriminatory power between the two hypotheses. 
+This feature is clearly visible in Fig.~\ref{fig:vii}, when comparing the solid with the doted curves. 
+Contrasting the LO results in Fig.~\ref{fig:vii}(left) with the NLO result (right) shows that 
+the lower uncertainty associated with the NLO prediction allows for significantly better statistical discrimination between the hypotheses.
+Also the increase of the NLO cross section due to the $K$-factor of $\approx1.4$ leads to a larger number of expected events and therefore to smaller statistical uncertainties.
+
 
 \begin{figure}[t]
 \centering
@@ -815,14 +830,14 @@ On the other hand, the value of $\DConeV$ can be as low as -4 or as high as 3. A
 with low values of $\DConeA$ to create regions of parameter space which are indistinguishable from the SM. 
 Both of these features are qualitatively similar to the results obtained by Ref.~\cite{Baur:2004uw}. 
 \begin{figure}[t]
-\includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
-\includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13LO30.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO30.eps} 
 \\
-\includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
-\includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13LO300.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO300.eps} 
 \\
-\includegraphics[scale=0.6]{BLLLO1223HSsig_SUA2_300_1.30.eps} 
-\includegraphics[scale=0.6]{BLLNLO1223sig_SUA2_300_1.15.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13LO3000.eps} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO3000.eps} 
 \caption{\label{fig:ix} Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
 The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.}
 \end{figure}
