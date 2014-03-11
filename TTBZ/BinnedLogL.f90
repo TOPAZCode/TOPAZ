@@ -1,31 +1,31 @@
-! Compile:  ifort -o BinnedLogL BinnedLogL.f90
+! ./BinnedLogL GetLogL LO_Hi17_V+0.00_A+0.00.dat LO_Hi17_V+4.00_A+0.20.new.dat 17 3000 20000 1.2 test
+! Compile:  ifort -o BinnedLogL -D_UseMPI=0 BinnedLogL.f90
 ! Compile:  mpif90 -D_UseMPI=1 -o BinnedLogL BinnedLogL.f90
-! Compile:  safety options:  -O0 -fpp -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv
-program BinnedLogL
+! Compile:  safety options:   
+  PROGRAM BinnedLogL
   use ifport
   implicit none
-  integer :: NumArgs,Histo,NPseudoExp,NPseudoExp_Worker
-  real(8) :: PreFactor,Data
-  character :: operation*(10),H0_infile*(50),H1_infile*(50),Data_str*(5),Histo_str*(5),NPseudoExp_str*(9),dummy*(1),outfile*(50),DeltaN_str*(5),filename_out1*(50),filename_out2*(50)
+  integer :: NumArgs,Histo,NPseudoExp,NPseudoExp_Worker,Data
+  real(8) :: PreFactor
+  character :: operation*(10),H0_infile*(100),H1_infile*(100),Data_str*(5),Histo_str*(5),NPseudoExp_str*(9),dummy*(1),outfile*(100),DeltaN_str*(5),filename_out1*(100),filename_out2*(100)
   character(len=*),parameter :: fmt1 = "(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)"
-character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X,1PE14.7,A,2X,1PE14.7,A)"
-  integer,parameter :: MaxBins=1100, MaxEvents=100000,MaxExp=1000000
-  integer,parameter :: NumLLbins=1100
+  character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X,1PE14.7,A,2X,1PE14.7,A)"
+  integer,parameter :: MaxBins=100, MaxEvents=100000,MaxExp=1000000
   real(8) :: BinVal(1:2,1:MaxBins)=-1d-99,Value(1:2,1:MaxBins)=-1d-99,Error(1:2,1:MaxBins)=-1d-99,BinSize(1:2)
-  integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999,NumBins0=0,NumBins1=0,NumBins,iPseudoExp,iBin,iHypothesis,LLBin,NumExpectedEvents(1:2)
-  real(8) :: PoissonMax(1:2,1:MaxBins),LLRatio
-  logical :: GotNumEvents(1:MaxBins)
-  integer :: ExpectedEvents(1:2,1:MaxBins),TryEvts,ObsEvents(1:2,1:MaxBins),PlotObsEvts(1:2,1:10000)
-  real(8) :: nran(1:2),offset,sran,DeltaN
-  real(8) :: sigmatot(1:2),check(1:2),alpha(1:2,1:MaxBins),IntLLRatio(1:2),checkalpha(1:MaxBins)
+  integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999,NumBins0=0,NumBins1=0,NumBins,BinMin,BinMax,iPseudoExp,iBin,iHypothesis,LLBin
+  logical :: GotNumEvents(1:MaxBins),IdenticalHypothesis
+  integer :: ExpectedEvents(1:2,1:MaxBins),TryEvts,MinEvts,MaxEvts,ObsEvents(1:2,1:MaxBins),PlotObsEvts(1:2,1:10000)=0d0,TotSigmaHisto
+  real(8) :: nran(1:2),offset,sran,DeltaN,Delta(1:2),MaxAllowedDelta,AvgTotalEvents,LLRatio,PoissonWidth
   real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),alpha_ave,beta_ave,sigs
   real(8) :: LLRatio_array(1:2,1:MaxExp),LLRatio_array_tmp(1:2,1:MaxExp),LLRatio_min,LLRatio_max,WhichBin
-  integer :: j,i,s,SUA,MPI_Rank,worker,MPI_NUM_PROCS,ierror
+  integer :: j,i,s,MPI_Rank,worker,MPI_NUM_PROCS,ierror,TotalEvents(1:2)=0,TheUnit
+  integer,parameter :: MaxLLBins=1000
+  real(8) :: sigmatot(1:2),check(1:2),alpha(1:MaxLLBins),beta(1:MaxLLBins),IntLLRatio(1:2),checkalpha(0:MaxLLBins)=0d0
   type :: Histogram
      integer :: NBins
      real(8) :: BinSize
      real(8) :: LowVal
-     integer :: Hits(1:1000)
+     integer :: Hits(1:MaxLLBins)
   end type Histogram
   type(Histogram) :: LLHisto(1:2)
 !DEC$ IF(_UseMPI .EQ.1)
@@ -41,33 +41,15 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 
 
 
-  LLHisto(1)%NBins   = 1000
-  LLHisto(1)%BinSize = 1d0
-  LLHisto(1)%LowVal  = -500d0
-  LLHisto(1)%Hits(:) = 0
-  
-  LLHisto(2)%NBins   =  LLHisto(1)%NBins   
-  LLHisto(2)%BinSize =  LLHisto(1)%BinSize 
-  LLHisto(2)%LowVal  =  LLHisto(1)%LowVal  
-  LLHisto(2)%Hits(:) =  LLHisto(1)%Hits(:) 
-
   NumArgs=NArgs()-1
-  PreFactor=8d0
-  SUA=2
+  PreFactor=8d0!  Lepton multiplicities
 
-
-  if (SUA .ne. 1 .and. SUA .ne. 2 .and. DeltaN .ne. 1d0) then
-     print *, "WARNING : SCALE UNCERTAINTY NOT USED!"
-     stop
-  endif
 
   call GetArg(1,operation)
-  
   if (trim(operation) .ne. 'GetLogL') then
      print *, 'only available operation is GetLogL'
      stop
   endif
-
   call GetArg(2,H0_infile)
   call GetArg(3,H1_infile)
   call GetArg(4,Histo_str)
@@ -78,21 +60,28 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   filename_out1=trim(outfile)//".dat"
   filename_out2=trim(outfile)//".out"
   read(Histo_str,"(I2)") Histo
-  read(Data_str,"(F10.6)") Data
+  read(Data_str,"(I5)") Data
   read(NPseudoExp_str,"(I9)") NPseudoExp
-  read(DeltaN_str,"(F9.6)") DeltaN
-  write(*,*) "Performing binned log-likelihood analysis."
-  write(*,"(A,I2,A,F10.6,A,I9,A,F9.6)") "Reading histogram ",Histo," for likelihood analysis with Lumi=",Data,"fb^-1 using ",NPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
-  write(*,*) 'Using input files:', trim(H0_infile),trim(H1_infile)
-  write(*,*) "Writing output to files : ", trim(filename_out1), " and ", trim(filename_out2)
+  read(DeltaN_str,"(F5.1)") DeltaN
   if (NPseudoExp .gt. MaxExp) then
      print *, "Too many experiments!"
      print *, MaxExp, NPseudoExp
      stop
   endif
+
+  if( DeltaN.lt.0d0 ) then
+     print *, "!! WARNING DeltaN has to be positive",DeltaN
+     stop
+  endif
+  if( DeltaN.gt.100.0d0) then
+     print *, "!! WARNING DeltaN is outside the range 0..100%",DeltaN
+  endif
+
   sigmatot(1:2) = 0d0
   NumBins0=0
   NumBins1=0
+
+
 !--------------------------------------------------
 !          1. reading input files
 !--------------------------------------------------
@@ -103,16 +92,23 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   open(unit=14,file=trim(filename_out1),form='formatted',access='sequential')  ! open output file
   open(unit=15,file=trim(filename_out2),form='formatted',access='sequential')  ! open output file
 
-  write(14,*) "Performing binned log-likelihood analysis."
-  write(14,"(A,I2,A,F10.6,A,I9,A,F9.6)") "Reading histogram ",Histo," for likelihood analysis with Lumi=",Data,"fb^-1 using ",NPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN
-  write(14,*) 'Using input files:', trim(H0_infile)," and  ", trim(H1_infile)
-  write(14,*) "Writing output to files : ", trim(filename_out1), " and ", trim(filename_out2)
-
+  if( MPI_Rank.eq.0 ) then
+  do TheUnit=6,14,8! write to screen(unit=6) and test.dat(unit=14)
+    write(TheUnit,"(A)") "# Performing binned log-likelihood analysis."
+    write(TheUnit,"(A,I2,A,I5,A,I9,A,F6.1,A)") "# Reading histogram ",Histo," for likelihood analysis with Lumi=",Data," fb^-1 using ",NPseudoExp," pseudo-experiments, and scale uncertainty", DeltaN,"%."
+    write(TheUnit,"(A,A)") '# Input file 1: NULL hypothesis        ', trim(H0_infile)
+    write(TheUnit,"(A,A)") '# Input file 2: ALTERNATIVE hypothesis ', trim(H1_infile)
+    write(TheUnit,"(A,A,A,A)") "# Writing output to files : ", trim(filename_out1), " and ", trim(filename_out2)
+    write(TheUnit,"(A)") "#";  write(TheUnit,"(A)") "#";
+  enddo
+  endif
 
 !-------------------------------------------------------------------------
 ! 1a. Because our Delta phi_ll histogram excludes a small bin at the end,
-! first use histo #1 to get the total cross-section
+! first use histo #TotSigmaHisto  to get the total cross-section
 !-------------------------------------------------------------------------
+
+  TotSigmaHisto = 1 ! Histo
 
   do while(.not.eof(112))!   reading input file 1
      read(unit=112,fmt="(A)") dummy
@@ -133,7 +129,7 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
      
      read(unit=113,fmt=fmt1) NHisto(2),dummy,BinVal(2,NumBins1+1),dummy,Value(2,NumBins1+1),dummy,Error(2,NumBins1+1),dummy,Hits(2,NumBins1+1),dummy
 !    if( NHisto(2).ne.1 ) cycle
-    if( NHisto(2).ne.Histo ) cycle
+    if( NHisto(2).ne.TotSigmaHisto ) cycle
      NumBins1=NumBins1 + 1
   enddo
 
@@ -143,6 +139,15 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
        sigmatot(1) = sigmatot(1) + Value(1,iBin) * BinSize(1)
        sigmatot(2) = sigmatot(2) + Value(2,iBin) * BinSize(2)
   enddo
+
+  if( MPI_Rank.eq.0 ) then
+  do TheUnit=6,14,8! write to screen(unit=6) and test.dat(unit=14)
+      write(TheUnit,"(A,1PE16.8,A,I6)") "# Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",int(Data * sigmatot(1) * PreFactor)
+      write(TheUnit,"(A,1PE16.8,A,I6)") "# Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",int(Data * sigmatot(2) * PreFactor) 
+  enddo
+  endif
+
+
 
 ! now reset everything to zero
   NumBins0=0
@@ -184,60 +189,68 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
   else
      NumBins=NumBins0
   endif
-  
   BinSize(1) = BinVal(1,2)-BinVal(1,1)
   BinSize(2) = BinVal(2,2)-BinVal(2,1)
+ 
 
-
-  NumExpectedEvents(1) = int(Data * sigmatot(1) * PreFactor) ! factor of 8 from lepton species
-  NumExpectedEvents(2) = int(Data * sigmatot(2) * PreFactor) 
-  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
-  write(*,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
-  write(14,"(A,1PE16.8,A,I6)") "Total cross section of input file 1: ",sigmatot(1),"   <-->   Number of events: ",NumExpectedEvents(1)
-  write(14,"(A,1PE16.8,A,I6)") "Total cross section of input file 2: ",sigmatot(2),"   <-->   Number of events: ",NumExpectedEvents(2)
-
-!  check(1:2) = 0d0
-!  do iBin=1,NumBins! check
-!      check(1) = check(1) + Value(1,iBin)
-!      check(2) = check(2) + Value(2,iBin)
-!  enddo
-!  write(*,"(A,1PE16.8)") "Sum of bins in input file 1: ",check(1)
-!  write(*,"(A,1PE16.8)") "Sum of bins in input file 2: ",check(2)
-!  write(*,*) ""
+! select the range of used histogram binsize  
+  BinMin=1            +1 ! remove first and last bin for NLO analysis
+  BinMax=NumBins      -1
+  if( BinMin.ne.1 .or. BinMax.ne.NumBins ) then
+      do TheUnit=6,14,8! write to screen(unit=6) and test.dat(unit=14)
+        if( MPI_Rank.eq.0 ) write(TheUnit,"(A,I2,A,I2)") "# WARNING: Not all histogram bins are used for the analysis. BinMin,BinMax=",BinMin,",",BinMax
+      enddo
+  endif
 
 ! print the input histograms 
-  write(*,"(2X,A,16X,A,11X,A,16X,A)") "NBin|","Input file 1","|","Input file 2"
-  do iBin=1,NumBins
-     write(*,fmt="(2X,1I3,A,2X,1PE10.3,2X,1PE23.16,A,2X,1PE10.3,2X,1PE23.16)") iBin," | ",BinVal(1,iBin),Value(1,iBin)," | ",BinVal(2,iBin),Value(2,iBin)
+  if( MPI_Rank.eq.0 ) write(*,"(A,16X,A,11X,A,16X,A)") "# NBin|","Input file 1","|","Input file 2"
+  do iBin=BinMin,BinMax
+     if( MPI_Rank.eq.0 ) write(*,fmt="(2X,1I3,A,2X,1PE10.3,2X,1PE23.16,A,2X,1PE10.3,2X,1PE23.16)") iBin," | ",BinVal(1,iBin),Value(1,iBin)," | ",BinVal(2,iBin),Value(2,iBin)
      if( dabs(BinVal(1,iBin)-BinVal(2,iBin)).gt.1d-6 ) then
         print *, "Error: Different bin sizes in input files 1 and 2"
         stop
      endif
   enddo
-  write(14,*) ""
+
   
 ! -----------------------------------------------------------------
 ! 2. Find the expected values for null and alt. hypothesis in each bin
 ! -----------------------------------------------------------------
 
-! Null hypothesis first
-
   do iHypothesis=1,2    ! 1=null, 2=alt
-     do iBin=1,NumBins
-!     ExpectedEvents0(iBin)=int(Value(1,iBin)*Data*PreFactor*BinSize0)
-!     ExpectedEvents1(iBin)=int(Value(2,iBin)*Data*PreFactor*BinSize1)
-!
-!     ! now find the value of the Poisson distribution at this maximum
-!     PoissonMax0(iBin)=Poisson(ExpectedEvents0(iBin),ExpectedEvents0(iBin))
-!     PoissonMax1(iBin)=Poisson(ExpectedEvents1(iBin),ExpectedEvents1(iBin))
-        ExpectedEvents(iHypothesis,iBin)=int(Value(iHypothesis,iBin)*Data*PreFactor*BinSize(iHypothesis))
-        if (ExpectedEvents(iHypothesis,iBin).eq.0) then
-           PoissonMax(iHypothesis,iBin)=0d0
-        else
-           PoissonMax(iHypothesis,iBin)=Poisson(ExpectedEvents(iHypothesis,iBin),ExpectedEvents(iHypothesis,iBin))
-        endif
-     enddo
+     TotalEvents(iHypothesis) = int( sum(Value(iHypothesis,BinMin:BinMax))*Data*PreFactor*BinSize(iHypothesis) )
+     if( MPI_Rank.eq.0 ) write(*,"(A,I1,A,I6)") "Hypothesis:",iHypothesis," Number of events in Histogram:",TotalEvents(iHypothesis)
   enddo
+  if( ( TotalEvents(1).lt.100) .or. ( TotalEvents(2).lt.100) ) print *, "!! WARNING: less than 100 events in total histogram !!"
+ 
+  if( TotalEvents(1).gt.TotalEvents(2) ) then! null hypothesis has larger total cross section
+        MaxAllowedDelta = 0.5d0*(dble(TotalEvents(1))/dble(TotalEvents(2))-1d0) * 100d0
+        AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+        if( DeltaN .lt. MaxAllowedDelta ) then! if DeltaN is smaller than difference between the two values
+            Delta(1) = -DeltaN/100d0! make null hypothesis smaller
+            Delta(2) = +DeltaN/100d0! make alt. hypothesis larger
+        else
+            Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+            Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+        endif
+  else! null hypothesis has smaller total cross section
+        MaxAllowedDelta = 0.5d0*(dble(TotalEvents(2))/dble(TotalEvents(1))-1d0) * 100d0
+        AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+        Delta(1) = +DeltaN/100d0! make null hypothesis larger
+        Delta(2) = -DeltaN/100d0! make alt. hypothesis smaller
+        if( dble(TotalEvents(1))*(1d0+Delta(1)) .gt.  dble(TotalEvents(2))*(1d0+Delta(2)) ) then
+            Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+            Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+        endif
+  endif
+  Value(1,:) = Value(1,:) * ( 1d0 + Delta(1) )
+  Value(2,:) = Value(2,:) * ( 1d0 + Delta(2) )
+  do iHypothesis=1,2    ! 1=null, 2=alt
+     TotalEvents(iHypothesis) = int( sum(Value(iHypothesis,BinMin:BinMax))*Data*PreFactor*BinSize(iHypothesis) )
+     if( MPI_Rank.eq.0 ) write(*,"(A,I1,A,I6,A,F5.1,A)") "Hypothesis:",iHypothesis," Number of events in Histogram:",TotalEvents(iHypothesis)," (after rescaling by uncertainty of ",Delta(iHypothesis)*100d0,"%)"
+  enddo
+
+
   
 !  call random_seed()
   call init_random_seed()
@@ -245,25 +258,31 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
 ! 3.1 Generate Poisson distribution about expected null value in each bin
 ! -----------------------------------------------------------------
   NPseudoExp_Worker = NPseudoExp/(MPI_NUM_PROCS)
-  print *, "MPI rank ",MPI_Rank," running ",NPseudoExp_Worker," pseudoexperiments"
 
 !DEC$ IF(_UseMPI .EQ.1)
   call MPI_BARRIER(MPI_COMM_WORLD,ierror)
 !DEC$ ENDIF
 !  call random_seed()
-  PlotObsEvts=0
   do iHypothesis=1,2
-!           call random_seed()
-     print *, 'Hypothesis ', iHypothesis
+     write(*,"(A,I2,A,I2,A,I7,A)") 'Hypothesis=', iHypothesis, ' on worker=',MPI_Rank," running ",NPseudoExp_Worker," pseudoexperiments" 
      do iPseudoExp=1,NPseudoExp_Worker
-!        if( mod(iPseudoExp,10000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NPseudoExp
+!        if( mod(iPseudoExp,25000).eq.0 ) print *, "Pseudo experiment ",iPseudoExp,"/",NPseudoExp
+
+        ExpectedEvents(1,:)=int(Value(1,:)*Data*PreFactor*BinSize(1))
+        ExpectedEvents(2,:)=int(Value(2,:)*Data*PreFactor*BinSize(2))
+
         GotNumEvents=.false.
-        do iBin=1,NumBins
+        do iBin=BinMin,BinMax
            do while (.not. GotNumEvents(iBin))
               call random_number(nran(1:2))
-              nran(1)=nran(1)*PoissonMax(iHypothesis,iBin)        
-              TryEvts=int(5d0*ExpectedEvents(iHypothesis,iBin)*nran(2))
-              if (Poisson(ExpectedEvents(iHypothesis,iBin),TryEvts) .gt. nran(1)) then
+              nran(1) = nran(1) * Poisson(ExpectedEvents(iHypothesis,iBin),ExpectedEvents(iHypothesis,iBin))
+!               MinEvts=0
+!               MaxEvts=5*ExpectedEvents(iHypothesis,iBin)! old: linear distribution between 0 and 5*(Poisson maximum)
+!               TryEvts=int((MaxEvts-MinEvts)*nran(2)+MinEvts)             
+              MinEvts = max(0d0,ExpectedEvents(iHypothesis,iBin) - 3.5d0*dsqrt(dble(ExpectedEvents(iHypothesis,iBin)))) ! generate events between +/-3.5 sigma around Poisson maximum
+              MaxEvts = ExpectedEvents(iHypothesis,iBin)         + 3.5d0*dsqrt(dble(ExpectedEvents(iHypothesis,iBin)))
+              TryEvts=int((MaxEvts-MinEvts)*nran(2)+MinEvts)
+              if( Poisson(ExpectedEvents(iHypothesis,iBin),TryEvts) .gt. nran(1) ) then
                  ObsEvents(iHypothesis,iBin)=TryEvts
                  GotNumEvents(iBin)=.true.
               endif
@@ -272,81 +291,67 @@ character(len=*),parameter :: fmt2 = "(I5,A,2X,1PE14.7,A,2X,I9,A,2X,1PE14.7,A,2X
                  GotNumEvents(iBin)=.true.
               endif
            enddo
-           if (SUA .eq. 1) then
-              call random_number(sran)
-              sran=sran*(DeltaN**2-1d0)/DeltaN + 1d0/DeltaN
-              ObsEvents(iHypothesis,iBin)=ObsEvents(iHypothesis,iBin)*sran
-           endif
 
-           if (iBin .eq. 1 .and. ObsEvents(iHypothesis,iBin) .gt. 0) then
-              PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))=PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))+1
-           endif
-
+!            if( iBin.eq.1 .and. ObsEvents(iHypothesis,iBin).gt.0 ) then! this is to check the Poisson distribution in each bin
+!               PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))=PlotObsEvts(iHypothesis,ObsEvents(iHypothesis,iBin))+1
+!            endif
         enddo
 
-! -----------------------------------------------------------------! 3.1a  change number of observed events in all bins for scale uncertainty    
-! -----------------------------------------------------------------
-        if (SUA .eq. 2) then
-           call random_number(sran)
-           sran=sran*(DeltaN**2-1d0)/DeltaN + 1d0/DeltaN
-           write(201,*) sran
-           ObsEvents(iHypothesis,1:NumBins)=ObsEvents(iHypothesis,1:NumBins)*sran
-        endif
+
 ! -----------------------------------------------------------------
 ! 3.2 Now find the log likelihood, with a Poisson distr in each bin
 ! -----------------------------------------------------------------
-
      LLRatio=0d0
-     do iBin=1,NumBins
+     do iBin=BinMin,BinMax
         if (ObsEvents(iHypothesis,iBin) .ne. 0 .and. ExpectedEvents(1,iBin) .ne. 0 .and. ExpectedEvents(2,iBin) .ne. 0) then
-           LLRatio=LLRatio+ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin))
-!           if (iPseudoExp .eq. 1) then
-           write(301,*) iBin, ObsEvents(iHypothesis,iBin),dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),ObsEvents(iHypothesis,iBin)*dlog(1d0*ExpectedEvents(1,iBin)/ExpectedEvents(2,iBin)),LLRatio
-!        endif
+              LLRatio = LLRatio + ObsEvents(iHypothesis,iBin)*dlog(dble(ExpectedEvents(1,iBin))/dble(ExpectedEvents(2,iBin))) - dble(ExpectedEvents(1,iBin)) + dble(ExpectedEvents(2,iBin))
         endif
      enddo
 
+     
 ! offset to get the distributions with the histogram limits
 !DEC$ IF(_UseMPI .NE.1)
-
      if (iHypothesis .eq. 1 .and. iPseudoExp .eq. 1) then
+        write(*,*) 'LLRatio(before offset)=',LLRatio
         offset=-100d0*(int(LLRatio)/100)
-        print *, 'using offset of ', offset
-     endif
-     
+        write(*,*) 'using offset of ', offset
+     endif  
      LLRatio=LLRatio+offset
-!DEC$ ENDIF
      if (iPseudoExp .eq. 1) then
-        print *, 'LLRatio=',iHypothesis,LLRatio
+        write(*,*) 'LLRatio(after offset)=',LLRatio
      endif
+!DEC$ ENDIF
      LLRatio_array(iHypothesis,iPseudoExp)=LLRatio
         
   enddo!  iPseudoExp
 
-  do i=1,1000
-     s=101+iHypothesis
-     write(s,*) i,PlotObsEvts(iHypothesis,i)
-  enddo
+!   do i=1,1000
+!      s=101+iHypothesis
+!      write(s,*) i,PlotObsEvts(iHypothesis,i),ExpectedEvents(iHypothesis,1)
+!   enddo
 
 enddo!   iHypothesis
 
-  print *, "MPI rank ",MPI_Rank," finished"
+
+  write(*,*) "MPI rank ",MPI_Rank," finished generating pseudoexperiments"
+
+
+
 !DEC$ IF(_UseMPI .EQ.1)
-  call MPI_BARRIER(MPI_COMM_WORLD,ierror)
+   call MPI_BARRIER(MPI_COMM_WORLD,ierror)
    if( MPI_Rank.eq.0 ) then
       do worker=1,MPI_NUM_PROCS-1
         call MPI_Recv(LLRatio_array_tmp, 2*MaxExp,MPI_DOUBLE_PRECISION, MPI_ANY_SOURCE ,1,MPI_COMM_WORLD, status,ierror)
-        print *, "received array from worker",worker
+        write(*,*) "received array from worker",worker
 
         LLRatio_array(1,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(1,1:NPseudoExp_Worker)
         LLRatio_array(2,NPseudoExp_Worker*worker+1:NPseudoExp_Worker*(worker+1)) = LLRatio_array_tmp(2,1:NPseudoExp_Worker)
         if (worker.eq.1) then
            offset=-100d0*(int(LLRatio_array(1,1))/100)
+           write(*,*) "using offset of ", offset
         endif
-        print *, "using offset of ", offset
-
       enddo
-        LLRatio_array=LLRatio_array+offset
+      LLRatio_array=LLRatio_array+offset
 
    elseif( MPI_Rank.gt.0 ) then
         call MPI_Send(LLRatio_array, 2*MaxExp,MPI_DOUBLE_PRECISION, 0 ,1,MPI_COMM_WORLD,ierror)
@@ -354,38 +359,18 @@ enddo!   iHypothesis
 !DEC$ ENDIF
 
 
+
+
+
+
+
 if( MPI_Rank.eq.0 ) then 
 
-!     if (iHypothesis .eq. 1 .and. iPseudoExp .eq. 1) then
-!        print *, LLRatio,offset
-!
-!        if (LLRatio .lt. LLHisto1%LowVal .or. LLRatio .gt. (LLHisto1%LowVal+LLHisto1%NBins*LLHisto1%BinSize)) then
-!            print *, 'LLRatio out  of binning range! Reset binning and rerun'
-!            print *, LLRatio
-!            stop
-!         endif
-!      endif
-
 ! -----------------------------------------------------------------
-! 3.3 Bin the log likelihood
+! 4.1 find a good bin size and range for histograms
 ! -----------------------------------------------------------------
-
-!      WhichBin = (LLRatio-LLHisto1%LowVal)/LLHisto1%BinSize + 1
-!      if( WhichBin.lt.0 ) WhichBin = 1
-!      if( WhichBin.gt.LLHisto1%NBins ) WhichBin = LLHisto1%NBins
-!      LLHisto1%Hits(WhichBin) = LLHisto1%Hits(WhichBin) + 1
-      
-
- !  enddo! iPseudoExp
-
-
-!   do iPseudoExp=1,1000    ! this is just a check 
-!      write(201,*) iPseudoExp,PlotObsEvts(1,iPseudoExp)
-!   enddo
-   
    LLRatio_max=-1d-6
-   LLRatio_min=1d6
-   
+   LLRatio_min=1d6   
    do iHypothesis=1,2
       do iPseudoExp=1,NPseudoExp
          if (LLRatio_array(iHypothesis,iPseudoExp) .gt. LLRatio_max) then
@@ -409,18 +394,22 @@ if( MPI_Rank.eq.0 ) then
       LLRatio_max=LLRatio_max+1d0
       LLRatio_min=LLRatio_min-1d0
    endif
-   print *, LLRatio_min,LLRatio_max
    
-   LLHisto(1)%NBins   = 1000
+   LLHisto(1)%NBins   = MaxLLBins
    LLHisto(1)%BinSize = (LLRatio_max-LLRatio_min)/LLHisto(1)%NBins
    LLHisto(1)%LowVal  = LLRatio_min
    LLHisto(1)%Hits(:) = 0
-   print *, 'using ', LLHisto(1)%BinSize, ' bins in range ',LLRatio_min, LLRatio_max
    LLHisto(2)%NBins   = LLHisto(1)%NBins
    LLHisto(2)%BinSize = LLHisto(1)%BinSize
    LLHisto(2)%LowVal  = LLHisto(1)%LowVal
    LLHisto(2)%Hits(:) = LLHisto(1)%Hits(:)
-   
+!    Write(*,*) 'using binsize', LLHisto(1)%BinSize, 'within',LLRatio_min, LLRatio_max
+
+  
+! -----------------------------------------------------------------
+! 4.1 do the binning
+! -----------------------------------------------------------------
+   IdenticalHypothesis=.false.
    do iHypothesis=1,2
       do iPseudoExp=1,NPseudoExp
          LLRatio=LLRatio_array(iHypothesis,iPseudoExp)
@@ -431,17 +420,22 @@ if( MPI_Rank.eq.0 ) then
          LLHisto(iHypothesis)%Hits(WhichBin) = LLHisto(iHypothesis)%Hits(WhichBin) + 1
       enddo
 
-! -----------------------------------------------------------------
-! 4. Calculate the integral of the log likelihood ratio curve, at each bin
-! -----------------------------------------------------------------
-
-
-      do LLbin=1,LLHisto(iHypothesis)%NBins
-         IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)+&
-              LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
-         alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)
-      enddo
+      if( any( LLHisto(iHypothesis)%Hits(:).eq.NPseudoExp ) ) then
+           IdenticalHypothesis=.true.
+      endif
    enddo
+
+
+
+! -----------------------------------------------------------------
+! 5. Calculate the integral of the log likelihood ratio curve, at each bin
+! -----------------------------------------------------------------
+!       do LLbin=1,LLHisto(iHypothesis)%NBins
+!          IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)  +  LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+!          alpha(iHypothesis,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)
+!       enddo
+!    enddo
+!    MARKUS: check that beta=1-alpha, check that intllratio/(NPseudoExp*LLHisto(iHypothesis)%BinSize) is one.
 
 !  do LLbin=1,LLHisto1%NBins
 !     IntH0=IntH0+LLHisto1%BinSize*LLHisto1%Hits(LLbin)
@@ -449,63 +443,99 @@ if( MPI_Rank.eq.0 ) then
 !     print *, LLbin, LLHisto1%LowVal + LLbin*LLHisto1%BinSize, LLHisto1%Hits(LLbin), alpha(LLBin)
 !  enddo
 
-   print *, ""
-   print *, "Writing log-likelihood distribution to output file"
-   print *, ""
-   do LLbin=1,LLHisto(1)%NBins
-      !         print *, LLBin
-      write(14,"(2X,I4,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,1PE16.8)") LLbin, LLHisto(1)%LowVal+LLbin*LLHisto(1)%BinSize, LLHisto(1)%Hits(LLbin),LLHisto(2)%LowVal+LLbin*LLHisto(2)%BinSize, LLHisto(2)%Hits(LLbin),alpha(1,LLBin),alpha(2,LLBin)
-   enddo
+
+
+
+      iHypothesis=1
+      IntLLRatio(:)=0
+      do LLbin=1,LLHisto(iHypothesis)%NBins
+         IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)  + LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+         alpha(LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)! normalize total integral to one
+      enddo
+
+      iHypothesis=2
+      IntLLRatio(:)=0
+      do LLbin=LLHisto(iHypothesis)%NBins,1,-1
+         IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)  + LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+         beta(LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)! normalize total integral to one
+      enddo
+
+
+      write(*,*) "Writing log-likelihood distribution to output file"
+      do LLbin=1,LLHisto(1)%NBins
+          write(14,"(2X,I4,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,I10,2X,1PE16.8,2X,1PE16.8)") LLbin, LLHisto(1)%LowVal+LLbin*LLHisto(1)%BinSize, LLHisto(1)%Hits(LLbin), &
+                                                                                               LLHisto(2)%LowVal+LLbin*LLHisto(2)%BinSize, LLHisto(2)%Hits(LLbin), &
+                                                                                               alpha(LLBin),beta(LLBin)
+      enddo
+
 
 
 !************************************************************
-!  5. Now find the point at which alpha=1-beta
+!  6. Now find the point at which alpha=beta
 !************************************************************
 
-! for the time being, I'm going to assume that both distributions have the same range and binning - can change this later
-   do LLbin=1,LLHisto(1)%NBins
-      checkalpha(LLBin)=alpha(1,LLBin)+alpha(2,LLBin)-1d0
-      !   print *, LLBIn,alpha(1,LLBin),alpha(2,LLBin),checkalpha(LLBin)
-      if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
-         alphamin=alpha(1,LLBin-1)
-         alphamax=alpha(1,LLBin)
-         betamin =alpha(2,LLBin-1)
-         betamax =alpha(2,LLBin)
-         
-         if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
-            ! this is comparing two identical hypotheses!
-            alphamin=0.5d0
-            alphamax=0.5d0
-            betamin =0.5d0
-            betamax =0.5d0
-         endif
+! ! for the time being, I'm going to assume that both distributions have the same range and binning - can change this later
+!    do LLbin=1,LLHisto(1)%NBins
+!       checkalpha(LLBin)=alpha(1,LLBin)+alpha(2,LLBin)-1d0
+!       !   print *, LLBIn,alpha(1,LLBin),alpha(2,LLBin),checkalpha(LLBin)
+!       if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
+!          alphamin=alpha(1,LLBin-1)
+!          alphamax=alpha(1,LLBin)
+!          betamin =alpha(2,LLBin-1)
+!          betamax =alpha(2,LLBin)
+!          
+!          if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
+!             ! this is comparing two identical hypotheses!
+!             alphamin=0.5d0
+!             alphamax=0.5d0
+!             betamin =0.5d0
+!             betamax =0.5d0
+!          endif
+!       endif
+!    enddo
+
+
+      if( .not. IdenticalHypothesis ) then
+        do LLbin=1,LLHisto(1)%NBins
+          checkalpha(LLBin)=alpha(LLBin)-beta(LLBin)
+          if( checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0 ) then! search for sign change
+            alphamin=alpha(LLBin-1)
+            alphamax=alpha(LLBin)
+            betamin =beta(LLBin-1)
+            betamax =beta(LLBin)
+            exit! stop searching for sign change
+          endif
+        enddo
+      else
+        alphamin=0.5d0
+        alphamax=0.5d0
+        betamin =0.5d0
+        betamax =0.5d0           
       endif
-   enddo
 
    
-   alpha_ave=(alphamin+alphamax)/2d0
-   beta_ave=(betamin+betamax)/2d0
-   sigs=dsqrt(2d0)*inverf(1d0-alpha_ave)
+      alpha_ave=(alphamin+alphamax)/2d0
+      beta_ave=(betamin+betamax)/2d0
+      sigs=dsqrt(2d0)*inverf(1d0-alpha_ave)!  check this
+      
+      do TheUnit=6,14,8! write to screen(unit=6) and test.dat(unit=14)
+        if( IdenticalHypothesis ) write(TheUnit,"(A)") "# NOTE: Identical Hypothesis!"
+        write(TheUnit,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
+        write(TheUnit,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
+        write(TheUnit,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha average:", alpha_ave 
+        write(TheUnit,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta average:", beta_ave   
+        write(TheUnit,"(A,2X,1PE16.8,2X,1PE16.8)") "# sigma value: ", sigs
+      enddo
+      write(15,"(1PE16.8)") alpha_ave
+      write(15,"(1PE16.8)") beta_ave
+      write(15,"(1PE16.8)") sigs
    
-   print *, 'alpha value in range:', alphamin,alphamax
-   print *, 'beta value in range:', betamin,betamax 
-   print *, 'alpha average :', alpha_ave
-   print *, 'beta average :', beta_ave
-   print *, 'sigma value :', sigs
-   
-   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha value in range:",alphamin,alphamax
-   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta value in range:",betamin,betamax
-   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# alpha average:", alpha_ave 
-   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# beta average:", beta_ave   
-   write(14,"(A,2X,1PE16.8,2X,1PE16.8)") "# sigma value: ", sigs
-   
-
-   write(15,"(1PE16.8)") alpha_ave
-   write(15,"(1PE16.8)") beta_ave
-   write(15,"(1PE16.8)") sigs
-   
-
+      close(14)
+      close(15)
+      write(*,*) "Done"; write(*,*) "";  write(*,*) ""
 endif! MPI_Rank
+
+
 
 !DEC$ IF(_UseMPI .EQ.1)
    call MPI_FINALIZE(ierror)
@@ -513,7 +543,22 @@ endif! MPI_Rank
 
 
 
-contains
+
+
+
+!---------------------------------------------------------------------------------------------
+CONTAINS
+!---------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
   FUNCTION Poisson(nu,n)
 ! Poisson distribution = exp(-nu)*nu^n/n!
@@ -521,9 +566,15 @@ contains
     integer :: nu,n
     real(8) :: Poisson
     
-    Poisson=-nu+n*log(1d0*nu)-logfac(n)
-    Poisson=exp(Poisson)
+    
+    if( nu.le.0 ) then
+        Poisson=0d0
+    else
+        Poisson=-nu+n*log(1d0*nu)-logfac(n)
+        Poisson=exp(Poisson)
+    endif
 
+  RETURN
   end FUNCTION POISSON
 
 
@@ -654,5 +705,5 @@ contains
 
 
 
-end program BinnedLogL
+END PROGRAM
   
