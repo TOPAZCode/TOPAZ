@@ -15,10 +15,10 @@
   integer :: NHisto(1:2)=-999999,Hits(1:2,1:MaxBins)=-999999,NumBins0=0,NumBins1=0,NumBins,BinMin,BinMax,iPseudoExp,iBin,iHypothesis,LLBin
   logical :: GotNumEvents(1:MaxBins),IdenticalHypothesis
   integer :: ExpectedEvents(1:2,1:MaxBins),TryEvts,MinEvts,MaxEvts,ObsEvents(1:2,1:MaxBins),PlotObsEvts(1:2,1:10000)=0d0,TotSigmaHisto
-  real(8) :: nran(1:2),offset,sran,DeltaN,Delta(1:2),MaxAllowedDelta,AvgTotalEvents,LLRatio,PoissonWidth
-  real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),alpha_ave,beta_ave,sigs
+  real(8) :: nran(1:2),offset,sran,DeltaN,Delta(1:2),MaxAllowedDelta,AvgTotalEvents,LLRatio,PoissonWidth,MinMu,MaxMu
+  real(8) :: alphamin,alphamax,betamin,betamax,rescale(1:2),alpha_ave,beta_ave,sigs,DeltaRnd,GaussSigma
   real(8) :: LLRatio_array(1:2,1:MaxExp),LLRatio_array_tmp(1:2,1:MaxExp),LLRatio_min,LLRatio_max,WhichBin
-  integer :: j,i,s,MPI_Rank,worker,MPI_NUM_PROCS,ierror,TotalEvents(1:2)=0,TheUnit
+  integer :: j,i,s,MPI_Rank,worker,MPI_NUM_PROCS,ierror,TotalEvents(1:2)=0,TheUnit,UncertTreatment
   integer,parameter :: MaxLLBins=1000
   real(8) :: sigmatot(1:2),check(1:2),alpha(1:MaxLLBins),beta(1:MaxLLBins),IntLLRatio(1:2),checkalpha(0:MaxLLBins)=0d0
   type :: Histogram
@@ -43,7 +43,10 @@
 
   NumArgs=NArgs()-1
   PreFactor=8d0!  Lepton multiplicities
-
+  
+  ! Treatment of uncertainties. 1=Rescale hypotheses 0,1 by uncertainties to worst case separation
+  !                             2=Gauss distribute uncertainties (2*sigma=DeltaN) in each pseudoexperiment
+  UncertTreatment=1
 
   call GetArg(1,operation)
   if (trim(operation) .ne. 'GetLogL') then
@@ -78,6 +81,7 @@
   endif
 
   sigmatot(1:2) = 0d0
+  TotalEvents(1:2)=0
   NumBins0=0
   NumBins1=0
 
@@ -107,7 +111,6 @@
 ! 1a. Because our Delta phi_ll histogram excludes a small bin at the end,
 ! first use histo #TotSigmaHisto  to get the total cross-section
 !-------------------------------------------------------------------------
-
   TotSigmaHisto = 1 ! Histo
 
   do while(.not.eof(112))!   reading input file 1
@@ -188,6 +191,8 @@
      stop
   else
      NumBins=NumBins0
+     
+     
   endif
   BinSize(1) = BinVal(1,2)-BinVal(1,1)
   BinSize(2) = BinVal(2,2)-BinVal(2,1)
@@ -212,7 +217,8 @@
      endif
   enddo
 
-  
+
+   
 ! -----------------------------------------------------------------
 ! 2. Find the expected values for null and alt. hypothesis in each bin
 ! -----------------------------------------------------------------
@@ -223,33 +229,38 @@
   enddo
   if( ( TotalEvents(1).lt.100) .or. ( TotalEvents(2).lt.100) ) print *, "!! WARNING: less than 100 events in total histogram !!"
  
-  if( TotalEvents(1).gt.TotalEvents(2) ) then! null hypothesis has larger total cross section
-        MaxAllowedDelta = 0.5d0*(dble(TotalEvents(1))/dble(TotalEvents(2))-1d0) * 100d0
-        AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
-        if( DeltaN .lt. MaxAllowedDelta ) then! if DeltaN is smaller than difference between the two values
-            Delta(1) = -DeltaN/100d0! make null hypothesis smaller
-            Delta(2) = +DeltaN/100d0! make alt. hypothesis larger
-        else
-            Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
-            Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
-        endif
-  else! null hypothesis has smaller total cross section
-        MaxAllowedDelta = 0.5d0*(dble(TotalEvents(2))/dble(TotalEvents(1))-1d0) * 100d0
-        AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
-        Delta(1) = +DeltaN/100d0! make null hypothesis larger
-        Delta(2) = -DeltaN/100d0! make alt. hypothesis smaller
-        if( dble(TotalEvents(1))*(1d0+Delta(1)) .gt.  dble(TotalEvents(2))*(1d0+Delta(2)) ) then
-            Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
-            Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
-        endif
+ 
+  if( UncertTreatment.eq.1 ) then! Rescale the total cross sections by DeltaN such that they are closest.
+                                 ! If the two total cross sections have overlapping DeltaN bands, then rescale them equal to their common average.
+                                 ! Use this rescaling factor to rescale all the bins.
+      if( TotalEvents(1).gt.TotalEvents(2) ) then! null hypothesis has larger total cross section
+	    MaxAllowedDelta = 0.5d0*(dble(TotalEvents(1))/dble(TotalEvents(2))-1d0) * 100d0
+	    AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+	    if( DeltaN .lt. MaxAllowedDelta ) then! if DeltaN is smaller than difference between the two values
+		Delta(1) = -DeltaN/100d0! make null hypothesis smaller
+		Delta(2) = +DeltaN/100d0! make alt. hypothesis larger
+	    else
+		Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+		Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+	    endif
+      else! null hypothesis has smaller total cross section
+	    MaxAllowedDelta = 0.5d0*(dble(TotalEvents(2))/dble(TotalEvents(1))-1d0) * 100d0
+	    AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+	    Delta(1) = +DeltaN/100d0! make null hypothesis larger
+	    Delta(2) = -DeltaN/100d0! make alt. hypothesis smaller
+	    if( dble(TotalEvents(1))*(1d0+Delta(1)) .gt.  dble(TotalEvents(2))*(1d0+Delta(2)) ) then
+		Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+		Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+	    endif
+      endif
+      Value(1,:) = Value(1,:) * ( 1d0 + Delta(1) )
+      Value(2,:) = Value(2,:) * ( 1d0 + Delta(2) )
   endif
-  Value(1,:) = Value(1,:) * ( 1d0 + Delta(1) )
-  Value(2,:) = Value(2,:) * ( 1d0 + Delta(2) )
   do iHypothesis=1,2    ! 1=null, 2=alt
-     TotalEvents(iHypothesis) = int( sum(Value(iHypothesis,BinMin:BinMax))*Data*PreFactor*BinSize(iHypothesis) )
-     if( MPI_Rank.eq.0 ) write(*,"(A,I1,A,I6,A,F5.1,A)") "Hypothesis:",iHypothesis," Number of events in Histogram:",TotalEvents(iHypothesis)," (after rescaling by uncertainty of ",Delta(iHypothesis)*100d0,"%)"
+      TotalEvents(iHypothesis) = int( sum(Value(iHypothesis,BinMin:BinMax))*Data*PreFactor*BinSize(iHypothesis) )
+      if( MPI_Rank.eq.0 ) write(*,"(A,I1,A,I6,A,F5.1,A)") "Hypothesis:",iHypothesis," Number of events in Histogram:",TotalEvents(iHypothesis)," (after rescaling by uncertainty of ",Delta(iHypothesis)*100d0,"%)"
+      print *, "Hypothesis:",iHypothesis,". Number of events in Histogram:",TotalEvents(iHypothesis)
   enddo
-
 
   
 !  call random_seed()
@@ -259,6 +270,9 @@
 ! -----------------------------------------------------------------
   NPseudoExp_Worker = NPseudoExp/(MPI_NUM_PROCS)
 
+  
+  
+  
 !DEC$ IF(_UseMPI .EQ.1)
   call MPI_BARRIER(MPI_COMM_WORLD,ierror)
 !DEC$ ENDIF
@@ -270,6 +284,45 @@
 
         ExpectedEvents(1,:)=int(Value(1,:)*Data*PreFactor*BinSize(1))
         ExpectedEvents(2,:)=int(Value(2,:)*Data*PreFactor*BinSize(2))
+
+        if( UncertTreatment.eq.2 ) then
+            GaussSigma = DeltaN/100d0/2d0
+            MinMu = - 3.5d0*GaussSigma
+            MaxMu = + 3.5d0*GaussSigma
+            do while( .true. )
+                call random_number(nran(1:2))
+                DeltaRnd = (MaxMu-MinMu)*nran(2)+MinMu
+                nran(1) = nran(1) * Gauss(0d0,GaussSigma,0d0) 
+                if( nran(1) .lt. Gauss(0d0,GaussSigma,DeltaRnd) ) exit
+            enddo
+            DeltaRnd = dabs(DeltaRnd)*100d0! DeltaRnd from Gauss distribution with 2*sigma=DeltaN
+            
+            ! Take Gauss distributed DeltaRnd and rescale total cross section such that they are closest or equal to their common average.
+            ! Use this rescaling factor to rescale all bins.
+            if( TotalEvents(1).gt.TotalEvents(2) ) then! null hypothesis has larger total cross section
+                  MaxAllowedDelta = 0.5d0*(dble(TotalEvents(1))/dble(TotalEvents(2))-1d0) * 100d0
+                  AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+                  if( DeltaRnd .lt. MaxAllowedDelta ) then! if DeltaN is smaller than difference between the two values
+                      Delta(1) = -DeltaRnd/100d0! make null hypothesis smaller
+                      Delta(2) = +DeltaRnd/100d0! make alt. hypothesis larger
+                  else
+                      Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+                      Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+                  endif
+            else! null hypothesis has smaller total cross section
+                  MaxAllowedDelta = 0.5d0*(dble(TotalEvents(2))/dble(TotalEvents(1))-1d0) * 100d0
+                  AvgTotalEvents  = 0.5d0*(TotalEvents(1)+TotalEvents(2))
+                  Delta(1) = +DeltaRnd/100d0! make null hypothesis larger
+                  Delta(2) = -DeltaRnd/100d0! make alt. hypothesis smaller
+                  if( dble(TotalEvents(1))*(1d0+Delta(1)) .gt.  dble(TotalEvents(2))*(1d0+Delta(2)) ) then
+                      Delta(1) = dble(AvgTotalEvents)/dble(TotalEvents(1)) - 1d0! rescale such that total cross section is equal to the average between the two hypothesis
+                      Delta(2) = dble(AvgTotalEvents)/dble(TotalEvents(2)) - 1d0
+                  endif
+            endif
+            ExpectedEvents(1,:) = int(ExpectedEvents(1,:) * ( 1d0 + Delta(1) ) )
+            ExpectedEvents(2,:) = int(ExpectedEvents(2,:) * ( 1d0 + Delta(2) ) )
+        endif
+
 
         GotNumEvents=.false.
         do iBin=BinMin,BinMax
@@ -336,8 +389,7 @@ enddo!   iHypothesis
   write(*,*) "MPI rank ",MPI_Rank," finished generating pseudoexperiments"
 
 
-
-!DEC$ IF(_UseMPI .EQ.1)
+!DEC$ IF(_UseMPI .EQ. 1)
    call MPI_BARRIER(MPI_COMM_WORLD,ierror)
    if( MPI_Rank.eq.0 ) then
       do worker=1,MPI_NUM_PROCS-1
@@ -357,6 +409,7 @@ enddo!   iHypothesis
         call MPI_Send(LLRatio_array, 2*MaxExp,MPI_DOUBLE_PRECISION, 0 ,1,MPI_COMM_WORLD,ierror)
    endif
 !DEC$ ENDIF
+
 
 
 
@@ -437,11 +490,6 @@ if( MPI_Rank.eq.0 ) then
 !    enddo
 !    MARKUS: check that beta=1-alpha, check that intllratio/(NPseudoExp*LLHisto(iHypothesis)%BinSize) is one.
 
-!  do LLbin=1,LLHisto1%NBins
-!     IntH0=IntH0+LLHisto1%BinSize*LLHisto1%Hits(LLbin)
-!     alpha(LLbin)=IntH0/(NPseudoExp*LLHisto1%BinSize)
-!     print *, LLbin, LLHisto1%LowVal + LLbin*LLHisto1%BinSize, LLHisto1%Hits(LLbin), alpha(LLBin)
-!  enddo
 
 
 
@@ -535,7 +583,66 @@ if( MPI_Rank.eq.0 ) then
       write(*,*) "Done"; write(*,*) "";  write(*,*) ""
 endif! MPI_Rank
 
-
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+!       iHypothesis=1
+!       IntLLRatio(:)=0
+!       do LLbin=1,LLHisto(iHypothesis)%NBins
+!          IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)  +  LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+!          alpha(1,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)! normalize total integral to one
+!       enddo
+!             
+!       iHypothesis=2
+!       IntLLRatio(:)=0
+!       do LLbin=LLHisto(iHypothesis)%NBins,1,-1
+!          IntLLRatio(iHypothesis)=IntLLRatio(iHypothesis)  +  LLHisto(iHypothesis)%BinSize * LLHisto(iHypothesis)%Hits(LLbin)
+!          beta(1,LLBin)=IntLLRatio(iHypothesis)/(NPseudoExp*LLHisto(iHypothesis)%BinSize)! normalize total integral to one
+!       enddo
+!             
+!    do LLbin=1,LLHisto(1)%NBins
+!       checkalpha(LLBin)=alpha(1,LLBin)-beta(1,LLBin)
+!       if (checkalpha(LLBin)*checkalpha(LLBin-1) .lt. 0d0) then
+!          alphamin=alpha(1,LLBin-1)
+!          alphamax=alpha(1,LLBin)
+!          betamin =beta(1,LLBin-1)
+!          betamax =beta(1,LLBin)
+!          
+!          if (checkalpha(LLBin) .eq. 1d0 .and. checkalpha(LLBin-1) .eq.-1d0) then
+!             ! this is comparing two identical hypotheses!
+!             alphamin=0.5d0
+!             alphamax=0.5d0
+!             betamin =0.5d0
+!             betamax =0.5d0
+!          endif
+!          exit
+!       endif
+!    enddo
+!             
+! 
+!    alpha_ave=(alphamin+alphamax)/2d0
+!    beta_ave=(betamin+betamax)/2d0
+!    sigs=inverf(1d0-2d0*dsqrt(2d0)*alpha_ave)
+!    
+!    print *, 'alpha value in range:', alphamin,alphamax
+!    print *, 'beta value in range:', betamin,betamax 
+!    print *, 'alpha average :', alpha_ave
+!    print *, 'beta average :', beta_ave
+!    print *, 'sigma value :', sigs
+            
+            
+            
+            
 
 !DEC$ IF(_UseMPI .EQ.1)
    call MPI_FINALIZE(ierror)
@@ -553,6 +660,23 @@ CONTAINS
 
 
 
+
+
+
+  FUNCTION Gauss(mu,sigma,x)
+! Gauss distribution = 1/sqrt(2*pi*sigma^2) * Exp( -(x-mu)^2/(2*sigma^2) )
+  implicit none
+  real(8), parameter :: DblPi = 3.1415926535897932384d0
+  real(8) :: mu,sigma,x,Gauss
+    
+      if( sigma.le.1d-6 ) then
+         Gauss=1d0
+      else
+         Gauss = 1d0/dsqrt(2d0*DblPi*sigma**2) * dexp( -0.5d0*(x-mu)**2/sigma**2 )
+      endif
+    
+  RETURN
+  END FUNCTION Gauss
 
 
 
@@ -575,7 +699,7 @@ CONTAINS
     endif
 
   RETURN
-  end FUNCTION POISSON
+  end FUNCTION Poisson
 
 
   FUNCTION logfac(N)
