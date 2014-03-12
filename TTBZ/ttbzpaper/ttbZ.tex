@@ -241,7 +241,7 @@ The virtual and real corrections to the top quark decay and hadronic $W$ boson d
 Soft and collinear singularities in the real emission decay phase space are regularized using subtractions dipoles given in~\cite{see ttbphoton paper}.
 We also would like to point out our utilization of parallel computing features. 
 We implemented a version of the Vegas integration algorithm which allows parallelization~\cite{pvegas} via the Message-Passing-Interface (MPI)~\cite{mpi-2-standard}. 
-The observed speed-up in run time scales almost linear scaling with the number of CPU cores used. 
+The observed speed-up in run time scales almost linear with the number of CPU cores used. 
 This allows us to obtain a full NLO QCD prediction for the total cross section within a few hours on a modern desktop computer with 8 cores.
 % The NLO amplitudes for the decay of the top quarks well-known, and are given in \cite{Jezabek:1988iv,Czarnecki:1990pe,Czarnecki:1990kv,Li:1990qf,Campbell:2004ch,}. In the NWA, the NLO cross-section for the production and decay is written as \cite{Campbell:2004ch,Melnikov:2009dn}
 
@@ -353,7 +353,7 @@ Instead, they arise from potential deviations which the higher dimensional opera
 Those parameters are highly constrained through the experimental fits~\cite{Ciuchini:2013pca} of the $\varepsilon$ parameters~\cite{Altarelli:1993sz},
 \be
    \label{epsexp}
-   \varepsilon_1^\mathrm{exp} = (5.6 \pm 1.0) \times 10^{-3}, \quad \quad \varepsilon_b^\mathrm{exp} = (-5.8 \pm 1.3) \times 10^{-3}.
+   \varepsilon_1^\mathrm{exp} = (5.6 \pm 1.0) \times 10^{-3}, \quad \quad \varepsilon_b^\mathrm{exp} = (-5.8 \pm 1.3) \times 10^{-3}
 \ee
 The SM predicts their values as $\varepsilon_1^\mathrm{SM} = (5.21 \pm 0.08) \times 10^{-3} $ and $\varepsilon_b^\mathrm{SM} = -(6.94 \pm 0.15) \times 10^{-3}$~\cite{Ciuchini:2013pca},
 whereas the new physics contributions (\ref{Cone_NP}) introduce the corrections~\cite{Larios:1999au}
@@ -493,7 +493,7 @@ The ratio of the cross sections with and without cuts defines the acceptance fun
 \ee
 % We supress dependence on the scale variation because it is almost vanishing in the above ratios.
 Hence, modelling acceptance effects at LO and multiplying with a $K$-factor obtained from a NLO QCD calculation with stable particles,
-leads to a result that is $\sim A^\mathrm{LO}/A^\mathrm{NLO}=10\%$ too small.
+underestimates the correct result by $\sim A^\mathrm{LO}/A^\mathrm{NLO}=10\%$.
 To estimate uncertainties from parton distribution functions we contrast the results in Eq.~\ref{XsecNum} (MSTW~\cite{Martin:2009iq})
 with a calculation that uses the sets from CTEQ6L1~\cite{Pumplin:2002vw} and CTEQ10~\cite{Lai:2010vv} at LO and NLO QCD, respectively. 
 We find 
@@ -503,8 +503,9 @@ We find
   \quad\quad\quad
   \sigma_{\ttb Z}^\mathrm{NLO} &= 4.86^{+13\%}_{-13\%}~\mathrm{fb}.
 \ee
-Some short discussion of CTEQ results. Scale var., K, MSTW comparison. Within scale?
-We also checked that shape changes can be as large as ... due to the different set of pdf.
+These results are about 14\% smaller at LO and 7\% smaller at NLO QCD than the results obtained with MSTW parton distribution functions. 
+The resulting scale uncertainty bands are approximately the same between CTEQ and MSTW.
+Hence, the difference due to two different parton distribution sets is well within the uncertainty estimate from factorization and renormalization scales.
 
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
@@ -517,7 +518,7 @@ The bands represent the LO (light) and NLO (dark) results for scale variation by
 \end{figure}
 
 Before turning to the $\ttbZ$ coupling analysis, let us discuss some generic kinematic distributions.
-Fig.~\ref{fig:ii}a shows the transverse momemtum of two lepton system reconstructing the $Z$~boson.
+Fig.~\ref{fig:ii}a shows the transverse momemtum of the two lepton system reconstructing the $Z$~boson.
 Similar to the total cross sections we observe a strong reduction in unphysical scale dependence over the entire $\pT$ spectrum.
 Scale bands for LO and NLO predictions are comfortably overlapping. 
 From this plot we read off an average transverse momemtum of the $Z$~boson of almost 100~GeV with a far extending kinematic tail,
@@ -525,7 +526,7 @@ promissing approximately 30 events with $\pT^Z \approx 300~\GeV$ from $300~\math
 Fig.~\ref{fig:ii}b shows the azimuthal opening angle between the two leptons from the $Z$~boson decay.
 This observable has been proven to be a good analyzer of the $\ttbZ$ couplings~\cite{Baur:2004uw} and we wil consider it in the following analysis.
 The differential $K$-factor in the lower pane of this plot shows shape changes in the range of 10~\% due to higher order corrections.
-Shape changes that arise from higher order corrections in the decay matrix elements are shown in the dashed line and amount up to xx\%.
+% Shape changes that arise from higher order corrections in the decay matrix elements are shown in the dashed line and amount up to xx\%.
 
 
 
@@ -533,12 +534,15 @@ In Fig.~\ref{fig:iii}a and Fig.~\ref{fig:iii}b we compare the transverse momentu
 We find that leptons from the $Z$~boson have a typically harder spectrum. 
 This is already true for LO while significatly different $K$-factors enhance this behavior even further at NLO.
 
-%tagCMSdata
-% \subsection{Top-Z coupling results from current CMS data}
-\subsection{Coupling extrapolation and first results from current CMS data}
-\label{sect:CMS}
 
-In this section and the next, we will use our calculation to investigate the constraints that can be placed on top-Z couplings, using both existing and anticipated LHC data. 
+
+
+
+\subsection{Coupling extrapolation and statistical analysis}
+\label{sect:analysis}
+
+In this section and the next, we will use our calculation to investigate the constraints that can be placed on $\ttbZ$ couplings, 
+using both existing and anticipated LHC data. 
 To do so, we need to determine how normalization and shapes depend on variations of the couplings. 
 Hence total cross sections and differential distributions need to be calculated for a large grid of $C_{1,V}$ and $C_{1,A}$ values. 
 This is simple enough at LO, and while it is still feasible at NLO, it does place a strain on computing resources. 
@@ -546,7 +550,7 @@ As a convenient alternative, we note that $\ttbZ$ production and decay amplitude
 \begin{equation}
   \mathcal{M} = \mathcal{M}_0 +  \ConeV \mathcal{M}_\mathrm{V} +  \ConeA \mathcal{M}_\mathrm{A},
 \end{equation}
-with the coefficients $\mathcal{M}_i$ encoding both the kinematics and all couplings other than the top-Z coupling. 
+with the coefficients $\mathcal{M}_i$ encoding both the kinematics and all couplings other than the $\ttbZ$ couplings. 
 The differential cross section is then dependent on six coupling stuctures, and can be written as
 \begin{equation}
 \label{couplfit}
@@ -559,12 +563,14 @@ retaining the effects of spin correlations and selction cuts.
 As a check of this approach, we have evaluated the cross sections and distributions for a few points in the $(C_{1,V},C_{1,A})$ parameter space, 
 both by an explicit calculation and by using the fit for the $s_i$ coefficients. Excellent agreement is found in all cases. 
 As an example, we show one comparison in Fig.~\ref{fig:iv} for the  $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution, which we will later use in the coupling analysis.
+As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are correctly reproduced by the fitting procedure.
 The relative shifts in the couplings are given by
 \be
-%\begin{split}
-\DConeV =  \frac{\ConeV}{\ConeVSM}-1 ; \hspace{2cm} \DConeA = \frac{\ConeA}{\ConeASM}-1.
+  \DConeV =  \frac{\ConeV}{\ConeVSM}-1,
+  \hspace{2cm} 
+  \DConeA = \frac{\ConeA}{\ConeASM}-1.
 \ee
-As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are correctly reproduced by the fitting procedure.
+
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.49\textwidth]{./LHC_53_Fig17d.eps}
@@ -572,8 +578,241 @@ As can be seen in Fig.~\ref{fig:iv}, the overall normalization and the shape are
 for the non-SM coupling choice $(\DConeV,\DConeA)=(1.0,0.1)$, and from the fit described in Eq.~3.8. }
 \end{figure}
 
-{\bf MARKUS NOTE: I think we have to be careful with the word observed. This is typically only used for 5sigma signals, which is not the case here at all.}
-We turn now to an analysis based on current LHC data. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
+
+
+We now move on to study future constraints that analyses of the high energy LHC run can place on the $\ttbZ$ couplings.
+For this, we assume a centre-of-mass energy of $\sqrt{s}=13$~TeV and consider projections for an integrated luminosity of
+$30\, \invfb$, $300\, \invfb$, and $3000\, \invfb$. 
+We focus on the trileptonic final state and employ the azimuthal angle between the leptons originating
+from the $Z$ decay to perform our analysis.
+This angle has been identified as being particularly sensitive to the $\ttbZ$ couplings in Ref.~\cite{Baur:2004uw}.
+We already discussed the strong reduction in scale uncertainty when going from LO to NLO QCD for this observable.
+Here, in Fig.~\ref{fig:vi}(a), we show the effect of NLO QCD corrections on the shape of the normalized $\Delta \phi_{\ell\ell}$ distribution.
+Higher order effects tend to shift events from larger to smaller opening angles.
+In Fig.~\ref{fig:vi}(b) we show that similar shape changes can arise due to variations of the vector and axial $\ttbZ$-couplings.
+This emphasizes the importance of precise predictions since missing higher order effects might be misinterpreted as deviations from the SM.
+To illustrate that the $\Delta \phi_{\ell\ell}$ shape is a useful discriminator for our coupling analysis, we have chosen 
+values $(\DConeV,\DConeA)$ in Fig.~\ref{fig:vi}(b) such that the total cross sections approximately coincide with the SM $\ttbZ$ cross section.
+Hence, a measurement of the rate alone would not reveal the deviations from their Standard Model value.\\
+% , and a combination of normalization and shape information provides the best sensitivity.
+ 
+
+
+\begin{figure}[t]
+\centering % \begin{center}/\end{center} takes some additional vertical space
+\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17a.eps}
+\hfill
+\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17b.eps}
+\caption{\label{fig:vi}
+Normalized distributions of the azimuthal opening angle of the opposite sign leptons from the $Z$~boson decay at the 13~TeV LHC.
+In the left Figure~(a), shapes of LO and NLO QCD predictions are compared for SM $\ttbZ$-couplings.
+Shape changes due to deviations from the SM values are shown in the right Figure~(b).
+}
+\end{figure}
+
+
+
+Let us now outline the basic features of our statistical analysis.
+We are interested in answering the question: What are the bounds that can be placed on deviations of the $\ttbZ$ couplings, assuming that the SM is true? 
+Obviously, the answer will depend on the assumed integrated luminosity of the data sample as well as on theoretical and experimental uncertainties. 
+% However, we emphasize again that we do not take experimental effects into account apart from the cuts in Eq.~\ref{selectioncuts} to account for detector acceptances.
+Since at the current point in time there is no experimental data available, we assume the SM prediction as our null hypothesis 
+$\mathcal{H}_{\mathrm{SM}}$ ($\DConeV,\DConeA)=(0,0)$,
+against which we test alternative hypotheses $\Halt$ with $(\DConeV,\DConeA) \ne (0,0)$.
+Once experiments have accumulated real events, the alternative hypothesis can be replaced by observed data to test for consistency with the SM prediction. 
+The null hypothesis could then also be replaced by  other points in $(\DConeV,\DConeA)$ parameter space, and tested against the data. 
+This will enable the exclusion of parts of the parameter space at a given confidence level. 
+Assuming that the data agree with the SM, 
+% and ignoring experimental effects which may be significant, 
+the bounds on the top-Z coupling 
+obtained in this section should approximate those obtained from real data in the future. 
+We begin by constructing two likelihood functions $\mathcal{L}_{\SM}$ and $\mathcal{L}_{\alt}$ which allow us to define a test 
+statistic $\Lambda = \log \left( \mathcal{L}_{\SM} / \mathcal{L}_{\alt} \right)$.
+% Assuming a fixed integrated luminosity, we now generate a number of events for the two hypotheses $\mathcal{H}_{\mathrm{SM}}$ and $\Halt$ based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$.
+% Based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$, we now generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
+We then generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
+The test statistic $\Lambda$ can be evaluated for these two event samples, and 
+repeating this evaluation in a large number of pseudo experiments provides the probability distributions $P(\Lambda|\mathcal{H}_{\mathrm{SM}})$ or $P(\Lambda|\Halt)$.
+The overlap of these two probability distributions can be used to define the type-I error for rejecting $\mathcal{H}_{\mathrm{SM}}$ in favor of $\Halt$, even though $\mathcal{H}_{\mathrm{SM}}$ is true.
+This error can finally be translated into the more familiar confidence level in terms of standard deviations.
+
+
+
+In the following we will describe the procedure outlined above more precisely and illustrate how differential distributions at NLO QCD can be used.
+We closely follow typical likelihood-based analyis as described for example in Ref.~\cite{Cowan:2010js}, based on the original procedure by 
+Feldman and Cousins~\cite{Feldman:1997qc}.
+The starting point is the binned likelihood function 
+\be
+\label{lili}
+   \mathcal{L}(\mathcal{H}|\vec{n}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i|\nu_{i}^\mathcal{H})
+\ee
+with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^\mathcal{H}$ for hypothesis $\mathcal{H}$. 
+% This expected value is obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
+%The starting point is the binned likelihood function 
+%\be
+%\label{lili}
+%   \mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i^{\mathcal{H}_a}|\nu_{i}^{\mathcal{H}_t})
+%\ee
+%with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
+%The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
+Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
+\be
+\label{lilifunct}
+\begin{split}
+  \log\mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\SM}) -\log(n_{i,\mathrm{obs}}!) -\nu_i^{\SM}  \bigr], \\
+  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
+\end{split}
+\ee
+where the sums over $i$ runs over all bins in a given histogram.
+%Consequently there are the log-likelihood functions for a test hypothesis $\mathcal{H}_t$ under the assumption of a hypothesis $\mathcal{H}_a$
+%\be
+%\label{lilifunct}
+%\begin{split}
+%  \log\mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu})  = \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\mathcal{H}_a}\log(\nu_i^{\mathcal{H}_t}) -\log(n_i^{\mathcal{H}_a}!) -\nu_i^{\mathcal{H}_t}  \bigr],% \\
+%  \log\mathcal{L}(\HSM,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\SM}) -\log(n_i^{\SM}!) -\nu_i^{\SM}  \bigr], \\
+%  \log\mathcal{L}(\HSM,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\alt}) -\log(n_i^{\SM}!) -\nu_i^{\alt}  \bigr], \\
+%  \log\mathcal{L}(\Halt,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\SM}) -\log(n_i^{\alt}!) -\nu_i^{\SM}  \bigr], \\
+%  \log\mathcal{L}(\Halt,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\alt}) -\log(n_i^{\alt}!) -\nu_i^{\alt}  \bigr], 
+%  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
+%\end{split}
+%\ee
+%where $n_{i,\mathrm{obs}}$ is the observed number of events in the $i$-th bin of the $\Delta \phi_{\ell\ell}$ distribution. 
+Eqs.~\ref{lilifunct} allow us to construct a log-likelihood ratio which serves at the test statistic
+\be
+\begin{split}
+  \Lambda(\vec{n}_\mathrm{obs}) =& \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
+                                =& \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr].
+\end{split}
+\ee
+This test statistic can now be evaluated with $\vec{n}_{\mrm{obs}}$ which are the Poisson distributed events from the  
+$\Delta \phi_{\ell\ell}$ histogram, for either the SM or the alternative hypothesis.
+% , yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
+\begin{figure}[t]
+\centering % \begin{center}/\end{center} takes some additional vertical space
+\includegraphics[width=0.49\textwidth]{./LogLikelihoods_LO.eps}
+\hfill
+\includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.eps}
+\caption{\label{fig:vii}
+Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or an alternative hypothesis (blue) 
+with $(\DConeV,\DConeA)=(0.8,0.36)$.
+The solid lines include statistic and systematic uncertainties as described in the text, whereas the dashed lines only include statistic uncertainties.
+The left plot shows the separating power using LO input with $\Delta_\mathrm{syst.}=30\%$, 
+the right plot is obtained at NLO QCD with $\Delta_\mathrm{syst.}=15\%$, assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
+}
+\end{figure}
+%\be
+%\begin{split}
+%  \Lambda(\HSM) =&  \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
+%                                =& \, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+%\end{split}
+%\ee
+%and similarly
+%\be
+%\begin{split}
+%  \Lambda(\Halt) =& -2 \, \log \biggl( \mathcal{L}(\Halt,\vec{n}|\HSM,\vec{\nu})%  \big/ \mathcal{L}(\Halt,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
+%                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
+%\end{split}
+%\ee
+%This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the 
+% $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
+Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
+%Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
+An example of two such probability distributions, $P(\Lambda|\mathcal{H}_{\mathrm{SM/alt}})$, is shown in Fig.~\ref{fig:vii} for LO and NLO QCD, respectively.
+These two distributions can be used to define a confidence level for excluding the alternative hypothesis.
+For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
+\begin{equation}
+    \alpha = \int^{\hLambda}_{-\infty} \mathrm{d}\Lambda \; P(\Lambda | {\HSM}).
+\end{equation}
+Similarly, the probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\alt}$ is correct (type-II error) is given as 
+\begin{equation}
+    \beta = \int_{\hLambda}^{\infty} \mathrm{d}\Lambda \; P(\Lambda|\Halt).
+\end{equation}
+We define $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of {\it incorrectly} rejecting one hypothesis in favor of the other. 
+The value $\alpha(\hLambda)$ is then a measure of statistical discrimination between the two hypotheses. 
+It can be translated into the more familiar number of standard deviations by 
+\begin{equation}
+\sigma = \sqrt{2} \, \erf^{-1}(1-\alpha),
+\end{equation}
+where $\erf^{-1}$ is the inverse error function. 
+
+The above discussion made so far no mention of systematic uncertainties.
+In this work we would like to include the leading theoretical uncertainties from unphysical scale dependence and errors associated with parton distribution functions.
+For simplicity we neglect experimental systematics such as efficiencies or momentum smearing effects.
+Note however that we include realistic detector acceptances through the cuts in Eq.~\ref{selectioncuts}.
+Statistical fluctuations are obviously included in our analysis through the Poisson distribution in Eq.~(\ref{lili}).
+Following Ref.~\cite{Conway:2011in}, we include the theoretical uncertainties through nuisance parameters by multiplicative factors.
+At this point we should mention that the use of a log-likelihood ratio as test statistic is guaranteed to be optimal 
+thanks to the Neyman-Pearson lemma~\cite{NeymanPearsonLemma}.
+This is however no longer true when nuisance parameters are introduced in the analysis. 
+Nevertheless, one still expects the test to be approximately optimal as long as the nuisance parameters are reasonably constrained.
+We include the theoretical uncertainties by modifying the likelihood function in Eq.~\ref{lili} according to
+\be
+  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{unc.}) \right),
+\ee
+where we choose $\mathcal{G}$ to be a normalized function with uniform spread $\tilde{\nu}_{\mathrm{min,max},i}^\mathcal{H} = \tilde{\nu}_i^\mathcal{H} \pm \Delta_\mathrm{unc.}$,
+% around the central scale choice $\tilde{\nu}_i^\mathcal{H}$,
+\be
+  \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{unc.}) \right) = 
+  \big( \theta\left( {\nu}_i^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \right) 
+      \times  \theta\left( \nu_{\mathrm{max},i}^\mathcal{H} - {\nu}_i^\mathcal{H} \right)  \big) 
+  \big/ \big( \nu_{\mathrm{max},i}^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \big).
+\ee
+The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the assumed luminosity times the cross section in the $i$th bin 
+for the central scale choice $\mu_0$.
+As mentioned in the previous Section, we choose the constant values $\Delta_\mathrm{unc.} = 30\%$ at LO
+and $\Delta_\mathrm{unc.} = 15\%$ at NLO QCD.
+To be most conservative, we then fix $\nu_i^\mathcal{H}$ to either $\tilde{\nu}_{\mathrm{min},i}^\mathcal{H}$ or $\tilde{\nu}_{\mathrm{max},i}^\mathcal{H}$
+for the respective hypthesis such that their total cross sections are closest.
+This treatment results in a larger overlap between the two likelihood distributions, 
+and consequently a larger $\alpha$ value and less discriminatory power between the two hypotheses. 
+This feature is clearly visible in Fig.~\ref{fig:vii}, when comparing the solid with the doted curves. 
+Contrasting the LO results in Fig.~\ref{fig:vii}(left) with the NLO result (right) shows that 
+the lower uncertainty associated with the NLO prediction allows for significantly better statistical discrimination between the hypotheses.
+Also the increase of the NLO cross section due to the $K$-factor of $\approx1.4$ leads to a larger number of expected events and therefore 
+to smaller statistical uncertainties.
+
+
+
+\subsection{$\ttbZ$ coupling constraints from current and future LHC data}
+\label{sect:CouplLimits}
+
+We now apply the analysis outlined in the previous section to study coupling constraints from current and future LHC data.
+Figure~\ref{fig:viii} shows the $\ttbZ$ cross section with non-SM couplings relative to the SM cross section 
+for a wide range of vector and axial couplings. 
+Of course, the results are obtained at NLO QCD and include the selection cuts of Eq.~\ref{selectioncuts}.
+The grid of 3200 NLO QCD cross sections is generated with the fit described in Eq.~\ref{couplfit}, at low computational cost.
+We find that within the given range the cross section varies by about $\pm 50\%$ due to shifts of vector and axial couplings away from their SM value.
+The remaining scale unceratinty at NLO QCD was found to be $\sim 10\%$ which roughly corresponds to the area inside the dotted line in Fig.~\ref{fig:viii}.
+Hence, for all coupling values within this band a rate measurement alone is not sensitive to any deviation.
+This is true for a large range of couplings far off the SM value, e.g. $(\Delta\ConeV,\Delta\ConeA)=(1.7,-0.3)$.
+We will later see that adding shape information from kinematic distributions will improve this situation and lead to a more powerful discrimintation. 
+It is clearly noticable in Fig.~\ref{fig:viii} that cross sections are symmetric around the axis $\Delta\ConeV=-1$. 
+This feature can be easily understood from the fact that the LO cross section is dominantly proportional to 
+$\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
+% MARKUS NOTE:  maybe we move this explanation to the cms section because the feature appears there first
+We expect to see a similar symmetry around $\Delta\ConeA=-1$ but we do not consider it here since the sign of the axial coupling is already constrained from 
+LEP measurements of the $Zb_\mathrm{L}\bar{b}_\mathrm{L}$ interaction when $\mathrm{SU(2)}_\mathrm{L}$ symmetry is invoked.
+
+
+As a side remark we would like to note that we brielfy studied the effects of $\ttbZ$ coupling shifts on the top quark forward-backward asymmetry, $A_\mathrm{FB}^{\ttb}$, 
+at the Tevatron.
+At leading order, we considered the parity-violating process $q \bar{q} \to Z/\gamma^* \to \ttb$ with coupling variations as shown in Fig.~\ref{fig:viii}.
+We find that within this range no significant contribution to the forward-backward asymmetry is obtained.
+Hence, current discrepancies between theory and experiment for $A_\mathrm{FB}^{\ttb}$ cannot be explained by deviations of the $\ttbZ$ couplings as
+assumed in this paper.
+
+
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.6]{LHC_53_SigmaNLO.eps}
+\caption{ \label{fig:viii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. the SM.
+The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described in Eq.~3.8. }
+\end{figure}
+
+
+
+% {\bf MARKUS NOTE: I think we have to be careful with the word observed. This is typically only used for 5sigma signals, which is not the case here at all.}
+We now use current LHC data to obtain first constraints on vector and axial couplings. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events~\cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria~\cite{ATLAS-CONF-2012-126}. 
 This enables ATLAS to place an upper bound on the $\ttbZ$ cross section, 
 while CMS is able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$~pb. 
@@ -622,6 +861,9 @@ obtained from the future high-energy LHC which we study in the next section.
 
 
 
+
+
+
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.495\textwidth]{./CMSLO_Delta0.40_0213.eps}
@@ -633,208 +875,11 @@ The left~(right) plot shows the limits obtained from LO~(NLO QCD) input.
 }
 \end{figure}
 
-\subsection{Top-Z coupling constraints from future LHC runs}
 
 
-
-
-We now move on to study future constraints that analyses of the high energy LHC run can place on the top-Z coupling.
-For this, we assume a centre-of-mass energy of $\sqrt{s}=13$~TeV and consider projections for an integrated luminosity of
-$30\, \invfb$, $300\, \invfb$, and $3000\, \invfb$. 
-We focus on the trileptonic final state and employ the azimuthal angle between the leptons originating
-from the $Z$ decay to perform our analysis.
-This angle has been identified as being particularly sensitive to the top-Z coupling in Ref.~\cite{Baur:2004uw}.
-We already discussed the strong reduction in scale uncertainty when going from LO to NLO QCD for this observable.
-Here, in Fig.~\ref{fig:vi}(a) we show the effect of NLO QCD corrections on the shape of the normalized $\Delta \phi_{\ell\ell}$ distribution.
-Higher order effects tend to shift events from larger to smaller opening angles.
-In Fig.~\ref{fig:vi}(b) we show that similar shape changes can arise due to variations of the vector and axial $\ttbZ$-couplings.
-This emphasizes the importance of precise predictions since missing higher order effects might be misinterpreted as deviations from the SM.
-To illustrate that the $\Delta \phi_{\ell\ell}$ shape is a useful discriminator for our coupling analysis, we have chosen 
-values $\delta_V$ and $\delta_A$ in Fig.~\ref{fig:vi}(b) such that the total cross sections approximately coincide with the SM value.
-Hence, a measurement of the rate alone would not reveal the deviations from their Standard Model value.
-% , and a combination of normalization and shape information provides the best sensitivity.
- 
-
-
-\begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
-\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17a.eps}
-\hfill
-\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17b.eps}
-\caption{\label{fig:vi}
-Normalized distributions of the azimuthal opening angle of the opposite sign leptons from the $Z$~boson decay at the 13~TeV LHC.
-In the left Figure~(a), shapes of LO and NLO QCD predictions are compared for SM $\ttbZ$-couplings.
-Shape changes due to deviations from the SM values are shown in the right Figure~(b).
-}
-\end{figure}
-
-
-
-Let us now outline the basic idea of our statistical analysis.
-We are interested in answering the question: What are the bounds that can be placed on top-Z couplings? 
-Obviously, the answer will depend on the assumed integrated luminosity of the data sample as well as theoretical and experimental uncertainties. 
-However, we emphasize again that we do not take experimental effects into account apart from the cuts in Eq.~\ref{selectioncuts} to account for detector acceptances.
-Since at the current point in time there is no experimental data available, we assume the SM prediction as our null hypothesis 
-$\mathcal{H}_{\mathrm{SM}}$ ($\DConeV,\DConeA)=(0,0)$,
-against which we test alternative hypotheses $\Halt$ with $(\DConeV,\DConeA) \ne (0,0)$.
-Once experiments have accumulated real events, the alternative hypothesis can be replaced by observed data to test for consistency with the SM prediction. 
-The null hypothesis could then be replaced by  other points in $(\DConeV,\DConeA)$ parameter space, and tested against the data. 
-This will enable the exclusion of parts of the parameter space at a given confidence level (e.g. 3-$\sigma$). 
-Assuming that the data agree with the SM, 
-% and ignoring experimental effects which may be significant, 
-the bounds on the top-Z coupling 
-obtained in this section should approximate those obtained from real data in the future. 
-We begin by constructing two likelihood functions $\mathcal{L}_{\SM}$ and $\mathcal{L}_{\alt}$ which allow us to define a test 
-statistic $\Lambda = \log \left( \mathcal{L}_{\SM} / \mathcal{L}_{\alt} \right)$.
-% Assuming a fixed integrated luminosity, we now generate a number of events for the two hypotheses $\mathcal{H}_{\mathrm{SM}}$ and $\Halt$ based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$.
-% Based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$, we now generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
-We now generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
-The test statistic $\Lambda$ can be evaluated for these two event samples, and 
-repeating this evaluation in a large number of pseudo experiments provides the probability distributions $P(\Lambda|\mathcal{H}_{\mathrm{SM}})$ or $P(\Lambda|\Halt)$.
-The overlap of these two probability distributions can be used to define the type-I error for rejecting $\mathcal{H}_{\mathrm{SM}}$ in favor of $\Halt$, even though $\mathcal{H}_{\mathrm{SM}}$ is true.
-This error can finally be translated into the more familiar confidence level in terms of standard deviations.
-
-
-
-In the following we will describe the procedure outlined above more precisely and illustrate how NLO QCD input can be used.
-The starting point is the binned likelihood function 
-\be
-\label{lili}
-   \mathcal{L}(\mathcal{H}|\vec{n}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i|\nu_{i}^\mathcal{H})
-\ee
-with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^\mathcal{H}$ for hypothesis $\mathcal{H}$. 
-% This expected value is obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
-%The starting point is the binned likelihood function 
-%\be
-%\label{lili}
-%   \mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i^{\mathcal{H}_a}|\nu_{i}^{\mathcal{H}_t})
-%\ee
-%with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
-%The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
-Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
-\be
-\label{lilifunct}
-\begin{split}
-  \log\mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\SM}) -\log(n_{i,\mathrm{obs}}!) -\nu_i^{\SM}  \bigr], \\
-  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
-\end{split}
-\ee
-%Consequently there are the log-likelihood functions for a test hypothesis $\mathcal{H}_t$ under the assumption of a hypothesis $\mathcal{H}_a$
-%\be
-%\label{lilifunct}
-%\begin{split}
-%  \log\mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu})  = \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\mathcal{H}_a}\log(\nu_i^{\mathcal{H}_t}) -\log(n_i^{\mathcal{H}_a}!) -\nu_i^{\mathcal{H}_t}  \bigr],% \\
-%  \log\mathcal{L}(\HSM,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\SM}) -\log(n_i^{\SM}!) -\nu_i^{\SM}  \bigr], \\
-%  \log\mathcal{L}(\HSM,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\alt}) -\log(n_i^{\SM}!) -\nu_i^{\alt}  \bigr], \\
-%  \log\mathcal{L}(\Halt,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\SM}) -\log(n_i^{\alt}!) -\nu_i^{\SM}  \bigr], \\
-%  \log\mathcal{L}(\Halt,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\alt}) -\log(n_i^{\alt}!) -\nu_i^{\alt}  \bigr], 
-%  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
-%\end{split}
-%\ee
-%where $n_{i,\mathrm{obs}}$ is the observed number of events in the $i$-th bin of the $\Delta \phi_{\ell\ell}$ distribution. 
-Eqs.~\ref{lilifunct} allow us to construct the test statistic as the log-likelihood ratio
-\be
-\begin{split}
-  \Lambda(\vec{n}_\mathrm{obs}) =& \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
-                                =& \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-\end{split}
-\ee
-where $\vec{n}_{\mrm{obs}}$ are generated by a Poisson distribution of $\nu_i^{\SM}$ and $\nu_i^{\alt}$
-from the $\Delta \phi_{\ell\ell}$ histograms for $\HSM$ and $\Halt$, respectively.
-% , yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
-\begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
-\includegraphics[width=0.49\textwidth]{./LogLikelihoods_LO.eps}
-\hfill
-\includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.eps}
-\caption{\label{fig:vii}
-Probability distributions of the log-likelihood ratio $\Lambda$ assuming that the observed events follow the SM hypothesis (red) or an alternative hypothesis (blue) 
-with $(\DConeV,\DConeA)=(0.8,0.24)$.
-The solid lines include statistic and systematic uncertainties as described in the text, whereas the dashed lines only include statistic uncertainties.
-The left plot shows the separating power using LO input with $\Delta_\mathrm{syst.}=30\%$, 
-the right plot is obtained at NLO QCD with $\Delta_\mathrm{syst.}=15\%$, assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
-}
-\end{figure}
-%\be
-%\begin{split}
-%  \Lambda(\HSM) =&  \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-%                                =& \, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-%\end{split}
-%\ee
-%and similarly
-%\be
-%\begin{split}
-%  \Lambda(\Halt) =& -2 \, \log \biggl( \mathcal{L}(\Halt,\vec{n}|\HSM,\vec{\nu})%  \big/ \mathcal{L}(\Halt,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-%                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-%\end{split}
-%\ee
-%This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the 
-% $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
-Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
-%Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
-An example of two such probability distributions is shown in Figs.~\ref{fig:vii} for LO and NLO QCD, respectively. 
-For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
-\begin{equation}
-    \alpha = \int^{\hLambda}_{-\infty} \mathrm{d}\Lambda \; P(\Lambda | {\HSM}).
-\end{equation}
-Similarly, the probability of accepting $\mathcal{H}_{\SM}$ even though $\mathcal{H}_{\alt}$ is correct (type-II error) is given as 
-\begin{equation}
-    \beta = \int_{\hLambda}^{\infty} \mathrm{d}\Lambda \; P(\Lambda|\Halt).
-\end{equation}
-We define $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of {\it incorrectly} rejecting one hypothesis in favor of the other. 
-The value $\alpha(\hLambda)$ is then a measure of statistical discrimination between the two hypotheses. 
-It can be translated into the more familiar number of standard deviations by 
-\begin{equation}
-\sigma = \sqrt{2} \, \erf^{-1}(1-\alpha),
-\end{equation}
-where $\erf^{-1}$ is the inverse error function. 
-
-The above discussion made so far no mention of systematic uncertainties.
-In this work we would like to include the leading theoretical uncertainties from unphysical scale dependence and errors associated with parton distribution functions.
-For simplicity we neglect experimental systematics such as efficiencies or momentum smearing effects.
-Note however that we include realistic detector acceptances through the cuts in Eq.~\ref{selectioncuts}.
-Statistical fluctuations are obviously included through the Poisson distribution in Eq.~(\ref{lili}).
-Following Ref.~\cite{Conway}, we include the theoretical uncertainties 
-by integrating the expected number of events over the range $(1 \pm \Delta_\mathrm{unc.})$ 
-when generating the pseudo-experiments.
-This is achieved by modifying the likelihood function in Eq.~\ref{lili} according to
-\be
-  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}  (1 \pm \Delta_\mathrm{unc.}) \right),
-\ee
-where we choose $\mathcal{G}$ to be a normalized function uniformly distributed around $\tilde{\nu}_i^\mathcal{H}$ with spead $\Delta_\mathrm{unc.}$.
-The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the cross section and the assumed luminosity.
-As mentioned in the previous Section, we choose $\Delta_\mathrm{unc.} = 30\%$ at LO
-and $\Delta_\mathrm{unc.} = 15\%$ at NLO QCD in our analysis.
-The effect of these additional uncertainties is to broaden the distributions in $\Lambda$, 
-resulting in a larger overlap between the two distributions, and consequently a larger $\alpha$ value and less discriminatory power between the two hypotheses. 
-This feature is clearly visible in Fig.~\ref{fig:vii}, when comparing the solid with the doted curves. 
-Contrasting the LO results in Fig.~\ref{fig:vii}(left) with the NLO result (right) shows that 
-the lower uncertainty associated with the NLO prediction allows for significantly better statistical discrimination between the hypotheses.
-Also the increase of the NLO cross section due to the $K$-factor of $\approx1.4$ leads to a larger number of expected events and therefore to smaller statistical uncertainties.
-
-
-\begin{figure}[t]
-\centering
-\includegraphics[scale=0.6]{LHC_53_SigmaNLO.eps}
-\caption{ \label{fig:viii} Relative deviations of the NLO QCD cross section as a function of relative shifts in vector and axial couplings wrt. the SM.
-The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described in Eq.~3.8. }
-\end{figure}
 
 We now present the results of our analysis in Figs.~\ref{fig:viii} and~\ref{fig:ix}.
-The first Figure shows the NLO QCD cross section relative to the SM cross section 
-including selection cuts of Eq.~\ref{selectioncuts} for a wide range of top-Z vector and axial couplings.
-This grid of 3200 NLO QCD cross sections is generated with the fit described around Eq.~\ref{couplfit}, at low computational cost.
-We find that within the given range the cross section varies by about $\pm 50\%$.
-Note that the remaining scale unceratinty at NLO QCD was found to be $\sim 15\%$ which roughly corresponds to the area inside the dotted band in Fig.~\ref{fig:viii}.
-Within this band a rate measurement alone is not sensitive to any deviation of the coupling, this is true for example for $(\Delta\ConeV,\Delta\ConeA)=(1.7,-0.3)$ which is far off the SM value.
-We will later see that adding shape information will improve this situation.
-It is clearly noticable that cross sections in Fig.~\ref{fig:viii} are symmetric around the axis $\Delta\ConeV=-1$. This feature can be easily understood
-from the fact that the LO cross section is dominantly proportional to $\ConeV^2+\ConeA^2$ and $\Delta\ConeV=-1$ corresponds to the point $\ConeV=0$.
-We expect to see a similar symmetry around $\Delta\ConeA=-1$ but we do not consider it here since the sign of the axial coupling is already highly constrained from 
-the LEP measurements ({\bf check or remove!!}).
-We also would like to note that we studied the effects of coupling shifts on the top quark forward-backward asymmetry at the Tevatron.
-At leading order, we considered the parity-violating process $q \bar{q} \to Z/\gamma^* \to \ttb$ with shifts in $\ttbZ$ couplings as assumed in Fig.~\ref{fig:viii}.
-We find that within this range no significant contribution to the forward-backward asymmetry is obtained.
+
 
 Using the interpolation of Eq.~\ref{} we generate $10^4$ distributions in $\Delta \phi_{\ell\ell}$ for a grid of $xx \, C_V \times yy\, C_A$ couplings 
 choices in the range $\pm 3$ and $\pm 0.4$, respectively. 
@@ -881,10 +926,10 @@ This also explains why the tongue is more prominent in the LO analysis.
 % The values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ in each bin are therefore similar, and the log of their ratio is small. 
 % The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. 
 % This means that the large significance values are not greatly reduced by the theoretical uncertainty.  
-{\bf would this be seen in some other treatment of the scale uncertainty? corresponds to what you'd think, or not? on the one hand, 
-the shape change should be less sensitive to the uncertainty than the overall cross section. on the other, in each bin the number is similar to that of the SM, 
-we should be able to wiggle them so that they coincide with the SM, whereas if the overall cross section is very different from the SM, 
-then the scale uncertainty can't do much. } 
+% {\bf would this be seen in some other treatment of the scale uncertainty? corresponds to what you'd think, or not? on the one hand, 
+% the shape change should be less sensitive to the uncertainty than the overall cross section. on the other, in each bin the number is similar to that of the SM, 
+% we should be able to wiggle them so that they coincide with the SM, whereas if the overall cross section is very different from the SM, 
+% then the scale uncertainty can't do much. } 
 
 In figure \ref{fig:LHC13data}, we show results of the analysis for 30 and 3000 $\invfb$ of data. 30 $\invfb$ of data should be available after 
 the first year or so of the high energy run, while 3000 $\invfb$ is the benchmark value for the complete dataset over the lifetime of the LHC. 
