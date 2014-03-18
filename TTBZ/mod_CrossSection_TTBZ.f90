@@ -913,7 +913,6 @@ ENDIF
 IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.3 ) THEN
    NLO_Res_UnPol( 0) = NLO_Res_UnPol(0)  - Ren_Res_UnPol*4d0/3d0*2d0   ! Raoul's gamma5 ren
 ENDIF
-print *, NLO_Res_UnPol(-2)/LO_Res_UnPol
 
 
 !  normalization
