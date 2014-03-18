@@ -91,15 +91,6 @@ EvalCS_1L_ttbggZ = 0d0
    NRndHel=8
 
 
- print *, 'Mom Cons check:'
- print *, -MomExt(1:4,1)-MomExt(1:4,2)+MomExt(1:4,3)+MomExt(1:4,4)+MomExt(1:4,5)
- print *, 'momsq check:'
- print *, ExtParticle(1)%PartType,sqrt(ExtParticle(1)%Mom(1)**2-ExtParticle(1)%Mom(2)**2-ExtParticle(1)%Mom(3)**2-ExtParticle(1)%Mom(4)**2)
- print *, ExtParticle(2)%PartType,sqrt(ExtParticle(2)%Mom(1)**2-ExtParticle(2)%Mom(2)**2-ExtParticle(2)%Mom(3)**2-ExtParticle(2)%Mom(4)**2)
- print *, ExtParticle(3)%PartType,sqrt(ExtParticle(3)%Mom(1)**2-ExtParticle(3)%Mom(2)**2-ExtParticle(3)%Mom(3)**2-ExtParticle(3)%Mom(4)**2)
- print *, ExtParticle(4)%PartType,sqrt(ExtParticle(4)%Mom(1)**2-ExtParticle(4)%Mom(2)**2-ExtParticle(4)%Mom(3)**2-ExtParticle(4)%Mom(4)**2)
- print *, ExtParticle(5)%PartType,sqrt(ExtParticle(5)%Mom(1)**2-ExtParticle(5)%Mom(2)**2-ExtParticle(5)%Mom(3)**2-ExtParticle(5)%Mom(4)**2)
-
 
 IF( TOPDECAYS.NE.0 ) THEN
    call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),.false.,MomExt(1:4,6:8),PSWgt2)
@@ -162,25 +153,6 @@ ENDIF
       EvalCS_1L_ttbggZ = 0d0
       return
    endif
-
-! gosam pt 1
-   MomExt(1:4,1) = (/  250.00000000000000d0,    0.0000000000000000d0,   0.0000000000000000d0,        250.00000000000000d0/)
-   MomExt(1:4,2) = (/  250.00000000000000d0,    0.0000000000000000d0,   0.0000000000000000d0,       -250.00000000000000d0/)     
-   MomExt(1:4,5) = (/  175.22200924704686d0,    27.222472800185145d0,  -11.880541334081011d0,        22.607570343240067d0/)     
-   MomExt(1:4,4) = (/  198.37810192117584d0,   -80.809072464118643d0,  -57.031626618050183d0,       -16.177722170829782d0/)     
-   MomExt(1:4,3) = (/  126.39988883177732d0,    53.586599663933455d0,   68.912167952131227d0,       -6.4298481724103009d0/)
-!gosam
-!gosam!pt2 
-!gosam
-! MomExt(1:4,1) = (/250.00000000000000d0,  0.0000000000000000d0,   0.0000000000000000d0,   250.00000000000000d0/)     
-! MomExt(1:4,2) = (/250.00000000000000d0,  0.0000000000000000d0,   0.0000000000000000d0,  -250.00000000000000d0/)     
-! MomExt(1:4,5) = (/179.26513131988636d0, -7.5033384307890731d0,   16.473309176988511d0,   49.988771782156249d0/)     
-! MomExt(1:4,4) = (/208.18599472610890d0,  29.743769151017364d0,  -40.269112945937856d0,  -107.35769715925237d0/)     
-! MomExt(1:4,3) = (/112.54887395400472d0, -22.240430720228282d0,   23.795803768949341d0,   57.368925377096112d0/)
-
-   MomExt=MomExt*GeV
-   IsFac=MomCrossing(MomExt)
-
 
 
 ! we still need this for the massless qqZ couplings
@@ -312,8 +284,7 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.1 ) THEN
           AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
 
 ! QP 
-!          if ( AccPoles .gt. DPtol ) then
-          if (.true.) then
+          if ( AccPoles .gt. DPtol ) then
              useQP=useQP+1
 !             QPredo(iPrimAmp,1)=APrimAmp
 !             QPredo(iPrimAmp,2:PrimAmps(APrimAmp)%NumSisters+1)=PrimAmps(APrimAmp)%Sisters(1:PrimAmps(APrimAmp)%NumSisters)
@@ -489,8 +460,7 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.2 ) THEN
 
 
 ! QP 
-!          if ( AccPoles .gt. DPtol ) then
-          if (.true.) then
+          if ( AccPoles .gt. DPtol ) then
              useQP=useQP+1
              if (PrimAmps(APrimAmp)%NumSisters .gt. 0) then
                 lastSister=PrimAmps(APrimAmp)%Sisters(PrimAmps(APrimAmp)%NumSisters)
@@ -703,8 +673,7 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.2 ) THEN
           AccPoles = CheckPoles(PrimAmps(APrimAmp),BornAmps(APrimAmp),rdiv(1:2))
 
 ! QP 
-!          if ( AccPoles .gt. DPtol ) then
-          if (.true.) then
+          if ( AccPoles .gt. DPtol ) then
              useQP=useQP+1
 
              if (PrimAmps(APrimAmp)%NumSisters .gt. 0) then
@@ -906,7 +875,6 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.3 ) THEN
 
 
 ENDIF
-      print *, 'done helicity #',iHel
     enddo! helicity loop
 ENDIF
 
@@ -931,19 +899,6 @@ IF( Correction.EQ.0 ) THEN
 ELSEIF( Correction.EQ.1 ) THEN
 !  overall normalization: (4*Pi)^eps/Gamma(1-eps)
 !  CT contributions
-   print *, 'before renorm'
-   print *, 'LO', LO_Res_UnPol*IsFac*GeV**2
-   print *, 'gamma-5 ren', -Ren_Res_UnPol/LO_Res_UnPol*8/3
-   print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
-   print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
-   print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
-   print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
-   print *,  'bos fin', NLO_Res_UnPol(0)/LO_Res_UnPol+NLO_Res_UnPol(1)/LO_Res_UnPol
-   print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
-   print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
-   print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
-   print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
-   print *, 'ferm fin', (NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol
 
 IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.1 ) THEN
                         ! beta        !top WFRC
@@ -953,36 +908,12 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.1 ) THEN
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol  ! shift alpha_s^DR --> alpha_s^MSbar
 
-   print * , 'converting to CDR for GOSAM comparison'
-   NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) - LO_Res_Unpol  ! shift to T'H SCHEME for comparisons
-
 
 ENDIF
 IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.3 ) THEN
    NLO_Res_UnPol( 0) = NLO_Res_UnPol(0)  - Ren_Res_UnPol*4d0/3d0*2d0   ! Raoul's gamma5 ren
 ENDIF
-   print *, 'after renorm'
-   print *, 'LO', LO_Res_UnPol*IsFac*GeV**2
-   print *, 'gamma-5 ren', -Ren_Res_UnPol/LO_Res_UnPol*8/3
-   print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
-   print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
-   print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
-   print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
-   print *,  'bos fin', NLO_Res_UnPol(0)/LO_Res_UnPol+NLO_Res_UnPol(1)/LO_Res_UnPol
-   print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
-   print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
-   print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
-   print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
-   print *, 'ferm fin', (NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol
-   print *, ''
-   print *,  'bos fin', real(NLO_Res_UnPol(0)/LO_Res_UnPol+NLO_Res_UnPol(1)/LO_Res_UnPol)
-   print *, 'ferm fin',real( (NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol)
-   print *, ''
-   print *,'ferm+bos:'
-   print *, 'DP', real((NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2))/LO_Res_UnPol)
-   print *, 'SP', real((NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_UnPol)
-   print *, 'fin', real((NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol)
-   stop
+print *, NLO_Res_UnPol(-2)/LO_Res_UnPol
 
 
 !  normalization
@@ -990,6 +921,7 @@ ENDIF
    NLO_Res_UnPol(-2:1) = NLO_Res_UnPol(-2:1)           * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor * alpha4Pi
    NLO_Res_UnPol_Ferm(-2:1) = NLO_Res_UnPol_Ferm(-2:1) * ISFac * (alpha_s4Pi*RunFactor)**2 * alpha_sOver2Pi*RunFactor * alpha4Pi
    EvalCS_1L_ttbggZ = ( NLO_Res_UnPol(0)+NLO_Res_UnPol(1) + NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1) ) * PreFac
+
 
 
 ! LO_Res_Unpol      =LO_Res_Unpol/(alpha_s*RunFactor)**2
@@ -1162,7 +1094,7 @@ complex(8) :: tmpBornResults(14),RenormAmps(14)
 ! ZQcoupl=2           ! up and down
   ZQcoupl=3           !vector and axial-vector
   npdfmin=1
-  npdfmax=1
+  npdfmax=2
   DPtol=1d-4
   QPtol=1d-3
 
@@ -1268,45 +1200,6 @@ complex(8) :: tmpBornResults(14),RenormAmps(14)
       return
    endif
 
-! gosam pt
-   MomExt(1:4,1) = (/  250.00000000000000d0,    0.0000000000000000d0,   0.0000000000000000d0,        250.00000000000000d0/)
-   MomExt(1:4,2) = (/  250.00000000000000d0,    0.0000000000000000d0,   0.0000000000000000d0,       -250.00000000000000d0/)     
-   MomExt(1:4,5) = (/  175.22200924704686d0,    27.222472800185145d0,  -11.880541334081011d0,        22.607570343240067d0/)     
-   MomExt(1:4,4) = (/  198.37810192117584d0,   -80.809072464118643d0,  -57.031626618050183d0,       -16.177722170829782d0/)     
-   MomExt(1:4,3) = (/  126.39988883177732d0,    53.586599663933455d0,   68.912167952131227d0,       -6.4298481724103009d0/)
-!gosam
-!gosam!pt2 
-!gosam
- MomExt(1:4,1) = (/250.00000000000000d0,  0.0000000000000000d0,   0.0000000000000000d0,   250.00000000000000d0/)     
- MomExt(1:4,2) = (/250.00000000000000d0,  0.0000000000000000d0,   0.0000000000000000d0,  -250.00000000000000d0/)     
- MomExt(1:4,5) = (/179.26513131988636d0, -7.5033384307890731d0,   16.473309176988511d0,   49.988771782156249d0/)     
- MomExt(1:4,4) = (/208.18599472610890d0,  29.743769151017364d0,  -40.269112945937856d0,  -107.35769715925237d0/)     
- MomExt(1:4,3) = (/112.54887395400472d0, -22.240430720228282d0,   23.795803768949341d0,   57.368925377096112d0/)
-
-   MomExt=MomExt*GeV
-
-! MomExt(1:4,1)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,   0.5000000000000000D+03  /)/100d0
-! MomExt(1:4,2)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,  -0.5000000000000000D+03  /)/100d0
-! MomExt(1:4,5)=(/      0.4466330696862922D+03,   0.1521554279252636D+03,   0.3408985991020550D+03,  -0.1737497332963036D+03  /)/100d0
-! MomExt(1:4,4)=(/      0.3698572218766013D+03,  -0.1645875540767423D+02,  -0.3122106305328265D+03,   0.9549343499425849D+02  /)/100d0
-! MomExt(1:4,3)=(/      0.1835097084371113D+03 , -0.1356966725175894D+03,  -0.2868796856922846D+02,   0.7825629830204510D+02  /)/100d0
-
-! MomExt(1:4,1)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,   0.5000000000000000D+03   /)/100d0
-! MomExt(1:4,2)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,  -0.5000000000000000D+03   /)/100d0
-! MomExt(1:4,5)=(/      0.4537079959096802D+03,   0.1581677262999214D+03,   0.2707949609336001D+03,  -0.2785228985962585D+03   /)/100d0
-! MomExt(1:4,4)=(/      0.1936330289864301D+03,  -0.5982057623498757D+02,  -0.3681031460485045D+02,   0.5129570461613380D+02   /)/100d0
-! MomExt(1:4,3)=(/      0.3526589751038897D+03,  -0.9834715006493381D+02,  -0.2339846463287496D+03,   0.2272271939801247D+03   /)/100d0
-
-! MomExt(1:4,1)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,   0.5000000000000000D+03  /)/100d0
-! MomExt(1:4,2)=(/      0.5000000000000000D+03,   0.0000000000000000D+00,   0.0000000000000000D+00,  -0.5000000000000000D+03  /)/100d0
-! MomExt(1:4,5)=(/      0.3808855687121014D+03,   0.3284222399723979D+03,  -0.9378429309512216D+01,   0.8482743546954623D+02  /)/100d0
-! MomExt(1:4,4)=(/      0.4751116412440198D+03,  -0.4206924423299802D+03,  -0.2915421705347285D+02,  -0.1340521250858091D+03  /)/100d0
-! MomExt(1:4,3)=(/      0.1440027900438789D+03,   0.9227020235758222D+02,   0.3853264636298505D+02,   0.4922468961626290D+02  /)/100d0
-
-
-
-
-
 ! we still need this for the massless qqZ couplings
    pZsq=MomExt(1,3)*MomExt(1,3)-MomExt(2,3)*MomExt(2,3)-MomExt(3,3)*MomExt(3,3)-MomExt(4,3)*MomExt(4,3)
    if ( ZDecays.lt.10 .and. ZDecays.gt.0 ) then
@@ -1327,10 +1220,6 @@ complex(8) :: tmpBornResults(14),RenormAmps(14)
    ENDIF
 
 
-!! RR remove
-   PDFFac_a(up)=1d0
-   PDFFac_a(dn)=0d0
-   PDFFac_b=0d0
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
    RunFactor = RunAlphaS(NLOParam,MuRen)
@@ -1827,7 +1716,6 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.3 ) THEN
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 ENDIF
 
-print *, 'done helicity #', iHel
     enddo!helicity loop
  enddo ! npdf
 ENDIF
@@ -1855,33 +1743,10 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.1 ) THEN
    NLO_Res_UnPol_Ferm( 0) = NLO_Res_UnPol_Ferm( 0) + (2d0/3d0*Nf_heavy)*2d0*dlog(MuRen/m_top)*LO_Res_Unpol  ! finite log(mu2) contrib. from heavy flavor in alpha_s ren.
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + (-5d0/2d0*8d0/3d0 )*LO_Res_Unpol   ! finite contribution from top WFRC's
    NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) + LO_Res_Unpol ! shift alpha_s^DR --> alpha_s^MSbar
-   print *, 'coverting to CDR for Gosam comparison'
- NLO_Res_UnPol( 0) = NLO_Res_UnPol( 0) - 4d0/3d0*LO_Res_Unpol  ! shift to T'H SCHEME
 ENDIF
 IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.3 ) THEN
    NLO_Res_UnPol( 0)=NLO_Res_UnPol(0) - Ren_Res_UnPol*4d0/3d0*2d0  ! Raoul's gamma5 ren
 ENDIF
-
-print *, 'after renorm'
- print *, 'LO', LO_Res_UnPol*IsFac*GeV**2
- print *, 'LO', LO_Res_UnPol*IsFac*GeV**2*alpha4Pi
- print *, 'gamma-5 ren', -8d0/3d0*Ren_Res_UnPol/LO_Res_UnPol
-print *, 'bos DP', NLO_Res_UnPol(-2)/LO_Res_UnPol
-print *, 'bos SP', NLO_Res_UnPol(-1)/LO_Res_UnPol
-print *, 'bos CC', NLO_Res_UnPol(0)/LO_Res_UnPol
-print *, 'bos rat', NLO_Res_UnPol(1)/LO_Res_UnPol
-print *,  'bos fin', NLO_Res_UnPol(0)/LO_Res_UnPol+NLO_Res_UnPol(1)/LO_Res_UnPol
-print *, 'ferm DP',  NLO_Res_UnPol_Ferm(-2)/LO_Res_UnPol
-print *, 'ferm SP',  NLO_Res_UnPol_Ferm(-1)/LO_Res_UnPol
-print *, 'ferm CC',  NLO_Res_UnPol_Ferm(0)/LO_Res_UnPol
-print *, 'ferm rat', NLO_Res_UnPol_Ferm(1)/LO_Res_UnPol
-print *, 'ferm fin', (NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol
-print *, ''
-print *,'ferm+bos:'
-print *, 'DP', (NLO_Res_UnPol(-2)+NLO_Res_UnPol_Ferm(-2))/LO_Res_UnPol
-print *, 'SP', (NLO_Res_UnPol(-1)+NLO_Res_UnPol_Ferm(-1))/LO_Res_UnPol
-print *, 'fin', (NLO_Res_UnPol(0)+NLO_Res_UnPol_Ferm(0)+NLO_Res_UnPol(1)+NLO_Res_UnPol_Ferm(1))/LO_Res_UnPol
-stop
 
 
 !  normalization
