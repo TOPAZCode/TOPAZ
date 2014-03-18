@@ -45,9 +45,13 @@ real(8), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 real(8), public, parameter :: GeV=0.01d0
 
 
-!orig real(8), public, parameter :: alpha = 1d0/(137d0)
+real(8), public, parameter :: alpha = 1d0/(137d0)
+!gosam 
+real(8), public,parameter ::  alpha4Pi=0.30282212021435284d0**2
 !orig real(8), public, parameter :: alpha4Pi = alpha*4d0*DblPi
-real(8), public, parameter :: GF = (1.16639d-5)/GeV**2  !GF = (1.166379d-5)/GeV**2  ! (1.16639d-5)/GeV**2  !
+!real(8), public, parameter :: GF = (1.16639d-5)/GeV**2  !GF = (1.166379d-5)/GeV**2  ! (1.16639d-5)/GeV**2  !
+!gosam
+real(8), public, parameter :: GF = (1.166379d-5)/GeV**2
 real(8), public            :: m_Top, m_SMTop
 real(8), public            :: m_Bot
 real(8), public, parameter :: m_Chm   = 0d0
@@ -55,7 +59,9 @@ real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
 real(8), public, parameter :: m_Z     = 91.1876*GeV!  91.19*GeV ! 91.18*GeV!     ! 
-real(8), public, parameter :: m_W     = 80.385d0*GeV  ! 80.45*GeV  !80.385152965002916d0*GeV  !80.37576d0*GeV !
+!real(8), public, parameter :: m_W     = 80.385d0*GeV  ! 80.45*GeV  !80.385152965002916d0*GeV  !80.37576d0*GeV !
+! gosam
+real(8), public, parameter :: m_W     = 80.485d0*GeV  ! 80.45*GeV  !80.385152965002916d0*GeV  !80.37576d0*GeV !
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
 real(8), public            :: m_HTop
@@ -63,11 +69,15 @@ real(8), public, parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8), public, parameter :: g_weak = dsqrt(g2_weak)
 !orig real(8), public, parameter :: sw = dsqrt(4.d0*DblPi*alpha/g2_weak)
 !orig real(8), public, parameter :: sw2 = sw**2
-real(8), public, parameter :: sw2 = 1d0 - m_W**2/m_Z**2
-real(8), public, parameter :: sw = dsqrt(sw2)
-real(8), public, parameter :: alpha4Pi = g2_weak*sw2
-real(8), public, parameter :: alpha = alpha4Pi/4d0/DblPi
-real(8), public, parameter :: cw = dsqrt(1d0-sw2)
+!real(8), public, parameter :: sw2 = 1d0 - m_W**2/m_Z**2
+!real(8), public, parameter :: sw = dsqrt(sw2)
+!gosam
+real(8), public, parameter :: sw=4.70066556669314d-1
+real(8), public, parameter :: sw2 = sw**2
+real(8), public, parameter :: cw =8.82630971754932d-01
+!real(8), public, parameter :: alpha4Pi = g2_weak*sw2
+!real(8), public, parameter :: alpha = alpha4Pi/4d0/DblPi
+!real(8), public, parameter :: cw = dsqrt(1d0-sw2)
 real(8), public, parameter :: EL = dsqrt(4.d0*DblPi*alpha)
 real(8), public            :: Ga_Top(0:1)
 real(8), public            :: Ga_W(0:1)
@@ -292,7 +302,7 @@ integer, public :: PrimAmp1_165234,PrimAmp1_152364,PrimAmp1_162354,PrimAmp1_1235
 integer, public :: PrimAmp3_15432,PrimAmp3_14532,PrimAmp3_14352,PrimAmp3_14325
 integer, public :: PrimAmp4_12354,PrimAmp4_12534,PrimAmp4_15234,PrimAmp4_12345
 integer, public :: PrimAmp2_12345,PrimAmp2_15234,PrimAmp2_12534,PrimAmp2_12354
-integer, public :: PrimAmp2_15243,PrimAmp2m_15243,PrimAmp2_12543,PrimAmp2_12453,PrimAmp2m_12435,PrimAmp2_12435,PrimAmp2m_12543,PrimAmp2m_12453
+integer, public :: PrimAmp2_15243,PrimAmp2m_15243,PrimAmp2_12543,PrimAmp2_12453,PrimAmp2m_12435,PrimAmp2_12435,PrimAmp2m_12543,PrimAmp2m_12453,PrimAmp2_13245,PrimAmp2_13254,PrimAmp2_14235,PrimAmp2_14253,PrimAmp2m_13245,PrimAmp2m_13254,PrimAmp2m_14235,PrimAmp2m_14253
 integer, public :: PrimAmp2m_12345,PrimAmp2m_15234,PrimAmp2m_12534,PrimAmp2m_12354
 
 
