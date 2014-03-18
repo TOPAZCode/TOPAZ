@@ -73,7 +73,6 @@ complex(8) :: couplZFF_right,couplZFF_left,couplZFF
    if( ZDecays.lt.10  ) then  ! Z is on-shell
       couplZTT_left_dyn  = couplZTT_left * PropZ *couplZFF
       couplZTT_right_dyn = couplZTT_right * PropZ *couplZFF
-
    elseif( ZDecays.gt.10 ) then  ! Z is off-shell
       couplZTT_left_dyn  = couplZTT_left * PropZ *couplZFF + Q_Top*PropPhoton*Q_el
       couplZTT_right_dyn = couplZTT_right*PropZ *couplZFF + Q_Top*PropPhoton*Q_el
@@ -149,21 +148,34 @@ END SUBROUTINE
     integer, intent(in)     :: QType, QHel
     real(8), intent(out)     :: couplZQQ, couplGQQ
 
+    real(8) :: couplZUU_left_tmp,couplZUU_right_tmp,couplZDD_left_tmp,couplZDD_right_tmp
+    real(8) :: couplZUU_V,couplZUU_A,couplZDD_V,couplZDD_A
+
+    couplZUU_V=(couplZUU_left+couplZUU_right)/2d0     *1d0
+    couplZUU_A=(couplZUU_left-couplZUU_right)/2d0     *1d0 !(1d0-0.045d0)
+    couplZDD_V=(couplZDD_left+couplZDD_right)/2d0     *1d0
+    couplZDD_A=(couplZDD_left-couplZDD_right)/2d0     *1d0 !(1d0-0.045d0)
+
+    couplZUU_left_tmp  = couplZUU_V+couplZUU_A
+    couplZUU_right_tmp = couplZUU_V-couplZUU_A
+    couplZDD_left_tmp  = couplZDD_V+couplZDD_A
+    couplZDD_right_tmp = couplZDD_V-couplZDD_A
+
 ! Decide on quark charge and isospin    
     if ( mod(QType,2) .eq. 1) then      ! up-type quark
        if (QHel .eq. -1) then
-          couplZQQ=couplZUU_left
+          couplZQQ=couplZUU_left_tmp
        elseif (QHel .eq. 1) then
-          couplZQQ=couplZUU_right
+          couplZQQ=couplZUU_right_tmp
        else
           call Error("Error in ZDecay: QHel undefined",QHel)
        endif
        couplGQQ=Q_up
     elseif ( mod(QType,2) .eq. 0) then      ! down-type quark
        if (QHel .eq. -1) then
-          couplZQQ=couplZDD_left
+          couplZQQ=couplZDD_left_tmp
        elseif (QHel .eq. 1) then
-          couplZQQ=couplZDD_right
+          couplZQQ=couplZDD_right_tmp
        else
           call Error("Error in ZDecay: QHel undefined",QHel)
        endif    

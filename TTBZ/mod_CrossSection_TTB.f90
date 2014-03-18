@@ -446,6 +446,17 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_1L_ttbqqb_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_1L_ttbqqb_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_1L_ttbqqb(yRnd,VgsWgt)
+EvalCS_1L_ttbqqb_MPI=0
+RETURN
+END FUNCTION
+
+
 
 FUNCTION EvalCS_1L_ttbqqb(yRnd,VgsWgt)
 use ModProcess
@@ -1044,6 +1055,18 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_Real_ttbggg_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_Real_ttbggg_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_Real_ttbggg(yRnd,VgsWgt)
+EvalCS_Real_ttbggg_MPI=0
+RETURN
+END FUNCTION
+
+
+
 
 FUNCTION EvalCS_Real_ttbggg(yRnd,VgsWgt)
 use ModProcess
@@ -1262,6 +1285,21 @@ END FUNCTION
 
 
 
+FUNCTION EvalCS_Real_ttbqqbg_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_Real_ttbqqbg_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_Real_ttbqqbg(yRnd,VgsWgt)
+EvalCS_Real_ttbqqbg_MPI=0
+RETURN
+END FUNCTION
+
+
+
+
+
+
 FUNCTION EvalCS_Real_ttbqqbg(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -1286,6 +1324,7 @@ real(8) :: MadGraph_tree,SpinDecorr
 logical :: applyPSCut,applySingCut
 real(8),parameter :: ThresholdCutOff = 1.00d0
 include "vegas_common.f"
+
 
   ParityFlip=1
   EvalCS_Real_ttbqqbg = 0d0

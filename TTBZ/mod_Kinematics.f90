@@ -48,7 +48,7 @@ real(8),public ::MInv_LB
 
 !DEC$ IF(_UseMPIVegas.EQ.1)
 integer,public,parameter :: NUMHISTO=30       ! this has to match the constants in pvegas_mpi.c
-integer,public,parameter :: MXHISTOBINS=100
+integer,public,parameter :: MXHISTOBINS=55
 type, BIND(C) :: ReducedHistogram
     real(8) :: Value(1:MXHISTOBINS)
     real(8) :: Value2(1:MXHISTOBINS)
@@ -641,9 +641,9 @@ ELSEIF( ObsSet.EQ.54 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar dec
    pT_ll_cut  = 35d0*GeV
    HT_jet_cut = 120*GeV  
 
-
    Rsep_jetlep = 0.3d0
    Frac_sep_jetlep=0.15d0
+
 
 ELSEIF( ObsSet.EQ.55 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay ) same as 52 but no cuts
 
@@ -668,6 +668,23 @@ ELSEIF( ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar dec
     pT_miss_cut = 20d0*GeV      *0d0 
     eta_lep_cut = 2.5d0         *1d2
     Rsep_jetlep = 0.4d0         *0d0
+
+
+
+ELSEIF( ObsSet.EQ.57 ) THEN! set of observables for ttb+Z ( semi-lept. ttbar decays and di-lept. Z decay ) at Tevatron
+
+
+    Rsep_jet    = 0.4d0
+    pT_bjet_cut = 15d0*GeV
+    eta_bjet_cut= 2.5d0
+    pT_jet_cut  = 15d0*GeV
+    eta_jet_cut = 2.5d0
+
+    pT_lep_cut  = 15d0*GeV
+    pT_miss_cut = 20d0*GeV
+    eta_lep_cut = 2.5d0
+    Rsep_jetlep = 0.4d0
+
 
 
 ELSEIF ( ObsSet.EQ.60 ) THEN ! Zprime, stable top
@@ -731,6 +748,11 @@ ELSEIF ( ObsSet.EQ.66 ) THEN ! Zprime, semi-hadronic top decay (for CMS analysis
 !   more jet cuts are defined inside KinematicsZprimeTTB subroutine   
 
    
+
+ELSEIF ( ObsSet.EQ.67 ) THEN ! SM Z boson, stable top
+
+
+
 ENDIF
 
 END SUBROUTINE
@@ -3779,6 +3801,7 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(25)%SmearSigma=1d0
 
 
+
        ELSEIF( ObsSet.EQ.54 .or. ObsSet.EQ.58 ) THEN 
 ! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
 ! observed at CMS at sqrt(s)=7 TeV
@@ -3899,7 +3922,43 @@ ELSEIF( ObsSet.EQ.53 .or. ObsSet.EQ.56 ) THEN! set of observables for ttb+Z ( di
           Histo(18)%LowVal = 0d0*GeV
           Histo(18)%SetScale= 100d0
 
-          
+
+
+ELSEIF( ObsSet.EQ.57 ) THEN! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay )
+          if(abs(TopDecays).ne.4)  call Error("TopDecays needs to be 4")
+          if(abs(ZDecays).ne.1)    call Error("ZDecays needs to be 1")
+          NumHistograms = 4
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "y(top)"
+          Histo(1)%NBins  = 30
+          Histo(1)%BinSize= 0.2d0
+          Histo(1)%LowVal =  -3d0
+          Histo(1)%SetScale= 1d0
+
+          Histo(2)%Info   = "y(tbar)"
+          Histo(2)%NBins  = 30
+          Histo(2)%BinSize= 0.2d0
+          Histo(2)%LowVal =  -3d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "y(top) FWD"
+          Histo(3)%NBins  = 1
+          Histo(3)%BinSize= 10d0
+          Histo(3)%LowVal = -5d0
+          Histo(3)%SetScale= 1d0
+
+          Histo(4)%Info   = "y(top) BWD"
+          Histo(4)%NBins  = 1
+          Histo(4)%BinSize= 10d0
+          Histo(4)%LowVal = -5d0
+          Histo(4)%SetScale= 1d0
+
+
+
 
 ELSEIF( ObsSet.EQ.60  ) THEN! set of observables for Zprime, stable tops
           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
@@ -4229,6 +4288,73 @@ ELSEIF( ObsSet.EQ.66 ) THEN ! Zprime, semi-hadronic top decay (for CMS analysis:
           Histo(8)%BinSize= 0.04d0
           Histo(8)%LowVal = -1d0
           Histo(8)%SetScale= 1d0
+
+
+
+ELSEIF( ObsSet.EQ.67  ) THEN! set of observables for SM Z, stable tops
+!           if(Collider.ne.1)  call Error("Collider needs to be LHC!")
+          if(TopDecays.ne.0  ) call Error("TopDecays needs to be 0!")
+          NumHistograms = 9
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+
+          Histo(1)%Info   = "pT_ATop"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 100d0
+
+          Histo(2)%Info   = "pT_Top"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 50d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 100d0
+
+          Histo(3)%Info   = "y_ATop"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.5d0
+          Histo(3)%LowVal =-5.0d0
+          Histo(3)%SetScale= 1d0
+
+          Histo(4)%Info   = "y_Top (FW BWD)"
+          Histo(4)%NBins  = 2
+          Histo(4)%BinSize= 10d0
+          Histo(4)%LowVal =-10.0d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "M_TTbar"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 20d0*GeV
+          Histo(5)%LowVal = 50d0*GeV
+          Histo(5)%SetScale= 100d0
+
+          Histo(6)%Info   = "deltaPhi_TTbar"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.1d0
+          Histo(6)%LowVal = 0d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "CosTheta_scatter"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 0.1d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "CosTheta_star"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 0.1d0
+          Histo(8)%LowVal = -1d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "M_TTbar+jet"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 40d0*GeV
+          Histo(9)%LowVal = 350d0*GeV
+          Histo(9)%SetScale= 100d0
+
 
 
 
@@ -7392,8 +7518,8 @@ real(8) :: pT_lep(4),ET_miss,PT_miss,pT_ATop,pT_Top,HT,ET_bjet
 real(8) :: eta_ATop,eta_Top,eta_lep(1:4),pseudo_Z, pseudo_top, pseudo_tbar
 real(8) :: pT_jet(1:7),eta_jet(1:7),eta_sepa,mT_bln(1:2),pT_Z,eta_Z
 real(8) :: R_lj(1:5),R_PlepM,pT_lept,ET_lept,mT,dPhiLL,CosTheta1,DphiZt,Dphittbar
-real(8) :: pT_ll,HT_jet,WithinCone(1:3),RLept
 integer :: tbar,t,Zbos,inLeft,inRight,realp,bbar,lepM,nubar,b,lepP,nu,qdn,qbup,qbdn,qup,L,N,Zl,Za,ferm_Z,Aferm_Z,jlabel
+real(8) :: pT_ll,HT_jet,WithinCone(1:3),RLept
 integer :: iLept,jLept,jJet,JetIndex(1:4),LepIndex(1:3)
 
 
@@ -7664,7 +7790,7 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
     NBin(22) = WhichBin(22,pseudo_top)
     NBin(23) = WhichBin(23,pseudo_tbar)
 
-       
+
     if( present(PObs) ) then
       PObs(1) = pT_Lep(1)
       PObs(2) = pT_Lep(2)
@@ -7690,6 +7816,7 @@ elseif( ObsSet.eq.52 .or. ObsSet.eq.55 ) then! set of observables for ttb+Z ( di
       PObs(22) = pseudo_top
       PObs(23) = pseudo_tbar
     endif
+
 
 
 
@@ -7865,7 +7992,6 @@ elseif( ObsSet.eq.53 .or. ObsSet.eq.56 ) then! set of observables for ttb+Z ( di
       PObs(25) = Dphittbar
     endif
 
-!-------------------------------------------------------
 
 elseif (ObsSet .eq. 54 .or. ObsSet .eq. 58) then    ! this is for the observed CMS set at 7 TeV
 
@@ -7971,8 +8097,160 @@ elseif (ObsSet .eq. 54 .or. ObsSet .eq. 58) then    ! this is for the observed C
        endif
     enddo
 
- else
 
+
+elseif( ObsSet.eq.57 ) then! set of observables for ttb+Z ( di-lept. ttbar decays and di-lept. Z decay ) at TEvatron
+
+! request at least four jets where two are b-jets
+    NObsJet_Tree = 4
+    if( .not.(NJet.ge.NObsJet_Tree .and. any(JetList(1:NJet).eq.1) .and. any(JetList(1:NJet).eq.2)) ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+
+    pT_jet(1) = get_PT(MomJet(1:4,1))
+    pT_jet(2) = get_PT(MomJet(1:4,2))
+    pT_jet(3) = get_PT(MomJet(1:4,3))
+    pT_jet(4) = get_PT(MomJet(1:4,4))
+    eta_jet(1) = get_ETA(MomJet(1:4,1))
+    eta_jet(2) = get_ETA(MomJet(1:4,2))
+    eta_jet(3) = get_ETA(MomJet(1:4,3))
+    eta_jet(4) = get_ETA(MomJet(1:4,4))
+
+
+    pT_Lep(1)  = get_PT(Mom(1:4,LepP))
+    eta_Lep(1) = get_ETA(Mom(1:4,LepP))
+
+    pT_Lep(2)  = get_PT(Mom(1:4,ferm_Z))
+    eta_Lep(2) = get_ETA(Mom(1:4,ferm_Z))
+
+    pT_Lep(3)  = get_PT(Mom(1:4,Aferm_Z))
+    eta_Lep(3) = get_ETA(Mom(1:4,Aferm_Z))
+
+    pT_miss = get_PT(Mom(1:4,nu))
+
+    MomZ(1:4) = Mom(1:4,ferm_Z)+Mom(1:4,Aferm_Z)
+    pT_Z  = get_PT(MomZ(1:4))
+    eta_Z = get_eta(MomZ(1:4))
+
+    pT_top = get_PT(Mom(1:4,t))
+    eta_top = get_ETA(Mom(1:4,t))
+    eta_atop = get_ETA(Mom(1:4,tbar))
+
+
+
+    DphiLL = dabs( Get_PHI(Mom(1:4,ferm_Z)) - Get_PHI(Mom(1:4,Aferm_Z))  )
+    if( DphiLL.gt.Pi ) DphiLL=dabs(2d0*Pi-DphiLL)
+
+
+
+    MomBoost(1)   = +MomZ(1)
+    MomBoost(2:4) = -MomZ(2:4)
+    MomFermZframe(1:4) = Mom(1:4,ferm_Z)
+    call boost(MomFermZframe(1:4),MomBoost(1:4), get_MInv(MomZ(1:4)) )
+    CosTheta1 = Get_CosAlpha( MomFermZframe(1:4),MomZ(1:4) ) !  = angle between: fermion from Z in the rest frame of the Z and the direction of flight of the Z
+!     CosTheta1 = Get_CosAlpha( MomFermZframe(1:4),MomBoost(1:4) ) !  = angle between: fermion from Z in the rest frame of the Z and the direction of flight of the Z
+
+    DphiZt = dabs( Get_PHI(Mom(1:4,Zbos)) - Get_PHI(Mom(1:4,t))  )
+    if( DphiZt.gt.Pi ) DphiZt=2d0*Pi-DphiZt
+
+    Dphittbar = dabs( Get_PHI(Mom(1:4,t)) - Get_PHI(Mom(1:4,tbar))  )
+    if( Dphittbar.gt.Pi ) Dphittbar=2d0*Pi-Dphittbar
+
+
+
+
+! check cuts
+    if( pT_jet(1).lt.pT_bjet_cut .OR. pT_jet(2).lt.pT_bjet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_jet(1)).gt.eta_bjet_cut .OR. abs(eta_jet(2)).gt.eta_bjet_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_jet(3).lt.pT_jet_cut .OR. pT_jet(4).lt.pT_jet_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_jet(3)).gt.eta_jet_cut .OR. abs(eta_jet(4)).gt.eta_jet_cut) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    NObsJet=0
+    do i=1,NJet
+        if( get_PT(MomJet(1:4,i)).gt.pT_jet_cut .and. abs(get_ETA(MomJet(1:4,i))).lt.eta_jet_cut ) NObsJet=NObsJet+1
+    enddo
+
+    if( pT_lep(1).lt.pT_lep_cut .OR. pT_lep(2).lt.pT_lep_cut .OR. pT_lep(3).lt.pT_lep_cut ) then
+        applyPSCut = .true.
+        RETURN
+    endif
+
+    if( abs(eta_lep(1)).gt.eta_lep_cut .OR. abs(eta_lep(2)).gt.eta_lep_cut  .OR. abs(eta_lep(3)).gt.eta_lep_cut ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    if( pT_miss.lt.pT_miss_cut ) then
+       applyPSCut = .true.
+        RETURN
+    endif
+
+    leptj = (/ LepP,ferm_Z,Aferm_Z /)
+    do i=1,4
+    do j=1,3
+      if( get_R( MomJet(1:4,i),Mom(1:4,leptj(j)) ) .lt. Rsep_jetlep ) then 
+        applyPSCut = .true.
+        RETURN
+      endif
+    enddo
+    enddo
+
+
+
+! binning
+    NBin(1) = WhichBin(1,eta_top)
+    NBin(2) = WhichBin(2,eta_atop)
+    if( eta_top.gt.0d0 ) NBin(3) = WhichBin(3,eta_top)
+    if( eta_top.le.0d0 ) NBin(4) = WhichBin(4,eta_top)
+
+
+    if( present(PObs) ) then
+      PObs(1) = pT_Lep(1)
+      PObs(2) = pT_Lep(2)
+      PObs(3) = pT_Lep(3)
+      PObs(4) = pT_jet(1)
+      PObs(5) = pT_jet(2)
+      PObs(6) = pT_jet(3)
+      PObs(7) = pT_jet(4)
+      PObs(8) = pT_miss
+      PObs(9) = eta_Lep(1)
+      PObs(10) = eta_Lep(2)
+      PObs(11) = eta_Lep(3)
+      PObs(12) = pT_Z
+      PObs(13) = eta_Z
+      PObs(14) = pT_top
+      PObs(15) = eta_top
+      PObs(16) = eta_atop
+      PObs(17) = DphiLL
+      PObs(18) = CosTheta1
+      PObs(19) = DphiZt
+      PObs(20) = Dphittbar
+      PObs(21) = dble(NObsJet)
+      PObs(22) = DphiLL
+      PObs(23) = CosTheta1
+      PObs(24) = DphiZt
+      PObs(25) = Dphittbar
+    endif
+
+!-------------------------------------------------------
+else
   print *, "ObsSet not implemented",ObsSet
   stop
 endif
@@ -10358,6 +10636,55 @@ elseif( ObsSet.eq.66 ) then ! Zprime, semi-hadronic top decay (for CMS analysis:
 
 
 
+
+
+
+
+
+
+
+elseif (ObsSet.EQ.67) then ! set of observables for ttb production without decays, for SM Z
+
+
+    pT_ATop = get_PT(MomTops(1:4,1))
+    pT_Top  = get_PT(MomTops(1:4,2))
+
+    y_ATop = get_ETA(MomTops(1:4,1))
+    y_Top  = get_ETA(MomTops(1:4,2))
+
+    M_TTbar = get_MInv(MomTops(1:4,1)+MomTops(1:4,2))
+
+
+
+    Dphi_TTbar = dabs( Get_PHI(MomTops(1:4,1)) - Get_PHI(MomTops(1:4,2))  )
+    if( Dphi_TTbar.gt.Pi ) Dphi_TTbar=2d0*Pi-Dphi_TTbar
+
+!   scattering angle of the top quark in lab frame
+    CosTheta_scatter = get_CosTheta( MomTops(1:4,2) )
+
+!   see chinese paper, approximates scattering angle in ttb rest frame
+    MomAux1(1:4) = MomTops(1:4,2)
+    MomAux2(1:4) = MomExt(1:4,1)
+    call boost(MomAux1(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)! this seems wrong!!!
+    call boost(MomAux2(1:4),MomTops(1:4,1)+MomTops(1:4,2),m_top)
+    CosTheta_star = get_CosAlpha(MomAux1(1:4),MomAux2(1:4))
+
+
+
+! binning
+    NBin(1) = WhichBin(1,pT_ATop)
+    NBin(2) = WhichBin(2,pT_Top)
+    NBin(3) = WhichBin(3,y_ATop)
+    NBin(4) = WhichBin(4,y_Top)
+    NBin(5) = WhichBin(5,M_TTbar)
+    NBin(6) = WhichBin(6,Dphi_TTbar)
+    NBin(7) = WhichBin(7,CosTheta_scatter)
+    NBin(8) = WhichBin(8,CosTheta_star)
+
+    if( NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)+MomExt(1:4,3)))
+    if( .not. NPlus1PS ) NBin(9) = WhichBin(9,get_MInv(MomTops(1:4,1)+MomTops(1:4,2)))
+
+
 endif
 
 return
@@ -10816,21 +11143,19 @@ real(8) :: LowerBinValue,UpperBinValue,NeighbBinValue,ErrorFunct
         if( .not. present(BinValue) ) call Error("Argument BinValue is missing in call to IntoHisto.")
         LowerBinValue=(NBin-1)*Histo(NHisto)%BinSize + Histo(NHisto)%LowVal
         UpperBinValue=LowerBinValue + Histo(NHisto)%BinSize
-        if (NBin .eq. 1) then
-           NeighbBin=2
+        if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
            NeighbBinValue=UpperBinValue
-        elseif (NBin.eq.Histo(NHisto)%NBins) then
-           NeighbBin=Nbin-1
-           NeighbBinValue=LowerBinValue
+           NeighbBin=NBin+1
+           if( NeighbBin.gt.Histo(NHisto)%NBins  ) NeighbBin=Histo(NHisto)%NBins
         else
-           if( BinValue.gt.LowerBinValue+Histo(NHisto)%BinSize/2d0 ) then
-              NeighbBinValue=UpperBinValue
-              NeighbBin=NBin+1
-           else
-              NeighbBinValue=LowerBinValue
-              NeighbBin=NBin-1
-           endif
+           NeighbBinValue=LowerBinValue
+           NeighbBin=NBin-1
+           if( NeighbBin.le.0 ) NeighbBin=1
         endif
+
+! print *, NBin,NeighbBin
+! pause
+
            ! ErrorFunct ranges between 0...+1
            ! erf(0)=0, erf(1/sqrt2)=0.68, erf(2/sqrt2)=0.95, erf(3/sqrt2)=0.99
            ! --> the smaller SmearSigma the less leakage into the other bin
@@ -10894,7 +11219,7 @@ integer,optional :: iSel
    enddo
 
 !       check gauge invariance
-!        ExtParticle(4)%Pol(1:4) = ExtParticle(4)%Mom(1:4);       print *, "gauge invariance check"
+!        ExtParticle(3)%Pol(1:4) = ExtParticle(3)%Mom(1:4);       print *, "gauge invariance check"
 
 END SUBROUTINE
 
@@ -11120,6 +11445,9 @@ ELSEIF( PDFSET.EQ.1 .AND. NLOPARAM.EQ.2) THEN
             bbar(2)= 0d0
             glu(2) = 0d0
         endif
+
+
+
 
 
 !   CTEQ PDFS

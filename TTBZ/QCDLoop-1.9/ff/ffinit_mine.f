@@ -783,7 +783,8 @@ C	path = '/user/gj/lib/
    30	continue
 *	second try - the system directory
 C	path = '/usr/local/ff/'
-	path = '/Users/ellis/QCDLoop-1.9/ff/'
+	path = '/afs/cern.ch/user/m/maschulz/projects
+     +/TOPAZ/TTBZ/QCDLoop-1.9/ff/'
 	fullname = path(1:index(path,' ')-1)//name
 	open(ifile,file=fullname,status='OLD',err=40)
 	return

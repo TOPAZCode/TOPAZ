@@ -150,18 +150,16 @@ ELSEIF( Correction.EQ.1 ) THEN
           call DoubCut(PrimAmps(iPrimAmp))
           call SingCut(PrimAmps(iPrimAmp))
           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-print *, "before",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
-
-          call SetKirill(PrimAmps(iPrimAmp))
-          call PentCut_new(PrimAmps(:),iPrimAmp)
-          call QuadCut_new(PrimAmps(:),iPrimAmp)
-          call TripCut_new(PrimAmps(:),iPrimAmp)
-          call DoubCut_new(PrimAmps(:),iPrimAmp)
-          call SingCut_new(PrimAmps(:),iPrimAmp)
-          call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
-
-print *, "after ",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
-pause
+! print *, "before",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+!           call SetKirill(PrimAmps(iPrimAmp))
+!           call PentCut_new(PrimAmps(:),iPrimAmp)
+!           call QuadCut_new(PrimAmps(:),iPrimAmp)
+!           call TripCut_new(PrimAmps(:),iPrimAmp)
+!           call DoubCut_new(PrimAmps(:),iPrimAmp)
+!           call SingCut_new(PrimAmps(:),iPrimAmp)
+!           call EvalMasterIntegrals(PrimAmps(iPrimAmp),MuRen**2)
+! print *, "after ",iPrimAmp,PrimAmps(iPrimAmp)%Result(-2:1)
+! pause
 
           call RenormalizeUV(PrimAmps(iPrimAmp),BornAmps(iPrimAmp),MuRen**2)
           PrimAmps(iPrimAmp)%Result(-2:1) = -PrimAmps(iPrimAmp)%Result(-2:1)    ! A_R -> A_L factor

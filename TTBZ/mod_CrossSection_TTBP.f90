@@ -12,6 +12,22 @@ contains
 
 
 
+
+FUNCTION EvalCS_1L_ttbggp_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_1L_ttbggp_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_1L_ttbggp(yRnd,VgsWgt)
+EvalCS_1L_ttbggp_MPI=0
+RETURN
+END FUNCTION
+
+
+
+
+
+
 FUNCTION EvalCS_1L_ttbggp(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -268,7 +284,6 @@ ELSEIF( Correction.EQ.1 ) THEN
                                  + PrimAmps(PrimAmp2m_12345)%Result(-2:1) &
                                  + PrimAmps(PrimAmp2m_15234)%Result(-2:1)
 
-
       FermionLoopPartAmp(2,-2:1) = nf_light * PrimAmps(PrimAmp2_15243)%Result(-2:1)  &
                                  +            PrimAmps(PrimAmp2m_15243)%Result(-2:1) &
 
@@ -281,6 +296,7 @@ ELSEIF( Correction.EQ.1 ) THEN
                                  + PrimAmps(PrimAmp2m_12453)%Result(-2:1) &
                                  + PrimAmps(PrimAmp2m_12435)%Result(-2:1) &
                                  + PrimAmps(PrimAmp2m_15243)%Result(-2:1)
+
 
       FermionLoopPartAmp(3,-2:1) = -1d0/Nc * ( nf_light * PrimAmps(PrimAmp2_15234)%Result(-2:1) *0d0  &    ! cancels with  nf_light * PrimAmps(PrimAmp2_15243)  below
                                  +                        PrimAmps(PrimAmp2m_15234)%Result(-2:1)*0d0 &     ! cancels with  PrimAmps(PrimAmp2m_15243)  below

@@ -994,12 +994,12 @@ END FUNCTION
 
 
 
-FUNCTION cur_f_4f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f,tag_Z) result(res)           ! Quarks(:) does not include the OFF-shell quark
+FUNCTION cur_f_4f(Gluons,Quarks,Quark1PartType,NumGlu,tag_f,tag_Z_arg) result(res)           ! Quarks(:) does not include the OFF-shell quark
 implicit none
 integer :: NumGlu(0:4),Quark1PartType
 type(PtrToParticle) :: Gluons(1:),Quarks(2:4)
-integer :: tag_f
-integer, optional :: tag_Z
+integer :: tag_f,tag_Z
+integer, optional :: tag_Z_arg
 integer,target :: TmpExtRef
 complex(8) :: res(1:Ds),tmp(1:Ds)
 complex(8) :: ubar1(1:Ds)
@@ -1022,8 +1022,9 @@ integer :: rIn,rOut,i,counter
 
    Res(:)=(0d0,0d0)
 
-   if (.not. present(tag_Z) ) then
-      tag_Z=0
+   tag_Z=0
+   if( present(tag_Z_arg) ) then
+      tag_Z=tag_Z_arg
    endif
 
    if( Quark1PartType.eq.-Quarks(2)%PartType .and. Quarks(3)%PartType.eq.-Quarks(4)%PartType ) then
@@ -1117,9 +1118,10 @@ integer :: rIn,rOut,i,counter
          rIn =n1a+1
          rOut=NumGlu(1)+NumGlu(2)+n3a
 
+
 ! This prevents color issues with a Z on the quark loop, see RR notes
-         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) &
-              .and. Quarks(4)%ExtRef .eq. -1) then
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+n3a .eq. NumGlu(0)) .and. Quarks(4)%ExtRef .eq. -1) then
+!             print  * , "cycle for tag_Z=1 in cur_f_4f",n1a,n1b
             cycle
          endif
 
@@ -1634,7 +1636,10 @@ integer :: rIn,rOut,i,counter
 
 ! preventing color issues with Z on the loop, see RR notes 05-22-2013
 !note: only tested for zero gluons
-         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a .eq. NumGlu(0)) ) cycle
+         if ( tag_Z .eq. 1 .and. (n1b+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a .eq. NumGlu(0)) ) then
+!             print  * , "cycle for tag_Z=1 in cur_f_6f"
+            cycle
+         endif
 
          Eps2 = cur_g_4f(Gluons(rIn:rOut),Quarks(2:5),(/1+n1b+NumGlu(2)+NumGlu(3)+NumGlu(4)+n5a,n1b,NumGlu(2),NumGlu(3),NumGlu(4),n5a/))
          PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Quarks(5)%Mom
@@ -3536,7 +3541,7 @@ END FUNCTION
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
 
       if( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_ ) then!   note that Bot_ is treated as top quark in TOPAZ!
-            couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection (depending on stable/decaying Z boson)
+            couplVQQ_left  = couplZTT_left_dyn  ! these couplings are set dynamically in mod_CrossSection,ZDecay (depending on stable/decaying Z boson)
             couplVQQ_right = couplZTT_right_dyn
       else
          couplVQQ_left=couplZQQ_left_dyn
@@ -4352,6 +4357,7 @@ integer :: rIn,rOut,i,counter
        enddo
     endif
 
+
     if( (Quark1PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType)      .AND.  &
          (Quarks(4)%ExtRef.ne.-1 .or. tag_f.ne.1 .or. abs(Quark1PartType).ne.abs(Quarks(2)%PartType)) ) then
 
@@ -4365,18 +4371,22 @@ integer :: rIn,rOut,i,counter
 
 ! This means that all the ext gluons are on this lines, 
 ! and we must remove this to prevent color issues with a Z on the quark loop, see RR notes
-             if ( tag_Z .eq. 1 .and. n1b+NumGlu(2)+n3a .eq. NumGlu(0) ) cycle
-             
+            
              if (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  then
+                if ( tag_Z .eq. 1 .and. n1b+NumGlu(2)+n3a .eq. NumGlu(0) ) then
+!                     print  * , "cycle for tag_Z=1 in cur_f_4fV"
+                    cycle
+                endif
                 Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
                 PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
              elseif (BosonVertex .eq. 2) then
                 Eps2 = cur_g_2fV(Gluons(rIn:rOut),Quarks(2:3),Boson,(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
-                PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom+Boson%Mom
+                PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Boson%Mom
              endif
              PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
              if( abs(sc_(PMom1,PMom1)).lt.PropCut ) cycle
              Eps2 = Eps2*PropFac1
+
              do n4a=0,NumGlu(4)
                 n4b = NumGlu(4)-n4a
                 ! radiate V off Fer4
@@ -4387,7 +4397,6 @@ integer :: rIn,rOut,i,counter
                    ubar1(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n3b+n4a,n3b,n4a/) )
                    PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
                    PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
-                   
                    if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
                       PropFac2=(0d0,0d0)
                    endif
@@ -4439,8 +4448,8 @@ integer :: rIn,rOut,i,counter
                    tmp(:) = cur_f_2f(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,(/counter-1,n1a,n4b/) )
                    Res(:) = Res(:) + tmp(:)
                 endif
-                if (BosonVertex .eq. 1 .or. BosonVertex .eq. 4) then
-               
+
+                if (BosonVertex .eq. 1 .or. BosonVertex .eq. 4) then              
                    ! radiate V off Fer1
                    rIn =NumGlu(1)+NumGlu(2)+n3a+1
                    rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
@@ -4499,8 +4508,8 @@ integer :: rIn,rOut,i,counter
                    Res(:) = Res(:) + tmp(:)
                 endif
                 
-                if (BosonVertex .eq. 2) then
 
+                if (BosonVertex .eq. 2) then
                    rIn =NumGlu(1)+NumGlu(2)+n3a+1
                    rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
                    ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,(/n3b+n4a,n3b,n4a/) )

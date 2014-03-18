@@ -46,7 +46,7 @@
   
   ! Treatment of uncertainties. 1=Rescale hypotheses 0,1 by uncertainties to worst case separation
   !                             2=Gauss distribute uncertainties (2*sigma=DeltaN) in each pseudoexperiment
-  UncertTreatment=1
+  UncertTreatment=2
 
   call GetArg(1,operation)
   if (trim(operation) .ne. 'GetLogL') then
@@ -259,7 +259,6 @@
   do iHypothesis=1,2    ! 1=null, 2=alt
       TotalEvents(iHypothesis) = int( sum(Value(iHypothesis,BinMin:BinMax))*Data*PreFactor*BinSize(iHypothesis) )
       if( MPI_Rank.eq.0 ) write(*,"(A,I1,A,I6,A,F5.1,A)") "Hypothesis:",iHypothesis," Number of events in Histogram:",TotalEvents(iHypothesis)," (after rescaling by uncertainty of ",Delta(iHypothesis)*100d0,"%)"
-      print *, "Hypothesis:",iHypothesis,". Number of events in Histogram:",TotalEvents(iHypothesis)
   enddo
 
   

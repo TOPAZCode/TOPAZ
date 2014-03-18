@@ -209,18 +209,18 @@ integer :: i,j,Order(1:6)
                 Boson=.true.
           endif
           if( TreeProc%PartType(1).eq.Glu_ .and. .not. Boson ) then
+!               print *, "CHECK POINT cur_g_2f"
               Res(1:Dv) = cur_g_2f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:3) )
-! print *, "CHECK POINT cur_g_2f"
-! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Quarks(1)%Mom+ TreeProc%Quarks(2)%Mom)
-! pause
            elseif ( TreeProc%PartType(1).eq.Glu_ .and. Boson ) then
+!               print *, "CHECK POINT cur_g_2fV"
               Res(1:Dv) = cur_g_2fV( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%Boson,TreeProc%NumGlu(0:3) )
-
           elseif( IsAQuark(TreeProc%PartType(1)) .and. .not.Boson ) then
+!              print *, "CHECK POINT cur_f_2f"
              Res(1:Ds) = cur_f_2f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) ) 
 !             Res(1:Ds) = cur_f_2f_new( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:2) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
              if( TreeProc%NumV.eq.1 ) then
+!                 print *, "CHECK POINT cur_f_2fV"
                 Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))   
           elseif( TreeProc%NumW.eq.1 ) then!  this should only be used in top quark decay (because it is a Weyl current)
 !                 Res(1:Ds) = cur_f_2fW( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(1:2),TreeProc%Boson,TreeProc%NumGlu(0:2) )
@@ -235,7 +235,7 @@ integer :: i,j,Order(1:6)
       elseif( TreeProc%NumSca.eq.2 .and. TreeProc%NumQua.eq.0 ) then!  2 scalars and no quarks
           if( TreeProc%PartType(1).eq.Glu_ ) then
              Res(1:Dv) = cur_g_2s(TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Scalars(1:TreeProc%NumSca),TreeProc%NumGlu(0:3))
-! print *, "CHECK POINT cur_g_2s"
+!              print *, "CHECK POINT cur_g_2s"
 ! print *, sc_(Res(1:Dv),SumMom(TreeProc%Gluons(2:TreeProc%NumGlu(0)),1,TreeProc%NumGlu(0)-1) + TreeProc%Scalars(1)%Mom+ TreeProc%Scalars(2)%Mom)
           elseif( IsAScalar(TreeProc%PartType(1)) ) then
              Res(1) = cur_s_2s( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Scalars(2:2),TreeProc%NumGlu(0:2) )
@@ -308,7 +308,6 @@ integer :: i,j,Order(1:6)
              if( TreeProc%NumV.eq.0 ) then
                 Res(1:Dv) = cur_g_4f( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%NumGlu(0:5) )
               elseif( TreeProc%NumV.eq.1 ) then
-
                  Res(1:Dv) = cur_g_4fV( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:5) )
               endif
 ! print *, "CHECK POINT cur_g_4f"
@@ -316,8 +315,10 @@ integer :: i,j,Order(1:6)
 ! pause
           elseif( IsAQuark(TreeProc%PartType(1)) ) then
              if( TreeProc%NumV.eq.0 ) then
+!                 print *, "CHECK POINT cur_f_4f"
                 Res(1:Ds) = cur_f_4f( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%NumGlu(0:4),tag_f,tag_Z )
              elseif( TreeProc%NumV.eq.1 ) then
+!                 print *, "CHECK POINT cur_f_4Vf"
                 Res(1:Ds) = cur_f_4fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:4),tag_f,tag_Z )
              endif
           else
@@ -399,7 +400,6 @@ integer :: i,j,Order(1:6)
       else
            call Error("requested current is not available xx")
       endif
-
 
 return
 END SUBROUTINE

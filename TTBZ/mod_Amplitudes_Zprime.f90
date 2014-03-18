@@ -30,16 +30,53 @@ contains
     lqcurrR = (-cI) * vbqq2(ub1,chir(.true.,v2))
 
     hqcurr = (-cI) * (vbqq2(ub3,chir(.false.,v4)) * gL_Zpr(top_) + vbqq2(ub3,chir(.true.,v4)) * gR_Zpr(top_))
-
     propfact = -cI / (sc_(p1+p2,p1+p2)-m_Zpr**2 + cI * Ga_Zpr * M_Zpr)
     hqcurr = hqcurr * propfact
-    
+   
     LO_Res_Pol_Left  = sc_(lqcurrL,hqcurr) 
     LO_Res_Pol_Right = sc_(lqcurrR,hqcurr) 
 
     return
 
   end subroutine Tree_Zprime_tbtqbq
+
+
+
+  subroutine Tree_photon_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
+    use ModProcess
+    use ModParameters
+    complex(8), intent(out) :: LO_Res_Pol_Left, LO_Res_Pol_Right
+
+    complex(8) :: ub1(4), v2(4), ub3(4), v4(4)
+    complex(8) :: p1(4), p2(4), p3(4), p4(4)
+    complex(8) :: lqcurrL(4), lqcurrR(4) ! Light quark currents
+    complex(8) :: hqcurr_pho(4) ! Heavy quark current
+    complex(8) :: propfact
+    
+    
+    ub1(1:4) = ExtParticle(4)%Pol(1:4)
+    v2(1:4) = ExtParticle(3)%Pol(1:4)
+    ub3(1:4) = ExtParticle(2)%Pol(1:4)
+    v4(1:4) = ExtParticle(1)%Pol(1:4)
+    
+    p1(1:4) = ExtParticle(4)%Mom(1:4)
+    p2(1:4) = ExtParticle(3)%Mom(1:4)
+    p3(1:4) = ExtParticle(2)%Mom(1:4)
+    p4(1:4) = ExtParticle(1)%Mom(1:4)
+
+    lqcurrL = (-cI) * vbqq2(ub1,chir(.false.,v2))
+    lqcurrR = (-cI) * vbqq2(ub1,chir(.true.,v2))
+
+    hqcurr_pho = (-cI) * (vbqq2(ub3,chir(.false.,v4)) * Q_up + vbqq2(ub3,chir(.true.,v4)) * Q_up)
+    propfact   = -cI / (sc_(p1+p2,p1+p2))
+    hqcurr_pho = hqcurr_pho * propfact
+   
+    LO_Res_Pol_Left  = sc_(lqcurrL,hqcurr_pho) 
+    LO_Res_Pol_Right = sc_(lqcurrR,hqcurr_pho) 
+    return
+
+  end subroutine Tree_photon_tbtqbq
+
 
 
   subroutine Tree_Zprime_tbtqbq_gluefordip(LO_Res_Pol)

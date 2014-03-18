@@ -7,6 +7,24 @@ integer,private,parameter :: NumMaxHisto=45
 contains
 
 
+
+
+
+
+FUNCTION EvalCS_1L_Zprime_ttbqqb_MPI(yRnd,VgsWgt,res)
+implicit none
+integer :: EvalCS_1L_Zprime_ttbqqb_MPI
+real(8) ::  yRnd(*),res(*),VgsWgt
+
+res(1) = EvalCS_1L_Zprime_ttbqqb(yRnd,VgsWgt)
+EvalCS_1L_Zprime_ttbqqb_MPI=0
+RETURN
+END FUNCTION
+
+
+
+
+
 FUNCTION EvalCS_1L_Zprime_ttbqqb(yRnd,VgsWgt)
 use ModProcess
 use ModKinematics
@@ -48,12 +66,10 @@ include "vegas_common.f"
 
   NRndHel=5
   IF( TOPDECAYS.NE.0 ) THEN
-
      call EvalPhasespace_TopDecay(MomExt(1:4,3),yRnd(5:8),.false.,MomDK(1:4,1:3),PSWgt2)
      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(9:12),.false.,MomDK(1:4,4:6),PSWgt3)
      PSWgt = PSWgt * PSWgt2*PSWgt3
      NRndHel=13
-
   ENDIF
 
 
@@ -171,6 +187,49 @@ include "vegas_common.f"
 
      EvalCS_1L_Zprime_ttbqqb = ISFac*PreFac* (PDFFac_L * LO_Res_Unpol_Left + PDFFac_R * LO_Res_Unpol_Right)
      EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb * 9d0 ! Sum over initial / final colors
+
+
+
+
+
+! !     adding the photon ./TOPAZ_MPI Collider=2 TopDK=0 ObsSet=67 Process=62 NLOParam=1 Correction=0  MZpr=0.9119 GaZpr=0.02
+!       if( xpdf.le.0.5d0 ) then
+!         PDFFac_L = Q_up**2 * (pdf(up_,1)*pdf(aup_,2))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(dn_,1)*pdf(adn_,2))
+!         PDFFac_L = PDFFac_L + Q_up**2 * (pdf(chm_,1)*pdf(achm_,2))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(str_,1)*pdf(astr_,2))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(bot_,1)*pdf(abot_,2))
+!         
+!         PDFFac_R = Q_up**2 * (pdf(up_,1)*pdf(aup_,2))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(dn_,1)*pdf(adn_,2))
+!         PDFFac_R = PDFFac_R + Q_up**2 * (pdf(chm_,1)*pdf(achm_,2))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(str_,1)*pdf(astr_,2))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(bot_,1)*pdf(abot_,2))
+!       else
+!         PDFFac_L = Q_up**2 * (pdf(Up_,2)*pdf(aup_,1))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(dn_,2)*pdf(adn_,1))
+!         PDFFac_L = PDFFac_L + Q_up**2 * (pdf(chm_,2)*pdf(achm_,1))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(str_,2)*pdf(astr_,1))
+!         PDFFac_L = PDFFac_L + Q_dn**2 * (pdf(bot_,2)*pdf(abot_,1))
+!         
+!         PDFFac_R = Q_up**2 * (pdf(Up_,2)*pdf(aup_,1))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(dn_,2)*pdf(adn_,1))
+!         PDFFac_R = PDFFac_R + Q_up**2 * (pdf(chm_,2)*pdf(achm_,1))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(str_,2)*pdf(astr_,1))
+!         PDFFac_R = PDFFac_R + Q_dn**2 * (pdf(bot_,2)*pdf(abot_,1))
+!         call swapMom(MomExt(1:4,1),MomExt(1:4,2))
+!       endif
+!       do iHel=nHel(1),nHel(2)
+!         call HelCrossing(Helicities(iHel,1:NumExtParticles))
+!         call SetPolarizations()
+!         call Tree_photon_tbtqbq(LO_Res_Pol_Left, LO_Res_Pol_Right)
+!         LO_Res_UnPol_Left = LO_Res_UnPol_Left + dreal(LO_Res_Pol_Left*dconjg(LO_Res_Pol_Left))
+!         LO_Res_UnPol_Right = LO_Res_UnPol_Right + dreal(LO_Res_Pol_Right*dconjg(LO_Res_Pol_Right))
+!       enddo
+!       EvalCS_1L_Zprime_ttbqqb = EvalCS_1L_Zprime_ttbqqb  &
+!                               + ISFac*PreFac*EL**4* (PDFFac_L * LO_Res_Unpol_Left + PDFFac_R * LO_Res_Unpol_Right)* 9d0 ! Sum over initial / final colors
+
+
 
   ELSEIF(CORRECTION.EQ.1) THEN
 

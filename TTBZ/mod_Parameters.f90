@@ -18,6 +18,7 @@ integer(8), public, save :: EvalCounter=0
 integer(8), public, save :: PSCutCounter=0
 integer(8), public, save :: SkipCounter=0
 logical,public ,parameter :: TTBZ_SpeedUp=.false.  !  good idea but doesn't work. always set to .false.
+integer, public :: TTBZ_DebugSwitch=0   !   0=disabled, 1=bosonic loops, 2=fermionic loops, 3=gamma5 renormalization
 
 ! PVegas (MPI) part
 integer, public :: MPI_Rank
@@ -46,15 +47,15 @@ real(8), public, parameter :: GeV=0.01d0
 
 !orig real(8), public, parameter :: alpha = 1d0/(137d0)
 !orig real(8), public, parameter :: alpha4Pi = alpha*4d0*DblPi
-real(8), public, parameter :: GF = (1.166379d-5)/GeV**2
+real(8), public, parameter :: GF = (1.16639d-5)/GeV**2  !GF = (1.166379d-5)/GeV**2  ! (1.16639d-5)/GeV**2  !
 real(8), public            :: m_Top, m_SMTop
 real(8), public            :: m_Bot
 real(8), public, parameter :: m_Chm   = 0d0
 real(8), public, parameter :: m_Str   = 0d0
 real(8), public, parameter :: m_Up    = 0d0
 real(8), public, parameter :: m_Dn    = 0d0
-real(8), public, parameter :: m_Z     = 91.1876d0*GeV  ! 
-real(8), public, parameter :: m_W     = 80.385d0*GeV
+real(8), public, parameter :: m_Z     = 91.1876*GeV!  91.19*GeV ! 91.18*GeV!     ! 
+real(8), public, parameter :: m_W     = 80.385d0*GeV  ! 80.45*GeV  !80.385152965002916d0*GeV  !80.37576d0*GeV !
 real(8), public, parameter :: m_e     = 0d0
 real(8), public, parameter :: m_nu    = 0d0
 real(8), public            :: m_HTop
@@ -114,7 +115,7 @@ real(8), public, parameter :: T3_dn    =-1d0/2d0
 real(8), public, parameter :: T3_nu    =+1d0/2d0
 real(8), public, parameter :: T3_el    =-1d0/2d0
 
-real(8), public, parameter :: couplZUU_left  = -sw/cw*Q_up +  1d0/sw/cw * T3_up
+real(8), public, parameter :: couplZUU_left  = -sw/cw*Q_up + 1d0/sw/cw * T3_up
 real(8), public, parameter :: couplZUU_right = -sw/cw*Q_up  
 real(8), public, parameter :: couplZDD_left  = -sw/cw*Q_dn + 1d0/sw/cw * T3_dn
 real(8), public, parameter :: couplZDD_right = -sw/cw*Q_dn
@@ -131,8 +132,8 @@ real(8), public, parameter :: couplZTT_right_SM = -sw/cw*Q_up
 ! real(8), public, parameter :: couplZTT_right_SM = Q_up
 ! real(8), public, parameter :: couplZTT_left_SM  = 1d0!  This is for the check against ttb+photon.
 ! real(8), public, parameter :: couplZTT_right_SM = 1d0
-real(8), public, parameter ::  couplZTT_V_SM =  (+couplZTT_left_SM+couplZTT_right_SM)/2d0   ! MARKUS: introduced 1/2 here
-real(8), public, parameter ::  couplZTT_A_SM =  (+couplZTT_left_SM-couplZTT_right_SM)/2d0   ! MARKUS: introduced 1/2 here and changed sign
+real(8), public, parameter ::  couplZTT_V_SM =  (+couplZTT_left_SM+couplZTT_right_SM)/2d0   ! our vertex is gamma^mu ( cV - cA*gamma5 ) = gamma^mu *( cL*PL + cR*PR )
+real(8), public, parameter ::  couplZTT_A_SM =  (+couplZTT_left_SM-couplZTT_right_SM)/2d0   ! i.e. cV=1/2(cL+cR), cA=1/2(cL-cR)   <-->    cL=cV+cA, cR=cV-cA
 
 real(8), public, parameter :: couplZEE_left  = -sw/cw*Q_el + 1d0/sw/cw * T3_el
 real(8), public, parameter :: couplZEE_right = -sw/cw*Q_el
@@ -476,21 +477,25 @@ ENDIF
 
 !   top quark-Z-boson coupling
 
-! first get (possibly BSM) top-Z coupl
 
+! our vertex is gamma^mu ( cV - cA*gamma5 ) = gamma^mu *( cL*PL + cR*PR )
+! i.e. cV=1/2(cL+cR), cA=1/2(cL-cR)   <-->    cL=cV+cA, cR=cV-cA
+
+
+
+! first get (possibly BSM) top-Z coupl
    couplZTT_V = couplZTT_V_SM * (1d0 + DeltaF1V)
    couplZTT_A = couplZTT_A_SM * (1d0 + DeltaF1A)
    couplZTT_left  = (couplZTT_V + couplZTT_A)/1d0     ! MARKUS:  removed 1/2
    couplZTT_right = (couplZTT_V - couplZTT_A)/1d0     ! MARKUS:  removed 1/2 and introduced a minus
+   
 
 !   the _dyn variables will be overwritten in mod_ZDecay.f90 if the Z-boson decays
    couplZTT_left_dyn  = couplZTT_left
    couplZTT_right_dyn = couplZTT_right
-    
-    
-
-    r2 = (M_Z/(2*4.6d0*GeV))**2! mass correction for bottom quark
-    ZWidth = alpha/12d0*M_Z * (  +((couplZUU_left+couplZUU_right)**2 + (couplZUU_left-couplZUU_right)**2 *1d0 )*3d0 &! up
+   
+   r2 = (M_Z/(2*4.6d0*GeV))**2! mass correction for bottom quark
+   ZWidth = alpha/12d0*M_Z * (  +((couplZUU_left+couplZUU_right)**2 + (couplZUU_left-couplZUU_right)**2 *1d0 )*3d0 &! up
                                 +((couplZDD_left+couplZDD_right)**2 + (couplZDD_left-couplZDD_right)**2 *1d0 )*3d0 &! dn
                                 +((couplZUU_left+couplZUU_right)**2 + (couplZUU_left-couplZUU_right)**2 *1d0 )*3d0 &! chm
                                 +((couplZDD_left+couplZDD_right)**2 + (couplZDD_left-couplZDD_right)**2 *1d0 )*3d0 &! str
@@ -679,21 +684,21 @@ ENDIF
 !!! Zprime section !!!
 
 !-- Sequential couplings
-!gR_Zpr(top_) =  eL*(sw/cw)*2d0/3d0
-!gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0 - sw**2*2d0/3d0)
+!  Collider=2 TopDK=0 ObsSet=67 Process=62 NLOParam=1 Correction=0  MZpr=0.9119 GaZpr=0.02 MuRen=1.73 MuFac=1.73
+! SM couplings
+! gR_Zpr(top_) =  eL*(sw/cw)*2d0/3d0 
+! gL_Zpr(top_) = -eL/(sw*cw)*( 0.5d0  - sw**2*2d0/3d0 )
+! gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
+! gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
+! gL_Zpr(up_) = gL_Zpr(top_)
+! gR_Zpr(up_) = gR_Zpr(top_)
+! gL_Zpr(chm_) = gL_Zpr(top_)
+! gR_Zpr(chm_) = gR_Zpr(top_)
+! gL_Zpr(str_) = gL_Zpr(dn_)
+! gR_Zpr(str_) = gR_Zpr(dn_)
+! gL_Zpr(bot_) = gL_Zpr(dn_)
+! gR_Zpr(bot_) = gR_Zpr(dn_)
 
-!gL_Zpr(dn_) = -eL/(sw*cw)*(-0.5d0 + sw**2/3d0)
-!gR_Zpr(dn_)  = -eL*(sw/cw)/3d0
-
-!gL_Zpr(up_) = gL_Zpr(top_)
-!gR_Zpr(up_) = gR_Zpr(top_)
-!gL_Zpr(chm_) = gL_Zpr(top_)
-!gR_Zpr(chm_) = gR_Zpr(top_)
-
-!gL_Zpr(str_) = gL_Zpr(dn_)
-!gR_Zpr(str_) = gR_Zpr(dn_)
-!gL_Zpr(bot_) = gL_Zpr(dn_)
-!gR_Zpr(bot_) = gR_Zpr(dn_)
 
 !print *, 'gR_Zpr(top_)', gR_Zpr(top_)
 !print *, 'gL_Zpr(top_)', gL_Zpr(top_)
@@ -710,9 +715,8 @@ myCos2thw = 0.768d0
 !print *, 'cot(th_H)**2', cot2thH
 !g_Zpr = 1d0/2d0 * dsqrt(4d0*pi*alpha/myCos2thw * cot2thH)
 !g_Zpr = dsqrt(Ga_Zpr/M_Zpr * 8d0 * Pi / (dsqrt(1d0-4d0*m_Top**2/m_Zpr**2)*(2d0+4d0*m_top**2/m_Zpr**2)+4d0))
-
-gL_Zpr(:) = 0d0
-gR_Zpr(:) = 0d0
+! gL_Zpr(:) = 0d0
+! gR_Zpr(:) = 0d0
 
 !-- original experimental setup: f1 = 1, f2 = 0
 !-- topcolor tilting motivated parameters: f1 > 0 and / or f2 < 0
@@ -746,32 +750,32 @@ phi = dlog(rhoplus)
 !-- Eq. 32: +3 f1 -> -6 f1
 
 !-- LO decay width, c0 is vector d0 is axial
-c0 = dsqrt(1d0-1d0/ratio) * (1d0+1d0/(2d0*ratio))
-d0 = (1d0-1d0/ratio)**(3d0/2d0)
+ c0 = dsqrt(dabs(1d0-1d0/ratio)) * (1d0+1d0/(2d0*ratio))
+ d0 = dabs(1d0-1d0/ratio)**(3d0/2d0)
 
 !-- NLO decay, coefficients of asonpi
-c1 = 8d0/3d0 * (1d0-1d0/(4d0*ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
+ c1 = 8d0/3d0 * (1d0-1d0/(4d0*ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
      + ddilog(rhominus**4) + 2d0 * phi * (3d0 * phi - gamma-2d0 * chi)) &
      - 8d0/3d0 * dsqrt(1d0-1d0/ratio) * (1d0+1d0/(2d0 * ratio)) * (gamma + 2d0 * chi) &
      + 8d0 * (1d0-1d0/(6d0*ratio) - 7d0/(48d0*ratio**2))*phi + dsqrt(1d0-1d0/ratio) * (1d0+3d0/(2d0 * ratio))
 
-d1 = 8d0/3d0 * (1d0-3d0/(2d0 * ratio) + 1d0/(2d0 * ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
-     + ddilog(rhominus**4) + 2d0 * phi * (3d0 * phi-gamma-2d0 * chi)) - 8d0/3d0 * &
+ d1 = 8d0/3d0 * (1d0-3d0/(2d0 * ratio) + 1d0/(2d0 * ratio**2)) * ( 2d0 * ddilog(rhominus**2) &
+      + ddilog(rhominus**4) + 2d0 * phi * (3d0 * phi-gamma-2d0 * chi)) - 8d0/3d0 * &
      (1d0-1d0/ratio)**(3d0/2d0) * (gamma+2d0 * chi) + 8d0 * (1d0-11d0/(12d0 * ratio) + 5d0/(48d0 * ratio**2) &
      + 1d0/(32d0 * ratio**3)) * phi + dsqrt(1d0-1d0/ratio) * (1d0-3d0/ratio+1d0/(4d0 * ratio**2))
 
-Ga_Zpr_top(0) = ( c0 * ((1d0 + f1)/2d0)**2 + d0 * ((1d0-f1)/2d0)**2 )
-Ga_Zpr_up(0) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 )
-Ga_Zpr_dn(0) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 )
+ Ga_Zpr_top(0) = ( c0 * ((1d0 + f1)/2d0)**2 + d0 * ((1d0-f1)/2d0)**2 )
+ Ga_Zpr_up(0) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 )
+ Ga_Zpr_dn(0) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 )
 
-Ga_Zpr_top(1) = ( c1 * ((1d0 + f1)/2d0)**2 + d1 * ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
-Ga_Zpr_up(1) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
-Ga_Zpr_dn(1) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+ Ga_Zpr_top(1) = ( c1 * ((1d0 + f1)/2d0)**2 + d1 * ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+ Ga_Zpr_up(1) =  (((1d0+f1)/2d0)**2 + ((1d0-f1)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
+ Ga_Zpr_dn(1) =  (((1d0+f2)/2d0)**2 + ((1d0-f2)/2d0)**2 ) * alpha_s * RUNALPHAS(2,MuRen) / Pi
 
-Ga_Zpr_TOT = Ga_Zpr_top + Ga_Zpr_up + 2d0 * Ga_Zpr_dn
+ Ga_Zpr_TOT = Ga_Zpr_top + Ga_Zpr_up + 2d0 * Ga_Zpr_dn
 
 !-- use the Ga_Zpr(0) as input for couplings
-Ga_Zpr_pref = Ga_Zpr/Ga_Zpr_TOT(0)
+ Ga_Zpr_pref = Ga_Zpr   /Ga_Zpr_TOT(0)
 
 !if (NLOParam.le.1) then
 !   Ga_Zpr_pref = Ga_Zpr/Ga_Zpr_TOT(0)
@@ -779,7 +783,7 @@ Ga_Zpr_pref = Ga_Zpr/Ga_Zpr_TOT(0)
 !   Ga_Zpr_pref = Ga_Zpr/(Ga_Zpr_TOT(0) + Ga_Zpr_TOT(1))
 !endif
 
-Ga_Zpr_TOT = Ga_Zpr_TOT * Ga_Zpr_pref
+ Ga_Zpr_TOT = Ga_Zpr_TOT * Ga_Zpr_pref
 
 if (NLOParam.le.1) then
    Ga_Zpr = Ga_Zpr_TOT(0)
@@ -790,8 +794,14 @@ endif
 !-- properly normalize couplings
 g_Zpr = dsqrt(4d0*pi/M_Zpr * Ga_Zpr_pref)
 
+
+
+!  remove this rescaling if SM Z is assumed
 gR_Zpr(:) = gR_Zpr(:) * g_Zpr
 gL_Zpr(:) = gL_Zpr(:) * g_Zpr
+
+
+
 
 !print *, 'g_Zpr', g_Zpr
 !print *, 'Ga_Zpr_TOT(0)', Ga_Zpr_TOT(0)
@@ -862,32 +872,34 @@ real(8) :: beta1=17d0*3d0-4d0/3d0*NF-5d0*NF
 
 
 ! !    MCFM version
-    if( Loop.eq.1 ) then
-      w = 1d0 - alpha_sOver2Pi*beta0*dlog(m_Z/Q)   ! one loop running
-      RunAlphaS = 1d0/w
-    elseif( Loop.eq.2 ) then
-      w = 1d0 - alpha_sOver2Pi*beta0*dlog(m_Z/Q)
-      RunAlphaS = 1d0/w * (1d0-beta1/beta0*alpha_sOver2Pi*dlog(w)/w)   ! two loop running
-    else
-      RunAlphaS = 1d0   ! no running
-    endif
+     if( Loop.eq.1 ) then
+       w = 1d0 - alpha_sOver2Pi*beta0*dlog(m_Z/Q)   ! one loop running
+       RunAlphaS = 1d0/w
+     elseif( Loop.eq.2 ) then
+       w = 1d0 - alpha_sOver2Pi*beta0*dlog(m_Z/Q)
+       RunAlphaS = 1d0/w * (1d0-beta1/beta0*alpha_sOver2Pi*dlog(w)/w)   ! two loop running
+     else
+       RunAlphaS = 1d0   ! no running
+     endif
 
 
 !print *, "USING DUW Alpha_S"
-! ! ! !   DUW version
-!     if( Loop.eq.1 ) then
-!       RunAlphaS = 4d0*dblpi/beta0/dlog((Q*100d0)**2/165d-3**2)
-!       RunAlphaS = RunAlphaS/alpha_s
-!     elseif( Loop.eq.2 ) then
-!       RunAlphaS = 4d0*dblpi/beta0/dlog((Q*100d0)**2/226d-3**2)*(1d0-(beta1*2d0)/beta0**2*dlog(dlog((Q*100d0)**2/226d-3**2))/dlog((Q*100d0)**2/226d-3**2))
-!       RunAlphaS = RunAlphaS/alpha_s
-!     else
-!       RunAlphaS = 1d0   ! no running
-!     endif
+! ! !   DUW version
+!    if( Loop.eq.1 ) then
+!      RunAlphaS = 4d0*dblpi/beta0/dlog((Q*100d0)**2/165d-3**2)
+!      RunAlphaS = RunAlphaS/alpha_s
+!    elseif( Loop.eq.2 ) then
+!      RunAlphaS = 4d0*dblpi/beta0/dlog((Q*100d0)**2/226d-3**2)*(1d0-(beta1*2d0)/beta0**2*dlog(dlog((Q*100d0)**2/226d-3**2))/dlog((Q*100d0)**2/226d-3**2))
+!      RunAlphaS = RunAlphaS/alpha_s
+!    else
+!      RunAlphaS = 1d0   ! no running
+!    endif
+
 
 
 RETURN
 END FUNCTION
+
 
 END MODULE
 

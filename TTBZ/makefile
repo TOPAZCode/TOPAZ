@@ -14,12 +14,14 @@ QCDLoop = $(Here)/QCDLoop-1.9
 
 
 # MPI compiler options.  Also adjust -D_UseMPIVegas=0,1 in ttbjets.cfg
-# run with: mpiexec -n 4 ./TOPAZ ...
-useMPI = Yes
+# run with: mpiexec -n 4 ./TOPAZ_MPI ...
+useMPI = No
 ifeq ($(useMPI),Yes)
+    Exec = ./TOPAZ_MPI
     F95compiler = mpif90 -f90=ifort -lpthread  -lm 
     ccomp = mpicc -lpthread  -lm 
 else
+    Exec = ./TOPAZ
     F95compiler = ifort
     ccomp = gcc -O0
 # never use gcc with other than O0, optimization seems to be buggy
@@ -36,8 +38,6 @@ fcomp = $(F95compiler) $(IfortOpts) @$(ConfigFile)
 
 
 
-# executable file
-Exec = ./TOPAZ
 
 
 makeDep = 
@@ -282,9 +282,9 @@ MadGraphObj = $(Here)/MadGraph/gg_ttbg.o \
 				  $(HOME)/lib/HELAS-3.0/vvvxxx.o \
 				  $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a \
 				  $(Here)/MadGraph/gg_ttbz.o \
-				  $(Here)/MadGraph/gg_ttbzg.o
-# 				  $(Here)/MadGraph/uub_ttbgz.o\
-# 				  $(Here)/MadGraph/ddb_ttbgz.o\
+				  $(Here)/MadGraph/gg_ttbzg.o\
+				  $(Here)/MadGraph/uub_ttbgz.o\
+				  $(Here)/MadGraph/ddb_ttbgz.o
 # 				  $(Here)/MadGraph/dg_ttbdz.o \
 # 				  $(Here)/MadGraph/gub_ttbubz.o \
 # 				  $(Here)/MadGraph/gdb_ttbdbz.o \
@@ -422,6 +422,12 @@ all: $(allObjects)
 clean:
 	rm -f ./modules/*.mod
 	rm -f ./objects/*.o
+
+
+
+./summer: summer.f90
+	@echo " compiling" $<
+	$(fcomp) $< -o summer
 
 
 # ------------------------------------------------------------

@@ -1084,7 +1084,7 @@ double complex :: Res(1:2)
 !  loop over all sing. cuts
    do CutNum = 1,SingCuts%NumCuts
 !DEC$ IF (_DebugShowCuts==1)
-      print *, "SingCut ",CutNum,":",SingCuts%CutProp(CutNum,1:1)
+      print *, "SingCut ",CutNum,":",SingCuts%CutProp(CutNum,1:1), "Skip ?",SingCuts%skip(CutNum)
 !DEC$ ENDIF
       if (SingCuts%skip(CutNum)) then
          SingCuts%Coeff(CutNum,:)=(0d0,0d0)

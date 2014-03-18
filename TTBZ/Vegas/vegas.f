@@ -333,11 +333,11 @@ c     2  ' accumulated results:   integral=',g14.8/
 c     3  24x,'std dev =',g14.8 / 24x,'chi**2 per it''n =',g10.4)
  201    format(/'************* Integration by Vegas (iteration ',i3,
      .   ') **************' / '*',63x,'*'/,
-     .   '*  integral  = ',g14.8,2x,
-     .   ' accum. integral = ',g14.8,'*'/,
-     .   '*  std. dev. = ',g14.8,2x,
-     .   ' accum. std. dev = ',g14.8,'*'/,
-     .   '*   max. wt. = ',g14.6,35x,'*'/,'*',63x,'*'/,
+     .   '*  integral  = ',PE14.6,2x,
+     .   ' accum. integral = ',PE14.6,'*'/,
+     .   '*  std. dev. = ',PE14.6,2x,
+     .   ' accum. std. dev = ',PE14.6,'*'/,
+     .   '*   max. wt. = ',PE14.6,35x,'*'/,'*',63x,'*'/,
      .   '**************   chi**2/iteration = ',
      .   g10.4,'   ****************' /)
  202    format(1X,' data for axis',i2,/,' ',6x,'x',7x,'  delt i ',

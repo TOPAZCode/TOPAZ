@@ -71,7 +71,6 @@ ELSE
 ENDIF
       ResultSum = ResultSum + TheDipoles(1)%DipoleValue
 
-
       r_sc=0d0
       TheDipoles(2)%alphaCut = alpha_if
       call evalDipole2_153(Mom,Mass2,TheDipoles(2))
@@ -211,7 +210,6 @@ ELSE
 ENDIF
       ResultSum = ResultSum + TheDipoles(8)%DipoleValue
 
-
       r_sc=0d0
       TheDipoles(9)%alphaCut = 1d0 !alpha_ff not yet implemeted
       call evalDipole9_354(Mom,Mass2,TheDipoles(9))
@@ -290,6 +288,8 @@ ELSE
       enddo
 ENDIF
       ResultSum = ResultSum + TheDipoles(12)%DipoleValue
+
+
 
 
       return
@@ -829,7 +829,6 @@ ENDIF
 !      SqAmp = Tree_UUb_TTb_354_5(dcmplx(TheDipole%MomTd),TheDipole%Mass2Td,Split_A,Split_B,Split_V)
       SqAmp = Tree_UUb_TTb_ij(9,dcmplx(TheDipole%MomTd),TheDipole%Mass2Td,Split_A,Split_B,Split_V)
 
-
       TheDipole%DipoleValue = LeadSing * SqAmp
       return
       END SUBROUTINE
@@ -1061,7 +1060,6 @@ ENDIF
 
       MassTd(1:4) = dsqrt(Mass2Td(1:4))
 
-
       call EvalPhasespace_TopDecay(dble(MomTd(0:3,3)),yRndDK(5:8),.false.,MomDK(0:3,4:6),PSWgt3)
       call EvalPhasespace_TopDecay(dble(MomTd(0:3,4)),yRndDK(1:4),.false.,MomDK(0:3,1:3),PSWgt2)
 
@@ -1130,7 +1128,6 @@ ENDIF
       do iHel=1,2
       Quarks(2)%Pol => PolV(:,HelList(iHel,2),2)
       Quarks(2)%Helicity => HelList(iHel,2)
-
 
 !      calc currents
       Res(0:3) = cur_f_4f((/Gluons(1)/),(/Quarks(2),Quarks(3),Quarks(4)/),Quarks(1)%PartType,(/0,0,0,0,0/),0)

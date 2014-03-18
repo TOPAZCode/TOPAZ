@@ -1914,43 +1914,22 @@ END SUBROUTINE
         elseif( Ds.eq.16 ) then
             sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); sp9=sp(9); sp10=sp(10); sp11=sp(11); sp12=sp(12); sp13=sp(13); sp14=sp(14); sp15=sp(15); sp16=sp(16); 
             v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); v7=v(7);  v8=v(8); 
-
-            SpiVL(1) =sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 - (0d0,1d0)*sp7*v6 +   (0d0,1d0)*sp15*v7 + sp15*v8
-            SpiVL(2) =sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 - (0d0,1d0)*sp8*v6 +  (0d0,1d0)*sp16*v7 + sp16*v8
-            SpiVL(3) =-(sp3*v1) - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 - (0d0,1d0)*sp5*v6 +  (0d0,1d0)*sp13*v7 + sp13*v8
-            SpiVL(4) =-(sp4*v1) - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 - (0d0,1d0)*sp6*v6 +  (0d0,1d0)*sp14*v7 + sp14*v8
-            SpiVL(5) =sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp3*v6 +  (0d0,1d0)*sp11*v7 + sp11*v8
-            SpiVL(6) =sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp4*v6 +   (0d0,1d0)*sp12*v7 + sp12*v8
-            SpiVL(7) =-(sp7*v1) - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp1*v6 +   (0d0,1d0)*sp9*v7 + sp9*v8
-            SpiVL(8) =-(sp8*v1) - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 - (0d0,1d0)*sp2*v6 +    (0d0,1d0)*sp10*v7 + sp10*v8
-            SpiVL(9) =sp9*v1 + sp12*(v2 + (0d0,1d0)*v3) + sp11*v4 + sp15*v5 - (0d0,1d0)*sp15*v6 -   (0d0,1d0)*sp7*v7 + sp7*v8
-            SpiVL(10) =sp10*v1 + sp11*(v2 - (0d0,1d0)*v3) - sp12*v4 + sp16*v5 - (0d0,1d0)*sp16*v6 -   (0d0,1d0)*sp8*v7 + sp8*v8
-            SpiVL(11) =-(sp11*v1) - sp10*(v2 + (0d0,1d0)*v3) - sp9*v4 + sp13*v5 -   (0d0,1d0)*sp13*v6 - (0d0,1d0)*sp5*v7 + sp5*v8
-            SpiVL(12) =-(sp12*v1) - sp9*v2 + (0d0,1d0)*sp9*v3 + sp10*v4 + sp14*v5 -   (0d0,1d0)*sp14*v6 - (0d0,1d0)*sp6*v7 + sp6*v8
-            SpiVL(13) =sp13*v1 + sp16*(v2 + (0d0,1d0)*v3) + sp15*v4 - sp11*v5 - (0d0,1d0)*sp11*v6 -  (0d0,1d0)*sp3*v7 + sp3*v8
-            SpiVL(14) =sp14*v1 + sp15*(v2 - (0d0,1d0)*v3) - sp16*v4 - sp12*v5 - (0d0,1d0)*sp12*v6 -   (0d0,1d0)*sp4*v7 + sp4*v8
-            SpiVL(15) =-(sp15*v1) - sp14*(v2 + (0d0,1d0)*v3) - sp13*v4 - sp9*v5 -   (0d0,1d0)*sp9*v6 - (0d0,1d0)*sp1*v7 + sp1*v8
-            SpiVL(16) =-(sp16*v1) - sp13*v2 + (0d0,1d0)*sp13*v3 + sp14*v4 - sp10*v5 -   (0d0,1d0)*sp10*v6 - (0d0,1d0)*sp2*v7 + sp2*v8
-
-
-
-
-!             SpiVL(1) = sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 + (0d0,1d0)*sp15*v6 - (0d0,1d0)*sp7*v7 + sp15*v8
-!             SpiVL(2) = sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 + (0d0,1d0)*sp16*v6 -(0d0,1d0)*sp8*v7 + sp16*v8
-!             SpiVL(3) =-(sp3*v1) - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 + (0d0,1d0)*sp13*v6 -   (0d0,1d0)*sp5*v7 + sp13*v8
-!             SpiVL(4) =-(sp4*v1) - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 + (0d0,1d0)*sp14*v6 - (0d0,1d0)*sp6*v7 + sp14*v8
-!             SpiVL(5) = sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp11*v6 -  (0d0,1d0)*sp3*v7 + sp11*v8
-!             SpiVL(6) = sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp12*v6 - (0d0,1d0)*sp4*v7 + sp12*v8
-!             SpiVL(7) =-(sp7*v1) - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp9*v6 - (0d0,1d0)*sp1*v7 + sp9*v8
-!             SpiVL(8) =-(sp8*v1) - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 -  (0d0,1d0)*sp10*v6 - (0d0,1d0)*sp2*v7 + sp10*v8
-!             SpiVL(9) = sp9*v1 + sp12*(v2 + (0d0,1d0)*v3) + sp11*v4 + sp15*v5 + (0d0,1d0)*sp7*v6 -   (0d0,1d0)*sp15*v7 + sp7*v8
-!             SpiVL(10)= sp10*v1 + sp11*(v2 - (0d0,1d0)*v3) - sp12*v4 + sp16*v5 + (0d0,1d0)*sp8*v6 -  (0d0,1d0)*sp16*v7 + sp8*v8
-!             SpiVL(11)= -(sp11*v1) - sp10*(v2 + (0d0,1d0)*v3) - sp9*v4 + sp13*v5 + (0d0,1d0)*sp5*v6 - (0d0,1d0)*sp13*v7 + sp5*v8
-!             SpiVL(12)= -(sp12*v1) - sp9*v2 + (0d0,1d0)*sp9*v3 + sp10*v4 + sp14*v5 +  (0d0,1d0)*sp6*v6 - (0d0,1d0)*sp14*v7 + sp6*v8
-!             SpiVL(13)= sp13*v1 + sp16*(v2 + (0d0,1d0)*v3) + sp15*v4 - sp11*v5 - (0d0,1d0)*sp3*v6 -  (0d0,1d0)*sp11*v7 + sp3*v8
-!             SpiVL(14)= sp14*v1 + sp15*(v2 - (0d0,1d0)*v3) - sp16*v4 - sp12*v5 - (0d0,1d0)*sp4*v6 -  (0d0,1d0)*sp12*v7 + sp4*v8
-!             SpiVL(15)= -(sp15*v1) - sp14*(v2 + (0d0,1d0)*v3) - sp13*v4 - sp9*v5 -  (0d0,1d0)*sp1*v6 - (0d0,1d0)*sp9*v7 + sp1*v8
-!             SpiVL(16)= -(sp16*v1) - sp13*v2 + (0d0,1d0)*sp13*v3 + sp14*v4 - sp10*v5 - (0d0,1d0)*sp2*v6 - (0d0,1d0)*sp10*v7 + sp2*v8
+            SpiVL(1) =          sp1*v1 + sp4*(v2 + (0d0,1d0)*v3) + sp3*v4 + sp7*v5 - (0d0,1d0)*sp7*v6 - sp11*v7 + (0d0,1d0)*sp11*v8
+            SpiVL(2) =          sp2*v1 + sp3*(v2 - (0d0,1d0)*v3) - sp4*v4 + sp8*v5 - (0d0,1d0)*sp8*v6 - sp12*v7 + (0d0,1d0)*sp12*v8
+            SpiVL(3) =         -(sp3*v1) - sp2*(v2 + (0d0,1d0)*v3) - sp1*v4 + sp5*v5 - (0d0,1d0)*sp5*v6 - sp9*v7 + (0d0,1d0)*sp9*v8
+            SpiVL(4) =         -(sp4*v1) - sp1*v2 + (0d0,1d0)*sp1*v3 + sp2*v4 + sp6*v5 - (0d0,1d0)*sp6*v6 - sp10*v7 + (0d0,1d0)*sp10*v8
+            SpiVL(5) =         sp5*v1 + sp8*(v2 + (0d0,1d0)*v3) + sp7*v4 - sp3*v5 - (0d0,1d0)*sp3*v6 + sp15*v7 - (0d0,1d0)*sp15*v8
+            SpiVL(6) =         sp6*v1 + sp7*(v2 - (0d0,1d0)*v3) - sp8*v4 - sp4*v5 - (0d0,1d0)*sp4*v6 + sp16*v7 - (0d0,1d0)*sp16*v8
+            SpiVL(7) =         -(sp7*v1) - sp6*(v2 + (0d0,1d0)*v3) - sp5*v4 - sp1*v5 - (0d0,1d0)*sp1*v6 + sp13*v7 - (0d0,1d0)*sp13*v8
+            SpiVL(8) =         -(sp8*v1) - sp5*v2 + (0d0,1d0)*sp5*v3 + sp6*v4 - sp2*v5 - (0d0,1d0)*sp2*v6 + sp14*v7 - (0d0,1d0)*sp14*v8
+            SpiVL(9) =         sp9*v1 + sp12*(v2 + (0d0,1d0)*v3) + sp11*v4 + sp15*v5 - (0d0,1d0)*sp15*v6 + sp3*v7 + (0d0,1d0)*sp3*v8
+            SpiVL(10)=         sp10*v1 + sp11*(v2 - (0d0,1d0)*v3) - sp12*v4 + sp16*v5 - (0d0,1d0)*sp16*v6 + sp4*v7 + (0d0,1d0)*sp4*v8
+            SpiVL(11) =         -(sp11*v1) - sp10*(v2 + (0d0,1d0)*v3) - sp9*v4 + sp13*v5 - (0d0,1d0)*sp13*v6 + sp1*v7 + (0d0,1d0)*sp1*v8
+            SpiVL(12) =         -(sp12*v1) - sp9*v2 + (0d0,1d0)*sp9*v3 + sp10*v4 + sp14*v5 - (0d0,1d0)*sp14*v6 + sp2*v7 + (0d0,1d0)*sp2*v8
+            SpiVL(13) =         sp13*v1 + sp16*(v2 + (0d0,1d0)*v3) + sp15*v4 - sp11*v5 - (0d0,1d0)*sp11*v6 - sp7*v7 - (0d0,1d0)*sp7*v8
+            SpiVL(14) =         sp14*v1 + sp15*(v2 - (0d0,1d0)*v3) - sp16*v4 - sp12*v5 - (0d0,1d0)*sp12*v6 - sp8*v7 - (0d0,1d0)*sp8*v8
+            SpiVL(15) =         -(sp15*v1) - sp14*(v2 + (0d0,1d0)*v3) - sp13*v4 - sp9*v5 - (0d0,1d0)*sp9*v6 - sp5*v7 - (0d0,1d0)*sp5*v8
+            SpiVL(16) =         -(sp16*v1) - sp13*v2 + (0d0,1d0)*sp13*v3 + sp14*v4 - sp10*v5 - (0d0,1d0)*sp10*v6 - sp6*v7 - (0d0,1d0)*sp6*v8
         endif
         
       return
@@ -1988,41 +1967,22 @@ END SUBROUTINE
         elseif( Ds.eq.16 ) then
             sp1=sp(1); sp2=sp(2); sp3=sp(3); sp4=sp(4); sp5=sp(5); sp6=sp(6); sp7=sp(7); sp8=sp(8); sp9=sp(9); sp10=sp(10); sp11=sp(11); sp12=sp(12); sp13=sp(13); sp14=sp(14); sp15=sp(15); sp16=sp(16); 
             v1=v(1); v2=v(2); v3=v(3); v4=v(4); v5=v(5); v6=v(6); v7=v(7);  v8=v(8); 
-
-            VSpiL(1) =sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 -  (0d0,1d0)*sp7*v6 - (0d0,1d0)*sp15*v7 + sp15*v8
-            VSpiL(2) =sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp8*v6 -    (0d0,1d0)*sp16*v7 + sp16*v8
-            VSpiL(3) =-(sp3*v1) + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp5*v6 -    (0d0,1d0)*sp13*v7 + sp13*v8
-            VSpiL(4) =-(sp4*v1) + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp6*v6 -   (0d0,1d0)*sp14*v7 + sp14*v8
-            VSpiL(5) =sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 - (0d0,1d0)*sp3*v6 -    (0d0,1d0)*sp11*v7 + sp11*v8
-            VSpiL(6) =sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 - (0d0,1d0)*sp4*v6 -     (0d0,1d0)*sp12*v7 + sp12*v8
-            VSpiL(7) =-(sp7*v1) + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 - (0d0,1d0)*sp1*v6 -    (0d0,1d0)*sp9*v7 + sp9*v8
-            VSpiL(8) =-(sp8*v1) + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 - (0d0,1d0)*sp2*v6 -   (0d0,1d0)*sp10*v7 + sp10*v8
-            VSpiL(9) =sp9*v1 - sp12*v2 + (0d0,1d0)*sp12*v3 - sp11*v4 - sp15*v5 -    (0d0,1d0)*sp15*v6 + (0d0,1d0)*sp7*v7 + sp7*v8
-            VSpiL(10) =sp10*v1 - sp11*(v2 + (0d0,1d0)*v3) + sp12*v4 - sp16*v5 - (0d0,1d0)*sp16*v6 +   (0d0,1d0)*sp8*v7 + sp8*v8
-            VSpiL(11) =-(sp11*v1) + sp10*(v2 - (0d0,1d0)*v3) + sp9*v4 - sp13*v5 -  (0d0,1d0)*sp13*v6 + (0d0,1d0)*sp5*v7 + sp5*v8
-            VSpiL(12) =-(sp12*v1) + sp9*(v2 + (0d0,1d0)*v3) - sp10*v4 - sp14*v5 -    (0d0,1d0)*sp14*v6 + (0d0,1d0)*sp6*v7 + sp6*v8
-            VSpiL(13) =sp13*v1 - sp16*v2 + (0d0,1d0)*sp16*v3 - sp15*v4 + sp11*v5 -     (0d0,1d0)*sp11*v6 + (0d0,1d0)*sp3*v7 + sp3*v8
-            VSpiL(14) =sp14*v1 - sp15*(v2 + (0d0,1d0)*v3) + sp16*v4 + sp12*v5 - (0d0,1d0)*sp12*v6 +   (0d0,1d0)*sp4*v7 + sp4*v8
-            VSpiL(15) =-(sp15*v1) + sp14*(v2 - (0d0,1d0)*v3) + sp13*v4 + sp9*v5 -   (0d0,1d0)*sp9*v6 + (0d0,1d0)*sp1*v7 + sp1*v8
-            VSpiL(16) =-(sp16*v1) + sp13*(v2 + (0d0,1d0)*v3) - sp14*v4 + sp10*v5 -    (0d0,1d0)*sp10*v6 + (0d0,1d0)*sp2*v7 + sp2*v8
-
-
-!             VSpiL(1) = sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 - (0d0,1d0)*sp15*v6 - (0d0,1d0)*sp7*v7 + sp15*v8
-!             VSpiL(2) = sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp16*v6 -  (0d0,1d0)*sp8*v7 + sp16*v8
-!             VSpiL(3) =-(sp3*v1) + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp13*v6 -  (0d0,1d0)*sp5*v7 + sp13*v8
-!             VSpiL(4) =-(sp4*v1) + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp14*v6 -    (0d0,1d0)*sp6*v7 + sp14*v8
-!             VSpiL(5) = sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 + (0d0,1d0)*sp11*v6 -   (0d0,1d0)*sp3*v7 + sp11*v8
-!             VSpiL(6) = sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 + (0d0,1d0)*sp12*v6 -  (0d0,1d0)*sp4*v7 + sp12*v8
-!             VSpiL(7) =-(sp7*v1) + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 + (0d0,1d0)*sp9*v6 -    (0d0,1d0)*sp1*v7 + sp9*v8
-!             VSpiL(8) =-(sp8*v1) + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 + (0d0,1d0)*sp10*v6 -   (0d0,1d0)*sp2*v7 + sp10*v8
-!             VSpiL(9) = sp9*v1 - sp12*v2 + (0d0,1d0)*sp12*v3 - sp11*v4 - sp15*v5 -  (0d0,1d0)*sp7*v6 - (0d0,1d0)*sp15*v7 + sp7*v8
-!             VSpiL(10) = sp10*v1 - sp11*(v2 + (0d0,1d0)*v3) + sp12*v4 - sp16*v5 - (0d0,1d0)*sp8*v6 -   (0d0,1d0)*sp16*v7 + sp8*v8
-!             VSpiL(11) =-(sp11*v1) + sp10*(v2 - (0d0,1d0)*v3) + sp9*v4 - sp13*v5 -   (0d0,1d0)*sp5*v6 - (0d0,1d0)*sp13*v7 + sp5*v8
-!             VSpiL(12) =-(sp12*v1) + sp9*(v2 + (0d0,1d0)*v3) - sp10*v4 - sp14*v5 -  (0d0,1d0)*sp6*v6 - (0d0,1d0)*sp14*v7 + sp6*v8
-!             VSpiL(13) = sp13*v1 - sp16*v2 + (0d0,1d0)*sp16*v3 - sp15*v4 + sp11*v5 +  (0d0,1d0)*sp3*v6 - (0d0,1d0)*sp11*v7 + sp3*v8
-!             VSpiL(14) = sp14*v1 - sp15*(v2 + (0d0,1d0)*v3) + sp16*v4 + sp12*v5 + (0d0,1d0)*sp4*v6 -  (0d0,1d0)*sp12*v7 + sp4*v8
-!             VSpiL(15) =-(sp15*v1) + sp14*(v2 - (0d0,1d0)*v3) + sp13*v4 + sp9*v5 +  (0d0,1d0)*sp1*v6 - (0d0,1d0)*sp9*v7 + sp1*v8
-!             VSpiL(16) =-(sp16*v1) + sp13*(v2 + (0d0,1d0)*v3) - sp14*v4 + sp10*v5 +  (0d0,1d0)*sp2*v6 - (0d0,1d0)*sp10*v7 + sp2*v8
+            VSpiL(1) =           sp1*v1 - sp4*v2 + (0d0,1d0)*sp4*v3 - sp3*v4 - sp7*v5 - (0d0,1d0)*sp7*v6 + sp11*v7 + (0d0,1d0)*sp11*v8
+            VSpiL(2) =           sp2*v1 - sp3*(v2 + (0d0,1d0)*v3) + sp4*v4 - sp8*v5 - (0d0,1d0)*sp8*v6 + sp12*v7 + (0d0,1d0)*sp12*v8
+            VSpiL(3) =          -(sp3*v1) + sp2*(v2 - (0d0,1d0)*v3) + sp1*v4 - sp5*v5 - (0d0,1d0)*sp5*v6 + sp9*v7 + (0d0,1d0)*sp9*v8
+            VSpiL(4) =          -(sp4*v1) + sp1*(v2 + (0d0,1d0)*v3) - sp2*v4 - sp6*v5 - (0d0,1d0)*sp6*v6 + sp10*v7 + (0d0,1d0)*sp10*v8
+            VSpiL(5) =          sp5*v1 - sp8*v2 + (0d0,1d0)*sp8*v3 - sp7*v4 + sp3*v5 - (0d0,1d0)*sp3*v6 - sp15*v7 - (0d0,1d0)*sp15*v8
+            VSpiL(6) =          sp6*v1 - sp7*(v2 + (0d0,1d0)*v3) + sp8*v4 + sp4*v5 - (0d0,1d0)*sp4*v6 - sp16*v7 - (0d0,1d0)*sp16*v8
+            VSpiL(7) =          -(sp7*v1) + sp6*(v2 - (0d0,1d0)*v3) + sp5*v4 + sp1*v5 - (0d0,1d0)*sp1*v6 - sp13*v7 - (0d0,1d0)*sp13*v8
+            VSpiL(8) =          -(sp8*v1) + sp5*(v2 + (0d0,1d0)*v3) - sp6*v4 + sp2*v5 - (0d0,1d0)*sp2*v6 - sp14*v7 - (0d0,1d0)*sp14*v8
+            VSpiL(9) =          sp9*v1 - sp12*v2 + (0d0,1d0)*sp12*v3 - sp11*v4 - sp15*v5 - (0d0,1d0)*sp15*v6 - sp3*v7 + (0d0,1d0)*sp3*v8
+            VSpiL(10) =          sp10*v1 - sp11*(v2 + (0d0,1d0)*v3) + sp12*v4 - sp16*v5 - (0d0,1d0)*sp16*v6 - sp4*v7 + (0d0,1d0)*sp4*v8
+            VSpiL(11) =          -(sp11*v1) + sp10*(v2 - (0d0,1d0)*v3) + sp9*v4 - sp13*v5 - (0d0,1d0)*sp13*v6 - sp1*v7 + (0d0,1d0)*sp1*v8
+            VSpiL(12) =          -(sp12*v1) + sp9*(v2 + (0d0,1d0)*v3) - sp10*v4 - sp14*v5 - (0d0,1d0)*sp14*v6 - sp2*v7 + (0d0,1d0)*sp2*v8
+            VSpiL(13) =          sp13*v1 - sp16*v2 + (0d0,1d0)*sp16*v3 - sp15*v4 + sp11*v5 - (0d0,1d0)*sp11*v6 + sp7*v7 - (0d0,1d0)*sp7*v8
+            VSpiL(14) =          sp14*v1 - sp15*(v2 + (0d0,1d0)*v3) + sp16*v4 + sp12*v5 - (0d0,1d0)*sp12*v6 + sp8*v7 - (0d0,1d0)*sp8*v8
+            VSpiL(15) =          -(sp15*v1) + sp14*(v2 - (0d0,1d0)*v3) + sp13*v4 + sp9*v5 - (0d0,1d0)*sp9*v6 + sp5*v7 - (0d0,1d0)*sp5*v8
+            VSpiL(16) =          -(sp16*v1) + sp13*(v2 + (0d0,1d0)*v3) - sp14*v4 + sp10*v5 - (0d0,1d0)*sp10*v6 + sp6*v7 - (0d0,1d0)*sp6*v8
         endif
 
       return
@@ -2043,6 +2003,7 @@ END SUBROUTINE
          double complex x0(4,4),xx(4,4),xy(4,4)
          double complex xz(4,4),x5(4,4)
          double complex y1,y2,y3,y4,bp,bm,cp,cm
+         double complex test(Ds)
 
            imax = Ds/4
 
@@ -2135,6 +2096,20 @@ END SUBROUTINE
 
               endif
 
+
+
+! if(Ds.eq.16) then
+!   test(:) = SpiVL(sp,v)
+!   print *, ""
+!   print *, "spb2",f(1:Ds)
+!   print *, "test",test(1:Ds)
+!   print *, "diff",test(1:Ds)-f(1:Ds)
+!   if( any( abs(test(1:Ds)-f(1:Ds) ).gt.1d-10  ) ) pause
+! endif
+
+
+
+
                return
                end SUBROUTINE
 
@@ -2158,6 +2133,8 @@ END SUBROUTINE
          double complex x0(4,4),xx(4,4),xy(4,4)
          double complex xz(4,4),x5(4,4)
          double complex y1,y2,y3,y4,bp,bm,cp,cm
+         double complex test(Ds)
+
 
          imax = Ds/4
 
@@ -2255,6 +2232,15 @@ END SUBROUTINE
             enddo
 
             endif
+
+! if(Ds.eq.16) then
+!   test(:) = VSpiL(v,sp)
+!   print *, ""
+!   print *, "spi2",f(1:Ds)
+!   print *, "test",test(1:Ds)
+!   print *, "diff",test(1:Ds)-f(1:Ds)
+!   if( any( abs(test(1:Ds)-f(1:Ds) ).gt.1d-10  ) ) pause
+! endif
 
            return
            end subroutine
@@ -2583,11 +2569,47 @@ END SUBROUTINE
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
-      complex(8), intent(in) :: coupl_left,coupl_right
-      complex(8) :: vbqV(size(sp))
+      complex(8), intent(in) :: coupl_left
+      complex(8) :: vbqV(size(sp)),coupl_right,cRight,cLeft
+      integer :: Ds
 !  complex(8) :: check_new(size(sp)),check_old(size(sp))
-
+ 
+            Ds = size(sp)
             vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) ) 
+
+! print *, ""
+! print *, "new",vbqV
+! vbqV = -(0d0,1d0)*( coupl_left*Chir_OLD(.false.,spb2_(sp,e1)) + coupl_right*Chir_OLD(.true.,spb2_(sp,e1)) ) 
+! print *, "old",vbqV
+
+
+! if( size(sp).eq.16 ) then
+!     vbqV = Chir(.false.,sp)
+!     vbqV = Chir(.false.,vbqV)- Chir(.false.,sp)
+!     print *, "chir check 1",vbqV 
+!     if( any( abs(vbqV) .gt.1d-10) ) pause
+! 
+!     vbqV = Chir(.true.,sp)
+!     vbqV = Chir(.true.,vbqV)- Chir(.true.,sp)
+!     print *, "chir check 2",vbqV 
+!     if( any( abs(vbqV) .gt.1d-10) ) pause
+! 
+!     vbqV = Chir(.true.,sp)
+!     vbqV = Chir(.false.,vbqV)
+!     print *, "chir check 3",vbqV
+!     if( any( abs(vbqV) .gt.1d-10) ) pause
+! 
+!     vbqV = Chir(.false.,sp)
+!     vbqV = Chir(.true.,vbqV)
+!     print *, "chir check 4",vbqV
+!     if( any( abs(vbqV) .gt.1d-10) ) pause
+! 
+!     vbqV = Chir(.false.,sp)+ Chir(.true.,sp) - sp 
+!     print *, "chir check 5",vbqV
+!     if( any( abs(vbqV) .gt.1d-10) ) pause
+! endif
+
+
 
 !             vbqV = -(0d0,1d0)*( coupl_left*Chir_check(.false.,spb2_(sp,e1)) + coupl_right*Chir_check(.true.,spb2_(sp,e1)) ) 
 
@@ -2626,7 +2648,78 @@ END SUBROUTINE
 !  print *, "old",check_old
 !  print *, "new",check_new
 
-!  if( size(sp).eq.16 ) pause
+
+
+
+! print *, ""
+! print *, Ds
+! print *, "old vbqV",vbqV
+!
+!       the code below corresponds to Chir with  gamma^mu*gamma^5 --->  1/2*( gamma^mu*gamma^5 - gamma^5*gamma^mu )
+!
+!       cLeft=coupl_left
+!       cRight=coupl_right
+!       if( Ds.eq.4 ) then
+!       vbqV = (/ (cRight*(-((sp(2) - sp(4))*(e1(2) + (0d0,1d0)*e1(3))) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4))) + cLeft*((sp(2) + sp(4))*(e1(2) + (0d0,1d0)*e1(3)) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4))))/2d0, & 
+!         (cLeft*((sp(1) + sp(3))*(e1(2) - (0d0,1d0)*e1(3)) + sp(2)*(e1(1) - e1(4)) + sp(4)*(e1(1) - e1(4))) + cRight*(-((sp(1) - sp(3))*(e1(2) - (0d0,1d0)*e1(3))) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4))))/2d0, &
+!         (cRight*(-((sp(2) - sp(4))*(e1(2) + (0d0,1d0)*e1(3))) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4))) - cLeft*((sp(2) + sp(4))*(e1(2) + (0d0,1d0)*e1(3)) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4))))/2d0,&
+!         (cLeft*(-((sp(1) + sp(3))*(e1(2) - (0d0,1d0)*e1(3))) + sp(2)*(-e1(1) + e1(4)) + sp(4)*(-e1(1) + e1(4))) + cRight*(-((sp(1) - sp(3))*(e1(2) - (0d0,1d0)*e1(3))) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4))))/2d0   /)
+!       elseif( Ds.eq.8 ) then
+!       vbqV = (/  &
+!         (cRight*(-(sp(2)*e1(2)) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(7)*e1(5) - (0d0,1d0)*sp(7)*e1(6)) +   &
+!              cLeft*(sp(2)*e1(2) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) + sp(7)*e1(5) - (0d0,1d0)*sp(7)*e1(6)))/2d0,   & 
+!         (cLeft*(sp(1)*e1(2) + sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(e1(1) - e1(4)) + sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6)) +            &
+!            cRight*(-(sp(1)*e1(2)) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) + sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6)))/2d0,    &
+!         (cRight*(-(sp(2)*e1(2)) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(5)*e1(5) - (0d0,1d0)*sp(5)*e1(6)) -        &
+!            cLeft*(sp(2)*e1(2) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) - sp(5)*e1(5) + (0d0,1d0)*sp(5)*e1(6)))/2d0,     &
+!         (cLeft*(-(sp(1)*e1(2)) - sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) + (0d0,1d0)*sp(3)*e1(3) + sp(2)*(-e1(1) + e1(4)) + sp(4)*(-e1(1) + e1(4)) + sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6)) +        &
+!            cRight*(-(sp(1)*e1(2)) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) + sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6)))/2d0,    &
+!         (cLeft*(sp(6)*e1(2) + sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) + sp(7)*(e1(1) + e1(4)) - sp(3)*e1(5) - (0d0,1d0)*sp(3)*e1(6)) -              &
+!            cRight*(sp(6)*e1(2) - sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(7)*(e1(1) - e1(4)) + sp(5)*(-e1(1) + e1(4)) + sp(3)*e1(5) + (0d0,1d0)*sp(3)*e1(6)))/2d0,    &
+!         (cLeft*(sp(5)*e1(2) + sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(e1(1) - e1(4)) - sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6)) -            &
+!            cRight*(sp(5)*e1(2) - sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) + (0d0,1d0)*sp(7)*e1(3) - sp(6)*(e1(1) + e1(4)) + sp(8)*(e1(1) + e1(4)) + sp(4)*e1(5) + (0d0,1d0)*sp(4)*e1(6)))/2d0,    &
+!         (-(cRight*(sp(6)*e1(2) - sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(7)*(e1(1) - e1(4)) + sp(5)*(-e1(1) + e1(4)) + sp(1)*e1(5) + (0d0,1d0)*sp(1)*e1(6))) -       &
+!            cLeft*(sp(6)*e1(2) + sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) + sp(7)*(e1(1) + e1(4)) + sp(1)*e1(5) + (0d0,1d0)*sp(1)*e1(6)))/2d0,     &
+!         (-(cLeft*(sp(5)*e1(2) + sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(e1(1) - e1(4)) + sp(2)*e1(5) + (0d0,1d0)*sp(2)*e1(6))) -         &
+!            cRight*(sp(5)*e1(2) - sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) + (0d0,1d0)*sp(7)*e1(3) - sp(6)*(e1(1) + e1(4)) + sp(8)*(e1(1) + e1(4)) + sp(2)*e1(5) + (0d0,1d0)*sp(2)*e1(6)))/2d0    /)   
+!       elseif( Ds.eq.16 ) then
+!       vbqV = (/  &
+!                (cRight*(-(sp(2)*e1(2)) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(7)*e1(5) - (0d0,1d0)*sp(7)*e1(6) - sp(11)*e1(7) +      &
+!                 (0d0,1d0)*sp(11)*e1(8)) + cLeft*(sp(2)*e1(2) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) + sp(7)*e1(5) - (0d0,1d0)*sp(7)*e1(6) - sp(11)*e1(7) +     &
+!               (0d0,1d0)*sp(11)*e1(8)))/2d0,(cLeft*(sp(1)*e1(2) + sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(e1(1) - e1(4)) + sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6) - sp(12)*e1(7) +    &
+!               (0d0,1d0)*sp(12)*e1(8)) + cRight*(-(sp(1)*e1(2)) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) + sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6) - sp(12)*e1(7) +    &
+!               (0d0,1d0)*sp(12)*e1(8)))/2d0,(-(cLeft*(sp(2)*e1(2) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) - sp(5)*e1(5) + (0d0,1d0)*sp(5)*e1(6) + sp(9)*e1(7) -    &
+!                 (0d0,1d0)*sp(9)*e1(8))) + cRight*(-(sp(2)*e1(2)) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) - e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(5)*e1(5) - (0d0,1d0)*sp(5)*e1(6) - sp(9)*e1(7) +    &
+!               (0d0,1d0)*sp(9)*e1(8)))/2d0,(-(cLeft*(sp(1)*e1(2) + sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(e1(1) - e1(4)) - sp(6)*e1(5) + (0d0,1d0)*sp(6)*e1(6) + sp(10)*e1(7) -    &
+!                 (0d0,1d0)*sp(10)*e1(8))) + cRight*(-(sp(1)*e1(2)) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) + sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6) - sp(10)*e1(7) +    &
+!               (0d0,1d0)*sp(10)*e1(8)))/2d0,(cLeft*(sp(6)*e1(2) + sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) + sp(7)*(e1(1) + e1(4)) - sp(3)*e1(5) - (0d0,1d0)*sp(3)*e1(6) + sp(15)*e1(7) -    &
+!               (0d0,1d0)*sp(15)*e1(8)) - cRight*(sp(6)*e1(2) - sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(7)*(e1(1) - e1(4)) + sp(5)*(-e1(1) + e1(4)) + sp(3)*e1(5) + (0d0,1d0)*sp(3)*e1(6) - sp(15)*e1(7) +    &
+!               (0d0,1d0)*sp(15)*e1(8)))/2d0,(cLeft*(sp(5)*e1(2) + sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(e1(1) - e1(4)) - sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6) + sp(16)*e1(7) -    &
+!               (0d0,1d0)*sp(16)*e1(8)) + cRight*(-(sp(5)*e1(2)) + sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) + e1(4)) - sp(8)*(e1(1) + e1(4)) - sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6) + sp(16)*e1(7) -    &
+!               (0d0,1d0)*sp(16)*e1(8)))/2d0,(-(cRight*(sp(6)*e1(2) - sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(7)*(e1(1) - e1(4)) + sp(5)*(-e1(1) + e1(4)) + sp(1)*e1(5) + (0d0,1d0)*sp(1)*e1(6) - sp(13)*e1(7) +    &
+!                 (0d0,1d0)*sp(13)*e1(8))) - cLeft*(sp(6)*e1(2) + sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) + sp(7)*(e1(1) + e1(4)) + sp(1)*e1(5) + (0d0,1d0)*sp(1)*e1(6) - sp(13)*e1(7) +    &
+!               (0d0,1d0)*sp(13)*e1(8)))/2d0,(cRight*(-(sp(5)*e1(2)) + sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) + e1(4)) - sp(8)*(e1(1) + e1(4)) - sp(2)*e1(5) - (0d0,1d0)*sp(2)*e1(6) + sp(14)*e1(7) -    &
+!               (0d0,1d0)*sp(14)*e1(8)) - cLeft*(sp(5)*e1(2) + sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(e1(1) - e1(4)) + sp(2)*e1(5) + (0d0,1d0)*sp(2)*e1(6) - sp(14)*e1(7) +    &
+!               (0d0,1d0)*sp(14)*e1(8)))/2d0,(cRight*(-(sp(10)*e1(2)) + sp(12)*e1(2) - (0d0,1d0)*sp(10)*e1(3) + (0d0,1d0)*sp(12)*e1(3) + sp(9)*(e1(1) - e1(4)) + sp(11)*(-e1(1) + e1(4)) + sp(15)*e1(5) - (0d0,1d0)*sp(15)*e1(6) +    &
+!               sp(3)*e1(7) + (0d0,1d0)*sp(3)*e1(8)) + cLeft*(sp(10)*e1(2) + sp(12)*e1(2) + (0d0,1d0)*sp(10)*e1(3) + (0d0,1d0)*sp(12)*e1(3) + sp(11)*(e1(1) + e1(4)) + sp(9)*(e1(1) + e1(4)) + sp(15)*e1(5) - (0d0,1d0)*sp(15)*e1(6) +    &
+!               sp(3)*e1(7) + (0d0,1d0)*sp(3)*e1(8)))/2d0,(cLeft*(sp(11)*e1(2) + sp(9)*e1(2) - (0d0,1d0)*sp(11)*e1(3) - (0d0,1d0)*sp(9)*e1(3) + sp(10)*(e1(1) - e1(4)) + sp(12)*(e1(1) - e1(4)) + sp(16)*e1(5) - (0d0,1d0)*sp(16)*e1(6) +    &
+!               sp(4)*e1(7) + (0d0,1d0)*sp(4)*e1(8)) + cRight*(sp(11)*e1(2) - sp(9)*e1(2) - (0d0,1d0)*sp(11)*e1(3) + (0d0,1d0)*sp(9)*e1(3) + sp(10)*(e1(1) + e1(4)) - sp(12)*(e1(1) + e1(4)) + sp(16)*e1(5) - (0d0,1d0)*sp(16)*e1(6) +    &
+!               sp(4)*e1(7) + (0d0,1d0)*sp(4)*e1(8)))/2d0,(-(cLeft*(sp(10)*e1(2) + sp(12)*e1(2) + (0d0,1d0)*sp(10)*e1(3) + (0d0,1d0)*sp(12)*e1(3) + sp(11)*(e1(1) + e1(4)) + sp(9)*(e1(1) + e1(4)) - sp(13)*e1(5) + (0d0,1d0)*sp(13)*e1(6) -    &
+!                 sp(1)*e1(7) - (0d0,1d0)*sp(1)*e1(8))) + cRight*(-(sp(10)*e1(2)) + sp(12)*e1(2) - (0d0,1d0)*sp(10)*e1(3) + (0d0,1d0)*sp(12)*e1(3) + sp(9)*(e1(1) - e1(4)) + sp(11)*(-e1(1) + e1(4)) + sp(13)*e1(5) - (0d0,1d0)*sp(13)*e1(6) +    &
+!               sp(1)*e1(7) + (0d0,1d0)*sp(1)*e1(8)))/2d0,(cLeft*(-(sp(11)*e1(2)) - sp(9)*e1(2) + (0d0,1d0)*sp(11)*e1(3) + (0d0,1d0)*sp(9)*e1(3) + sp(10)*(-e1(1) + e1(4)) + sp(12)*(-e1(1) + e1(4)) + sp(14)*e1(5) - (0d0,1d0)*sp(14)*e1(6) +    &
+!               sp(2)*e1(7) + (0d0,1d0)*sp(2)*e1(8)) + cRight*(sp(11)*e1(2) - sp(9)*e1(2) - (0d0,1d0)*sp(11)*e1(3) + (0d0,1d0)*sp(9)*e1(3) + sp(10)*(e1(1) + e1(4)) - sp(12)*(e1(1) + e1(4)) + sp(14)*e1(5) - (0d0,1d0)*sp(14)*e1(6) +    &
+!               sp(2)*e1(7) + (0d0,1d0)*sp(2)*e1(8)))/2d0,(cLeft*(sp(14)*e1(2) + sp(16)*e1(2) + (0d0,1d0)*sp(14)*e1(3) + (0d0,1d0)*sp(16)*e1(3) + sp(13)*(e1(1) + e1(4)) + sp(15)*(e1(1) + e1(4)) - sp(11)*e1(5) - (0d0,1d0)*sp(11)*e1(6) -    &
+!               sp(7)*e1(7) - (0d0,1d0)*sp(7)*e1(8)) - cRight*(sp(14)*e1(2) - sp(16)*e1(2) + (0d0,1d0)*sp(14)*e1(3) - (0d0,1d0)*sp(16)*e1(3) + sp(15)*(e1(1) - e1(4)) + sp(13)*(-e1(1) + e1(4)) + sp(11)*e1(5) + (0d0,1d0)*sp(11)*e1(6) +    &
+!               sp(7)*e1(7) + (0d0,1d0)*sp(7)*e1(8)))/2d0,(cLeft*(sp(13)*e1(2) + sp(15)*e1(2) - (0d0,1d0)*sp(13)*e1(3) - (0d0,1d0)*sp(15)*e1(3) + sp(14)*(e1(1) - e1(4)) + sp(16)*(e1(1) - e1(4)) - sp(12)*e1(5) - (0d0,1d0)*sp(12)*e1(6) -    &
+!               sp(8)*e1(7) - (0d0,1d0)*sp(8)*e1(8)) - cRight*(sp(13)*e1(2) - sp(15)*e1(2) - (0d0,1d0)*sp(13)*e1(3) + (0d0,1d0)*sp(15)*e1(3) - sp(14)*(e1(1) + e1(4)) + sp(16)*(e1(1) + e1(4)) + sp(12)*e1(5) + (0d0,1d0)*sp(12)*e1(6) +    &
+!               sp(8)*e1(7) + (0d0,1d0)*sp(8)*e1(8)))/2d0,(-(cRight*(sp(14)*e1(2) - sp(16)*e1(2) + (0d0,1d0)*sp(14)*e1(3) - (0d0,1d0)*sp(16)*e1(3) + sp(15)*(e1(1) - e1(4)) + sp(13)*(-e1(1) + e1(4)) + sp(9)*e1(5) + (0d0,1d0)*sp(9)*e1(6) +    &
+!                 sp(5)*e1(7) + (0d0,1d0)*sp(5)*e1(8))) - cLeft*(sp(14)*e1(2) + sp(16)*e1(2) + (0d0,1d0)*sp(14)*e1(3) + (0d0,1d0)*sp(16)*e1(3) + sp(13)*(e1(1) + e1(4)) + sp(15)*(e1(1) + e1(4)) + sp(9)*e1(5) + (0d0,1d0)*sp(9)*e1(6) +    &
+!               sp(5)*e1(7) + (0d0,1d0)*sp(5)*e1(8)))/2d0,(-(cLeft*(sp(13)*e1(2) + sp(15)*e1(2) - (0d0,1d0)*sp(13)*e1(3) - (0d0,1d0)*sp(15)*e1(3) + sp(14)*(e1(1) - e1(4)) + sp(16)*(e1(1) - e1(4)) + sp(10)*e1(5) + (0d0,1d0)*sp(10)*e1(6) +    &
+!                 sp(6)*e1(7) + (0d0,1d0)*sp(6)*e1(8))) - cRight*(sp(13)*e1(2) - sp(15)*e1(2) - (0d0,1d0)*sp(13)*e1(3) + (0d0,1d0)*sp(15)*e1(3) - sp(14)*(e1(1) + e1(4)) + sp(16)*(e1(1) + e1(4)) + sp(10)*e1(5) + (0d0,1d0)*sp(10)*e1(6) +    &
+!               sp(6)*e1(7) + (0d0,1d0)*sp(6)*e1(8)))/2d0   /)
+!       endif
+!       vbqV = -(0d0,1d0) * vbqV
+! print *, "new vbqV",vbqV
 
       end function vbqV
 
@@ -2636,12 +2729,85 @@ END SUBROUTINE
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
-      complex(8), intent(in) :: coupl_left,coupl_right
-      complex(8) :: vVq(size(sp))
-
-            vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )
-
+      complex(8), intent(in) :: coupl_left
+      complex(8) :: vVq(size(sp)),coupl_right,cRight,cLeft
+      integer :: Ds
+ 
+            Ds = size(sp)
+            vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )  
 !             vVq = -(0d0,1d0)*( coupl_left*Chir_check(.true., spi2_(e1,sp)) + coupl_right*Chir_check(.false., spi2_(e1,sp)) )
+
+
+! print *, ""
+! print *, Ds
+! print *, "old vVq",vVq
+!
+!       the code below corresponds to Chir with  gamma^mu*gamma^5 --->  1/2*( gamma^mu*gamma^5 - gamma^5*gamma^mu )
+!
+
+!       cLeft=coupl_left
+!       cRight=coupl_right
+!       if( Ds.eq.4 ) then
+!       vVq = (/ (cRight*(-((sp(2) + sp(4))*(e1(2) - (0d0,1d0)*e1(3))) + sp(1)*(e1(1) - e1(4)) + sp(3)*(e1(1) - e1(4))) + cLeft*((sp(2) - sp(4))*(e1(2) - (0d0,1d0)*e1(3)) + sp(1)*(e1(1) + e1(4)) - sp(3)*(e1(1) + e1(4))))/2d0,&
+!         (cLeft*((sp(1) - sp(3))*(e1(2) + (0d0,1d0)*e1(3)) + sp(2)*(e1(1) - e1(4)) + sp(4)*(-e1(1) + e1(4))) + cRight*(-((sp(1) + sp(3))*(e1(2) + (0d0,1d0)*e1(3))) + sp(2)*(e1(1) + e1(4)) + sp(4)*(e1(1) + e1(4))))/2d0,&
+!         (cRight*((sp(2) + sp(4))*(e1(2) - (0d0,1d0)*e1(3)) + sp(1)*(-e1(1) + e1(4)) + sp(3)*(-e1(1) + e1(4))) + cLeft*((sp(2) - sp(4))*(e1(2) - (0d0,1d0)*e1(3)) + sp(1)*(e1(1) + e1(4)) - sp(3)*(e1(1) + e1(4))))/2d0,&
+!         (cLeft*((sp(1) - sp(3))*(e1(2) + (0d0,1d0)*e1(3)) + sp(2)*(e1(1) - e1(4)) + sp(4)*(-e1(1) + e1(4))) + cRight*((sp(1) + sp(3))*(e1(2) + (0d0,1d0)*e1(3)) - sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4))))/2d0  /)
+!       elseif( Ds.eq.8 ) then
+!       vVq = (/     &
+!         (-(cRight*(sp(2)*e1(2) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) + sp(1)*(-e1(1) + e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(7)*e1(5) + (0d0,1d0)*sp(7)*e1(6))) -     &
+!              cLeft*(-(sp(2)*e1(2)) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) - sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) + sp(7)*e1(5) + (0d0,1d0)*sp(7)*e1(6)))/2d0,    &
+!         (cRight*(-(sp(1)*e1(2)) - sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) + sp(4)*(e1(1) + e1(4)) - sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6)) -    &
+!            cLeft*(-(sp(1)*e1(2)) + sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) + (0d0,1d0)*sp(3)*e1(3) + sp(4)*(e1(1) - e1(4)) + sp(2)*(-e1(1) + e1(4)) + sp(8)*e1(5) + (0d0,1d0)*sp(8)*e1(6)))/2d0,    &
+!         (cRight*(sp(2)*e1(2) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) + sp(1)*(-e1(1) + e1(4)) + sp(3)*(-e1(1) + e1(4)) - sp(5)*e1(5) - (0d0,1d0)*sp(5)*e1(6)) -    &
+!            cLeft*(-(sp(2)*e1(2)) + sp(4)*e1(2) + (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) - sp(1)*(e1(1) + e1(4)) + sp(3)*(e1(1) + e1(4)) + sp(5)*e1(5) + (0d0,1d0)*sp(5)*e1(6)))/2d0,    &
+!         (cLeft*(sp(1)*e1(2) - sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(-e1(1) + e1(4)) - sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6)) +    &
+!            cRight*(sp(1)*e1(2) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) + (0d0,1d0)*sp(3)*e1(3) - sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) - sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6)))/2d0,    &
+!         (cRight*(-(sp(6)*e1(2)) - sp(8)*e1(2) + (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) - e1(4)) + sp(7)*(e1(1) - e1(4)) + sp(3)*e1(5) - (0d0,1d0)*sp(3)*e1(6)) +    &
+!            cLeft*(sp(6)*e1(2) - sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) - sp(7)*(e1(1) + e1(4)) + sp(3)*e1(5) - (0d0,1d0)*sp(3)*e1(6)))/2d0,    &
+!         (cLeft*(sp(5)*e1(2) - sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(-e1(1) + e1(4)) + sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6)) +    &
+!            cRight*(-(sp(5)*e1(2)) - sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) + e1(4)) + sp(8)*(e1(1) + e1(4)) + sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6)))/2d0,    &
+!         (cRight*(sp(6)*e1(2) + sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(5)*(-e1(1) + e1(4)) + sp(7)*(-e1(1) + e1(4)) + sp(1)*e1(5) - (0d0,1d0)*sp(1)*e1(6)) +    &
+!            cLeft*(sp(6)*e1(2) - sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) - sp(7)*(e1(1) + e1(4)) + sp(1)*e1(5) - (0d0,1d0)*sp(1)*e1(6)))/2d0,    &
+!         (cLeft*(sp(5)*e1(2) - sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(-e1(1) + e1(4)) + sp(2)*e1(5) - (0d0,1d0)*sp(2)*e1(6)) +    &
+!            cRight*(sp(5)*e1(2) + sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) + (0d0,1d0)*sp(7)*e1(3) - sp(6)*(e1(1) + e1(4)) - sp(8)*(e1(1) + e1(4)) + sp(2)*e1(5) - (0d0,1d0)*sp(2)*e1(6)))/2d0   /)
+!       elseif( Ds.eq.16 ) then
+!       vVq = (/     &
+!               (-(cRight*(sp(2)*e1(2) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) + sp(1)*(-e1(1) + e1(4)) + sp(3)*(-e1(1) + e1(4)) + sp(7)*e1(5) + (0d0,1d0)*sp(7)*e1(6) - sp(11)*e1(7) -    &
+!                   (0d0,1d0)*sp(11)*e1(8))) + cLeft*(sp(2)*e1(2) - sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) - sp(3)*(e1(1) + e1(4)) - sp(7)*e1(5) - (0d0,1d0)*sp(7)*e1(6) + sp(11)*e1(7) +    &
+!               (0d0,1d0)*sp(11)*e1(8)))/2d0,(cLeft*(sp(1)*e1(2) - sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(-e1(1) + e1(4)) - sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6) + sp(12)*e1(7) +    &
+!               (0d0,1d0)*sp(12)*e1(8)) + cRight*(-(sp(1)*e1(2)) - sp(3)*e1(2) - (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) + e1(4)) + sp(4)*(e1(1) + e1(4)) - sp(8)*e1(5) - (0d0,1d0)*sp(8)*e1(6) + sp(12)*e1(7) +    &
+!               (0d0,1d0)*sp(12)*e1(8)))/2d0,(cRight*(sp(2)*e1(2) + sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) - (0d0,1d0)*sp(4)*e1(3) + sp(1)*(-e1(1) + e1(4)) + sp(3)*(-e1(1) + e1(4)) - sp(5)*e1(5) - (0d0,1d0)*sp(5)*e1(6) + sp(9)*e1(7) +    &
+!               (0d0,1d0)*sp(9)*e1(8)) + cLeft*(sp(2)*e1(2) - sp(4)*e1(2) - (0d0,1d0)*sp(2)*e1(3) + (0d0,1d0)*sp(4)*e1(3) + sp(1)*(e1(1) + e1(4)) - sp(3)*(e1(1) + e1(4)) - sp(5)*e1(5) - (0d0,1d0)*sp(5)*e1(6) + sp(9)*e1(7) + (0d0,1d0)*sp(9)*e1(8)))    &
+!          /2d0,(cLeft*(sp(1)*e1(2) - sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) - (0d0,1d0)*sp(3)*e1(3) + sp(2)*(e1(1) - e1(4)) + sp(4)*(-e1(1) + e1(4)) - sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6) + sp(10)*e1(7) + (0d0,1d0)*sp(10)*e1(8)) +    &
+!            cRight*(sp(1)*e1(2) + sp(3)*e1(2) + (0d0,1d0)*sp(1)*e1(3) + (0d0,1d0)*sp(3)*e1(3) - sp(2)*(e1(1) + e1(4)) - sp(4)*(e1(1) + e1(4)) - sp(6)*e1(5) - (0d0,1d0)*sp(6)*e1(6) + sp(10)*e1(7) + (0d0,1d0)*sp(10)*e1(8)))/2d0,    &
+!         (cLeft*(sp(6)*e1(2) - sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) - sp(7)*(e1(1) + e1(4)) + sp(3)*e1(5) - (0d0,1d0)*sp(3)*e1(6) - sp(15)*e1(7) - (0d0,1d0)*sp(15)*e1(8)) -    &
+!            cRight*(sp(6)*e1(2) + sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(5)*(-e1(1) + e1(4)) + sp(7)*(-e1(1) + e1(4)) - sp(3)*e1(5) + (0d0,1d0)*sp(3)*e1(6) + sp(15)*e1(7) + (0d0,1d0)*sp(15)*e1(8)))/2d0,    &
+!         (cLeft*(sp(5)*e1(2) - sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(-e1(1) + e1(4)) + sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6) - sp(16)*e1(7) - (0d0,1d0)*sp(16)*e1(8)) +    &
+!            cRight*(-(sp(5)*e1(2)) - sp(7)*e1(2) - (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) + e1(4)) + sp(8)*(e1(1) + e1(4)) + sp(4)*e1(5) - (0d0,1d0)*sp(4)*e1(6) - sp(16)*e1(7) - (0d0,1d0)*sp(16)*e1(8)))/2d0,    &
+!         (cRight*(sp(6)*e1(2) + sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) - (0d0,1d0)*sp(8)*e1(3) + sp(5)*(-e1(1) + e1(4)) + sp(7)*(-e1(1) + e1(4)) + sp(1)*e1(5) - (0d0,1d0)*sp(1)*e1(6) - sp(13)*e1(7) - (0d0,1d0)*sp(13)*e1(8)) +    &
+!            cLeft*(sp(6)*e1(2) - sp(8)*e1(2) - (0d0,1d0)*sp(6)*e1(3) + (0d0,1d0)*sp(8)*e1(3) + sp(5)*(e1(1) + e1(4)) - sp(7)*(e1(1) + e1(4)) + sp(1)*e1(5) - (0d0,1d0)*sp(1)*e1(6) - sp(13)*e1(7) - (0d0,1d0)*sp(13)*e1(8)))/2d0,    &
+!         (cLeft*(sp(5)*e1(2) - sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) - (0d0,1d0)*sp(7)*e1(3) + sp(6)*(e1(1) - e1(4)) + sp(8)*(-e1(1) + e1(4)) + sp(2)*e1(5) - (0d0,1d0)*sp(2)*e1(6) - sp(14)*e1(7) - (0d0,1d0)*sp(14)*e1(8)) +    &
+!            cRight*(sp(5)*e1(2) + sp(7)*e1(2) + (0d0,1d0)*sp(5)*e1(3) + (0d0,1d0)*sp(7)*e1(3) - sp(6)*(e1(1) + e1(4)) - sp(8)*(e1(1) + e1(4)) + sp(2)*e1(5) - (0d0,1d0)*sp(2)*e1(6) - sp(14)*e1(7) - (0d0,1d0)*sp(14)*e1(8)))/2d0,    &
+!         (-(cRight*(sp(10)*e1(2) + sp(12)*e1(2) - (0d0,1d0)*sp(10)*e1(3) - (0d0,1d0)*sp(12)*e1(3) + sp(11)*(-e1(1) + e1(4)) + sp(9)*(-e1(1) + e1(4)) + sp(15)*e1(5) + (0d0,1d0)*sp(15)*e1(6) + sp(3)*e1(7) - (0d0,1d0)*sp(3)*e1(8))) -    &
+!            cLeft*(-(sp(10)*e1(2)) + sp(12)*e1(2) + (0d0,1d0)*sp(10)*e1(3) - (0d0,1d0)*sp(12)*e1(3) + sp(11)*(e1(1) + e1(4)) - sp(9)*(e1(1) + e1(4)) + sp(15)*e1(5) + (0d0,1d0)*sp(15)*e1(6) + sp(3)*e1(7) - (0d0,1d0)*sp(3)*e1(8)))/2d0,    &
+!         (-(cLeft*(sp(11)*e1(2) - sp(9)*e1(2) + (0d0,1d0)*sp(11)*e1(3) - (0d0,1d0)*sp(9)*e1(3) + sp(12)*(e1(1) - e1(4)) + sp(10)*(-e1(1) + e1(4)) + sp(16)*e1(5) + (0d0,1d0)*sp(16)*e1(6) + sp(4)*e1(7) - (0d0,1d0)*sp(4)*e1(8))) +    &
+!            cRight*(-(sp(11)*e1(2)) - sp(9)*e1(2) - (0d0,1d0)*sp(11)*e1(3) - (0d0,1d0)*sp(9)*e1(3) + sp(10)*(e1(1) + e1(4)) + sp(12)*(e1(1) + e1(4)) - sp(16)*e1(5) - (0d0,1d0)*sp(16)*e1(6) - sp(4)*e1(7) + (0d0,1d0)*sp(4)*e1(8)))/2d0,    &
+!         (-(cLeft*(-(sp(10)*e1(2)) + sp(12)*e1(2) + (0d0,1d0)*sp(10)*e1(3) - (0d0,1d0)*sp(12)*e1(3) + sp(11)*(e1(1) + e1(4)) - sp(9)*(e1(1) + e1(4)) + sp(13)*e1(5) + (0d0,1d0)*sp(13)*e1(6) + sp(1)*e1(7) - (0d0,1d0)*sp(1)*e1(8))) +    &
+!            cRight*(sp(10)*e1(2) + sp(12)*e1(2) - (0d0,1d0)*sp(10)*e1(3) - (0d0,1d0)*sp(12)*e1(3) + sp(11)*(-e1(1) + e1(4)) + sp(9)*(-e1(1) + e1(4)) - sp(13)*e1(5) - (0d0,1d0)*sp(13)*e1(6) - sp(1)*e1(7) + (0d0,1d0)*sp(1)*e1(8)))/2d0,    &
+!         (-(cLeft*(sp(11)*e1(2) - sp(9)*e1(2) + (0d0,1d0)*sp(11)*e1(3) - (0d0,1d0)*sp(9)*e1(3) + sp(12)*(e1(1) - e1(4)) + sp(10)*(-e1(1) + e1(4)) + sp(14)*e1(5) + (0d0,1d0)*sp(14)*e1(6) + sp(2)*e1(7) - (0d0,1d0)*sp(2)*e1(8))) -    &
+!            cRight*(-(sp(11)*e1(2)) - sp(9)*e1(2) - (0d0,1d0)*sp(11)*e1(3) - (0d0,1d0)*sp(9)*e1(3) + sp(10)*(e1(1) + e1(4)) + sp(12)*(e1(1) + e1(4)) + sp(14)*e1(5) + (0d0,1d0)*sp(14)*e1(6) + sp(2)*e1(7) - (0d0,1d0)*sp(2)*e1(8)))/2d0,    &
+!         (cRight*(-(sp(14)*e1(2)) - sp(16)*e1(2) + (0d0,1d0)*sp(14)*e1(3) + (0d0,1d0)*sp(16)*e1(3) + sp(13)*(e1(1) - e1(4)) + sp(15)*(e1(1) - e1(4)) + sp(11)*e1(5) - (0d0,1d0)*sp(11)*e1(6) + sp(7)*e1(7) - (0d0,1d0)*sp(7)*e1(8)) +    &
+!            cLeft*(sp(14)*e1(2) - sp(16)*e1(2) - (0d0,1d0)*sp(14)*e1(3) + (0d0,1d0)*sp(16)*e1(3) + sp(13)*(e1(1) + e1(4)) - sp(15)*(e1(1) + e1(4)) + sp(11)*e1(5) - (0d0,1d0)*sp(11)*e1(6) + sp(7)*e1(7) - (0d0,1d0)*sp(7)*e1(8)))/2d0,    &
+!         (cLeft*(sp(13)*e1(2) - sp(15)*e1(2) + (0d0,1d0)*sp(13)*e1(3) - (0d0,1d0)*sp(15)*e1(3) + sp(14)*(e1(1) - e1(4)) + sp(16)*(-e1(1) + e1(4)) + sp(12)*e1(5) - (0d0,1d0)*sp(12)*e1(6) + sp(8)*e1(7) - (0d0,1d0)*sp(8)*e1(8)) +    &
+!            cRight*(-(sp(13)*e1(2)) - sp(15)*e1(2) - (0d0,1d0)*sp(13)*e1(3) - (0d0,1d0)*sp(15)*e1(3) + sp(14)*(e1(1) + e1(4)) + sp(16)*(e1(1) + e1(4)) + sp(12)*e1(5) - (0d0,1d0)*sp(12)*e1(6) + sp(8)*e1(7) - (0d0,1d0)*sp(8)*e1(8)))/2d0,    &
+!         (cRight*(sp(14)*e1(2) + sp(16)*e1(2) - (0d0,1d0)*sp(14)*e1(3) - (0d0,1d0)*sp(16)*e1(3) + sp(13)*(-e1(1) + e1(4)) + sp(15)*(-e1(1) + e1(4)) + sp(9)*e1(5) - (0d0,1d0)*sp(9)*e1(6) + sp(5)*e1(7) - (0d0,1d0)*sp(5)*e1(8)) +    &
+!            cLeft*(sp(14)*e1(2) - sp(16)*e1(2) - (0d0,1d0)*sp(14)*e1(3) + (0d0,1d0)*sp(16)*e1(3) + sp(13)*(e1(1) + e1(4)) - sp(15)*(e1(1) + e1(4)) + sp(9)*e1(5) - (0d0,1d0)*sp(9)*e1(6) + sp(5)*e1(7) - (0d0,1d0)*sp(5)*e1(8)))/2d0,    &
+!         (cLeft*(sp(13)*e1(2) - sp(15)*e1(2) + (0d0,1d0)*sp(13)*e1(3) - (0d0,1d0)*sp(15)*e1(3) + sp(14)*(e1(1) - e1(4)) + sp(16)*(-e1(1) + e1(4)) + sp(10)*e1(5) - (0d0,1d0)*sp(10)*e1(6) + sp(6)*e1(7) - (0d0,1d0)*sp(6)*e1(8)) +    &
+!            cRight*(sp(13)*e1(2) + sp(15)*e1(2) + (0d0,1d0)*sp(13)*e1(3) + (0d0,1d0)*sp(15)*e1(3) - sp(14)*(e1(1) + e1(4)) - sp(16)*(e1(1) + e1(4)) + sp(10)*e1(5) - (0d0,1d0)*sp(10)*e1(6) + sp(6)*e1(7) - (0d0,1d0)*sp(6)*e1(8)))/2d0   /)
+!       endif
+!       vVq = -(0d0,1d0) * vVq
+! print *, "new vVq",vVq
+
 
       end function vVq
 
@@ -3449,27 +3615,86 @@ END SUBROUTINE
 
 
 
+!       function Chir(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
+!       implicit none
+!       logical :: sign
+!       double complex :: sp(:)
+!       double complex :: Chir(size(sp))
+!       integer :: D
+! 
+!         D = size(sp)
+!         if( D.eq.4 ) then
+!             if(sign) then !omega_+
+!               Chir(1) = 0.5d0*(sp(1)+sp(3))
+!               Chir(2) = 0.5d0*(sp(2)+sp(4))
+!               Chir(3) = Chir(1)
+!               Chir(4) = Chir(2)
+!             else !omega_-
+!               Chir(1) = 0.5d0*(sp(1)-sp(3))
+!               Chir(2) = 0.5d0*(sp(2)-sp(4))
+!               Chir(3) =-Chir(1)
+!               Chir(4) =-Chir(2)
+!             endif
+!          elseif( D.eq.8 ) then
+!             if(sign) then !omega_+
+!               Chir(1) = 0.5d0*(sp(1)+sp(3))
+!               Chir(2) = 0.5d0*(sp(2)+sp(4))
+!               Chir(3) = Chir(1)
+!               Chir(4) = Chir(2)
+!               Chir(5) = 0.5d0*(sp(5)+sp(7))
+!               Chir(6) = 0.5d0*(sp(6)+sp(8))
+!               Chir(7) = Chir(5)
+!               Chir(8) = Chir(6)
+!             else !omega_-
+!               Chir(1) = 0.5d0*(sp(1)-sp(3))
+!               Chir(2) = 0.5d0*(sp(2)-sp(4))
+!               Chir(3) =-Chir(1)
+!               Chir(4) =-Chir(2)
+!               Chir(5) = 0.5d0*(sp(5)-sp(7))
+!               Chir(6) = 0.5d0*(sp(6)-sp(8))
+!               Chir(7) =-Chir(5)
+!               Chir(8) =-Chir(6)
+!             endif
+!          elseif( D.eq.16 ) then
+!             if(sign) then !omega_+
+!               Chir(1) = 0.5d0*(sp(1)+sp(3))
+!               Chir(2) = 0.5d0*(sp(2)+sp(4))
+!               Chir(3) = Chir(1)
+!               Chir(4) = Chir(2)
+!               Chir(5) = 0.5d0*(sp(5)+sp(7))
+!               Chir(6) = 0.5d0*(sp(6)+sp(8))
+!               Chir(7) = Chir(5)
+!               Chir(8) = Chir(6)
+!               Chir(9) = 0.5d0*(sp(09)+sp(11))
+!               Chir(10)= 0.5d0*(sp(10)+sp(12))
+!               Chir(11)= Chir(9)
+!               Chir(12)= Chir(10)
+!               Chir(13)= 0.5d0*(sp(13)+sp(15))
+!               Chir(14)= 0.5d0*(sp(14)+sp(16))
+!               Chir(15)= Chir(13)
+!               Chir(16)= Chir(14)
+!             else !omega_-
+!               Chir(1) = 0.5d0*(sp(1)-sp(3))
+!               Chir(2) = 0.5d0*(sp(2)-sp(4))
+!               Chir(3) =-Chir(1)
+!               Chir(4) =-Chir(2)
+!               Chir(5) = 0.5d0*(sp(5)-sp(7))
+!               Chir(6) = 0.5d0*(sp(6)-sp(8))
+!               Chir(7) =-Chir(5)
+!               Chir(8) =-Chir(6)
+!               Chir(9) = 0.5d0*(sp(09)-sp(11))
+!               Chir(10)= 0.5d0*(sp(10)-sp(12))
+!               Chir(11)=-Chir(9)
+!               Chir(12)=-Chir(10)
+!               Chir(13)= 0.5d0*(sp(13)-sp(15))
+!               Chir(14)= 0.5d0*(sp(14)-sp(16))
+!               Chir(15)=-Chir(13)
+!               Chir(16)=-Chir(14)
+!             endif
+!          endif         
+!       return
+!       end function
 
-
-!ORIG      function Chir(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
-!ORIG      implicit none
-!ORIG      logical :: sign
-!ORIG      double complex :: sp(1:4)
-!ORIG      double complex :: Chir(1:4)
-!ORIG
-!ORIG        if(sign) then !omega_+
-!ORIG          Chir(1) = 0.5d0*(sp(1)+sp(3))
-!ORIG          Chir(2) = 0.5d0*(sp(2)+sp(4))
-!ORIG          Chir(3) = Chir(1)
-!ORIG          Chir(4) = Chir(2)
-!ORIG        else !omega_-
-!ORIG          Chir(1) = 0.5d0*(sp(1)-sp(3))
-!ORIG          Chir(2) = 0.5d0*(sp(2)-sp(4))
-!ORIG          Chir(3) =-Chir(1)
-!ORIG          Chir(4) =-Chir(2)
-!ORIG        endif
-!ORIG      return
-!ORIG      end function
              
 ! RR -- new for D-dim chirality
              recursive function Chir(sign,sp) result(res)
@@ -3493,8 +3718,8 @@ END SUBROUTINE
                      res(4) =-res(2)
                   endif
                else
-                  res(1:D/2) = Chir(sign,sp(1:D/2))
-                  res((D/2+1):D) = Chir(sign,sp( (D/2+1):D ))
+                  res(1:D/2)     =  Chir(sign,sp(1:D/2))
+                  res((D/2+1):D) =  Chir(sign,sp( (D/2+1):D ))
                endif
 
              end function Chir

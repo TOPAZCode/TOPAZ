@@ -5790,9 +5790,9 @@ ELSEIF( MasterProcess.EQ.17 ) THEN! tb t g g Z0   ! ttbZ
 
    IF( Correction.EQ.0 .OR. Correction.EQ.4 .OR.Correction.EQ.5 ) THEN
       BornAmps(1)%ExtLine = (/1,5,2,3,4/)
-      BornAmps(2)%ExtLine = (/1,5,2,4,3/)
-
       PrimAmps(1)%ExtLine = (/1,5,2,3,4/)
+
+      BornAmps(2)%ExtLine = (/1,5,2,4,3/)
       PrimAmps(2)%ExtLine = (/1,5,2,4,3/)
 
    ELSEIF( Correction.EQ.1 ) THEN
