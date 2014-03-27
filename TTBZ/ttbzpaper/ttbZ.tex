@@ -1,3 +1,4 @@
+%  compile with pdflatex
 \documentclass[preprint]{JHEP3} 
 
 \JHEPspecialurl{http://jhep.sissa.it/JOURNAL/JHEP3.tar.gz}
@@ -348,7 +349,7 @@ We will come back to this issue in a separate publication and study the phenomen
 We now would like to comment on existing constraints on the $\ttbZ$ couplings.
 Clearly, those constraints are not obtained directly through the production of a $Z$~boson in association with top quark pairs.
 Instead, they arise from potential deviations which the higher dimensional operators in Eq.~\ref{Cone_NP} introduce to the $\rho$ parameter and the $Z b \bar{b}$ vertex in the SM.
-Those parameters are highly constrained through the experimental fits~\cite{Ciuchini:2013pca} of the $\varepsilon$ parameters~\cite{Altarelli:1993sz},
+Those parameters are highly constrained through the experimental fits~\cite{Ciuchini:2013pca} of the $\varepsilon$ parameters~\cite{Altarelli:1990zd,Altarelli:1991fk,Altarelli:1993sz},
 \be
    \label{epsexp}
    \varepsilon_1^\mathrm{exp} = (5.6 \pm 1.0) \times 10^{-3}, \quad \quad \varepsilon_b^\mathrm{exp} = (-5.8 \pm 1.3) \times 10^{-3}
@@ -371,7 +372,7 @@ We will present the numerical results later in Sect.~\ref{DimSixLimits} together
 At this point we also have to mention another experimental constraint.
 The measurements of the $Z b_\mathrm{L} \bar{b}_\mathrm{L}$ couplings from $R_b$ and $A^{b}_\mathrm{FB}$ at LEP are in permille level agreement 
 with the SM predictions~\cite{Abdallah:2008ab}.
-This experimental fact together with the $\mathrm{SU(2)}_L \times \mathrm{U(1)}_Y$ symmetry of the SM
+This experimental fact together with the $\mathrm{SU(2)}_L$ symmetry of the SM
 can be used to relate $  C^{(3,33)}_{\phi q} \approx - C^{(1,33)}_{\phi q}$.
 Hence, one of these two operators can be eliminated from Eq.~\ref{Cone_NP}.
 % Instead, limits are obtained from the LEP~II measurements of $R_b$ and $A_\mathrm{FB}^{(b)}$ which constrain the $b \bar{b} Z$ couplings.
@@ -885,8 +886,8 @@ obtained from the future high-energy LHC which we study in the next section.
 We now present the main results of our analysis in Figs.~\ref{fig:ix} and~\ref{fig:x}.
 Using the interpolation of Eq.~\ref{couplfit} we generate $441$ distributions in $\Delta \phi_{\ell\ell}$ for a grid of $21 \times 21$ $\DConeV,\DConeA$ couplings 
 choices in the range $\pm 4$ and $\pm 0.6$, respectively. 
-In terms of absolute numbers, this corresponds to a variation of $x.xx...x.xx$ around $\ConeVSM=x.xx$ and $y.yy..y.yy$ around $\ConeASM=z.zz$.
-The plots in Fig.~\ref{fig:ix} show the significance with which non-SM $\ttbZ$ couplings can be separated from the SM hypothesis.
+In terms of absolute numbers, this corresponds to a variation between $[-0.732\, ... \,1.22]$ around $\ConeVSM=0.244$ and $[-0.962\, ...\, -0.240]$ around $\ConeASM=-0.601$.
+The plots in Fig.~\ref{fig:ix} show the significance with which non-SM $\ttbZ$ couplings can be separated from the SM hypothesis, assuming that the SM hypothesis is true.
 Clearly, this significance is a function of the accumulated luminosity and the associated uncertainties at the given order in perturbation theory.
 We therefore present six scenarios for luminosities of $30\, \invfb$, $300\, \invfb$, and $3000\, \invfb$ at the 13~TeV LHC with 
 theory input at leading and next-to-leading order in QCD.
@@ -898,45 +899,41 @@ increasing the luminsity drastically improves the limits.
 By comparing plots in the left versus the right column we also see that 
 the bounds at NLO QCD are far stronger.
 This is a result of the reduced scale uncertainty and the larger cross section due to a positive perturbative correction at NLO.
-We find that with $300\, \invfb$ and LO input, $\DConeV$ is constrained between $-4...3$ and $\DConeA$ between $\pm 0.4$, at the 95\% C.L.
-These limits improve with NLO QCD input to $-3...1$ for $\DConeV$ and $-0.2...0.3$ for $\DConeA$.
-The latter numbers correspond to xxxxxxx in terms of absolute values.
-% At LO, the value of $\DConeA$ lies between roughly -0.5 and 0.5, implying that this coupling can be constrained to within a factor of half of its value. 
-% On the other hand, the value of $\DConeV$ can be as low as -4 or as high as 3. 
-Another noticeable feature is that large values of $| \DConeV |$ can conspire 
-with low values of $\DConeA$ to create regions of parameter space which are indistinguishable from the SM. 
-Both of these features are qualitatively similar to the results obtained by Ref.~\cite{Baur:2004uw}. 
+Numerically, one finds that with $300\, \invfb$ and LO input $\DConeV$ is constrained between $[-4\, ...\, 2.5]$ and $\DConeA$ between $[-0.4\, ...\, 0.4]$, 
+at the 95\% C.L.\footnote{We checked that these LO limits roughly agree with the ones quoted in Ref.~\cite{Baur:2004uw} for the 14~TeV LHC.}
+The limits improve with NLO QCD predictions to $[-3\, ...\, 1.5]$ for $\DConeV$ and $[-0.2\, ...\, 0.3]$ for $\DConeA$.
+In terms of absolute values, these intervals correspond to $[-0.5\, ...\, 0.6]$ and $[-0.75\, ...-0.5]$ for vector and axial couplings, respectively.
+
+An noticeable feature is that ...something something about the sad/smily face.
+Note that shapes play a significant role as is evident when comparing with fig.7.
+
 \begin{figure}[t]
 \includegraphics[scale=0.507]{LHC_53_LLSign_13LO30.pdf} 
 \includegraphics[scale=0.5]{LHC_53_LLSign_13NLO30.pdf} 
-\\[2ex]
+\\
 \includegraphics[scale=0.507]{LHC_53_LLSign_13LO300.pdf} 
 \includegraphics[scale=0.5]{LHC_53_LLSign_13NLO300.pdf} 
-\\[2ex]
+\\
 \includegraphics[scale=0.5]{LHC_53_LLSign_13LO3000.pdf} 
 \includegraphics[scale=0.5]{LHC_53_LLSign_13NLO3000.pdf} 
-\caption{\label{fig:ix} Significance levels for deviations from SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
-The results using LO results and uncertainties are shown on the left, results using NLO results and uncertainties are shown on the right.}
+\caption{\label{fig:ix} Significance of deviations from the SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
+Results using the LO prediction and uncertainty are shown on the left, the corresponding NLO QCD results are shown on the right hand side.}
 \end{figure}
 
 
-At this accuracy, the axial coupling can be constrained at $-0.2 \lesssim \DConeA \lesssim 0.15$ at the 1-$\sigma$ level and $-0.4 \lesssim \DConeA \lesssim 0.25$ 
-at the 3-$\sigma$ level, independent of the value of $\ConeV$. Constraints on the vector coupling $\ConeV$ are still much looser: 
-$-3 \lesssim \DConeV \lesssim 1.5$ at 1-$\sigma$ level and $-3 \lesssim \DConeV \lesssim 2.5$ at the 3-$\sigma$ level.
-
-A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DConeV|$ and large 
-negative values of $\DConeA$. This is best explained by considering the LO results for two points in the coupling parameter space, 
-$(\DConeV,\DConeA)=(-0.40,+1.50)$ and $(\DConeV,\DConeA)=(-0.40,+2.00)$. These points lie 1.3 and 2.5 deviations from the SM hypothesis respectively; 
-however, in the absence of theoretical uncertainties, the two hypotheses are 3.7 and 3.0 deviations away from the SM, respectively. 
-The effect of introducing the uncertainties into the analysis is much more pronounced for the first point than for the second. 
-The reason for this is that the main difference between the first point and the SM is the overall rate, whereas the second point has a similar rate to the 
-SM but a significantly different shape (see fig.~\ref{fig:coupl_distr}). Then, for the second coupling choice, the values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ 
-in each bin are similar, and the 
-log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. 
-This means that the significance values are not greatly reduced by the theoretical uncertainty. 
-The tongue of large $\sigma$-values therefore represents a set of points for which the distinction between the SM and alternate hypotheses 
-is made based not on the overall rate, but rather on the shape of the $\Dphill$ distributions, which is relatively insensitive to the theoretical uncertainty. 
-This also explains why the tongue is more prominent in the LO analysis.
+% A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DConeV|$ and large 
+% negative values of $\DConeA$. This is best explained by considering the LO results for two points in the coupling parameter space, 
+% $(\DConeV,\DConeA)=(-0.40,+1.50)$ and $(\DConeV,\DConeA)=(-0.40,+2.00)$. These points lie 1.3 and 2.5 deviations from the SM hypothesis respectively; 
+% however, in the absence of theoretical uncertainties, the two hypotheses are 3.7 and 3.0 deviations away from the SM, respectively. 
+% The effect of introducing the uncertainties into the analysis is much more pronounced for the first point than for the second. 
+% The reason for this is that the main difference between the first point and the SM is the overall rate, whereas the second point has a similar rate to the 
+% SM but a significantly different shape (see fig.~\ref{fig:coupl_distr}). Then, for the second coupling choice, the values of $\nu_i^{\SM}$ and $\nu_i^{\alt}$ 
+% in each bin are similar, and the 
+% log of their ratio is small. The uncertainty enters the number of events $n_i$ in the bin, which is multiplied by this log. 
+% This means that the significance values are not greatly reduced by the theoretical uncertainty. 
+% The tongue of large $\sigma$-values therefore represents a set of points for which the distinction between the SM and alternate hypotheses 
+% is made based not on the overall rate, but rather on the shape of the $\Dphill$ distributions, which is relatively insensitive to the theoretical uncertainty. 
+% This also explains why the tongue is more prominent in the LO analysis.
 
 %As can be seen in figure \ref{fig:coupl_distr}, there are significant shape changes for these values of the couplings, resulting in a large separation between the hypotheses. 
 % At the same time, the overall rate is similar to the SM one.  
@@ -956,12 +953,17 @@ This also explains why the tongue is more prominent in the LO analysis.
 
 
 
-Having presented our main results in Figs.~\ref{fig:CMS} and Figs.~\ref{fig:ix}, we can use the obtained limits to put constraints on 
+Having presented our main results in Fig.~\ref{fig:ix}, we can use the obtained limits to put constraints on 
 possible effects of physics beyond the SM. 
-The relevant dimension-6 operators have been presented in Sect.~\ref{sect:ttzcoupl}.
-In this Section we also pointed out that the excellent agreement between experiment and prediction
-for the $Z b_\mathrm{L} \bar{b}_\mathrm{L}$ coupling suggests $C^{(3,33)}_{\phi q} \approx - C^{(1,33)}_{\phi q}$.
-In the following we will interpret this fact emperically and eliminate $C^{(1,33)}_{\phi q}$.
+The relevant dimension-six operators have been presented in Sect.~\ref{sect:ttzcoupl},
+this is also where we pointed out that the excellent agreement between experiment and prediction
+for the $Z b_\mathrm{L} \bar{b}_\mathrm{L}$ couplings can be used 
+(together with $\mathrm{SU(2)_L}$ symmetry of the SM) to relate $C^{(3,33)}_{\phi q} \approx - C^{(1,33)}_{\phi q}$.
+In the following we will make use of this fact and eliminate $C^{(1,33)}_{\phi q}$ from our analysis
+\footnote{It should be noted however that models exist which give vanishing corrections to $Zb\bar{b}$ for finite $C^{(1,33)}_{\phi q}$. 
+One example is given in Ref.~\cite{delAguila:2000rc} with vector-like quarks. In such case, our limits remain valid upon the 
+replacement $C^{(3,33)}_{\phi q} \to C^{(3,33)}_{\phi q} -C^{(1,33)}_{\phi q} $.}.
+Hence we are left with only two dimension-six operators, $C^{(3,33)}_{\phi q}$ and $C^{33}_{\phi u}$.
 We begin by using the CMS cross section measurement at 7~TeV (see Sect.~\ref{sect:CMS}). 
 The limits on the total $\ttbZ$ cross section as a function of $\DConeV$ and $\DConeA$ directly
 translate into limits on the three operators in Eq.~\ref{EFTOp}. 
@@ -985,84 +987,98 @@ Diagonalizing the dependence in Eq.~\ref{Cone_NP}, we find at leading order
  \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
  \le 18.9 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2. 
 \ee
-Clearly this result should only be considered a first example for how constraints could be placed.
-Meaningful limits are only obtained once more data is accumulated.
-To estimate how limits will improve in such case, we use our results for the normalization and $\Delta \phi_{\ell\ell}$ shape 
-analysis for the case of 30, 300, and 3000~$\invfb$.
-For this case we find at leading order
-\be
- \left. \begin{array}{l}
- xx \\
- -6.4 \\
- xx  
- \end{array} \right\}   \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  
- \le \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  
- \left\{ \begin{array}{ll}
- yy & \quad 30  \, \invfb \\
- 4.7 & \quad 300 \, \invfb \\
- yy & \quad 3000\, \invfb  
- \end{array} \right.
-%  
- ,\nonumber \\  \\ \nonumber
-%  
- \left. \begin{array}{l}
- xx \\
- -16.5 \\
- xx  
- \end{array} \right\} \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
- \le yy \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \left\{ \begin{array}{ll}
- yy & \quad 30  \, \invfb \\
- 5.3 & \quad 300 \, \invfb \\
- yy & \quad 3000\, \invfb  
- \end{array} \right. .
-\ee
-At NLO QCD we find
-\be
- \left. \begin{array}{l}
- xx \\
- -5.1 \\
- xx  
- \end{array} \right\}   \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q}  \right]  
- \le \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  
- \left\{ \begin{array}{ll}
- yy & \quad 30  \, \invfb \\
- 2.7 & \quad 300 \, \invfb \\
- yy & \quad 3000\, \invfb  
- \end{array} \right.
-%  
- ,\nonumber\\  \\\nonumber
-%  
- \left. \begin{array}{l}
- xx \\
- -10.2 \\
- xx  
- \end{array} \right\} \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \le  \mathrm{Re} \left[ C^{(33}_{\phi u} \right]  
- \le yy \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2
- \left\{ \begin{array}{ll}
- yy & \quad 30  \, \invfb \\
- 3.4 & \quad 300 \, \invfb \\
- yy & \quad 3000\, \invfb  
- \end{array} \right. .
-\ee
-A graphical representaion of these limits, including their mutual dependence, is given in Fig.~\ref{fig:x} for $\Lambda=$1~TeV. 
-We also include the indirect constraints from LEP measurements of $\varepsilon_1$ and $\varepsilon_b$.
-As can be seen from the above results, something something...
-
 
 
 
 \begin{figure}[t]
 \centering
-\includegraphics[scale=0.4]{OPLimitNLO300.pdf} 
-\hspace{1cm}
-\includegraphics[scale=0.4]{OPLimitNLO3000.pdf} 
+\includegraphics[scale=0.43]{OPLimitNLO.pdf} 
+% \hspace{0.5cm}
+% \includegraphics[scale=0.43]{OPLimitNLO3000.pdf} 
 \caption{\label{fig:x} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$}
 \end{figure}
+
+This result should only be considered with case given the low number of events observed in experiments. 
+More reliable and stringent limits are only obtained once more data is accumulated.
+To estimate how limits will improve in such a case, we use the results presented in Fig.~\ref{fig:ix}
+for the luminosities 30, 300, and 3000~$\invfb$.
+We find at leading order
+\be
+\label{OPLimitsLO}
+ \left. \begin{array}{l}
+ -1.2 \\
+ -1.0 \\
+ -0.9  
+ \end{array} \right\}   
+ \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
+ \le 
+ \left\{ \begin{array}{ll}
+ 1.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
+ 0.7 & \quad\quad \mathrm{with }~300 \, \invfb \\
+ 0.6 & \quad\quad \mathrm{with }~3000\, \invfb  
+ \end{array} \right.
+%  
+ ,\nonumber \\  \\ \nonumber
+%  
+ \left. \begin{array}{l}
+ -2.3 \\
+ -1.4 \\
+ -0.9  
+ \end{array} \right\} 
+ \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
+ \le 
+ \left\{ \begin{array}{ll}
+ 2.2 & \quad\quad \mathrm{with }~30  \, \invfb \\
+ 2.2 & \quad\quad \mathrm{with }~300 \, \invfb \\
+ 2.0 & \quad\quad \mathrm{with }~3000\, \invfb  
+ \end{array} \right. .
+\ee
+At next-to-leading order QCD we obtain
+\be
+\label{OPLimitsNLO}
+ \left. \begin{array}{l}
+ -1.2 \\
+ -0.9 \\
+ -0.7  
+ \end{array} \right\}   
+ \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
+ \le 
+ \left\{ \begin{array}{ll}
+ 0.6 & \quad\quad \mathrm{with }~30  \, \invfb \\
+ 0.4 & \quad\quad \mathrm{with }~300 \, \invfb \\
+ 0.2 & \quad\quad \mathrm{with }~3000\, \invfb  
+ \end{array} \right.
+%  
+ ,\nonumber \\  \\ \nonumber
+%  
+ \left. \begin{array}{l}
+ -1.7 \\
+ -0.8 \\
+ -0.4  
+ \end{array} \right\} 
+ \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
+ \le 
+ \left\{ \begin{array}{ll}
+ 2.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
+ 1.8 & \quad\quad \mathrm{with }~300 \, \invfb \\
+ 1.5 & \quad\quad \mathrm{with }~3000\, \invfb  
+ \end{array} \right. .
+\ee
+Due to the weak correlation between vector and axial coupling limits and because of Eq.~\ref{Cone_NP},
+the limits on $C^{(3,33)}_{\phi q}$ and $C^{33}_{\phi u}$ are strongly correlated. 
+The results in Eqs.~\ref{OPLimitsLO}-\ref{OPLimitsNLO} are therefore very conservative.
+A more appropriate graphical representaion of these limits is given in Fig.~\ref{fig:x} for our NLO results. 
+We also include the indirect constraints from electroweak precision observables $\varepsilon_1$ and $\varepsilon_b$~\cite{Altarelli:1990zd,Altarelli:1991fk,Altarelli:1993sz},
+updated to account for $M_H=125.6$~GeV in Ref.~\cite{Ciuchini:2013pca}.
+All effective operators outside the colored ellipse in Fig.~\ref{fig:x} can be excluded at the 95\% confidence level.
+We observe that these limits from $\ttbZ$ production at the LHC are well-alligned with the precision limit from $\varepsilon_1$.
+This can be understood from the fact that $\varepsilon_1$ is directly proportional to the SM $\rho$-parameter which receives sensitivity 
+from the $Z$ boson self energy with a top quark loop insertion.
+The constraint from $\varepsilon_b$ arises from the measurement of $Z \to b \bar{b}$ and $\mathrm{SU(2)_L}$ symmetry.
+Hence it leaves $C^{33}_{\phi u}$ mostly unconstrained since this operator contributes to the right handed current only.
+Altogether, the electroweak precision observables put very strong constraints on the $\ttbZ$ coupling
+which, however, only arise through indirect sensitivity.
+Only the analysis of $pp \to \ttbZ$ at the LHC will allow placing {\it direct} limits for the first time.
 
 
 \section{Conclusion}
