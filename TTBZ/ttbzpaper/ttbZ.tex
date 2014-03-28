@@ -44,7 +44,6 @@
 \def\Halt{\mathcal{H}_{\mathrm{alt}}}
 \newcommand{\be}{\begin{eqnarray}}
 \newcommand{\ee}{\end{eqnarray}}
-%\newcommand{\ttb}{t \bar{t}}
 
 \title{Constraining couplings of top quarks to the $Z$~boson in $t\bar{t}+Z$ production at the LHC}
 
@@ -65,10 +64,9 @@ FNAL Preprint No.yyyyyy}
 
 \abstract{
 We study top quark pair production in association with a $Z$~boson at the Large Hadron Collider (LHC)
-%through next-to-leading order QCD
 and investigate the prospects of measuring the couplings of top quarks to the $Z$~boson.
 To this date these couplings have not been constrained in direct measurements and 
-only the high energy LHC will allow such a determination for the first time.
+only the LHC will allow such a determination for the first time.
 Our calculation improves previous coupling studies through the inclusion of next-to-leading order (NLO) QCD corrections in production and decays of all unstable particles.
 We treat top quarks in the narrow-width approximation and retain all NLO spin correlations.
 To determine the sensitivity of a coupling measurement we perform a binned log-likelihood ratio test
@@ -76,21 +74,22 @@ based on normalization and shape information of the angle between the leptons fr
 The obtained limits include statistical uncertainties as well as leading theoretical systematics from
 residual scale dependence and parton distribution functions.
 We find that with 300~fb$^{-1}$ of data at an energy of 13~TeV the vector and axial $t \bar t Z$-coupling can be
-constrained to $C_\mathrm{V}=0.24^{+0.36}_{-0.72}$ and $C_\mathrm{A}=-0.60^{+0.09}_{-0.12}$, at the 95.5\% confidence level.
-This is an improvement by 22\% and 54\%, respectively, compared to an analysis based on leading-order input alone.
+constrained to $C_\mathrm{V}=0.24^{+0.39}_{-0.39}$ and $C_\mathrm{A}=-0.60^{+0.14}_{-0.18}$, at the 95\% confidence level.
+This is a reduction by 25\% and 42\%, respectively, compared to an analysis based on leading-order predictions.
 We also translate these results into limits on dimension-six operators contributing to the $t \bar t Z$-interactions beyond the Standard Model.
 }
+
+% NLO $[-0.63\, ...\, 0.63]$ and $[-0.78\, ...-0.46]$
+%  LO $[-0.73\, ...\, 0.93]$ and $[-0.93\, ...-0.38]$
 
 
 
 \begin{document}
-%\maketitle
 
 \section{Introduction}
 After run~I of the Large Hadron Collider (LHC) at $\sqrt{s}=7$ and 8~TeV, we look back on a highly successful research program.
 Already this first phase of exploring a new energy regime has provided many exciting results: 
 the Higgs boson was discovered~\cite{Chatrchyan:2012ufa,Aad:2012tfa}, its quantum numbers and couplings are highly constrained,
-% and all previously known particles of the Standard Model (SM) were re-discovered within a very short period of time.
 and many Standard Model (SM) measurements are competitive with previous ones, if not exceeding them.
 Furthermore, a plethora of searches for signals of new physics have been undertaken, reaching out into the multi-TeV region as well as
 exploring small deviations of SM parameters. 
@@ -100,17 +99,11 @@ experimental searches and theoretical model building.
 These developments represent a remarkably fast progress and demonstrate the potential of the LHC in the years to come.
 
 One particularly promising class of SM processes is top quark pair production in association with gauge bosons or a Higgs boson.
-% for which we anticipate more progress in the near future 
-% Processes of top quark pairs in association with gauge bosons or a Higgs boson will greatly profit from higher energy and luminosity.
-%Due to the relatively high production threshold these processes have never been observed with large event numbers at the Tevatron
-%nor in the current LHC data sample.
 Due to their relatively high production threshold these processes were not accessible at the Tevatron. 
 In contrast, the high energy and large luminosity of the upcoming LHC runs will produce sufficiently many events to allow detailed studies of these processes.
-% The analysis of these processes will allow direct access of the electroweak top quark couplings, some of which are only indirectly constrained or not constrained at all. 
 Progress in this direction has already been made with cross section measurements of $\ttb+\gamma$ production by ATLAS~\cite{ATLAS:2011nka} at 7~TeV  
 and CMS~\cite{CMS:2014wma} at 8~TeV. First candidate events for the processes $\ttb+Z/W$  have also been reported in Refs.~\cite{ATLAS-CONF-2012-126,Chatrchyan:2013qca}.
 It is exciting to envision future studies of these processes with direct measurements of the couplings and new sensitivity to physics beyond the Standard Model. 
-% other prominent possibilities include the measurement of electric and magnetic dipole moments in single top$+\gamma$ production, as well as $y_t$ in the $\ttb+H$ process.
 
 In this paper we focus on the determination of the top quark to $Z$~boson couplings through $\ttbZ$ production at the LHC. 
 This process is a {\it direct} probe of the $\ttbZ$ interactions which distinguishes it from other indirect probes such as 
@@ -121,48 +114,25 @@ Popular examples are certain variants of Supersymmetry \cite{PhysRevD.82.055001,
 More generally, any new fermion which mixes with the third generation quarks might induce deviations to the $\ttbZ$ SM couplings. 
 Hence also 4th generation quarks~\cite{Frampton:1999xi,Dobrescu:2009vz}, top-color models~\cite{PhysRevD.86.095017} and extra-dimensional extensions of space-time~\cite{Randall:1999ee} 
 have to be considered.
-% maybe take citation from LMMP paper here and cite other models later
-% 
-% See   http://arxiv.org/abs/hep-ph/0512053v1  for this statement:
-% "For example, it is well known that the vector and axial tbtZ form factors receive large corrections (of order 5-10%)
-%   in certain models of dynamical electroweak symmetry breaking [1]."  
-%  But the reference [1] is useless and does not contain any number!!!
-% 
-% See also http://prd.aps.org/pdf/PRD/v88/i9/e094007 for more useful references:
-% "The top-quark couplings with the gauge bosons can be
-% modified significantly in models with new top (or third
-% generation) partners. This is the case of some extensions of
-% the minimal supersymmetric standard model [3,4], in little Higgs models [5], top-color models [6], top seesaw [7], top compositeness [8], and others. 
-% Testing them is therefore of
-% paramount importance to find out whether there are other sources of electroweak symmetry breaking that are differ-ent from the standard Higgs mechanism.
 It is therefore important to know to what extent LHC experiments are sensitive to physics beyond the SM in $\ttbZ$ production.
 Clearly, this is not only a question of experimental sensitivity but also depends crucialy on our theoretical understanding of the production and decay dynamics 
 of the $pp\to\ttbZ$ process.
 
 The ability of LHC experiments to constrain the $\ttbZ$ couplings was first considered in a series of studies by Baur,~Juste,~Orr and Rainwater~\cite{Baur:2004uw,Baur:2005wi}. 
 The authors identified suitable observables which are sensitive to vector and axial couplings as well as to the weak electric and magnetic dipole moments.
-The tri-lepton signature with semi-hadronically decaying top quarks and a leptonically decaying $Z$~boson turns out to provide the best compromise between
+The tri-lepton signature with semi-hadronically decaying top quarks and a leptonically decaying $Z$~boson turns out to provide a good compromise between
 clean signature and large enough cross section. 
 But even decay modes with a $Z$~boson decaying into neutrinos yield additional sensitivity~\cite{Baur:2005wi}.
-The analyses show that sensitivity to the form factor of the vector current is relatively weak and limits can only be placed within a factor of three wrt. the SM value. 
-In contrast, the form factor of the axial current can be pinned down to about 10\% accuracy. 
+Their analyses show that sensitivity to the form factor of the vector current is relatively weak and limits can only be placed within a factor of three wrt. the SM value. 
+In contrast, the form factor of the axial current can be pinned down to about 20\% accuracy. 
 The authors of Ref.~\cite{Berger:2009hi} perform a similar analysis using the more modern language of effective operators.
 This allows them to relate $t\bar{b}W$ and $\ttbZ$ couplings in a combined study of single top and $\ttbZ$ production.
 
 In the context of this work it is important to emphasize that all previous coupling studies were performed at leading-order and large residual scale uncertainty 
 was identified~\cite{Baur:2004uw} as the main obstacle to stronger constraints on the $\ttbZ$ couplings.
 It is the aim of this paper to reduce these uncertainties through a NLO QCD calculation for $\ttbZ$ production and decay into a realistic final state with leptons, jets and missing energy.
-% The transverse momentum of the $Z$ boson $\ptZ$ and the azimuthal angle between the leptons originating from its decay $\Dphill$ were found to be sensitive to this coupling. 
-% This observation, together with the desirability of applying realistic experimental cuts, means that our analysis must take into account the decays of the top 
-% quarks and the $Z$ bosons, including all spin correlations. Furthermore, the authors of ref. \cite{Baur:2004uw,Baur:2005wi} identified the large leading order (LO) 
-% scale uncertainty in the theoretical predictions as the main obstacle to tighter constraints on the top-$Z$ coupling. 
-% To reduce this uncertainty, we perform our calculation to next-to-leading order (NLO) in QCD, including the NLO corrections to the top quark decay products. 
-% {\bf something about the paper of Berger et al}
-% The $\ttbZ$ coupling is already measured by indirect means, through the decay of {\bf ??? and ref}, which disfavors non-SM values bigger than xx\%. 
-% It is worthwhile attempting to corroborate this measurement using a direct determination in $\ttbZ$ production.
 The hadronic production of $\ttbZ$, with stable top quarks and a stable $Z$~boson, was previously calculated at NLO QCD accuracy by 
 Lazopoulos, McElmurry, Melnikov, and Petriello~\cite{Lazopoulos:2008de}, and  by Kardos, Papadopoulos, and Trocsanyi~\cite{Kardos:2011na}.
-% Disagreement at the level of 3\% of the cross-section, and a small shape difference in $\ptZ$, was found between these two calculations. 
 The latter calculation was also interfaced to a parton shower~\cite{Garzelli:2011is}, accounting for the decays of the top quarks and $Z$~boson through 
 the spin uncorrelated parton shower approximation.
 Further hadronization effects were studied in Ref.~\cite{Garzelli:2012bn}.
@@ -183,8 +153,8 @@ We will therefore consider only the $\ttbZ$ process in this paper, and defer the
 
 
 Finally, let us note that a coupling analysis is not the only scenario in which the process $pp\to\ttbZ$ is interesting. 
-The semi-hadronic decay mode of the top pairs together with the leptonic $Z$ decay is background to several tri-lepton and same-sign lepton searches with additional jets and missing energy.
-Those signatures can arise from gluino decays of Supersymmetry, Universal Extra Dimensions as well as models with fermionic top quark partners. 
+The semi-hadronic decay mode of the top quark pairs together with the leptonic $Z$ decay is background to several tri-lepton and same-sign lepton searches with additional jets and missing energy.
+Those signatures can arise from gluino decays of Supersymmetry, in Universal Extra Dimensions as well as in models with fermionic top quark partners. 
 Furthermore, the invisible decay $Z \to \nu \bar{\nu}$ produces a top pair plus a large amount of missing transverse energy, and is therefore an irreducible background 
 to searches for scalar or fermionic top quark partners decaying into top quarks plus dark matter candidates.
 While we do not address these topics in this paper, it would be interesting to study the effects of NLO corrections when strong selection cuts are applied on this background.
@@ -198,9 +168,9 @@ which profits from a large cross section due to the hadronic decay of one $W$~bo
 In our results we will sum over all combinations of $e^\pm$ and $\mu^\pm$ in the final state, allowing either $t$ or $\bar t$ to decay leptonically.
 Application of the narrow-width approximation for top quarks and the $Z$~boson allows us to separate production and decays stage according to 
 \be
- \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj} = \rd \sigma_{pp\to\ttb+Z} \; \rd\Br_{t\to b \ell\nu} \; \rd\Br_{\bar{t} \to \bar{b} jj} \; \rd\Br_{Z\to \ell\ell}
- \;+\; \mathcal{O}(\Gamma_t/m_t, \, \Gamma_Z/M_Z)
-, \label{Xsec}
+  \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj} = \rd \sigma_{pp\to\ttb+Z} \; \rd\Br_{t\to b \ell\nu} \; \rd\Br_{\bar{t} \to \bar{b} jj} \; \rd\Br_{Z\to \ell\ell}
+  \;+\; \mathcal{O}(\Gamma_t/m_t, \, \Gamma_Z/M_Z)
+  , \label{Xsec}
 \ee
 where $\rd \sigma$ denotes the production cross section and $\rd\Br_{X\to Y}= \rd \Gamma_{X\to Y} \big/ \Gamma^\mrm{tot}_X$ are the partial branching fractions.
 The use of the narrow width approximation neglects contributions which are parameterically suppressed by $\mathcal{O}(\Gamma / m)$, arising from a largely off-shell top quark or $Z$~boson.
@@ -215,21 +185,21 @@ $\Br_{t\to W bZ } \approx 3 \times 10^{-6}$~\cite{Altarelli:2000nt,Decker:1992wz
 
 
 
-\subsection{NLO correction}
-At LO, the production of $\ttbZ$ occurs through the $gg$ and $q\bar{q}$ partonic channels. 
-At NLO QCD, these channels receive real and virtual corrections, while real emission corrections open up the partonic channels $qg$ and $\bar{q}g$. 
+\subsection{NLO QCD correction}
+At leading order, the production of $\ttbZ$ occurs through the $gg$ and $q\bar{q}$ partonic channels. 
+At next-to-leading order QCD, these channels receive real and virtual corrections, while real emission corrections open up the partonic channels $qg$ and $\bar{q}g$. 
 We also include NLO QCD corrections to the top quark decays and the hadronically decaying $W$~boson; consequently their total widths are included at LO and NLO as well.
 Eq.~(\ref{Xsec}) expanded up to NLO accuracy reads,
 \be
- \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj}^\mrm{NLO} &=& 
- \rd \sigma_{pp\to\ttbZ}^\mrm{LO} \; \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} \; \rd\Br_{Z\to \ell\ell}
- \; \left( 1 + \chi \right)
-\nonumber \\
- &+&   \rd \sigma_{pp\to\ttbZ+X}^{\delta \mrm{NLO}}  \, \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} \; \rd\Br_{Z\to \ell\ell}
- \\
- &+&  \rd \sigma_{pp\to\ttbZ}^\mrm{LO} \; \left(  \rd\Br_{t\to b \ell\nu+X}^{\delta\mrm{NLO}} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} + \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; 
-\rd\Br_{\bar{t} \to \bar{b} jj+X}^{\delta\mrm{NLO}} \right) \rd\Br_{Z\to \ell\ell}
-\nonumber. \label{XsecNLO}
+  \rd \sigma_{pp\to\ell\ell\ell\nu b \bar{b} jj}^\mrm{NLO} &=& 
+  \rd \sigma_{pp\to\ttbZ}^\mrm{LO} \; \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} \; \rd\Br_{Z\to \ell\ell}
+  \; \left( 1 + \chi \right)
+  \nonumber \\
+  &+&   \rd \sigma_{pp\to\ttbZ+X}^{\delta \mrm{NLO}}  \, \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} \; \rd\Br_{Z\to \ell\ell}
+  \\
+  &+&  \rd \sigma_{pp\to\ttbZ}^\mrm{LO} \; \left(  \rd\Br_{t\to b \ell\nu+X}^{\delta\mrm{NLO}} \; \rd\Br_{\bar{t} \to \bar{b} jj}^\mrm{LO} + \rd\Br_{t\to b \ell\nu}^\mrm{LO} \; 
+  \rd\Br_{\bar{t} \to \bar{b} jj+X}^{\delta\mrm{NLO}} \right) \rd\Br_{Z\to \ell\ell}
+  \nonumber. \label{XsecNLO}
 \ee
 The factor $\chi= -2 \Gamma_t^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_t^{\mrm{tot,LO}} -2 \Gamma_W^{\mrm{tot},\delta\mrm{NLO}}/\Gamma_W^{\mrm{tot,LO}} $ arises from the $\alpha_s$ expansion
 of the total widths in the denominator.
@@ -244,7 +214,6 @@ We also would like to point out our utilization of parallel computing features.
 We implemented a version of the Vegas integration algorithm which allows parallelization~\cite{pvegas} via the Message-Passing-Interface (MPI)~\cite{mpi-2-standard}. 
 The observed speed-up in run time scales almost linear with the number of CPU cores used. 
 This allows us to obtain a full NLO QCD prediction for the total cross section within a few hours on a modern desktop computer with 8 cores.
-% The NLO amplitudes for the decay of the top quarks well-known, and are given in \cite{Jezabek:1988iv,Czarnecki:1990pe,Czarnecki:1990kv,Li:1990qf,Campbell:2004ch,}. In the NWA, the NLO cross-section for the production and decay is written as \cite{Campbell:2004ch,Melnikov:2009dn}
 
 We perform several checks to ensure the correctness of our calculation. 
 The squared amplitudes for tree level and real emission corrections are checked against MadGraph v.2.49~\cite{Stelzer:1994ta}. 
@@ -256,11 +225,7 @@ At the level of the integrated cross section, we vary the cut-off parameter for 
 verify independence on this parameter for the total cross section and kinematic distributions.
 The interface of production and decay amplitudes is checked by integrating over the full phase space and verifying the factorization into 
 inclusive cross section for stable top quarks and $Z$~boson times by their branching ratios, at NLO QCD.
-% 
 Finally, we compare our full hadronic results with a previous calculation~\cite{Garzelli:2012bn} in the literature for stable top quarks and $Z$~boson.
-% We choose Ref.~\cite{1208} and adopt the following input parameters.
-% This calculation was first performed in Ref.~\cite{Lazopoulos:2008de}. 
-% For completeness, we repeat the parameters used in that calculation.
 The masses of the top quark, $W$~boson and $Z$ are $m_t=173.5$ GeV, $M_W=80.39$ GeV, and $M_Z=91.187$ GeV. 
 The electroweak coupling is defined through the Fermi constant $G_\mathrm{F}=1.16639 \times 10^{-5} \, \GeV^{-2}$ and the weak mixing angle $\sin^2\theta_w = 1-M_W^2/M_Z^2$. 
 CTEQ6L1~\cite{Pumplin:2002vw} and CTEQ6.6M~\cite{Nadolsky:2008zw} parton distribution functions (pdfs) are used with $\alpha_s(M_Z)=0.130$ and $\alpha_s(M_Z)=0.118$, respectively. 
@@ -270,57 +235,46 @@ This has to be compared with the results of Ref.~\cite{Garzelli:2012bn} which ar
 The cross sections are in excellent agreement within the integration errors.
 Figure~\ref{fig:i} also demonstrates good agreement in shape for the top quark $p_{\mathrm{T}}$ distribution between our results (RS) and Fig.~1a in Ref.~\cite{Garzelli:2012bn} (GKPT).
 \begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
+\centering
 \includegraphics[width=0.6\textwidth]{./Troc_pTtop.pdf}
 \caption{\label{fig:i} Shape comparison between our results (RS) and the ones of Ref.~\cite{Garzelli:2012bn} (GKPT) for 
 stable top quarks and $Z$~boson. Shown is the normalized transverse momentum spectrum of the top quark at NLO QCD for the process $pp \to \ttbZ$ at 7~TeV.
 }
 \end{figure}
 
-\subsection{Top-Z coupling}   \label{sect:ttzcoupl}
+\subsection{$\ttbZ$ couplings}   \label{sect:ttzcoupl}
 The $\ttbZ$ interaction Lagrangian in the SM can be written as
-\begin{equation} \label{L_SM}
-\mathcal{L}_{\ttbZ}^{\mrm{SM}} = \mathrm{i} e \, \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( \ConeVSM + \gamma_5 \ConeASM \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu}
-% + \mathrm{h.c.}
-,
-\end{equation}
-where $e$ is the electromagnetic coupling. The vector and axial couplings are 
-\begin{equation}
-\begin{split}
-\ConeVSM =& \frac{T^3_t - 2Q_t \swsq}{2\sw \cw}, \\
-\ConeASM =& \frac{-T^3_t}{2 \sw \cw},  
-\end{split}
+\begin{equation} 
+  \label{L_SM}
+  \mathcal{L}_{\ttbZ}^{\mrm{SM}} = \mathrm{i} e \, \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( \ConeVSM + \gamma_5 \ConeASM \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
+  \end{equation}
+  with the electromagnetic coupling constant $e$. The vector and axial couplings are 
+  \begin{equation}
+  \begin{split}
+  \ConeVSM =& \frac{T^3_t - 2Q_t \swsq}{2\sw \cw}, \\
+  \ConeASM =& \frac{-T^3_t}{2 \sw \cw},  
+  \end{split}
 \end{equation}
 where $Q_t = 2/3$ is the top quark electric charge, $T^3_t=1/2$ and $\theta_w$ is the weak mixing angle. 
-% Alternatively, the Lagrangian may be written in terms of left- and right-handed couplings
-% \begin{equation} \label{L_SM}
-% \mathcal{L}_{\ttbZ}^{\mrm{SM}} = \mathrm{i} e \, \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl( C_{L}^{\mrm{SM}}\gamma_L + \gamma_R C_{R}^{\mrm{SM}} \bigr) \biggr]v(p_{\bar{t}}) Z_{\mu},
-% \end{equation}
-% with $\gamma_L=1/2(1-\gamma_{\mu})$, $\gamma_R=1/2(1+\gamma_{\mu})$, and $C_L^{\mrm{SM}}=(T^3 - Q_t \swsq) / (\sw \cw) \\$ and $C_R^{\mrm{SM}}=-Q_t\sw / \cw$. 
 New physics contributions to the $\ttbZ$ couplings are most conveniently introduced by higher dimensional operators 
 in the language of effective field theory. 
-A minimal set of dimension-6 operators for top quark production and decay have been categorized in Ref.~\cite{AlcarazMaestre:2012vp,AguilarSaavedra:2008zc,Zhang:2012cd}.
+A minimal set of dimension-6 operators for top quark production and decay have been categorized in Refs.~\cite{AlcarazMaestre:2012vp,AguilarSaavedra:2008zc,Zhang:2012cd}.
 In total there are 91 different operators which can be summarized into 20 different anomalous couplings, if on-shellness and gauge invariance is enforced~\cite{AguilarSaavedra:2008zc}. 
 For interactions of a $Z$~boson with top quarks only four anomalous couplings, $C_{1/2,V/A}$, remain and Eq.~\ref{L_SM} becomes
 \be
-\label{L_NP}
-\mathcal{L}_{\ttbZ} = \mathrm{i} e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr)
- + \frac{\mathrm{i} \sigma_{\mu \nu} q_{\nu}}{M_Z} 
-\bigl(C_{2,V} + \mathrm{i} \gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu} 
-% + \mathrm{h.c.}
-,
+  \label{L_NP}
+  \mathcal{L}_{\ttbZ} = \mathrm{i} e \bar{u}(p_t)\biggl[ \gamma^{\mu} \bigl(C_{1,V} + \gamma_5 C_{1,A} \bigr)
+  + \frac{\mathrm{i} \sigma_{\mu \nu} q_{\nu}}{M_Z} 
+  \bigl(C_{2,V} + \mathrm{i} \gamma_5 C_{2,A} \bigr) \biggr] v(p_{\bar{t}}) Z_{\mu} ,
 \ee
 with $\sigma_{\mu \nu}=\frac{\mathrm{i}}{2} [ \gamma_{\mu},\gamma_{\nu} ]$ and $q_{\nu} = (p_{t}-p_{\bar{t}})_{\nu}$.
 The couplings can now be written in terms of the SM contribution plus deviations due to higher dimensional operators
 \be
-\label{Cone_NP}
+   \label{Cone_NP}
    &\ConeV=\ConeV^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q} - C^{33}_{\phi u}   \right],
    \\
    &\ConeA=\ConeA^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[  C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q} + C^{33}_{\phi u}  \right],
    \nonumber
-% \label{Ctwo_NP}
-%    &\CtwoV=\CtwoV^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[ \right],   
-%    \quad   \CtwoA=\CtwoA^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[ \right].   
 \ee
 where 
 \be  
@@ -338,7 +292,7 @@ We therefore do not present the expansion of the $C_{2,V/A}$ couplings in terms 
 These couplings correspond to the weak magnetic and electric dipole moments of the top quark. 
 Their tree level value vanishes in the SM and $C_{2,V}$ receives one-loop corrections of $ \mathcal{O}(10^{-4})$ \cite{Bernabeu:1995gs}.
 The coupling $C_{2,A}$ receives finite contributions only beyond two-loops \cite{Hollik:1998vz}.
-Also on the more technical side, the tensor structure that multiplies the $C_{2,V/A}$ couplings introduces the complication of 
+On the more technical side, the tensor structure that multiplies the $C_{2,V/A}$ couplings introduces the complication of 
 non-renormalizable amplitudes at NLO QCD.
 While it is straightforward to handle such contributions our current implemenation of the OPP integrand reduction method 
 does not allow tensor ranks larger than $N$ for $N$-point loop integrals.
@@ -352,10 +306,10 @@ Instead, they arise from potential deviations which the higher dimensional opera
 Those parameters are highly constrained through the experimental fits~\cite{Ciuchini:2013pca} of the $\varepsilon$ parameters~\cite{Altarelli:1990zd,Altarelli:1991fk,Altarelli:1993sz},
 \be
    \label{epsexp}
-   \varepsilon_1^\mathrm{exp} = (5.6 \pm 1.0) \times 10^{-3}, \quad \quad \varepsilon_b^\mathrm{exp} = (-5.8 \pm 1.3) \times 10^{-3}
+   \varepsilon_1^\mathrm{exp} = (5.6 \pm 1.0) \times 10^{-3}, \quad \quad \varepsilon_b^\mathrm{exp} = (-5.8 \pm 1.3) \times 10^{-3}.
 \ee
 The SM predicts their values as $\varepsilon_1^\mathrm{SM} = (5.21 \pm 0.08) \times 10^{-3} $ and $\varepsilon_b^\mathrm{SM} = -(6.94 \pm 0.15) \times 10^{-3}$~\cite{Ciuchini:2013pca},
-whereas the new physics contributions (\ref{Cone_NP}) introduce the corrections~\cite{Larios:1999au}
+whereas the new physics contributions in Eq.~\ref{Cone_NP} introduce the corrections~\cite{Larios:1999au}
 \be
    \delta \varepsilon_1 &=& \frac{3 m_t^2 G_\mathrm{F}}{2\sqrt{2}\pi^2}  
    \, \mathrm{Re}\left[  C^{(3,33)}_{\phi q}-C^{(1,33)}_{\phi q} + C^{33}_{\phi u} + \mathcal{O}\left(\frac{v^2}{\Lambda^2} \right) \right]
@@ -372,69 +326,26 @@ We will present the numerical results later in Sect.~\ref{DimSixLimits} together
 At this point we also have to mention another experimental constraint.
 The measurements of the $Z b_\mathrm{L} \bar{b}_\mathrm{L}$ couplings from $R_b$ and $A^{b}_\mathrm{FB}$ at LEP are in permille level agreement 
 with the SM predictions~\cite{Abdallah:2008ab}.
-This experimental fact together with the $\mathrm{SU(2)}_L$ symmetry of the SM
+This experimental fact together with the $\mathrm{SU(2)_L}$ symmetry of the SM
 can be used to relate $  C^{(3,33)}_{\phi q} \approx - C^{(1,33)}_{\phi q}$.
 Hence, one of these two operators can be eliminated from Eq.~\ref{Cone_NP}.
-% Instead, limits are obtained from the LEP~II measurements of $R_b$ and $A_\mathrm{FB}^{(b)}$ which constrain the $b \bar{b} Z$ couplings.
-% $SU(2)_\mathrm{L} \cross U(1)_\mathrm{Y}$ symmetry of the SM can then be used to 
 
-% These contributions introduce deviations to the SM interaction strength such that Eq.~\ref{L_SM} becomes
-% \be
-% \label{Cone_NP}
-%    &\ConeV=\ConeV^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re} \left[ C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q} - C^{(33}_{\phi u}   \right],
-%    \\
-%    &\ConeA=\ConeA^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[  C^{(3,33)}_{\phi q} - C^{(1,33)}_{\phi q} + C^{(33}_{\phi u}  \right],
-%    \\
-% \label{Ctwo_NP}
-%    &\CtwoV=\CtwoV^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[ \right],   
-%    \quad   \CtwoA=\CtwoA^\mathrm{SM}+\left(\frac{v^2}{\Lambda^2} \right) \mathrm{Re}\left[ \right].   
-% \ee
-% % the second term is suppressed by a  MARKUS comment: is is not really supressed because q^2/MZ~1, the M is just making it dimensionless
-% % mass scale $M$ is typically chosen to be $M_Z$. 
-% The $\ConeV$ and $\ConeA$ in Eq.~\ref{C_NP} modify the strength of vector and axial current as predicted by the SM.
-% The couplings $\CtwoV$ and $\CtwoA$ induce weak electric and magnetic dipole moments of the top quarks, which vanish at
-% tree level in the SM and only receive small corrections starting at two-loops~\cite{}, $C^\mathrm{SM}_{2,V/A} \sim \mathcal{O}(\alpha_s^y\alpha^y)$.
-% Higher order corrections enter at ... and lead to a shift of .. \cite{}.
-% In an effective field theory for physics beyond the SM, the couplings $\ConeA$ and $\ConeV$ receive contributions from the real part of the difference 
-% between two dimension-six operators, 
-% as well as the real part of a third operator~\cite{}. 
-% The dipole terms $C_{2,V/A}$ are related to a further two dimension-six operators.
-
-% In this paper, we will study sensitivity to the couplings in Eq.~
-% interpret the $\ConeV$, $\ConeV$, $\CtwoV$ and $\CtwoA$ as anomalous coupling coefficients which are independent of the kinematics of 
-% the top quarks or the $Z$-boson. 
-% The dipole terms introduce non-renormalizable amplitudes at NLO, and while it is possible to handle these in the $D$-dimensional unitarity approach \cite{}, 
-% it is a non-trivial extension. For this reason, we will focus on the capability of the LHC to constrain the couplings $\ConeA$ and $\ConeV$ in this paper, 
-% deferring the analysis of the effects of the dipole couplings $\CtwoV$ and $\CtwoA$ to a future work. We therefore set these couplings to zero throughout 
-% the rest of this paper. The anomalous values of the other two couplings are written as relative deviations from their SM values
-
-
-
-%Definition of top-Z couplings - vector, axial-vector, left and right handed \\
-%Focus of D=4 operators -- D=6 for later (unclear how to implement unitarity for such operators) \\
-%Definition of DF1V and DF1A
 
 
 
 \section{Results}
 \subsection{NLO Results}
-%TODO:
-%Four distr incl scale bounds (incl at least one of a decay product) at LO, NLO\\
-%Comparison with NLO + LO decay \\
-%Comparison with 0+1 jet from MadGraph using CKKW merging \\
-%Acceptance function = $\sigma_{\mathrm{incl}} / \sigma_{\mathrm{cuts}}$ at LO, NLO\\
-%Point out large k-factor with cuts than with fully inclusive \\
 In this section we describe the details of our numerical analysis and the results.
 We consider the process 
 $pp \to \ttb + Z \to t(\to \ell \nu b) \, \bar{t} (\to jj \bar{b}) \, Z(\to \ell \ell)$
 and sum over all combinations of leptons $e^\pm, \mu^\pm$.
 We choose the following fixed input parameter
 \be
- m_t = 173~\GeV,& \quad   m_b = 0~\GeV,&
-\nonumber\\
- M_Z =91.1876~\GeV,& \quad  M_W =80.385~\GeV,&
-\nonumber\\
- G_\mathrm{F} = 1.166379 \times 10^{-5} \,& \GeV^{-2},  \quad \Gamma_Z = 2.4952~\GeV.&
+  m_t = 173~\GeV,& \quad   m_b = 0~\GeV,&
+  \nonumber\\
+  M_Z =91.1876~\GeV,& \quad  M_W =80.385~\GeV,&
+  \nonumber\\
+  G_\mathrm{F} = 1.166379 \times 10^{-5} \,& \GeV^{-2},  \quad \Gamma_Z = 2.4952~\GeV.&
 \ee
 Unless otherwise stated, we use MSTW2008 parton distribution functions~\cite{Martin:2009iq} with 
 $\alpha_s(M_Z)=0.13939$ and $\alpha_s(M_Z)=0.12018$ at LO and NLO, which we
@@ -446,24 +357,24 @@ for $\mu=\mu_\mathrm{ren}=\mu_\mathrm{fact}$.
 Since we include NLO QCD corrections to the top quark decay and the hadronically decaying $W$~boson, we need to 
 include their total widths up to next-to-leading order,
 \be
- \Gamma_t^\mathrm{LO} &=& 1.4957~\GeV, \quad \Gamma_t^\mathrm{NLO} = 1.3693~\GeV,
-\nonumber\\
- \Gamma_W^\mathrm{LO} &=& 2.0455~\GeV, \quad \Gamma_W^\mathrm{NLO} = 2.1145~\GeV.
+  \Gamma_t^\mathrm{LO} &=& 1.4957~\GeV, \quad \Gamma_t^\mathrm{NLO} = 1.3693~\GeV,
+  \nonumber\\
+  \Gamma_W^\mathrm{LO} &=& 2.0455~\GeV, \quad \Gamma_W^\mathrm{NLO} = 2.1145~\GeV.
 \ee
 We consider proton-proton collisions at the LHC with a center-of-mass energy of $\sqrt{s}=13~\TeV$.
 To account for detector acceptances and trigger we require
 \be
-\label{selectioncuts}
- \pT^{\ell} \ge 15~\GeV, \quad |y^{\ell}| \le 2.5,
-\nonumber\\
- \pT^{j} \ge 20~\GeV, \quad |y^{j}| \le 2.5,
-\nonumber\\
- \pT^{\mathrm{miss}} \ge 20~\GeV, \quad R_{\ell j} \ge 0.4.
+  \label{selectioncuts}
+  \pT^{\ell} \ge 15~\GeV, \quad |y^{\ell}| \le 2.5,
+  \nonumber\\
+  \pT^{j} \ge 20~\GeV, \quad |y^{j}| \le 2.5,
+  \nonumber\\
+  \pT^{\mathrm{miss}} \ge 20~\GeV, \quad R_{\ell j} \ge 0.4.
 \ee
 Jet are defined by the anti-$k_\mathrm{T}$ algorithm~\cite{Cacciari:2008gp} with $R=0.4$.
 With these input parameter and cuts we find the LO and NLO QCD cross sections,
 \be
-\label{XsecNum}
+  \label{XsecNum}
   \sigma_{\ttb Z}^\mathrm{LO} &= 3.79(0)^{+34\%}_{-25\%}~\mathrm{fb},
   \quad\quad\quad
   \sigma_{\ttb Z}^\mathrm{NLO} &= 5.16(1)^{+13\%}_{-12\%}~\mathrm{fb}
@@ -509,7 +420,7 @@ The resulting scale uncertainty bands are approximately the same for CTEQ and MS
 Hence, the difference due to two different parton distribution sets is well within the uncertainty estimate from factorization and renormalization scales.
 
 \begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
+\centering
 \includegraphics[width=0.49\textwidth]{./LHC_53_Fig01and03.pdf}
 \hfill
 \includegraphics[width=0.49\textwidth]{./LHC_53_Fig17e.pdf}
@@ -529,7 +440,6 @@ Fig.~\ref{fig:ii}(right) shows the azimuthal opening angle between the two lepto
 This observable has been proven to be a good analyzer of the $\ttbZ$ couplings~\cite{Baur:2004uw} and we will consider it in the following analysis.
 Also here, we observe a strong reduction in scale dependence when going from LO to NLO.
 The differential $K$-factor in the lower pane of this plot shows shape changes in the range of 10~\% due to higher order corrections.
-% Shape changes that arise from higher order corrections in the decay matrix elements are shown in the dashed line and amount up to xx\%.
 
 
 
@@ -548,7 +458,7 @@ due to very different prediction with LO pdfs (cf. also Eqs.~\ref{XsecNum} and \
 \label{sect:analysis}
 
 \begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
+\centering 
 \includegraphics[width=0.6\textwidth]{./LHC_53_Fig17d.pdf}
 \caption{\label{fig:iv} Validation of our fitting procedure. Shown is the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution from an explicit NLO QCD calculation 
 for the non-SM coupling choice $(\DConeV,\DConeA)=(1.4,-0.2)$, and from the fit described in Eq.~3.8. }
@@ -562,13 +472,13 @@ Hence total cross sections and differential distributions need to be calculated 
 This is simple enough at LO, and while it is still feasible at NLO, it does place a strain on computing resources. 
 As a convenient alternative, we note that $\ttbZ$ production and decay amplitude at LO or NLO QCD can be written as
 \begin{equation}
-  \mathcal{M} = \mathcal{M}_0 +  \ConeV \mathcal{M}_\mathrm{V} +  \ConeA \mathcal{M}_\mathrm{A},
+    \mathcal{M} = \mathcal{M}_0 +  \ConeV \mathcal{M}_\mathrm{V} +  \ConeA \mathcal{M}_\mathrm{A},
 \end{equation}
 with the coefficients $\mathcal{M}_i$ encoding both the kinematics and all couplings other than the $\ttbZ$ couplings. 
 The differential cross section is then dependent on six coupling stuctures, and can be written as
 \begin{equation}
-\label{couplfit}
-  d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
+    \label{couplfit}
+    d\sigma = s_0 +s_1C_{1,V} + s_2C_{1,V}^2 +s_3 C_{1,A}+s_4C_{1,A}^2+s_5C_{1,V}C_{1,A}.
 \end{equation}
 Evaluating the cross section for six values of $(C_{1,V},C_{1,A})$ allows us to solve for the coefficients $s_i$. 
 These can then be used to extrapolate results for any values of $C_{1,V}$ and $C_{1,A}$. 
@@ -601,15 +511,14 @@ This emphasizes the importance of precise predictions since missing higher order
 To illustrate that the $\Delta \phi_{\ell\ell}$ shape is a useful discriminator for our coupling analysis, we have chosen 
 values $(\DConeV,\DConeA)$ in Fig.~\ref{fig:vi}(b) such that the total cross sections approximately coincide with the SM $\ttbZ$ cross section.
 Hence, a measurement of the rate alone would not reveal the deviations from their Standard Model value.\\
-% , and a combination of normalization and shape information provides the best sensitivity.
  
 
 
 \begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
-\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17a.pdf}
+\centering 
+\includegraphics[width=0.49\textwidth]{./LHC_53_Fig17a.pdf}
 \hfill
-\includegraphics[width=0.45\textwidth]{./LHC_53_Fig17b.pdf}
+\includegraphics[width=0.49\textwidth]{./LHC_53_Fig17b.pdf}
 \caption{\label{fig:vi}
 Normalized distributions of the azimuthal opening angle of the opposite sign leptons from the $Z$~boson decay at the 13~TeV LHC.
 In the left figure, shapes of LO and NLO QCD predictions are compared for SM $\ttbZ$-couplings.
@@ -622,7 +531,6 @@ Shape changes due to deviations from the SM values are shown in the right figure
 Let us now outline the basic features of our statistical analysis.
 We are interested in answering the question: What are the bounds that can be placed on deviations of the $\ttbZ$ couplings, assuming that the SM is true? 
 Obviously, the answer will depend on the assumed integrated luminosity of the data sample as well as on theoretical and experimental uncertainties. 
-% However, we emphasize again that we do not take experimental effects into account apart from the cuts in Eq.~\ref{selectioncuts} to account for detector acceptances.
 Since at the current point in time there is no experimental data available, we assume the SM prediction as our null hypothesis 
 $\mathcal{H}_{\mathrm{SM}}$ ($\DConeV,\DConeA)=(0,0)$,
 against which we test alternative hypotheses $\Halt$ with $(\DConeV,\DConeA) \ne (0,0)$.
@@ -630,13 +538,10 @@ Once experiments have accumulated real events, the alternative hypothesis can be
 The null hypothesis could then also be replaced by  other points in $(\DConeV,\DConeA)$ parameter space, and tested against the data. 
 This will enable the exclusion of parts of the parameter space at a given confidence level. 
 Assuming that the data agree with the SM, 
-% and ignoring experimental effects which may be significant, 
 the bounds on the top-Z coupling 
 obtained in this section should approximate those obtained from real data in the future. 
 We begin by constructing two likelihood functions $\mathcal{L}_{\SM}$ and $\mathcal{L}_{\alt}$ which allow us to define a test 
 statistic $\Lambda = \log \left( \mathcal{L}_{\SM} / \mathcal{L}_{\alt} \right)$.
-% Assuming a fixed integrated luminosity, we now generate a number of events for the two hypotheses $\mathcal{H}_{\mathrm{SM}}$ and $\Halt$ based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$.
-% Based on our NLO QCD predictions for $\Delta \phi_{\ell\ell}$, we now generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
 We then generate two event samples for a fixed integrated luminosity assuming that either $\mathcal{H}_{\mathrm{SM}}$ or $\Halt$ is true.
 The test statistic $\Lambda$ can be evaluated for these two event samples, and 
 repeating this evaluation in a large number of pseudo experiments provides the probability distributions $P(\Lambda|\mathcal{H}_{\mathrm{SM}})$ or $P(\Lambda|\Halt)$.
@@ -650,52 +555,30 @@ We closely follow typical likelihood-based analyis as described for example in R
 Feldman and Cousins~\cite{Feldman:1997qc}.
 The starting point is the binned likelihood function 
 \be
-\label{lili}
+   \label{lili}
    \mathcal{L}(\mathcal{H}|\vec{n}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i|\nu_{i}^\mathcal{H})
 \ee
 with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^\mathcal{H}$ for hypothesis $\mathcal{H}$. 
-% This expected value is obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
-%The starting point is the binned likelihood function 
-%\be
-%\label{lili}
-%   \mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu}) = \prod_{i=1}^{N_\mathrm{bins}} P_i(n_i^{\mathcal{H}_a}|\nu_{i}^{\mathcal{H}_t})
-%\ee
-%with the Poisson distribution $P_i$ for $n_i$ events in the $i$-th bin, given the expected value $\nu_{i}^{\mathcal{H}_a}$ for the assumed hypothesis $\mathcal{H}_a$. 
-%The values $\nu_i^{\mathcal{H}_t}$ are drawn from the test hypothesis $\mathcal{H}_t$. The values $\nu_i$ are obtained by multiplying the differential cross-section in bin $i$ by the assumed luminosity.
 Consequently the two log-likelihood functions for the SM and the alternative hypthesis read
 \be
-\label{lilifunct}
-\begin{split}
+  \label{lilifunct}
+  \begin{split}
   \log\mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\SM}) -\log(n_{i,\mathrm{obs}}!) -\nu_i^{\SM}  \bigr], \\
   \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
-\end{split}
+  \end{split}
 \ee
 where the sums over $i$ runs over all bins in a given histogram.
-%Consequently there are the log-likelihood functions for a test hypothesis $\mathcal{H}_t$ under the assumption of a hypothesis $\mathcal{H}_a$
-%\be
-%\label{lilifunct}
-%\begin{split}
-%  \log\mathcal{L}(\mathcal{H}_a,\vec{n}|\mathcal{H}_t,\vec{\nu})  = \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\mathcal{H}_a}\log(\nu_i^{\mathcal{H}_t}) -\log(n_i^{\mathcal{H}_a}!) -\nu_i^{\mathcal{H}_t}  \bigr],% \\
-%  \log\mathcal{L}(\HSM,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\SM}) -\log(n_i^{\SM}!) -\nu_i^{\SM}  \bigr], \\
-%  \log\mathcal{L}(\HSM,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\SM}\log(\nu_i^{\alt}) -\log(n_i^{\SM}!) -\nu_i^{\alt}  \bigr], \\
-%  \log\mathcal{L}(\Halt,\vec{n}|\HSM)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\SM}) -\log(n_i^{\alt}!) -\nu_i^{\SM}  \bigr], \\
-%  \log\mathcal{L}(\Halt,\vec{n}|\Halt)  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_i^{\alt}\log(\nu_i^{\alt}) -\log(n_i^{\alt}!) -\nu_i^{\alt}  \bigr], 
-%  \log\mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  =& \sum_{i=1}^{N_\mathrm{bins}} \bigl[ n_{i,\mathrm{obs}}\log(\nu_i^{\alt})-\log(n_{i,\mathrm{obs}}!) -\nu_i^{\alt} \bigr],
-%\end{split}
-%\ee
-%where $n_{i,\mathrm{obs}}$ is the observed number of events in the $i$-th bin of the $\Delta \phi_{\ell\ell}$ distribution. 
 Eqs.~\ref{lilifunct} allow us to construct a log-likelihood ratio which serves at the test statistic
 \be
-\begin{split}
+  \begin{split}
   \Lambda(\vec{n}_\mathrm{obs}) =& \log \biggl( \mathcal{L}(\HSM |\vec{n}_\mathrm{obs})  \big/ \mathcal{L}(\Halt|\vec{n}_\mathrm{obs})  \biggr)  \\
                                 =& \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i,\mathrm{obs}}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr].
 \end{split}
 \ee
 This test statistic can now be evaluated with $\vec{n}_{\mrm{obs}}$ which are the Poisson distributed events from the  
 $\Delta \phi_{\ell\ell}$ histogram, for either the SM or the alternative hypothesis.
-% , yielding $\vec{n}_{\SM}$ and $\vec{n}_{\alt}$.
 \begin{figure}[t]
-\centering % \begin{center}/\end{center} takes some additional vertical space
+\centering 
 \includegraphics[width=0.49\textwidth]{./LogLikelihoods_LO.pdf}
 \hfill
 \includegraphics[width=0.49\textwidth]{./LogLikelihoods_NLO.pdf}
@@ -707,23 +590,7 @@ The left plot shows the separating power using LO input with $\Delta_\mathrm{sys
 the right plot is obtained at NLO QCD with $\Delta_\mathrm{syst.}=15\%$, assuming $\sqrt{s}=13\,\TeV$ and $\mathcal{L}=300\,\invfb$.
 }
 \end{figure}
-%\be
-%\begin{split}
-%  \Lambda(\HSM) =&  \, \log \biggl( \mathcal{L}(\HSM,\vec{n}|\HSM,\vec{\nu})  \big/ \mathcal{L}(\HSM,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-%                                =& \, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\SM}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-%\end{split}
-%\ee
-%and similarly
-%\be
-%\begin{split}
-%  \Lambda(\Halt) =& -2 \, \log \biggl( \mathcal{L}(\Halt,\vec{n}|\HSM,\vec{\nu})%  \big/ \mathcal{L}(\Halt,\vec{n}|\Halt,\vec{\nu})  \biggr)  \\
-%                                =& -2\, \sum_{i=1}^{N_\mathrm{bins}} \biggl[ n_{i}^{\alt}\log \biggl( \frac{\nu_i^{\SM}}{\nu_i^{\alt}} \biggr) -\nu_i^{\SM} + \nu_i^{\alt} \biggr],
-%\end{split}
-%\ee
-%This function $\Lambda$ can now be evaluated with $\vec{n}$ events which are distributed according to the 
-% $\Delta \phi_{\ell\ell}$ distribution of either the SM hypothesis or the alternative hypothesis. 
 Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions of $\Lambda(\vec{n}_\mathrm{SM})$ and $\Lambda(\vec{n}_\mathrm{alt})$. 
-%Repeating this procedure for a large number of pseudo-experiments yields the two probability distributions  $P(\Lambda|\HSM)$ and $P(\Lambda|\Halt)$.
 An example of two such probability distributions, $P(\Lambda|\mathcal{H}_{\mathrm{SM/alt}})$, is shown in Fig.~\ref{fig:vii} for LO and NLO QCD, respectively.
 These two distributions can be used to define a confidence level for excluding the alternative hypothesis.
 For a given value $\hat{\Lambda}$, the probability of accepting $\mathcal{H}_{\alt}$ even though $\mathcal{H}_{\SM}$ is correct (type-I error) is
@@ -738,7 +605,7 @@ We define $\hLambda$ such that $\alpha=\beta$, i.e. there is equal chance of {\i
 The value $\alpha(\hLambda)$ is then a measure of statistical discrimination between the two hypotheses. 
 It can be translated into the more familiar number of standard deviations by 
 \begin{equation}
-\sigma = \sqrt{2} \, \erf^{-1}(1-\alpha),
+    \sigma = \sqrt{2} \, \erf^{-1}(1-\alpha),
 \end{equation}
 where $\erf^{-1}$ is the inverse error function. 
 
@@ -817,7 +684,6 @@ The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described
 
 
 
-% {\bf MARKUS NOTE: I think we have to be careful with the word observed. This is typically only used for 5sigma signals, which is not the case here at all.}
 We now use current LHC data to obtain first constraints on vector and axial couplings. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events~\cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria~\cite{ATLAS-CONF-2012-126}. 
 This enables ATLAS to place an upper bound on the $\ttbZ$ cross section, 
@@ -827,20 +693,20 @@ In spite of the low number of events and correspondingly high statistical error,
 This constitutes the first direct constraints on these couplings.
 We perform a simple $\chi^2$-test 
 \begin{equation}
-\chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
+    \chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
 \end{equation}
 where $\sigma_{\mathrm{pred}}=\sigma_{\mathrm{pred}}(C_{1,V},C_{1,A})$ is the predicted cross section at LO or NLO, 
 $\sigma_{\mathrm{CMS}}$ is the cross section measured by CMS, with error $\Delta \sigma_{\mathrm{CMS}}$ taken by adding the larger 
 statistical and systematic errors in quadrature, $\Delta \sigma_{\mathrm{CMS}}=\sqrt{0.14^2+0.06^2}$. 
 The factor $f$ takes into account the uncertainties in the theoretical predicion due to the scale and pdf choices. 
 It is defined as~\cite{Baur:2004uw,Baur:2005wi}
- \begin{equation}
-f = \left\{ 
-\begin{array} {l l}
-(1+\Delta N)  & \quad \mathrm{if}~ f^* > 1 + \Delta N \\
-1/(1+\Delta N)  & \quad \mathrm{if}~ f^* < 1/(1 + \Delta N) \\
-f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
-\end{array} \right.\ 
+\begin{equation}
+    f = \left\{ 
+    \begin{array} {l l}
+    (1+\Delta N)  & \quad \mathrm{if}~ f^* > 1 + \Delta N \\
+    1/(1+\Delta N)  & \quad \mathrm{if}~ f^* < 1/(1 + \Delta N) \\
+    f^* & \quad \mathrm{if}~ 1/(1 + \Delta N) < f^* < 1+\Delta N,
+    \end{array} \right.\ 
 \end{equation}  
 where the $f^*$ minimizes $\chi^2$, $f^* = \sigma_{\mathrm{CMS}} / \sigma_{\mathrm{pred}}$, and $\Delta N$ is the theoretical  uncertainty. 
 This strategy is similar to treating $f$ as a nuisance parameter and marginalizing over it; however, we do not allow it complete freedom, 
@@ -849,8 +715,6 @@ In determining $\Delta N$, we found in the previous section scale uncertainties 
 Uncertainties related to using different parton distribution functions amount to 17\% at LO and 7\% at NLO. 
 Since the latter uncertainties are comfortably within the variation of renormalization and factorization scales, we 
 choose here and in the following analysis $\Delta N = 0.30$ at LO and $\Delta N = 0.15$ at NLO.
-% we use a pdf uncertainty of 5\% and a scale uncertainty of 30\% at LO and 15\% at NLO, as found in the previous section. 
-% We sum these uncertainties linearly to obtain $\Delta N = 0.35$ at LO and $\Delta N = 0.20$ at NLO. 
 
 
 
@@ -899,10 +763,13 @@ increasing the luminsity drastically improves the limits.
 By comparing plots in the left versus the right column we also see that 
 the bounds at NLO QCD are far stronger.
 This is a result of the reduced scale uncertainty and the larger cross section due to a positive perturbative correction at NLO.
-Numerically, one finds that with $300\, \invfb$ and LO input $\DConeV$ is constrained between $[-4\, ...\, 2.5]$ and $\DConeA$ between $[-0.4\, ...\, 0.4]$, 
+Numerically, one finds that with $300\, \invfb$ and LO input $\DConeV$ is constrained between $[-4.0\, ...\, 2.8]$ and $\DConeA$ between $[-0.36\, ...\, 0.54]$, 
 at the 95\% C.L.\footnote{We checked that these LO limits roughly agree with the ones quoted in Ref.~\cite{Baur:2004uw} for the 14~TeV LHC.}
-The limits improve with NLO QCD predictions to $[-3\, ...\, 1.5]$ for $\DConeV$ and $[-0.2\, ...\, 0.3]$ for $\DConeA$.
-In terms of absolute values, these intervals correspond to $[-0.5\, ...\, 0.6]$ and $[-0.75\, ...-0.5]$ for vector and axial couplings, respectively.
+The limits improve with NLO QCD predictions to $[-3.6\, ...\, 1.6]$ for $\DConeV$ and $[-0.24\, ...\, 0.30]$ for $\DConeA$.
+In terms of absolute values, these intervals correspond to $C_\mathrm{V}=0.24^{+0.39}_{-0.39}$ and $C_\mathrm{A}=-0.60^{+0.14}_{-0.18}$
+which are reduced by 25\% and 42\%, respectively, compared to the results obtained at leading order.
+% $[-0.63\, ...\, 0.63]$ and $[-0.78\, ...-0.46]$ for vector and axial couplings, respectively.
+%  at leading order this is :$  [-0.73\, ...\, 0.93]$ and $[-0.93\, ...-0.38]$
 
 An noticeable feature is that ...something something about the sad/smily face.
 Note that shapes play a significant role as is evident when comparing with fig.7.
@@ -969,23 +836,23 @@ The limits on the total $\ttbZ$ cross section as a function of $\DConeV$ and $\D
 translate into limits on the three operators in Eq.~\ref{EFTOp}. 
 Diagonalizing the dependence in Eq.~\ref{Cone_NP}, we find at leading order
 \be
- -15.7 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
- \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q}  \right]   
- \le  21.1 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  ,
- \nonumber \\ \\ \nonumber 
- -50.2 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
- \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
- \le 23.3 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2. 
+  -15.7 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
+  \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q}  \right]   
+  \le  21.1 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  ,
+  \nonumber \\ \\ \nonumber 
+  -50.2 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
+  \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
+  \le 23.3 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2. 
 \ee
  Whereas using NLO input the limits improves to 
 \be
- -13.4 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
- \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q}  \right]   
- \le  20.0 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  ,
- \nonumber \\ \\ \nonumber
- -46.2 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
- \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
- \le 18.9 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2. 
+  -13.4 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
+  \le  \mathrm{Re} \left[ C^{(3,33)}_{\phi q}  \right]   
+  \le  20.0 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2  ,
+  \nonumber \\ \\ \nonumber
+  -46.2 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2 
+  \le  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  
+  \le 18.9 \left(\frac{\Lambda}{1\,\mathrm{TeV}} \right)^2. 
 \ee
 
 
@@ -993,8 +860,6 @@ Diagonalizing the dependence in Eq.~\ref{Cone_NP}, we find at leading order
 \begin{figure}[t]
 \centering
 \includegraphics[scale=0.43]{OPLimitNLO.pdf} 
-% \hspace{0.5cm}
-% \includegraphics[scale=0.43]{OPLimitNLO3000.pdf} 
 \caption{\label{fig:x} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$}
 \end{figure}
 
@@ -1004,65 +869,61 @@ To estimate how limits will improve in such a case, we use the results presented
 for the luminosities 30, 300, and 3000~$\invfb$.
 We find at leading order
 \be
-\label{OPLimitsLO}
- \left. \begin{array}{l}
- -1.2 \\
- -1.0 \\
- -0.9  
- \end{array} \right\}   
- \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
- \le 
- \left\{ \begin{array}{ll}
- 1.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
- 0.7 & \quad\quad \mathrm{with }~300 \, \invfb \\
- 0.6 & \quad\quad \mathrm{with }~3000\, \invfb  
- \end{array} \right.
-%  
- ,\nonumber \\  \\ \nonumber
-%  
- \left. \begin{array}{l}
- -2.3 \\
- -1.4 \\
- -0.9  
- \end{array} \right\} 
- \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
- \le 
- \left\{ \begin{array}{ll}
- 2.2 & \quad\quad \mathrm{with }~30  \, \invfb \\
- 2.2 & \quad\quad \mathrm{with }~300 \, \invfb \\
- 2.0 & \quad\quad \mathrm{with }~3000\, \invfb  
- \end{array} \right. .
+  \label{OPLimitsLO}
+  \left. \begin{array}{l}
+  -1.2 \\
+  -1.0 \\
+  -0.9  
+  \end{array} \right\}   
+  \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
+  \le 
+  \left\{ \begin{array}{ll}
+  1.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
+  0.7 & \quad\quad \mathrm{with }~300 \, \invfb \\
+  0.6 & \quad\quad \mathrm{with }~3000\, \invfb  
+  \end{array} \right.
+  ,\nonumber \\  \\ \nonumber
+  \left. \begin{array}{l}
+  -2.3 \\
+  -1.4 \\
+  -0.9  
+  \end{array} \right\} 
+  \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
+  \le 
+  \left\{ \begin{array}{ll}
+  2.2 & \quad\quad \mathrm{with }~30  \, \invfb \\
+  2.2 & \quad\quad \mathrm{with }~300 \, \invfb \\
+  2.0 & \quad\quad \mathrm{with }~3000\, \invfb  
+  \end{array} \right. .
 \ee
 At next-to-leading order QCD we obtain
 \be
-\label{OPLimitsNLO}
- \left. \begin{array}{l}
- -1.2 \\
- -0.9 \\
- -0.7  
- \end{array} \right\}   
- \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
- \le 
- \left\{ \begin{array}{ll}
- 0.6 & \quad\quad \mathrm{with }~30  \, \invfb \\
- 0.4 & \quad\quad \mathrm{with }~300 \, \invfb \\
- 0.2 & \quad\quad \mathrm{with }~3000\, \invfb  
- \end{array} \right.
-%  
- ,\nonumber \\  \\ \nonumber
-%  
- \left. \begin{array}{l}
- -1.7 \\
- -0.8 \\
- -0.4  
- \end{array} \right\} 
- \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
- \le 
- \left\{ \begin{array}{ll}
- 2.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
- 1.8 & \quad\quad \mathrm{with }~300 \, \invfb \\
- 1.5 & \quad\quad \mathrm{with }~3000\, \invfb  
- \end{array} \right. .
+  \label{OPLimitsNLO}
+  \left. \begin{array}{l}
+  -1.2 \\
+  -0.9 \\
+  -0.7  
+  \end{array} \right\}   
+  \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{(3,33)}_{\phi q} \right]  \quad 
+  \le 
+  \left\{ \begin{array}{ll}
+  0.6 & \quad\quad \mathrm{with }~30  \, \invfb \\
+  0.4 & \quad\quad \mathrm{with }~300 \, \invfb \\
+  0.2 & \quad\quad \mathrm{with }~3000\, \invfb  
+  \end{array} \right.
+  ,\nonumber \\  \\ \nonumber
+  \left. \begin{array}{l}
+  -1.7 \\
+  -0.8 \\
+  -0.4  
+  \end{array} \right\} 
+  \le \quad \frac{v^2}{\Lambda^2} \;  \mathrm{Re} \left[ C^{33}_{\phi u} \right]  \quad 
+  \le 
+  \left\{ \begin{array}{ll}
+  2.0 & \quad\quad \mathrm{with }~30  \, \invfb \\
+  1.8 & \quad\quad \mathrm{with }~300 \, \invfb \\
+  1.5 & \quad\quad \mathrm{with }~3000\, \invfb  
+  \end{array} \right. .
 \ee
 Due to the weak correlation between vector and axial coupling limits and because of Eq.~\ref{Cone_NP},
 the limits on $C^{(3,33)}_{\phi q}$ and $C^{33}_{\phi u}$ are strongly correlated. 
@@ -1081,6 +942,9 @@ which, however, only arise through indirect sensitivity.
 Only the analysis of $pp \to \ttbZ$ at the LHC will allow placing {\it direct} limits for the first time.
 
 
+
+
+
 \section{Conclusion}
 In this article we studied top quark pair production in association with a $Z$~boson.
 Due to its relatively high production threshold and 
@@ -1094,17 +958,12 @@ We therefore study the process $pp\to\ttbZ$ at 13~TeV in the tri-lepton final st
 which provides the best compromise between clean signature and large enough cross section. 
 The central question that we try to answer is by how much limits on
 $\ttbZ$ couplings improve once NLO QCD predictions are used.
-% Our theoretical description of production and decay dynamics is accurate to next-to-leading order QCD and
-% accounts for all spin correlations at this order in perturbation theory. 
-% Top quarks and the Z-boson are treated in the narrow-width approximation which is parameterically valid up to $\mathcal{O}(\Gamma \big/ m)$.
 A particularly sensitive observable for such a study is the opening angle between the two leptons from the $Z$~boson decay.
-% For this we investigate the distribution of the angle between the two leptons from the $Z$~boson decay 
-% which is particularly sensitive to variations of the $\ttbZ$-couplings.
 We perform the analysis through a binned log-likelihood ratio test which proves advantageous for several reasons.
-Firstly, the use of likelihood functions guarantees correct results even for low number of events when, for example, a simple $\chi^2$ analysis would fail.
+Firstly, the use of likelihood functions guarantees reliable results even for low number of events when, for example, a simple $\chi^2$ analysis would fail.
 Secondly, non-Gaussian systematic errors such as theoretical scale uncertainties can be straightforwardly implemented in the likelihood ratio test.
 In addition it turns out relatively easy to implement this procedure at NLO QCD.
-To this end we generated a grid of $10^4$ different couplings and their corresponding kinematic distributions at NLO QCD. 
+To this end we generated a grid of 441 different couplings and their corresponding kinematic distributions at NLO QCD. 
 The results show that with 300~$\invfb$ the vector and axial couplings can be constrained to xx\% and yy\% accuracy at the 1-$\sigma$ C.L.
 These limits are about yy times stronger compared to an analysis at leading order.
 Our NLO QCD analysis also yields significant improvements on the limits when going from 300~$\invfb$ to 3000~$\invfb$.
@@ -1117,21 +976,13 @@ Finally, we note that effects of New Physics can modify the $\ttbZ$-coupling bey
 Those couplings typically introduce non-renormalizable interactions and require an extension of our one-loop integrand reduction method. 
 This is an interesting subject for a continuation of this work.
 Another interesting future topic is the study of sensitivity at an 100~TeV $pp$ collider or at an $e^+ e^-$ machine.
-% The interactions of top quarks with other bosons, such as the Higgs or a photon, can also be studied through few changes in our framework.
 At any rate, we look forward to the first observation of the $\ttb+Z,W,\gamma,H$ processes and the consequential physics results in top quark phenomenology.
 
-% other ideas: ttbar+large ETmiss (=Z->nunu)
-%              e+ e- --> ttbar+2jets 
-%              single top + Z
-%              e+ e+ --> ttb z 
-%              ttb + h , w, photon with anomalous couplings
-
-% determine V_tb (see Berger)
 
 
 \acknowledgments
-We acknowledge helpful conversations with Y.~Gao, A.~Gritsan, N.~Tran and P.~Argrawal. 
-Some of the numeric calculations weee done at NERSC.
+We acknowledge helpful conversations with P.~Argrawal, Y.~Gao and N.~Tran. 
+Some of the numeric calculations were done at NERSC.
 
 
 
