@@ -75,7 +75,7 @@ The obtained limits include statistical uncertainties as well as leading theoret
 residual scale dependence and parton distribution functions.
 We find that with 300~fb$^{-1}$ of data at an energy of 13~TeV the vector and axial $t \bar t Z$-coupling can be
 constrained to $C_\mathrm{V}=0.24^{+0.39}_{-0.39}$ and $C_\mathrm{A}=-0.60^{+0.14}_{-0.18}$, at the 95\% confidence level.
-This is a reduction by 25\% and 42\%, respectively, compared to an analysis based on leading-order predictions.
+This is a reduction of uncertainties by 25\% and 42\%, respectively, compared to an analysis based on leading-order predictions.
 We also translate these results into limits on dimension-six operators contributing to the $t \bar t Z$-interactions beyond the Standard Model.
 }
 
@@ -173,7 +173,7 @@ Application of the narrow-width approximation for top quarks and the $Z$~boson a
   , \label{Xsec}
 \ee
 where $\rd \sigma$ denotes the production cross section and $\rd\Br_{X\to Y}= \rd \Gamma_{X\to Y} \big/ \Gamma^\mrm{tot}_X$ are the partial branching fractions.
-The use of the narrow width approximation neglects contributions which are parameterically suppressed by $\mathcal{O}(\Gamma / m)$, arising from a largely off-shell top quark or $Z$~boson.
+The use of the narrow width approximation neglects contributions which are parametrically suppressed by $\mathcal{O}(\Gamma / m)$, arising from a largely off-shell top quark or $Z$~boson.
 Severe selection cuts on final state particles can violate this approximation when distorting the Breit-Wiegner line shape of the resonance.
 In our analysis we aim for a large cross section and only place mild cuts required by experimental detector acceptance. 
 Hence, we believe the narrow-width is an excellent approximation for our study\footnote{
@@ -258,7 +258,7 @@ The $\ttbZ$ interaction Lagrangian in the SM can be written as
 where $Q_t = 2/3$ is the top quark electric charge, $T^3_t=1/2$ and $\theta_w$ is the weak mixing angle. 
 New physics contributions to the $\ttbZ$ couplings are most conveniently introduced by higher dimensional operators 
 in the language of effective field theory. 
-A minimal set of dimension-6 operators for top quark production and decay have been categorized in Refs.~\cite{AlcarazMaestre:2012vp,AguilarSaavedra:2008zc,Zhang:2012cd}.
+A minimal set of dimension-six operators for top quark production and decay have been categorized in Refs.~\cite{AlcarazMaestre:2012vp,AguilarSaavedra:2008zc,Zhang:2012cd}.
 In total there are 91 different operators which can be summarized into 20 different anomalous couplings, if on-shellness and gauge invariance is enforced~\cite{AguilarSaavedra:2008zc}. 
 For interactions of a $Z$~boson with top quarks only four anomalous couplings, $C_{1/2,V/A}$, remain and Eq.~(\ref{L_SM}) becomes
 \be
@@ -621,20 +621,22 @@ This is however no longer true when nuisance parameters are introduced in the an
 Nevertheless, one still expects the test to be approximately optimal as long as the nuisance parameters are reasonably constrained.
 We include the theoretical uncertainties by modifying the likelihood function in Eq.~(\ref{lili}) according to
 \be
-  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{unc.}) \right),
+  \label{errorfunctG}
+  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{theor.\,unc.}) \right),
 \ee
-where we choose $\mathcal{G}$ to be a normalized function with uniform spread $\tilde{\nu}_{\mathrm{min/max},i}^\mathcal{H} = \tilde{\nu}_i^\mathcal{H} \pm \Delta_\mathrm{unc.}$,
+where we choose $\mathcal{G}$ to be a normalized function with uniform spread $\tilde{\nu}_{\mathrm{min/max},i}^\mathcal{H} = \tilde{\nu}_i^\mathcal{H} \pm \Delta_\mathrm{theor.\,unc.}$,
 % around the central scale choice $\tilde{\nu}_i^\mathcal{H}$,
 \be
-  \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{unc.}) \right) = 
+\label{uniuncert}
+  \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{theor.\,unc.}) \right) = 
   \big( \theta\left( {\nu}_i^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \right) 
       \times  \theta\left( \nu_{\mathrm{max},i}^\mathcal{H} - {\nu}_i^\mathcal{H} \right)  \big) 
   \big/ \big( \nu_{\mathrm{max},i}^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \big).
 \ee
 The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the assumed luminosity times the cross section in the $i$th bin 
 for the central scale choice $\mu_0$.
-We choose the constant values $\Delta_\mathrm{unc.} = 30\%$ at LO
-and $\Delta_\mathrm{unc.} = 15\%$ at NLO QCD.
+We choose the constant values $\Delta_\mathrm{theor.\,unc.} = 30\%$ at LO
+and $\Delta_\mathrm{theor.\,unc.} = 15\%$ at NLO QCD.
 To be most conservative, we then fix $\nu_i^\mathcal{H}$ to either $\tilde{\nu}_{\mathrm{min},i}^\mathcal{H}$ or $\tilde{\nu}_{\mathrm{max},i}^\mathcal{H}$
 for the respective hypothesis such that their total cross sections are closest.
 This treatment results in a larger overlap between the two likelihood distributions, 
@@ -693,6 +695,8 @@ Nevertheless they are consistent with the NLO QCD predictions of $0.137\,$pb$\,\
 or with $0.148\,$pb$\,\pm 11\%$ from our calculation (MSTW pdfs). 
 In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross section to place bounds on the $\ttbZ$ couplings. 
 This constitutes the first direct constraints on these couplings.
+
+{\bf MARKUS: BEGIN change text below}\\
 We perform a simple $\chi^2$-test 
 \begin{equation}
     \chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
@@ -717,7 +721,6 @@ In determining $\Delta N$, we found in the previous section scale uncertainties 
 Uncertainties related to using different parton distribution functions amount to 17\% at LO and 7\% at NLO. 
 Since the latter uncertainties are comfortably within the variation of renormalization and factorization scales, we 
 choose here and in the following analysis $\Delta N = 0.30$ at LO and $\Delta N = 0.15$ at NLO.
-
 
 
 \begin{figure}[t]
@@ -746,9 +749,42 @@ Of course, the obtained limits have to be interpreted with care since very few e
 Only a larger data set and detailed analysis of backgrounds and detector effects will provide more reliable constraints on the $\ttbZ$-couplings.
 We still believe that these results are interesting to consider, especially when being put in context with limits
 obtained from the future high-energy LHC which we study in the next section.
+
+{\bf MARKUS: END}\\
+
+
+{\bf MARKUS: BEGIN New uncert. treatment. Insert somewhere here}\\
+Since we include experimental data we need to slightly modify the uncertainty treament described in Eq.~(\ref{uniuncert}).
+Instead of assuming a uniform distribution for the experimental systematics we introduce a Gaussian distributed probability.
+The function $\mathcal{G}(..|..)$ in Eq.~(\ref{errorfunctG}) becomes
+\be
+  \label{Gaussuncert}
+  \mathcal{G} \left( \nu | \tilde{\nu},\tilde{\sigma} \right) = \frac{1}{\sqrt{2\pi\tilde{\sigma}^2}} \; e^{-(\nu-\tilde{\nu})^2 / (2\tilde{\sigma}^2)}, 
+\ee
+where $\tilde{\nu}$ is the mean value of the experimental measurement and $\tilde{\sigma}=\sigma_\mathrm{exp.\,syst.}$ is the systematic experimental uncertainty. 
+In this way the mean value $\nu$ in the likelihood function is normal distributed during the generation of pseudo experiments with 
+a standard deviation of $\sigma_\mathrm{exp.\,syst.}$.
+Note that statistical uncertainties are already included through the Poisson distribution in Eq.~(\ref{lili}).
+In the following we adopt the experimental systematic error of $\sigma_\mathrm{exp.\,syst.}=\pm 20\%$ quoted in Ref.~\cite{Chatrchyan:2013qca}.
+The theoretical uncertainties are included through a uniform uncertainty distribution as described in the previous Section with 
+$\Delta_\mathrm{theor.\,unc.}=\pm 30\%$ at LO and $\Delta_\mathrm{theor.\,unc.}=\pm 15\%$ at NLO QCD.
+
+{\bf MARKUS: END}\\
 \\
 
 
+\begin{figure}[t]
+\includegraphics[scale=0.503]{LHC_53_LLSign_13LO30.pdf} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO30.pdf} 
+\\
+\includegraphics[scale=0.503]{LHC_53_LLSign_13LO300.pdf} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO300.pdf} 
+\\
+\includegraphics[scale=0.503]{LHC_53_LLSign_13LO3000.pdf} 
+\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO3000.pdf} 
+\caption{\label{fig:ix} Significance of deviations from the SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
+Results using the LO prediction and uncertainty are shown on the left, the corresponding NLO QCD results are shown on the right hand side.}
+\end{figure}
 
 We now present the main results of our analysis in Figs.~\ref{fig:ix} and~\ref{fig:x}
 for the future run of the LHC at $\sqrt{s}=13$~TeV. 
@@ -774,22 +810,17 @@ In terms of absolute values, these intervals correspond to $C_\mathrm{V}=0.24^{+
 This is a reduction by 25\% and 42\%, respectively, compared to results obtained at leading order.
 % $[-0.63\, ...\, 0.63]$ and $[-0.78\, ...-0.46]$ for vector and axial couplings, respectively.
 %  at leading order this is :$  [-0.73\, ...\, 0.93]$ and $[-0.93\, ...-0.38]$
+A noticeable feature in the exclusion limits at NLO, Fig.~\ref{fig:ix}(right), is the turnover from a 
+downwards bend shape to an upwards bend shape when going from $30\,\invfb$ to $3000\,\invfb$.
+This feature is a convoluted effect of our uncertainty treatment and a transition from normalization to shape sensitivity in the exclusion.
+In the upper right plot the exclusion region roughly follows the shape already observed in Fig.~\ref{fig:viii}. 
+This can be understood from the fact that with a small event sample the exclusion limit is dominated by 
+normalization differences, whereas different shapes have vanishing exclusion power. 
+Using a larger event sample, shape sensitivity increases and also allows to exclude regions where normalization differences 
+are small but shapes differ significantly.
+This is the case in the lower right plot of Fig.~\ref{fig:ix}, where the previously downwards bend are is safely excluded.
+% Note that shapes play a significant role as is evident when comparing with fig.7.
 
-An noticeable feature is that ...something something about the sad/smily face.
-Note that shapes play a significant role as is evident when comparing with fig.7.
-
-\begin{figure}[t]
-\includegraphics[scale=0.503]{LHC_53_LLSign_13LO30.pdf} 
-\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO30.pdf} 
-\\
-\includegraphics[scale=0.503]{LHC_53_LLSign_13LO300.pdf} 
-\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO300.pdf} 
-\\
-\includegraphics[scale=0.503]{LHC_53_LLSign_13LO3000.pdf} 
-\includegraphics[scale=0.5]{LHC_53_LLSign_13NLO3000.pdf} 
-\caption{\label{fig:ix} Significance of deviations from the SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
-Results using the LO prediction and uncertainty are shown on the left, the corresponding NLO QCD results are shown on the right hand side.}
-\end{figure}
 
 
 % A feature of both of these plots which bears comment is the tongue of large $\sigma$ values which occurs for large values of $| \DConeV|$ and large 
@@ -940,7 +971,7 @@ Hence it leaves $C^{33}_{\phi u}$ mostly unconstrained since this operator contr
 Altogether, electroweak precision observables put very strong constraints on the $\ttbZ$ coupling
 which, however, only arise through indirect sensitivity.
 Only the analysis of $pp \to \ttbZ$ at the LHC will allow placing {\it direct} limits for the first time.
-
+It would be an interesting continuation of this work to superimpose Fig.~\ref{fig:x} with constraints obtained from single $t Z+ \bar{t}Z$ production at the LHC.
 
 
 
