@@ -636,8 +636,8 @@ where we choose $\mathcal{G}$ to be a normalized function with uniform spread $\
 \ee
 The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the assumed luminosity times the cross section in the $i$th bin 
 for the central scale choice $\mu_0$.
-We choose the constant values $\Delta_\mathrm{theor.\,unc.} = 30\%$ at LO
-and $\Delta_\mathrm{theor.\,unc.} = 15\%$ at NLO QCD.
+We will choose the constant values $\Delta_\mathrm{theor.\,unc.} = 30\%$ at LO
+and $\Delta_\mathrm{theor.\,unc.} = 15\%$ at NLO QCD for our $\sqrt{s}=13$~TeV analysis below.
 To be most conservative, we then fix $\nu_i^\mathcal{H}$ to either $\tilde{\nu}_{\mathrm{min},i}^\mathcal{H}$ or $\tilde{\nu}_{\mathrm{max},i}^\mathcal{H}$
 for the respective hypothesis such that their total cross sections are closest.
 This treatment results in a larger overlap between the two likelihood distributions, 
@@ -690,26 +690,47 @@ The grid of $ 80 \times 40 $ coupling choices is obtained from the fit described
 Let us now use current LHC data to obtain first direct constraints on vector and axial couplings. The production of $\ttbZ$ has been observed at the $\sqrt{s}=7$ TeV run at the LHC, 
 with CMS observing nine events~\cite{Chatrchyan:2013qca}, and ATLAS observing one event with more stringent selection criteria~\cite{ATLAS-CONF-2012-126}. 
 This enables ATLAS to place an upper bound on the $\ttbZ$ cross section, 
-while CMS is able to determine $\sigma_{\ttbZ} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$~pb. 
-Clearly, error bars from these very first measurements are large. 
-Nevertheless they are consistent with the NLO QCD predictions of $0.137\,$pb$\,\pm 11\%$ in Ref.~\cite{Garzelli:2011is} (CTEQ pdfs) 
+while CMS is able to determine $\sigma_{\ttbZ}^{\mathrm{CMS}} = 0.28^{+0.14}_{-0.11}~\mathrm{(stat.)}^{+0.06}_{-0.03}~ \mathrm{(sys.)}$~pb. 
+Clearly, error bars from this very first measurement are large, nevertheless it constitutes a 3.3 standard deviation from the background-only hypothesis.
+The measured total cross section is also consistent with the NLO QCD predictions of $0.137\,$pb$\,\pm 11\%$ by Ref.~\cite{Garzelli:2011is} (CTEQ pdfs) 
 or with $0.148\,$pb$\,\pm 11\%$ from our calculation (MSTW pdfs). 
-In spite of the low number of events and correspondingly high statistical error, it is instructive to use this overall cross section to place bounds on the $\ttbZ$ couplings. 
+In spite of the low number of events and correspondingly high statistical error, it is instructive to use this measured cross section to place bounds on the $\ttbZ$ couplings. 
 This constitutes the first direct constraints on these couplings.
-
-{\bf MARKUS: BEGIN change text below}\\
-We perform a log-likelihood analysis, as described in section \ref{sect:analysis}. Our null hypothesis is derived from the experimental cross-section $\sigma_{\mathrm{CMS}}=0.28$pb, from which we predict 24 events in the trilepton channel from $5~\invfb$ of data. Note that CMS only observes 9 events with this dataset, a value that is consistent with our acceptance of 30\% quoted in section \ref{sec:NLOres}. Because we assume more events than are observed, our bounds artificially improved through better statistics. Our alternative hypothesis is a point in $(\ConeV,\ConeA)$ parameter space, for which we calculate the cross-section and hence the expected number of events in the $5~\invfb$ dataset. This number, togeter with the 24 events expected given the cross-section measured by CMS, comprise our only inputs into the log-likelihood function of equation \eqref{lilifunct}. 
-
-Since our alternative hypothesis is a theoretical prediction, and hence subject to scale uncertainties, we include a uniform uncertainty function as described in equations \eqref{errorfunctG} and \eqref{uniuncert}, with $\Delta_\mathrm{theor.\,unc.}=\pm 30\%$ {\bf 40\%???} at LO and $\Delta_\mathrm{theor.\,unc.}=\pm 15\%$ at NLO QCD. On the other hand, the null hypothesis is an experimental measurement, and as such is free of scale uncertainties but has both systematic and statistical uncertainties. The latter are taken into account through the Poisson distribution in Eq.~(\ref{lili}). To include the systematic uncertainties, we introduce a Gaussian distributed probability. The function $\mathcal{G}(..|..)$ in Eq.~(\ref{errorfunctG}) becomes
+We perform a log-likelihood analysis, as described in Section \ref{sect:analysis}. 
+Our null hypothesis is derived from the experimental cross section $\sigma_{\ttbZ}^{\mathrm{CMS}}=0.28$~pb, from which we predict 24 events in the trilepton channel 
+from $5~\invfb$ of data if no acceptance cuts are applied. 
+We are adopting this number as our reference point against which we compare the alternative hypothesis.
+% Note that CMS only observes 9 events with this dataset, a value that is consistent with our acceptance of 30\% quoted in section \ref{sec:NLOres}. 
+% Because we assume more events than are observed, our bounds artificially improved through better statistics. 
+% Our alternative hypothesis is a point in $(\ConeV,\ConeA)$ parameter space, for which we calculate the cross-section and hence the expected number of 
+% events in the $5~\invfb$ dataset. 
+% This number, togeter with the 24 events expected given the cross-section measured by CMS, comprise our only inputs into the log-likelihood function of 
+% equation \eqref{lilifunct}. 
+As described before, it is obtained from our theoretical prediction for various points in $(\ConeV,\ConeA)$ parameter space.
+% and hence subject to scale uncertainties, we include a uniform uncertainty function as 
+% described in equations \eqref{errorfunctG} and \eqref{uniuncert}, with $\Delta_\mathrm{theor.\,unc.}=\pm 30\%$ {\bf 40\%???} at LO 
+% and $\Delta_\mathrm{theor.\,unc.}=\pm 15\%$ at NLO QCD. 
+% On the other hand, the null hypothesis is an experimental measurement, and as such is free of scale uncertainties but has both systematic and 
+% statistical uncertainties. 
+% The latter are taken into account through the Poisson distribution in Eq.~(\ref{lili}). 
+To account for uncertainties we include a uniform distribution spanned by the theoretical error band. 
+Since we find slightly larger LO uncertainties for the pdfs at 8~TeV, we choose 
+$\Delta_\mathrm{theor.\,unc.} = 40\%$ at LO and keep $\Delta_\mathrm{theor.\,unc.} = 15\%$ at NLO QCD.
+% described in Eq.~(\eqref{uniuncert}) for the theoretical prediction whereas
+% with $\Delta_\mathrm{theor.\,unc.}=\pm 30\%$ {\bf 40\%???} at LO 
+% and $\Delta_\mathrm{theor.\,unc.}=\pm 15\%$ at NLO QCD. 
+% the 
+For experimental systematics we need to introduce a Gaussian distributed probability. 
+Hence, the function $\mathcal{G}(..|..)$ in Eq.~(\ref{errorfunctG}) has to be modified and becomes
 \be
   \label{Gaussuncert}
   \mathcal{G} \left( \nu | \tilde{\nu},\tilde{\sigma} \right) = \frac{1}{\sqrt{2\pi\tilde{\sigma}^2}} \; e^{-(\nu-\tilde{\nu})^2 / (2\tilde{\sigma}^2)}, 
 \ee
 where $\tilde{\nu}$ is the mean value of the experimental measurement and $\tilde{\sigma}=\sigma_\mathrm{exp.\,syst.}$ is the systematic experimental uncertainty. 
 In this way the mean value $\nu$ in the likelihood function is normal distributed during the generation of pseudo experiments with 
-a standard deviation of $\sigma_\mathrm{exp.\,syst.}$. We adopt the experimental systematic error of $\sigma_\mathrm{exp.\,syst.}=\pm 20\%$ quoted in Ref.~\cite{Chatrchyan:2013qca}. This is all we need to evaluate the log-likelihood ratios for null and alternative hypothesis, and use this to build up a distribution of $\Lambda$, from which we derive  the probability of incorrectly rejecting the alternative hypothesis. This is again translated into a $\sigma$-bound, following equation \eqref{alphatosig}.
-
-
+a standard deviation of $\sigma_\mathrm{exp.\,syst.}$. 
+We adopt the experimental systematic error of $\sigma_\mathrm{exp.\,syst.}=\pm 20\%$ quoted in Ref.~\cite{Chatrchyan:2013qca}. 
+% This is all we need to evaluate the log-likelihood ratios for null and alternative hypothesis, and use this to build up a distribution of $\Lambda$, from which we derive  the probability of incorrectly rejecting the alternative hypothesis. This is again translated into a $\sigma$-bound, following equation \eqref{alphatosig}.
 %We perform a simple $\chi^2$-test 
 %\begin{equation}
 %    \chi^2 = \frac{f \sigma_{\mathrm{pred}} - \sigma_{\mathrm{CMS}}}{\Delta \sigma_{\mathrm{CMS}}},
@@ -735,32 +756,31 @@ a standard deviation of $\sigma_\mathrm{exp.\,syst.}$. We adopt the experimental
 %Since the latter uncertainties are comfortably within the variation of renormalization and factorization scales, we 
 %choose here and in the following analysis $\Delta N = 0.30$ at LO and $\Delta N = 0.15$ at NLO.
 %
-
 \begin{figure}[t]
 \centering % \begin{center}/\end{center} takes some additional vertical space
 \includegraphics[width=0.44\textwidth]{./CMS_LOLO_SU40_CMSerr20_sig.pdf}
 \hspace{2mm}
-\includegraphics[width=0.44\textwidth]{./CMS_NLO_SU15_CMSerr20_sig.pdf}
+\includegraphics[width=0.52\textwidth]{./CMS_NLO_SU15_CMSerr20_sig.pdf}
 \caption{\label{fig:CMSbounds}
 Significance as a function of relative deviations for vector and axial couplings wrt. the SM value. 
 The limits are obtained from the first measurement of the $\ttbZ$ cross section by CMS~\cite{Chatrchyan:2013qca}. 
 The left~(right) plot shows the limits obtained from LO~(NLO QCD) input.
 }
 \end{figure}
-
-
-
-The results of the log-likelihood ratio test are shown in figure~\ref{fig:CMSbounds}, for our LO (left) and NLO (right) calculations.
+% 
+The results of the log-likelihood ratio test are shown in Figure~\ref{fig:CMSbounds}, for our LO (left) and NLO (right) calculations.
+The color code shows the significance with which an alternative coupling hypothesis can be excluded wrt. to the experimental data.
 In the plane of relative deviations of vector and axial couplings, the point $(\DConeV,\DConeA)=(0.0,0.0)$ corresponds to the SM value.
-By comparing left and right plots we clearly notice the stronger constraints when NLO input is used. 
-The constraints from the data using a LO calculation are $ -13 \lesssim \DConeV \lesssim 12$ and $-4 \lesssim \DConeA \lesssim 2$ at 3-$\sigma$, while the NLO constraints are $-10 \lesssim \DConeV \lesssim 8$ and $-3.5 \lesssim \DConeA \lesssim  1.5$.
-
-Since this area corresponds to very small cross sections, next-to-leading order data favors the experimental observation of the $\ttbZ$ final state even more. ??
+Clearly, this point is fully consistent with the experimental measurement.
+By comparing left and right plots we notice the stronger constraints when NLO input is used. 
+The constraints from the data using a LO calculation are $ -11 \lesssim \DConeV \lesssim 10$ and $-4 \lesssim \DConeA \lesssim 2$ at the 95\% C.L.,
+while they improve at NLO to $-8 \lesssim \DConeV \lesssim 7$ and $-3 \lesssim \DConeA \lesssim  1$.
+% Since this area corresponds to very small cross sections, next-to-leading order data favors the experimental observation of the $\ttbZ$ final state even more. ??
 Of course, these limits are extremely loose, and furthermore should be interpreted with care since very few events have been observed by the experiments so far.
 Only a larger data set and detailed analysis of backgrounds and detector effects will provide more reliable constraints on the $\ttbZ$-couplings.
 We still believe that these results are interesting to consider, especially when being put in context with limits
 obtained from the future high-energy LHC which we study in the next section.
-
+\\
 %{\bf MARKUS: END}\\
 
 
@@ -796,6 +816,7 @@ obtained from the future high-energy LHC which we study in the next section.
 \caption{\label{fig:ix} Significance of deviations from the SM vector and axial couplings $\DConeV$ and $\DConeA$,  using 30, 300 and 3000 $\invfb$ of data at the $\sqrt{s}=13$ TeV LHC. 
 Results using the LO prediction and uncertainty are shown on the left, the corresponding NLO QCD results are shown on the right hand side.}
 \end{figure}
+
 
 We now present the main results of our analysis in Figs.~\ref{fig:ix} and~\ref{fig:x}
 for the future run of the LHC at $\sqrt{s}=13$~TeV. 
@@ -892,17 +913,7 @@ Diagonalizing the dependence in Eq.~(\ref{Cone_NP}), we find at next-to-leading 
   &\le
   4.1. 
 \ee
-
-\begin{figure}[t]
-\centering
-\includegraphics[scale=0.43]{OPLimitNLO.pdf} 
-\caption{\label{fig:x} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$
-obtained from the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution in $\ttbZ$ production at the 13~TeV LHC. 
-The parameter space outside the blue colored area can be excluded at the 95\% C.L.
-The thin brown colored bands are indirect constraints from electroweak precision data.
-}
-\end{figure}
-
+% 
 This result should be considered with care given the low number of events observed in experiments. 
 More reliable and stringent limits are only obtained once more data is accumulated.
 To estimate how limits will improve in such a case, we use the results presented in Fig.~\ref{fig:ix}
@@ -967,6 +978,16 @@ At next-to-leading order QCD the limits improve to
   1.5 & \quad\quad \mathrm{with }~3000\, \invfb  
   \end{array} \right. .
 \ee
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.43]{OPLimitNLO.pdf} 
+\caption{\label{fig:x} Projected constraints on the operators $C^{(33,3)}_{\phi q}$ and $C^{33}_{\phi u}$
+obtained from the $\Delta \phi_{\ell^+_z \ell^-_z}$ distribution in $\ttbZ$ production at the 13~TeV LHC. 
+The parameter space outside the blue colored area can be excluded at the 95\% C.L.
+The thin brown colored bands are indirect constraints from electroweak precision data.
+}
+\end{figure}
+% 
 Due to the weak correlation between vector and axial coupling limits observed in Fig.~\ref{fig:ix} and because of Eq.~(\ref{Cone_NP}),
 the limits on $C^{(3,33)}_{\phi q}$ and $C^{33}_{\phi u}$ are strongly correlated. 
 Hence, the results in Eqs.~(\ref{OPLimitsLO})-(\ref{OPLimitsNLO}) are very conservative.
@@ -982,7 +1003,8 @@ Hence it leaves $C^{33}_{\phi u}$ mostly unconstrained since this operator contr
 Altogether, electroweak precision observables put very strong constraints on the $\ttbZ$ coupling
 which, however, only arise through indirect sensitivity.
 Only the analysis of $pp \to \ttbZ$ at the LHC will allow placing {\it direct} limits for the first time.
-It would be an interesting continuation of this work to superimpose Fig.~\ref{fig:x} with constraints obtained from single $t Z+ \bar{t}Z$ production at the LHC.
+It would be an interesting continuation of this work to superimpose Fig.~\ref{fig:x} with constraints obtained from single $t Z+ \bar{t}Z$ 
+or single $t W$ production at the LHC.
 
 
 
