@@ -99,8 +99,8 @@ These developments represent a remarkably fast progress and demonstrate the pote
 One particularly promising class of SM processes is top quark pair production in association with gauge bosons or a Higgs boson.
 Due to their relatively high production threshold these processes were not accessible at the Tevatron. 
 In contrast, the high energy and large luminosity of the upcoming LHC runs will produce sufficiently many events to allow detailed studies of these processes.
-Progress in this direction has already been made with cross section measurements of $\ttb+\gamma$ production by ATLAS~\cite{ATLAS:2011nka} at 7~TeV  
-and CMS~\cite{CMS:2014wma} at 8~TeV. First events for the processes $\ttb+Z/W$  have also been reported in Refs.~\cite{ATLAS-CONF-2012-126,Chatrchyan:2013qca}.
+Progress in this direction has already been made with cross section measurements of $\ttb+\gamma$ production by ATLAS at 7~TeV~\cite{ATLAS:2011nka}  
+and CMS at 8~TeV~\cite{CMS:2014wma}. First events for the processes $\ttb+Z/W$  have also been reported in Refs.~\cite{ATLAS-CONF-2012-126,Chatrchyan:2013qca}.
 It is exciting to envision future studies of these processes with direct measurements of the couplings and new sensitivity to physics beyond the Standard Model. 
 
 In this paper we focus on the determination of the top quark to $Z$~boson couplings through $\ttbZ$ production at the LHC. 
@@ -145,12 +145,12 @@ It is interesting to note that the $\ttbZ$ couplings may also be directly probed
 Indeed, the inclusive cross section of $tZ$ plus its charge conjugate process $\bar{t}Z$ is comparable to the inclusive $\ttbZ$ cross section~\cite{Campbell:2013yla}. 
 It turns out that this process is also the leading background to a $\ttbZ$ signal, while other backgrounds such as $pp\to WZ b \bar{b} jj$ are almost negligible~\cite{Baur:2004uw}.
 However, it is possible to separate $\ttbZ$ and $tZ$ production by cutting on forward jets and demanding a high jet multiplicity, including two $b$-tagged jets~\cite{Campbell:2013yla}. 
-We will therefore consider only the $\ttbZ$ process in this paper, and defer the study of the couplings using $tZ$ (or a combination of both processes) to a later date. 
+We will therefore consider only the process $pp \to \ttbZ$ in this paper, and defer the study of the couplings using $tZ$ (or a combination of both processes) to a later date. 
 
 
 
 Finally, let us note that a coupling analysis is not the only scenario in which the process $pp\to\ttbZ$ is interesting. 
-The semi-hadronic decay mode of the top quark pairs together with the leptonic $Z$ decay is background to several tri-lepton and same-sign lepton searches with additional jets and missing energy.
+The semi-hadronic decay mode of the top quark pairs together with the leptonic $Z$ boson decay is background to several tri-lepton and same-sign lepton searches with additional jets and missing energy.
 Such signatures can arise from gluino decays in Supersymmetry, in the context of Universal Extra Dimensions, as well as in models with fermionic top quark partners. 
 Furthermore, the invisible decay $Z \to \nu \bar{\nu}$ produces a top pair plus a large amount of missing transverse energy, and is therefore an irreducible background 
 to searches for scalar or fermionic top quark partners decaying into top quarks plus dark matter candidates.
@@ -499,7 +499,7 @@ In this figure and the following, the relative shifts in the couplings are given
 
 
 In our analysis we focus on the tri-leptonic final state and employ the azimuthal angle between the leptons originating
-from the $Z$ decay to perform our analysis.
+from the $Z$ boson decay to perform our analysis.
 This angle has been identified as being particularly sensitive to the $\ttbZ$ couplings in Ref.~\cite{Baur:2004uw}.
 We have already discussed the strong reduction in scale uncertainty when going from LO to NLO QCD for this observable.
 Here, in Fig.~\ref{fig:vi} (left), we show the effect of NLO QCD corrections on the shape of the normalized $\Delta \phi_{\ell\ell}$ distribution.
@@ -507,7 +507,7 @@ Higher order effects tend to shift events from larger to smaller opening angles.
 In Fig.~\ref{fig:vi} (right) we show that similar shape changes can arise due to variations of the vector and axial $\ttbZ$ couplings.
 This emphasizes the importance of precise predictions, since missing higher order effects might be misinterpreted as deviations from the SM.
 To illustrate that the $\Delta \phi_{\ell\ell}$ shape is a useful discriminator for our coupling analysis, we have chosen 
-a value $(\DConeV,\DConeA)$ in Fig.~\ref{fig:vi} (right) such that the total cross sections approximately coincide with the SM $\ttbZ$ cross section.
+a value $(\DConeV,\DConeA)$ in Fig.~\ref{fig:vi} (right) such that the total cross section approximately coincides with the SM $\ttbZ$ cross section.
 Hence, a measurement of the rate alone would not reveal the deviations from its Standard Model value.
  
 
@@ -613,20 +613,21 @@ Nevertheless, one still expects the test to be approximately optimal as long as 
 We include the theoretical uncertainties by modifying the likelihood function in Eq.~(\ref{lili}) according to
 \be
   \label{errorfunctG}
-  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{theor.\,unc.}) \right),
+  \mathcal{L}(\mathcal{H}|\vec{n}) \to \mathcal{L}(\mathcal{H}|\vec{n})  \,\times\, \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{theor.\,unc.}) \right).
 \ee
-where we choose $\mathcal{G}$ to be a constant normalized function with support $\tilde{\nu}_{\mathrm{min/max},i}^\mathcal{H} = \tilde{\nu}_i^\mathcal{H}(1 \pm \Delta_\mathrm{theor.\,unc.}$),
+We choose $\mathcal{G}$ to be a constant normalized function with support $\tilde{\nu}_{\mathrm{min/max},i}^\mathcal{H} = \tilde{\nu}_i^\mathcal{H}(1 \pm \Delta_\mathrm{theor.\,unc.}$),
 \be
 \label{uniuncert}
   \mathcal{G} \left( \nu_i^\mathcal{H} | \tilde{\nu}_i^\mathcal{H}(\Delta_\mathrm{theor.\,unc.}) \right) = 
   \big( \theta\left( {\nu}_i^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \right) 
       \times  \theta\left( \nu_{\mathrm{max},i}^\mathcal{H} - {\nu}_i^\mathcal{H} \right)  \big) 
-  \big/ \big( \nu_{\mathrm{max},i}^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \big).
+  \big/ \big( \nu_{\mathrm{max},i}^\mathcal{H} - \nu_{\mathrm{min},i}^\mathcal{H}  \big),
 \ee
+where $\theta(x)$ is the unit step function.
 The value of $\tilde{\nu}_i^\mathcal{H}$ is determined by the assumed luminosity times the cross section in the $i$th bin 
 for the central scale choice $\mu_0$.
-To be most conservative, we then choose the cross-section within the uncertainty band for each hypothesis such that their difference is minimized. 
-The value is each bin is then rescaled accordingly.
+To be most conservative, we choose the cross section within the uncertainty band for each hypothesis such that their difference is minimized. 
+The value in each bin is then rescaled accordingly.
 This treatment results in a larger overlap between the two likelihood distributions, 
 and consequently a larger $\alpha$ value and less discriminatory power between the two hypotheses. 
 This feature is clearly visible in Fig.~\ref{fig:vii}, when comparing the solid with the dotted curves. 
@@ -683,11 +684,11 @@ The measured total cross section is also consistent with the NLO QCD predictions
 or with $0.148\,$pb$\,\pm 11\%$ from our calculation (MSTW pdfs). 
 In spite of the low number of events and correspondingly high statistical error, it is instructive to use this measured cross section to place bounds on the $\ttbZ$ couplings. 
 This constitutes the first {\it direct} constraints on these couplings.
-We perform a log-likelihood analysis, as described in Section \ref{sect:analysis}. 
+We perform a log-likelihood ratio analysis, as described in Section \ref{sect:analysis}. 
 Our null hypothesis is derived from the experimental cross section $\sigma_{\ttbZ}^{\mathrm{CMS}}=0.28$~pb, from which we predict 24 events in the tri-lepton channel 
 from $5~\invfb$ of data if no acceptance cuts are applied. 
 We are adopting this number as our reference point against which we compare the alternative hypothesis, 
-which is a given point in $(\ConeV,\ConeA)$ parameter space, and for which we obtain a predicted number of events in a $5~\invfb$ dataset.
+which is a given point in $(\ConeV,\ConeA)$ parameter space, and for which we calculate a predicted number of events in a $5~\invfb$ dataset.
 To account for uncertainties in the theoretical prediction we include a uniform distribution spanned by the theoretical error band, 
 for which we choose $\Delta_\mathrm{theor.\,unc.} = 40\%$ at LO and $\Delta_\mathrm{theor.\,unc.} = 15\%$ at NLO QCD.
 For experimental systematics we need to introduce a Gaussian distributed probability. 
@@ -698,7 +699,7 @@ Hence, the function $\mathcal{G}(..|..)$ in Eq.~(\ref{errorfunctG}) has to be mo
 \ee
 where $\tilde{\nu}$ is the mean value of the experimental measurement and $\tilde{\sigma}=\sigma_\mathrm{exp.\,syst.}$ is the systematic experimental uncertainty. 
 In this way the mean value $\nu$ in the likelihood function is normal distributed during the generation of pseudo experiments with 
-a standard deviation of $\sigma_\mathrm{exp.\,syst.}$. 
+a standard deviation  $\sigma_\mathrm{exp.\,syst.}$. 
 We adopt the experimental systematic error of $\sigma_\mathrm{exp.\,syst.}=\pm 20\%$ quoted in Ref.~\cite{Chatrchyan:2013qca}. 
 Again, we use Eq.~(\ref{couplfit}) to generate a large grid corresponding to $\ConeV \in [-3.42:3.42]$ and $\ConeA \in [-3.61:3.61]$. 
 Recall from Section~\ref{sect:ttzcoupl} that the SM couplings are $\ConeVSM \simeq 0.244$ and $\ConeASM \simeq -0.601$.
