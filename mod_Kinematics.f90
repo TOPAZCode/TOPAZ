@@ -232,17 +232,19 @@ ELSEIF( ObsSet.EQ.22 ) THEN! set of observables for ttbgamma production with di-
     pT_miss_cut = 40d0*GeV
 
 ELSEIF( ObsSet.EQ.23 ) THEN! set of observables for ttbgamma production with di-lept.decays at LHC
-    Rsep_jet    = 0.4d0
-    pT_pho_cut  = 20d0*GeV
-    Rsep_Pj     = 0.4d0
-    Rsep_Pbj    = 0.4d0
-    Rsep_Plep   = 0.4d0
+    pT_pho_cut  = 15d0*GeV
+    eta_pho_cut = 3.0d0
+    Rsep_Pj     = 0.3d0
+    Rsep_Pbj    = 0.3d0
+    Rsep_Plep   = 0.3d0
 
-    pT_bjet_cut = 25d0*GeV
-    eta_bjet_cut= 2.5d0
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
-    pT_miss_cut = 40d0*GeV
+    pT_bjet_cut = 20d0*GeV
+    eta_bjet_cut= 5.0d0
+    Rsep_jet    = 0.5d0
+
+    pT_lep_cut  = 0d0*GeV
+    eta_lep_cut = 10d0
+    pT_miss_cut = 0d0*GeV
 
 ELSEIF( ObsSet.EQ.24 ) THEN! set of observables for ttbgamma production with semi-lept.decays(hadr.Atop, lept.top decay) at Tevatron
 
@@ -269,31 +271,26 @@ ELSEIF( ObsSet.EQ.24 ) THEN! set of observables for ttbgamma production with sem
 ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production with semi-lept.decays(hadr.Atop, lept.top decay) at LHC
 
 !   these are the cuts for muons
-    pT_lep_cut  = 20d0*GeV
-    eta_lep_cut = 2.5d0
+    pT_lep_cut  = 0d0*GeV
+    eta_lep_cut = 10d0
 
-    pT_bjet_cut = 25d0*GeV
-    pT_jet_cut  = 25d0*GeV
-    eta_bjet_cut= 2.5d0
-    eta_jet_cut = 2.5d0
+    pT_bjet_cut = 20d0*GeV
+    pT_jet_cut  = 20d0*GeV
+    eta_bjet_cut= 5.0d0
+    eta_jet_cut = 5.0d0
 
-    pT_pho_cut  = 15d0*GeV
-    eta_pho_cut = 2.37d0
-!   cracks for photon are hard coded below
-
-    pT_miss_cut = 25d0*GeV
-!   Mwt cut is hard coded below
+    pT_miss_cut = 0d0*GeV
+!   Mwt cut is hard coded below: removed
 
     pT_pho_cut  = 15d0*GeV
-    eta_pho_cut = 2.37d0
-!   cracks for photon are hard coded below
+    eta_pho_cut = 3.0d0
+!   cracks for photon are hard coded below: removed
 
-    Rsep_LepJet = 0.4d0
-    Rsep_jet    = 0.4d0
-    Rsep_Pj     = 0.5d0
-    Rsep_Pbj    = 0.5d0
-    Rsep_Plep   = 0.4d0!  not specified
-
+    Rsep_LepJet = 0.0d0
+    Rsep_jet    = 0.5d0
+    Rsep_Pj     = 0.3d0
+    Rsep_Pbj    = 0.3d0
+    Rsep_Plep   = 0.3d0
 
 
 
@@ -2429,9 +2426,9 @@ ELSEIF( ObsSet.EQ.23 ) THEN! set of observables for ttbgamma production di-lept.
           Histo(6)%SetScale= 1d0
 
           Histo(7)%Info   = "pT_Photon"
-          Histo(7)%NBins  = 40
-          Histo(7)%BinSize= 20d0*GeV
-          Histo(7)%LowVal = 0d0
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 5d0*GeV
           Histo(7)%SetScale= 100d0
 
           Histo(8)%Info   = "eta_Photon"
@@ -2636,9 +2633,9 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
           Histo(6)%SetScale= 1d0
 
           Histo(7)%Info   = "pT_Photon"
-          Histo(7)%NBins  = 40
-          Histo(7)%BinSize= 25d0*GeV
-          Histo(7)%LowVal = 0d0*GeV
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 5d0*GeV
           Histo(7)%SetScale= 100d0
 
           Histo(8)%Info   = "eta_Photon"
@@ -6417,7 +6414,12 @@ elseif( ObsSet.eq.22 .or. ObsSet.eq.23 ) then! set of observables for ttb+gamma 
         RETURN
     endif
 
+    if(abs(eta_Pho).gt.eta_pho_cut) then
+        applyPSCut = .true.
+        RETURN
+    endif
 
+    
     ET_miss = get_ET(Mom(1:4,nubar)+Mom(1:4,nu))
     HT = HT + ET_miss
 !     if( NJet.eq.3 .and. (pT_jet(3).lt.pT_jet_cut .or. abs(eta_jet(3)).gt.eta_jet_cut) ) then
@@ -6464,7 +6466,8 @@ elseif( ObsSet.eq.22 .or. ObsSet.eq.23 ) then! set of observables for ttb+gamma 
     NBin(2) = WhichBin(2,pT_Top)
     NBin(3) = WhichBin(3,eta_ATop)
     NBin(4) = WhichBin(4,eta_Top)
-    NBin(5) = WhichBin(5,eta_ATop)
+!     NBin(5) = WhichBin(5,eta_ATop)! Tevatron
+    NBin(5) = WhichBin(5,dabs(eta_Top)-dabs(eta_ATop)  )! LHC
     NBin(6) = WhichBin(6,eta_Top)
     NBin(7) = WhichBin(7,pT_Pho)
     NBin(8) = WhichBin(8,eta_Pho)
@@ -6566,10 +6569,10 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
         RETURN
     endif
 
-    if(abs(eta_Pho).gt.1.37d0 .and. abs(eta_Pho).lt.1.52d0 ) then! this is the crack in the detector
-        applyPSCut = .true.
-        RETURN
-    endif
+!     if(abs(eta_Pho).gt.1.37d0 .and. abs(eta_Pho).lt.1.52d0 ) then! this is the crack in the detector
+!         applyPSCut = .true.
+!         RETURN
+!     endif
 
     if( pT_lepP.lt.pT_lep_cut ) then
         applyPSCut = .true.
@@ -6588,7 +6591,8 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
 
     mT_lp = get_MT(Mom(1:4,L),MomMiss(1:4))! this is the transverse W mass
 
-    if( ET_miss.lt.pT_miss_cut .or. ET_miss+mT_lp.lt.60*GeV  ) then
+!     if( ET_miss.lt.pT_miss_cut .or. ET_miss+mT_lp.lt.60*GeV  ) then
+    if( ET_miss.lt.pT_miss_cut ) then
         applyPSCut = .true.
         RETURN
     endif
@@ -6612,7 +6616,8 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
     NBin(2) = WhichBin(2,eta_ATop)
     NBin(3) = WhichBin(3,pT_Top)
     NBin(4) = WhichBin(4,eta_Top)
-    NBin(5) = WhichBin(5,eta_ATop)
+!     NBin(5) = WhichBin(5,eta_ATop)! Tevatron
+    NBin(5) = WhichBin(5,dabs(eta_Top)-dabs(eta_ATop)  )! LHC
     NBin(6) = WhichBin(6,eta_Top)
     NBin(7) = WhichBin(7,pT_Pho)
     NBin(8) = WhichBin(8,eta_Pho)
@@ -7411,7 +7416,7 @@ elseif( ObsSet.eq.2 .or. ObsSet.eq.3) then! set of observables for ttb productio
     pA(2:4)      = (/0d0,MomLept(2,1),MomLept(3,1) /)*100d0
     pB(2:4)      = (/0d0,MomLept(2,3),MomLept(3,3) /)*100d0
     pTInvis(2:4) = (/0d0,MomLept(2,2)+MomLept(2,4),MomLept(3,2)+MomLept(3,4)/) *100d0
-    call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
+!     call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
     mT2=mT2/100d0
 
 
@@ -8636,7 +8641,7 @@ elseif( ObsSet.eq.32 .or. ObsSet.eq.34 .or. ObsSet.eq.42 .or. ObsSet.eq.44 )  th
     pB(2:4) = (/mB,Mom(2,LepM),Mom(3,LepM) /)*100d0
 !     pTInvis(2:4) = (/0d0,Mom(2,nu)+Mom(2,nubar),Mom(3,nu)+Mom(3,nubar)/) *100d0! this one has a sharpe edge at mW
     pTInvis(2:4) = (/0d0,Mom(2,nu)+Mom(2,nubar)+Mom(2,X0)+Mom(2,X0bar),Mom(3,nu)+Mom(3,nubar)+Mom(3,X0)+Mom(3,X0bar)/) *100d0
-    call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
+!     call calcMT2xx( pA, pB, pTInvis ,mT2 )!  this is the call to the slim MT2 subroutine
     mT2=mT2/100d0
 
 

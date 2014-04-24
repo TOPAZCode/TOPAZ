@@ -1836,9 +1836,9 @@ END SUBROUTINE
           call spi2(Dv,Ds,v,sp,spi2_)
 
 !  tmp = VSpiL(v,sp)
-!  print *, "dif",tmp-spi2_
-!  if(Ds.eq.16 .and. any(abs(tmp-spi2_).gt.1d-8) ) pause
-
+!  print *, "diff1",tmp-spi2_
+! pause
+ 
         return
         end function
 
@@ -1855,14 +1855,9 @@ END SUBROUTINE
           if (Ds == 16) Dv = 8
           call spb2(Dv,Ds,sp,v,spb2_)
 
-!  if(Ds.eq.16)then
-!  tmp = 0d0
 !  tmp = SpiVL(sp(1:Ds),v(1:Dv))
-! print *, "--------"
-!  print *, "dif",tmp-spb2_
-!  if(Ds.eq.16 .and. any(abs(tmp-spb2_).gt.1d-8) ) pause
-! endif
-
+!  print *, "diff2",tmp-spb2_
+!  pause
         return
         end function
 

@@ -402,7 +402,7 @@ IF( TTBZ_DebugSwitch.EQ.0 .OR. TTBZ_DebugSwitch.EQ.2 ) THEN
          couplZQQ_left_dyn =-couplZUU_right
          couplZQQ_right_dyn=-couplZUU_left
       elseif (ZQcoupl .eq. 3) then!         print *, 'vector loops'
-         couplZQQ_left_dyn=-one 
+         couplZQQ_left_dyn =-one 
          couplZQQ_right_dyn=-one
       endif
       
