@@ -294,27 +294,6 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production with sem
 
 
 
-!   below is a copy of the ObsSet=28 case
-!     pT_pho_cut  = 20d0*GeV
-!     eta_pho_cut = 2.5d0
-!     Rsep_Plep   = 0.4d0
-!     Rsep_Pj     = 0.4d0
-!     Rsep_Pbj    = 0.4d0
-! 
-!     Rsep_jet    = 0.4d0
-!     pT_bjet_cut = 20d0*GeV
-!     pT_jet_cut  = 20d0*GeV
-!     eta_bjet_cut= 2d0
-!     eta_jet_cut = 2.5d0
-! 
-!     pT_lep_cut  = 20d0*GeV
-!     eta_lep_cut = 2.5d0
-! 
-!     pT_miss_cut = 20d0*GeV
-!     HT_cut      = 200d0*GeV
-
-
-
 ELSEIF( ObsSet.EQ.26 ) THEN! set of observables for ttbgamma production with semi-lept.decays(hadr.Atop, lept.top decay) at Tevatron with Qtop cuts
 
     pT_pho_cut  = 20d0*GeV
@@ -2440,7 +2419,7 @@ ELSEIF( ObsSet.EQ.23 ) THEN! set of observables for ttbgamma production di-lept.
           Histo(9)%Info   = "pT_LepP"
           Histo(9)%NBins  = 40
           Histo(9)%BinSize= 20d0*GeV
-          Histo(9)%LowVal = 20d0*GeV
+          Histo(9)%LowVal =  0d0*GeV
           Histo(9)%SetScale= 100d0
 
           Histo(10)%Info   = "eta_LepP"
@@ -2452,13 +2431,13 @@ ELSEIF( ObsSet.EQ.23 ) THEN! set of observables for ttbgamma production di-lept.
           Histo(11)%Info   = "ET_miss"
           Histo(11)%NBins  = 40
           Histo(11)%BinSize= 20d0*GeV
-          Histo(11)%LowVal = 20d0*GeV
+          Histo(11)%LowVal = 0d0*GeV
           Histo(11)%SetScale= 100d0
 
           Histo(12)%Info   = "HT(jets+lept+pho+miss)"
           Histo(12)%NBins  = 40
           Histo(12)%BinSize= 20d0*GeV
-          Histo(12)%LowVal = 150d0*GeV
+          Histo(12)%LowVal = 100d0*GeV
           Histo(12)%SetScale= 100d0
 
           Histo(13)%Info   = "m(LepP+bjet)"
@@ -2598,25 +2577,25 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
 
           Histo(1)%Info   = "pT_ATop"
           Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%BinSize= 25d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 100d0
 
-          Histo(2)%Info   = "eta_ATop"
+          Histo(2)%Info   = "pT_Top"
           Histo(2)%NBins  = 40
-          Histo(2)%BinSize= 0.25d0
-          Histo(2)%LowVal =-5.0d0
-          Histo(2)%SetScale= 1d0
-
-          Histo(3)%Info   = "pT_Top"
-          Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 50d0*GeV
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 100d0
+          Histo(2)%BinSize= 25d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 100d0
+                    
+          Histo(3)%Info   = "eta_ATop"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.2d0
+          Histo(3)%LowVal =-5.0d0
+          Histo(3)%SetScale= 1d0
 
           Histo(4)%Info   = "eta_Top"
-          Histo(4)%NBins  = 40
-          Histo(4)%BinSize= 0.25d0
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.2d0
           Histo(4)%LowVal =-5.0d0
           Histo(4)%SetScale= 1d0
 
@@ -2639,14 +2618,14 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
           Histo(7)%SetScale= 100d0
 
           Histo(8)%Info   = "eta_Photon"
-          Histo(8)%NBins  = 40
-          Histo(8)%BinSize= 0.25d0
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 0.2d0
           Histo(8)%LowVal =-5.0d0
           Histo(8)%SetScale= 1d0
 
           Histo(9)%Info   = "pT_LepP"
           Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 25d0*GeV
+          Histo(9)%BinSize= 20d0*GeV
           Histo(9)%LowVal =  0d0*GeV
           Histo(9)%SetScale= 100d0
 
@@ -2658,14 +2637,14 @@ ELSEIF( ObsSet.EQ.25 ) THEN! set of observables for ttbgamma production semi-lep
 
           Histo(11)%Info   = "pT_miss"
           Histo(11)%NBins  = 40
-          Histo(11)%BinSize= 25d0*GeV
+          Histo(11)%BinSize= 20d0*GeV
           Histo(11)%LowVal =  0d0*GeV
           Histo(11)%SetScale= 100d0
 
           Histo(12)%Info   = "HT(jets+lept+pho)"
           Histo(12)%NBins  = 40
-          Histo(12)%BinSize= 50d0*GeV
-          Histo(12)%LowVal = 150d0*GeV
+          Histo(12)%BinSize= 20d0*GeV
+          Histo(12)%LowVal = 100d0*GeV
           Histo(12)%SetScale= 100d0
 
           Histo(13)%Info   = "R(pho,bjet)"
@@ -6613,8 +6592,8 @@ elseif( ObsSet.eq.24 .or. ObsSet.eq.25 ) then! set of observables for ttb+gamma 
 
 ! binning
     NBin(1) = WhichBin(1,pT_ATop)
-    NBin(2) = WhichBin(2,eta_ATop)
-    NBin(3) = WhichBin(3,pT_Top)
+    NBin(2) = WhichBin(2,pT_Top)
+    NBin(3) = WhichBin(3,eta_ATop)
     NBin(4) = WhichBin(4,eta_Top)
 !     NBin(5) = WhichBin(5,eta_ATop)! Tevatron
     NBin(5) = WhichBin(5,dabs(eta_Top)-dabs(eta_ATop)  )! LHC
